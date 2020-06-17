@@ -476,6 +476,18 @@
     <string name="dnd_mode_alarms">Alarms</string>
     <string name="dnd_mode_priority">Priority</string>
     <string name="dnd_mode_none">Nothing</string>
+
+    <string name="samsung_camera_video_mode">Video</string>
+    <string name="samsung_camera_pro_mode">Pro</string>
+    <string name="samsung_live_broadcast_mode">Live Broadcast</string>
+    <string name="samsung_virtual_shot_mode">Virtual Shot</string>
+    <string name="samsung_video_collage_mode">Video Collage</string>
+    <string name="samsung_slow_motion_mode">Slow Motion</string>
+    <string name="samsung_selective_focus_mode">Selective Focus</string>
+    <string name="samsung_panorama_mode">Panorama</string>
+    <string name="samsung_fast_motion_mode">Fast Motion</string>
+    <string name="samsung_auto_mode">Auto</string>
+    <string name="samsung_camera_mode">Camera</string>
     <!-- system action options -->
 
     <!-- Tiles -->
@@ -682,6 +694,9 @@
     <string name="action_toggle_airplane_mode">Toggle Airplane Mode</string>
     <string name="action_enable_airplane_mode">Enable Airplane Mode</string>
     <string name="action_disable_airplane_mode">Disable Airplane Mode</string>
+
+    <string name="action_samsung_camera_mode">Open Samsung Camera in a Particular Mode</string>
+    <string name="action_samsung_camera_mode_formatted">Open Samsung Camera in %s Mode</string>
     <!-- System action labels -->
 
     <!-- System action category labels -->

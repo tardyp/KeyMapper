@@ -58,6 +58,7 @@ import io.github.sds100.keymapper.util.SystemAction.OPEN_CAMERA
 import io.github.sds100.keymapper.util.SystemAction.OPEN_DEVICE_ASSISTANT
 import io.github.sds100.keymapper.util.SystemAction.OPEN_MENU
 import io.github.sds100.keymapper.util.SystemAction.OPEN_RECENTS
+import io.github.sds100.keymapper.util.SystemAction.OPEN_SAMSUNG_CAMERA_MODE
 import io.github.sds100.keymapper.util.SystemAction.OPEN_SETTINGS
 import io.github.sds100.keymapper.util.SystemAction.OPEN_VOICE_ASSISTANT
 import io.github.sds100.keymapper.util.SystemAction.PAUSE_MEDIA
@@ -712,6 +713,15 @@ object SystemActionUtils {
             descriptionRes = R.string.action_show_power_menu,
             iconRes = R.drawable.ic_outline_power_settings_new_24,
             minApi = Build.VERSION_CODES.LOLLIPOP
+        ),
+        SystemActionDef(
+            id = OPEN_SAMSUNG_CAMERA_MODE,
+            category = CATEGORY_OTHER,
+            descriptionRes = R.string.action_samsung_camera_mode,
+            descriptionFormattedRes = R.string.action_samsung_camera_mode_formatted,
+            iconRes = R.drawable.ic_baseline_camera_enhance_24,
+            options = Option.SAMSUNG_CAMERA_MODES,
+            features = arrayOf(PackageManager.FEATURE_CAMERA)
         )
     )
 
@@ -743,6 +753,17 @@ object SystemActionUtils {
 
         if (Build.VERSION.SDK_INT > maxApi) {
             return SdkVersionTooHigh(maxApi)
+        }
+
+        if (id == OPEN_SAMSUNG_CAMERA_MODE) {
+            try {
+                ctx.packageManager.getApplicationInfo(
+                    Constants.SAMSUNG_CAMERA_PACKAGE_NAME,
+                    PackageManager.GET_META_DATA
+                )
+            } catch (e: PackageManager.NameNotFoundException) {
+                return AppNotFound(Constants.SAMSUNG_CAMERA_PACKAGE_NAME)
+            }
         }
 
         val options = getOptions()

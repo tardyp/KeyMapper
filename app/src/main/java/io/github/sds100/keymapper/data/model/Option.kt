@@ -5,6 +5,7 @@ import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
 import android.media.AudioManager
 import android.os.Build
+import androidx.annotation.StringDef
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.KeyboardUtils
 import io.github.sds100.keymapper.util.SystemAction
@@ -16,6 +17,20 @@ import io.github.sds100.keymapper.util.str
 /**
  * Created by sds100 on 14/04/2019.
  */
+
+@StringDef(value = [
+    Option.SAMSUNG_CAMERA_MODE,
+    Option.SAMSUNG_VIDEO_MODE,
+    Option.SAMSUNG_PRO_MODE,
+    Option.SAMSUNG_LIVE_BROADCAST,
+    Option.SAMSUNG_VIRTUAL_SHOT,
+    Option.SAMSUNG_VIDEO_COLLAGE,
+    Option.SAMSUNG_SLOW_MOTION,
+    Option.SAMSUNG_SELECTIVE_FOCUS,
+    Option.SAMSUNG_PANORAMA,
+    Option.SAMSUNG_FAST_MOTION,
+    Option.SAMSUNG_AUTO])
+annotation class SamsungCameraMode
 
 object Option {
     //DONT CHANGE THESE IDS!
@@ -39,6 +54,18 @@ object Option {
     const val DND_ALARMS = "do_not_disturb_alarms"
     const val DND_PRIORITY = "do_not_disturb_priority"
     const val DND_NONE = "do_not_disturb_none"
+
+    const val SAMSUNG_PRO_MODE = "samsung_pro_mode"
+    const val SAMSUNG_VIDEO_MODE = "samsung_video_mode"
+    const val SAMSUNG_LIVE_BROADCAST = "samsung_live_broadcast_mode"
+    const val SAMSUNG_VIRTUAL_SHOT = "samsung_virtual_shot_mode"
+    const val SAMSUNG_VIDEO_COLLAGE = "samsung_video_collage_mode"
+    const val SAMSUNG_SLOW_MOTION = "samsung_slow_motion_mode"
+    const val SAMSUNG_SELECTIVE_FOCUS = "samsung_selective_focus_mode"
+    const val SAMSUNG_PANORAMA = "samsung_panorama_mode"
+    const val SAMSUNG_FAST_MOTION = "samsung_fast_motion_mode"
+    const val SAMSUNG_AUTO = "samsung_auto_mode"
+    const val SAMSUNG_CAMERA_MODE = "samsung_camera_mode"
 
     val STREAMS = sequence {
         yieldAll(listOf(STREAM_ALARM,
@@ -64,6 +91,20 @@ object Option {
         DND_ALARMS,
         DND_PRIORITY,
         DND_NONE
+    )
+
+    val SAMSUNG_CAMERA_MODES = listOf(
+        SAMSUNG_CAMERA_MODE,
+        SAMSUNG_VIDEO_MODE,
+        SAMSUNG_PRO_MODE,
+        SAMSUNG_LIVE_BROADCAST,
+        SAMSUNG_VIRTUAL_SHOT,
+        SAMSUNG_VIDEO_COLLAGE,
+        SAMSUNG_SLOW_MOTION,
+        SAMSUNG_SELECTIVE_FOCUS,
+        SAMSUNG_PANORAMA,
+        SAMSUNG_FAST_MOTION,
+        SAMSUNG_AUTO
     )
 
     val OPTION_ID_SDK_ID_MAP = sequence {
@@ -117,6 +158,8 @@ object Option {
             SystemAction.ENABLE_DND_MODE,
             SystemAction.DISABLE_DND_MODE -> Action.EXTRA_DND_MODE
 
+            SystemAction.OPEN_SAMSUNG_CAMERA_MODE -> Action.EXTRA_SAMSUNG_CAMERA_MODE
+
             else -> throw Exception("Can't find an extra id for that system action $systemActionId")
         }
     }
@@ -149,6 +192,18 @@ object Option {
             DND_ALARMS -> ctx.str(R.string.dnd_mode_alarms)
             DND_PRIORITY -> ctx.str(R.string.dnd_mode_priority)
             DND_NONE -> ctx.str(R.string.dnd_mode_none)
+
+            SAMSUNG_PRO_MODE -> ctx.str(R.string.samsung_camera_pro_mode)
+            SAMSUNG_VIDEO_MODE -> ctx.str(R.string.samsung_camera_video_mode)
+            SAMSUNG_LIVE_BROADCAST -> ctx.str(R.string.samsung_live_broadcast_mode)
+            SAMSUNG_VIRTUAL_SHOT -> ctx.str(R.string.samsung_virtual_shot_mode)
+            SAMSUNG_VIDEO_COLLAGE -> ctx.str(R.string.samsung_video_collage_mode)
+            SAMSUNG_SLOW_MOTION -> ctx.str(R.string.samsung_slow_motion_mode)
+            SAMSUNG_SELECTIVE_FOCUS -> ctx.str(R.string.samsung_selective_focus_mode)
+            SAMSUNG_PANORAMA -> ctx.str(R.string.samsung_panorama_mode)
+            SAMSUNG_FAST_MOTION -> ctx.str(R.string.samsung_fast_motion_mode)
+            SAMSUNG_AUTO -> ctx.str(R.string.samsung_auto_mode)
+            SAMSUNG_CAMERA_MODE -> ctx.str(R.string.samsung_camera_mode)
 
             else -> return OptionLabelNotFound(optionId)
         }

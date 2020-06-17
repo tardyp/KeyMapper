@@ -12,4 +12,6 @@ object Constants {
     const val PERMISSION_ROOT = "$PACKAGE_NAME.ROOT"
     const val VERSION = BuildConfig.VERSION_NAME
     const val VERSION_CODE = BuildConfig.VERSION_CODE
+
+    const val SAMSUNG_CAMERA_PACKAGE_NAME = "com.sec.android.app.camera"
 }

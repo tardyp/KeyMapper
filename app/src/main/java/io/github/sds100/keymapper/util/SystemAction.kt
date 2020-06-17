@@ -126,6 +126,7 @@ object SystemAction {
     const val CONSUME_KEY_EVENT = "consume_key_event"
     const val OPEN_SETTINGS = "open_settings"
     const val SHOW_POWER_MENU = "show_power_menu"
+    const val OPEN_SAMSUNG_CAMERA_MODE = "open_samsung_camera_mode"
 
     /**
      * REQUIRES ROOT

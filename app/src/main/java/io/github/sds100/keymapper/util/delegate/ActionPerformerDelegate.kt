@@ -291,6 +291,11 @@ class ActionPerformerDelegate(context: Context,
                 SystemAction.ENABLE_AIRPLANE_MODE -> AirplaneModeUtils.enableAirplaneMode()
                 SystemAction.DISABLE_AIRPLANE_MODE -> AirplaneModeUtils.disableAirplaneMode()
 
+                SystemAction.OPEN_SAMSUNG_CAMERA_MODE ->
+                    action.getExtraData(Action.EXTRA_SAMSUNG_CAMERA_MODE).onSuccess {
+                        CameraUtils.openSamsungCameraMode(this, it)
+                    }
+
                 else -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         when (id) {

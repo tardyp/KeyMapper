@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.KeyEvent
+import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.ActionChipModel
@@ -241,6 +242,17 @@ fun Action.canBePerformed(ctx: Context): Result<Action> {
                 for (feature in systemActionDef.features) {
                     if (!ctx.packageManager.hasSystemFeature(feature)) {
                         return FeatureUnavailable(feature)
+                    }
+                }
+
+                if (systemActionDef.id == SystemAction.OPEN_SAMSUNG_CAMERA_MODE) {
+                    try {
+                        ctx.packageManager.getApplicationInfo(
+                            Constants.SAMSUNG_CAMERA_PACKAGE_NAME,
+                            PackageManager.GET_META_DATA
+                        )
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        return AppNotFound(Constants.SAMSUNG_CAMERA_PACKAGE_NAME)
                     }
                 }
 
