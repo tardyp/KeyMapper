@@ -252,6 +252,14 @@ class MyAccessibilityService : AccessibilityService(),
         }
     }
 
+    //TODO write delegate for this
+
+    private var mTimeOfLastMessage = 0L
+
+    private val mParseLogcatDelegate = ParseLogcatDelegate {
+        mTimeOfLastMessage = SystemClock.uptimeMillis()
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
 
@@ -427,6 +435,8 @@ class MyAccessibilityService : AccessibilityService(),
                 )
             })
         }
+
+        mParseLogcatDelegate.startListening(lifecycleScope)
     }
 
     override fun onInterrupt() {}
@@ -452,10 +462,20 @@ class MyAccessibilityService : AccessibilityService(),
             mFingerprintGestureMapController.reset()
         }
 
+        mParseLogcatDelegate.stopListening()
+
         super.onDestroy()
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+
+        if (SystemClock.uptimeMillis() - mTimeOfLastMessage <= 700) {
+            performGlobalAction(GLOBAL_ACTION_BACK)
+            mKeymapDetectionDelegate.keyMapListCache.getOrNull(0)?.actionList?.forEach {
+                mActionPerformerDelegate.performAction(PerformAction(it), mChosenImePackageName, currentPackageName)
+            }
+        }
+    }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         event ?: return super.onKeyEvent(event)
