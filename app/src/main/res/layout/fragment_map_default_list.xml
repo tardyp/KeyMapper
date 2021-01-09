@@ -18,8 +18,12 @@
         <import type="io.github.sds100.keymapper.util.Empty" />
 
         <variable
-            name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel" />
+            name="requestBackup"
+            type="View.OnClickListener" />
+
+        <variable
+            name="requestReset"
+            type="View.OnClickListener" />
 
         <variable
             name="state"
@@ -82,7 +86,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:onClick="@{()-> viewModel.requestReset()}"
+            android:onClick="@{requestReset}"
             android:text="@string/action_reset"
             app:layout_constraintBottom_toBottomOf="@id/buttonBackupAll"
             app:layout_constraintEnd_toEndOf="parent"
@@ -97,7 +101,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:onClick="@{() -> viewModel.backupAll()}"
+            android:onClick="@{requestBackup}"
             android:text="@string/action_backup_all"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/buttonReset"

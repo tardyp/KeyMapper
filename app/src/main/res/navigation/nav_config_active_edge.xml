@@ -2,13 +2,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_config_fingerprint_map"
+    android:id="@+id/nav_config_active_edge"
     app:startDestination="@id/config_active_edge_fragment">
 
     <fragment
         android:id="@+id/config_active_edge_fragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.fingerprint.ConfigFingerprintMapFragment"
-        android:label="Edit Fingerprint Map"
+        android:name="io.github.sds100.keymapper.ui.fragment.activeedge.ConfigActiveEdgeFragment"
+        android:label="Edit Active Edge"
         tools:layout="@layout/fragment_config_fingerprint_map">
 
         <argument
@@ -16,18 +16,18 @@
             app:argType="string" />
 
         <action
-            android:id="@+id/action_config_fingerprint_map_fragment_to_actionOptionsFragment"
+            android:id="@+id/action_config_active_edge_fragment_to_actionOptionsFragment"
             app:destination="@id/activeEdgeActionOptionsFragment"
             app:enterAnim="@anim/slide_in_bottom" />
     </fragment>
 
     <dialog
         android:id="@+id/activeEdgeActionOptionsFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.fingerprint.FingerprintActionOptionsFragment"
-        android:label="FingerprintActionOptionsFragment">
+        android:name="io.github.sds100.keymapper.ui.fragment.activeedge.ActiveEdgeActionOptionsFragment"
+        android:label="ActiveEdgeActionOptionsFragment">
 
         <argument
-            android:name="@string/nav_arg_fingerprint_action_options"
-            app:argType="io.github.sds100.keymapper.data.model.options.FingerprintActionOptions" />
+            android:name="@string/nav_arg_active_edge_action_options"
+            app:argType="io.github.sds100.keymapper.data.model.options.ActiveEdgeActionOptions" />
     </dialog>
 </navigation>

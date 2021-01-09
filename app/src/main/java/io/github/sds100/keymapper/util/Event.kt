@@ -78,6 +78,11 @@ class BuildFingerprintMapModels(val maps: Map<String, FingerprintMap>) : Event()
 class BackupFingerprintMaps : Event()
 class RequestFingerprintMapReset : Event()
 
+//active edge map
+class BuildActiveEdgeListModel(val map: ActiveEdgeMap) : Event()
+class BackupActiveEdgeMap : Event()
+class RequestActiveEdgeMapReset : Event()
+
 //menu
 class OpenSettings : Event()
 class OpenAbout : Event()

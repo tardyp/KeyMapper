@@ -15,4 +15,5 @@ interface IPreferenceDataStore {
     fun setStringPref(@StringRes key: Int, value: String)
 
     val fingerprintGestureDataStore: DataStore<Preferences>
+    val activeEdgeDataStore: DataStore<Preferences>
 }

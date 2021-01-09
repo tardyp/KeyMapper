@@ -30,6 +30,9 @@ object ServiceLocator {
     private var fingerprintMapRepository: FingerprintMapRepository? = null
 
     @Volatile
+    private var activeEdgeMapRepository: ActiveEdgeMapRepository? = null
+
+    @Volatile
     private var fileRepository: FileRepository? = null
 
     @Volatile
@@ -72,6 +75,13 @@ object ServiceLocator {
         synchronized(this) {
             return fingerprintMapRepository
                 ?: createFingerprintMapRepository(context)
+        }
+    }
+
+    fun activeEdgeMapRepository(context: Context): ActiveEdgeMapRepository {
+        synchronized(this) {
+            return activeEdgeMapRepository
+                ?: createActiveEdgeRepository(context)
         }
     }
 
@@ -137,6 +147,15 @@ object ServiceLocator {
         return fingerprintMapRepository
             ?: FingerprintMapRepository(dataStore).also {
                 this.fingerprintMapRepository = it
+            }
+    }
+
+    private fun createActiveEdgeRepository(context: Context): ActiveEdgeMapRepository {
+        val dataStore = preferenceDataStore(context).activeEdgeDataStore
+
+        return activeEdgeMapRepository
+            ?: ActiveEdgeMapRepository(dataStore).also {
+                this.activeEdgeMapRepository = it
             }
     }
 

@@ -106,6 +106,12 @@ object InjectorUtils {
             ServiceLocator.deviceInfoRepository(context))
     }
 
+    fun provideActiveEdgeInfoViewModel(context: Context): ActiveEdgeInfoViewModel.Factory {
+        return ActiveEdgeInfoViewModel.Factory(
+            ServiceLocator.activeEdgeMapRepository(context),
+            ServiceLocator.deviceInfoRepository(context))
+    }
+
     fun provideMenuFragmentViewModel(context: Context): MenuFragmentViewModel.Factory {
         return MenuFragmentViewModel.Factory(
             ServiceLocator.keymapRepository(context),
@@ -128,6 +134,17 @@ object InjectorUtils {
         (context.applicationContext as MyApplication).apply {
             return ConfigFingerprintMapViewModel.Factory(
                 ServiceLocator.fingerprintMapRepository(context),
+                ServiceLocator.deviceInfoRepository(context),
+                ServiceLocator.preferenceDataStore(context)
+            )
+        }
+    }
+
+    fun provideConfigActiveEdgeViewModel(context: Context
+    ): ConfigActiveEdgeViewModel.Factory {
+        (context.applicationContext as MyApplication).apply {
+            return ConfigActiveEdgeViewModel.Factory(
+                ServiceLocator.activeEdgeMapRepository(context),
                 ServiceLocator.deviceInfoRepository(context),
                 ServiceLocator.preferenceDataStore(context)
             )

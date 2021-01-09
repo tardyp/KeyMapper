@@ -27,10 +27,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.AppPreferences
 import io.github.sds100.keymapper.data.model.ChooseAppStoreModel
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
-import io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel
-import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
+import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.databinding.DialogChooseAppStoreBinding
 import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.service.MyAccessibilityService
@@ -62,6 +59,10 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     private val mFingerprintMapListViewModel: FingerprintMapListViewModel by activityViewModels {
         InjectorUtils.provideFingerprintMapListViewModel(requireContext())
+    }
+
+    private val mActiveEdgeInfoViewModel: ActiveEdgeInfoViewModel by activityViewModels {
+        InjectorUtils.provideActiveEdgeInfoViewModel(requireContext())
     }
 
     /**
@@ -136,6 +137,12 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    private val mFingerprintGesturesAvailable: Boolean
+        get() = mFingerprintMapListViewModel.fingerprintGesturesAvailable.value ?: false
+
+    private val mActiveEdgeAvailable: Boolean
+        get() = mActiveEdgeInfoViewModel.activeEdgeAvailable.value ?: false
+
     private lateinit var mRecoverFailureDelegate: RecoverFailureDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,13 +183,14 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
             val pagerAdapter = HomePagerAdapter(
                 this@HomeFragment,
-                mFingerprintMapListViewModel.fingerprintGesturesAvailable.value ?: false
+                mFingerprintGesturesAvailable,
+                mActiveEdgeAvailable
             )
 
             viewPager.adapter = pagerAdapter
 
             mFingerprintMapListViewModel.fingerprintGesturesAvailable.observe(viewLifecycleOwner, {
-                pagerAdapter.invalidateFragments(it ?: false)
+                pagerAdapter.invalidateFragments(it ?: false, mActiveEdgeAvailable)
                 isFingerprintGestureDetectionAvailable = it ?: false
             })
 

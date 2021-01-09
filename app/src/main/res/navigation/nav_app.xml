@@ -55,6 +55,15 @@
     </action>
 
     <action
+        android:id="@+id/action_to_config_active_edge"
+        app:destination="@id/nav_config_active_edge"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right">
+    </action>
+
+    <action
         android:id="@+id/action_global_chooseActionFragment"
         app:destination="@id/nav_choose_action"
         app:enterAnim="@anim/slide_in_right"
@@ -83,6 +92,7 @@
     <include app:graph="@navigation/nav_config_keymap" />
     <include app:graph="@navigation/nav_config_fingerprint_map" />
     <include app:graph="@navigation/nav_choose_constraint" />
+    <include app:graph="@navigation/nav_config_active_edge" />
 
     <fragment
         android:id="@+id/settingsFragment"

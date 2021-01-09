@@ -160,6 +160,7 @@
     <string name="tab_trigger">Trigger</string>
     <string name="tab_keyevents" translatable="false">Key Events</string>
     <string name="tab_fingerprint">Fingerprint</string>
+    <string name="tab_active_edge">Active Edge</string>
     <!--  Tabs  -->
 
     <!--  Navigation argument ids  -->
@@ -172,6 +173,7 @@
     <string name="nav_arg_choose_action_request_key" translatable="false">choose_action_request_key</string>
     <string name="nav_arg_choose_constraint_request_key" translatable="false">choose_constraint_request_key</string>
     <string name="nav_arg_fingerprint_action_options" translatable="false">fingerprint_action_options</string>
+    <string name="nav_arg_active_edge_action_options" translatable="false">active_edge_action_options</string>
     <!--  Navigation argument ids  -->
 
     <!--  Toasts  -->
@@ -534,7 +536,7 @@
     </integer-array>
 
     <!-- The tabs that should be shown when configuring a keymap -->
-    <string-array name="config_fingerprint_map_tab_titles" tools:ignore="InconsistentArrays">
+    <string-array name="config_map_default_tab_titles" tools:ignore="InconsistentArrays">
         <item>@string/tab_actions</item>
         <item>@string/tab_constraints</item>
         <item>@string/tab_options</item>
@@ -542,7 +544,7 @@
     <!-- The tabs that should be shown when configuring a keymap -->
 
     <!-- The fragments that should be shown when configuring a keymap -->
-    <integer-array name="config_fingerprint_map_fragments" tools:ignore="InconsistentArrays">
+    <integer-array name="config_map_default_fragments" tools:ignore="InconsistentArrays">
         <item>@integer/fragment_id_action_list</item>
         <item>@integer/fragment_id_constraint_list</item>
         <item>@integer/fragment_id_fingerprint_map_options</item>
@@ -552,6 +554,7 @@
     <string-array name="home_tab_titles">
         <item>@string/tab_keyevents</item>
         <item>@string/tab_fingerprint</item>
+        <item>@string/tab_active_edge</item>
     </string-array>
     <!-- The fragments on the homescreen -->
 

@@ -19,6 +19,7 @@ class DefaultPreferenceDataStore(ctx: Context) : IPreferenceDataStore {
         get() = mCtx.defaultSharedPreferences
 
     override val fingerprintGestureDataStore = ctx.createDataStore("fingerprint_gestures")
+    override val activeEdgeDataStore = ctx.createDataStore("active_edge")
 
     override fun getBoolPref(key: Int): Boolean {
         return mPrefs.getBoolean(mCtx.str(key), false)

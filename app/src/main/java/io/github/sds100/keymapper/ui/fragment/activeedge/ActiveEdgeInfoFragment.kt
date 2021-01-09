@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.ui.fragment.fingerprint
+package io.github.sds100.keymapper.ui.fragment.activeedge
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +9,10 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.switchmaterial.SwitchMaterial
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.FingerprintGestureMapListItemModel
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.ActiveEdgeListItemModel
+import io.github.sds100.keymapper.data.model.ActiveEdgeMap
+import io.github.sds100.keymapper.data.viewmodel.ActiveEdgeInfoViewModel
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
-import io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentMapDefaultListBinding
 import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
@@ -24,10 +24,10 @@ import splitties.alertdialog.appcompat.*
 /**
  * Created by sds100 on 11/12/2020.
  */
-class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBinding>() {
+class ActiveEdgeInfoFragment : RecyclerViewFragment<FragmentMapDefaultListBinding>() {
 
-    private val mViewModel: FingerprintMapListViewModel by activityViewModels {
-        InjectorUtils.provideFingerprintMapListViewModel(requireContext())
+    private val mViewModel: ActiveEdgeInfoViewModel by activityViewModels {
+        InjectorUtils.provideActiveEdgeInfoViewModel(requireContext())
     }
 
     private val mBackupLauncher =
@@ -35,7 +35,7 @@ class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBi
             it ?: return@registerForActivityResult
 
             mBackupRestoreViewModel
-                .backupFingerprintMaps(requireActivity().contentResolver.openOutputStream(it))
+                .backupActiveEdgeMap(requireActivity().contentResolver.openOutputStream(it))
         }
 
     private val mBackupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
@@ -57,20 +57,20 @@ class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBi
     }
 
     override fun subscribeUi(binding: FragmentMapDefaultListBinding) {
-        mViewModel.models.observe(viewLifecycleOwner, { models ->
+        mViewModel.model.observe(viewLifecycleOwner, { model ->
 
-            binding.state = models
+            binding.state = model
 
-            if (models !is Data) return@observe
+            if (model !is Data) return@observe
 
             binding.epoxyRecyclerView.withModels {
-                models.data.forEach {
-                    fingerprintMap {
-                        id(it.id)
+                model.data.let {
+                    activeEdge {
+                        id("active_edge")
                         model(it)
 
                         onEnabledSwitchClick { view ->
-                            mViewModel.setEnabled(it.id, (view as SwitchMaterial).isChecked)
+                            mViewModel.setEnabled((view as SwitchMaterial).isChecked)
                         }
 
                         onErrorClick(object : ErrorClickCallback {
@@ -80,7 +80,7 @@ class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBi
                         })
 
                         onClick { _ ->
-                            val direction = NavAppDirections.actionToConfigFingerprintMap(it.id)
+                            val direction = NavAppDirections.actionToConfigActiveEdge()
                             findNavController().navigate(direction)
                         }
                     }
@@ -91,13 +91,13 @@ class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBi
         mViewModel.eventStream.observe(viewLifecycleOwner,
             {
                 when (it) {
-                    is BuildFingerprintMapModels -> {
+                    is BuildActiveEdgeListModel -> {
                         viewLifecycleScope.launchWhenStarted {
-                            mViewModel.setModels(buildModels(it.maps))
+                            mViewModel.setModels(buildModels(it.map))
                         }
                     }
 
-                    is RequestFingerprintMapReset -> {
+                    is RequestActiveEdgeMapReset -> {
                         requireActivity().alertDialog {
                             messageResource = R.string.dialog_title_are_you_sure
 
@@ -111,34 +111,30 @@ class FingerprintMapListFragment : RecyclerViewFragment<FragmentMapDefaultListBi
                         }
                     }
 
-                    is BackupFingerprintMaps -> mBackupLauncher.launch(BackupUtils.createFileName())
+                    is BackupActiveEdgeMap -> mBackupLauncher.launch(BackupUtils.createFileName())
                 }
             })
 
         mViewModel.rebuildModels()
     }
 
-    private suspend fun buildModels(maps: Map<String, FingerprintMap>) =
-        maps.map {
-            FingerprintGestureMapListItemModel(
-                id = it.key,
-                header = str(FingerprintMapUtils.HEADERS[it.key]!!),
+    private suspend fun buildModels(map: ActiveEdgeMap) =
+        ActiveEdgeListItemModel(
 
-                actionModels = it.value.actionList.map { action ->
-                    action.buildChipModel(requireContext(), mViewModel.getDeviceInfoList())
-                },
+            actionModels = map.actionList.map { action ->
+                action.buildChipModel(requireContext(), mViewModel.getDeviceInfoList())
+            },
 
-                constraintModels = it.value.constraintList.map { constraint ->
-                    constraint.buildModel(requireContext())
-                },
+            constraintModels = map.constraintList.map { constraint ->
+                constraint.buildModel(requireContext())
+            },
 
-                constraintMode = it.value.constraintMode,
+            constraintMode = map.constraintMode,
 
-                isEnabled = it.value.isEnabled,
+            isEnabled = map.isEnabled,
 
-                optionsDescription = it.value.buildOptionsDescription(requireContext())
-            )
-        }
+            optionsDescription = map.buildOptionsDescription(requireContext())
+        )
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentMapDefaultListBinding.inflate(inflater, container)

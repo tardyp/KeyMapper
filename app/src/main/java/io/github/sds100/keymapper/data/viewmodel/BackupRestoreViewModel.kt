@@ -108,6 +108,19 @@ class BackupRestoreViewModel internal constructor(
         }
     }
 
+    //TODO backup active edge map
+    fun backupActiveEdgeMap(outputStream: OutputStream?) {
+//        viewModelScope.launch {
+//            backup(
+//                outputStream,
+//                emptyList(),
+//                mFingerprintMapRepository.swipeDown.firstOrNull(),
+//                mFingerprintMapRepository.swipeUp.firstOrNull(),
+//                mFingerprintMapRepository.swipeLeft.firstOrNull(),
+//                mFingerprintMapRepository.swipeRight.firstOrNull())
+//        }
+    }
+
     private suspend fun backup(
         outputStream: OutputStream?,
         keymapList: List<KeyMap> = emptyList(),

@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.ui.fragment.fingerprint
+package io.github.sds100.keymapper.ui.fragment.activeedge
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,16 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.Constraint
-import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
-import io.github.sds100.keymapper.data.viewmodel.ConfigFingerprintMapViewModel
-import io.github.sds100.keymapper.databinding.FragmentConfigFingerprintMapBinding
+import io.github.sds100.keymapper.data.model.options.ActiveEdgeActionOptions
+import io.github.sds100.keymapper.data.viewmodel.ConfigActiveEdgeViewModel
+import io.github.sds100.keymapper.databinding.FragmentConfigActiveEdgeBinding
 import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.util.*
@@ -32,12 +31,11 @@ import splitties.alertdialog.appcompat.positiveButton
 /**
  * Created by sds100 on 22/11/20.
  */
-class ConfigFingerprintMapFragment : Fragment() {
-    private val mArgs by navArgs<ConfigFingerprintMapFragmentArgs>()
+class ConfigActiveEdgeFragment : Fragment() {
 
-    private val mViewModel: ConfigFingerprintMapViewModel
-        by navGraphViewModels(R.id.nav_config_fingerprint_map) {
-            InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
+    private val mViewModel: ConfigActiveEdgeViewModel
+        by navGraphViewModels(R.id.nav_config_active_edge) {
+            InjectorUtils.provideConfigActiveEdgeViewModel(requireContext())
         }
 
     private lateinit var mRecoverFailureDelegate: RecoverFailureDelegate
@@ -47,7 +45,7 @@ class ConfigFingerprintMapFragment : Fragment() {
 
         //only load the fingerprint map if opening this fragment for the first time
         if (savedInstanceState == null) {
-            mViewModel.loadFingerprintMap(mArgs.gestureId)
+            mViewModel.loadActiveEdgeMap()
         }
 
         mRecoverFailureDelegate = RecoverFailureDelegate(
@@ -71,8 +69,8 @@ class ConfigFingerprintMapFragment : Fragment() {
             }
         }
 
-        setFragmentResultListener(FingerprintActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<FingerprintActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
+        setFragmentResultListener(ActiveEdgeActionOptionsFragment.REQUEST_KEY) { _, result ->
+            result.getParcelable<ActiveEdgeActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
                 ?.let {
                     mViewModel.actionListViewModel.setOptions(it)
                 }
@@ -80,7 +78,7 @@ class ConfigFingerprintMapFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        FragmentConfigFingerprintMapBinding.inflate(inflater, container, false).apply {
+        FragmentConfigActiveEdgeBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = mViewModel
 
@@ -168,13 +166,13 @@ class ConfigFingerprintMapFragment : Fragment() {
             when (it) {
 
                 int(R.integer.fragment_id_action_list) ->
-                    it to { FingerprintActionListFragment() }
+                    it to { ActiveEdgeActionListFragment() }
 
                 int(R.integer.fragment_id_constraint_list) ->
-                    it to { FingerprintConstraintListFragment() }
+                    it to { ActiveEdgeConstraintListFragment() }
 
                 int(R.integer.fragment_id_fingerprint_map_options) ->
-                    it to { FingerprintMapOptionsFragment() }
+                    it to { ActiveEdgeOptionsFragment() }
 
                 int(R.integer.fragment_id_constraints_and_options) ->
                     it to { ConstraintsAndOptionsFragment() }
@@ -185,7 +183,7 @@ class ConfigFingerprintMapFragment : Fragment() {
     )
 
     class ConstraintsAndOptionsFragment : TwoFragments(
-        top = R.string.option_list_header to FingerprintMapOptionsFragment::class.java,
-        bottom = R.string.constraint_list_header to FingerprintConstraintListFragment::class.java
+        top = R.string.option_list_header to ActiveEdgeOptionsFragment::class.java,
+        bottom = R.string.constraint_list_header to ActiveEdgeConstraintListFragment::class.java
     )
 }
