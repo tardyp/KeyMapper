@@ -95,7 +95,7 @@
             type="LiveData&lt;Integer>" />
 
         <variable
-            name="isFingerprintGestureDetectionAvailable"
+            name="showExtraTabs"
             type="Boolean" />
     </data>
 
@@ -196,16 +196,16 @@
                                 <include
                                     layout="@layout/keymap_list_header_expanded"
                                     bind:accessibilityServiceStatusState="@{accessibilityServiceStatusState}"
-                                    bind:enableAccessibilityService="@{enableAccessibilityService}"
-
-                                    bind:enableImeService="@{enableImeService}"
                                     bind:batteryOptimisationState="@{batteryOptimisationState}"
 
-                                    bind:grantDndAccess="@{grantDndAccess}"
                                     bind:disableBatteryOptimisation="@{disableBatteryOptimisation}"
-
-                                    bind:grantWriteSecureSettingsPermission="@{grantWriteSecureSettingsPermission}"
                                     bind:dndAccessStatusState="@{dndAccessStatusState}"
+
+                                    bind:enableAccessibilityService="@{enableAccessibilityService}"
+                                    bind:enableImeService="@{enableImeService}"
+
+                                    bind:grantDndAccess="@{grantDndAccess}"
+                                    bind:grantWriteSecureSettingsPermission="@{grantWriteSecureSettingsPermission}"
 
                                     bind:imeServiceStatusState="@{imeServiceStatusState}"
                                     bind:writeSettingsStatusState="@{writeSettingsStatusState}" />
@@ -292,11 +292,11 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
-                        app:drawableStartCompat="@drawable/ic_outline_star_border_24"
                         android:drawablePadding="16dp"
                         android:gravity="center_vertical"
                         android:text="@string/new_gui_keyboard_ad_message"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        app:drawableStartCompat="@drawable/ic_outline_star_border_24"
                         app:drawableTint="@color/warn"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/buttonGetNewGuiKeyboard"
@@ -309,7 +309,7 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{!isSelectable &amp;&amp; isFingerprintGestureDetectionAvailable ? View.VISIBLE : View.GONE}"
+                android:visibility="@{!isSelectable &amp;&amp; showExtraTabs ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutNewGuiKeyboardAd"

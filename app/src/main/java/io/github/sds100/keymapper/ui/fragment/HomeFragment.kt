@@ -145,6 +145,19 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     private lateinit var mRecoverFailureDelegate: RecoverFailureDelegate
 
+    private val mTabTitles: List<String>
+        get() = sequence {
+            yield(str(R.string.tab_keyevents))
+
+            if (mFingerprintGesturesAvailable) {
+                yield(str(R.string.tab_fingerprint))
+            }
+
+            if (mActiveEdgeAvailable) {
+                yield(str(R.string.tab_active_edge))
+            }
+        }.toList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -191,11 +204,16 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
             mFingerprintMapListViewModel.fingerprintGesturesAvailable.observe(viewLifecycleOwner, {
                 pagerAdapter.invalidateFragments(it ?: false, mActiveEdgeAvailable)
-                isFingerprintGestureDetectionAvailable = it ?: false
+                invalidateTabs()
+            })
+
+            mActiveEdgeInfoViewModel.activeEdgeAvailable.observe(viewLifecycleOwner, {
+                pagerAdapter.invalidateFragments(mFingerprintGesturesAvailable, it ?: false)
+                invalidateTabs()
             })
 
             TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                tab.text = strArray(R.array.home_tab_titles)[position]
+                tab.text = mTabTitles[position]
             }.apply {
                 attach()
             }
@@ -527,5 +545,9 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 mCollapsedStatusState.value = StatusLayout.State.WARN
             }
         }
+    }
+
+    private fun FragmentHomeBinding.invalidateTabs(){
+        showExtraTabs = mFingerprintGesturesAvailable || mActiveEdgeAvailable
     }
 }

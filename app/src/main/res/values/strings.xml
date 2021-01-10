@@ -550,14 +550,6 @@
         <item>@integer/fragment_id_fingerprint_map_options</item>
     </integer-array>
 
-    <!-- The fragments on the homescreen -->
-    <string-array name="home_tab_titles">
-        <item>@string/tab_keyevents</item>
-        <item>@string/tab_fingerprint</item>
-        <item>@string/tab_active_edge</item>
-    </string-array>
-    <!-- The fragments on the homescreen -->
-
     <!--flags-->
     <string name="flag_show_volume_dialog">Show volume dialog</string>
     <string name="flag_long_press">Long press</string>
