@@ -31,6 +31,7 @@ import io.github.sds100.keymapper.data.AppPreferences
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.KeyMap
 import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.repository.ActiveEdgeMapRepository
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.*
@@ -208,6 +209,7 @@ class MyAccessibilityService : AccessibilityService(),
         FingerprintGestureController.FingerprintGestureCallback? = null
 
     private lateinit var mFingerprintMapRepository: FingerprintMapRepository
+    private lateinit var mActiveEdgeMapRepository: ActiveEdgeMapRepository
 
     override val currentTime: Long
         get() = SystemClock.elapsedRealtime()
@@ -348,6 +350,7 @@ class MyAccessibilityService : AccessibilityService(),
         mChosenImePackageName = KeyboardUtils.getChosenInputMethodPackageName(this).valueOrNull()
 
         mFingerprintMapRepository = ServiceLocator.fingerprintMapRepository(this)
+        mActiveEdgeMapRepository = ServiceLocator.activeEdgeMapRepository(this)
 
         mFingerprintGestureMapController = FingerprintGestureMapController(
             lifecycleScope,
@@ -471,8 +474,10 @@ class MyAccessibilityService : AccessibilityService(),
 
         if (SystemClock.uptimeMillis() - mTimeOfLastMessage <= 700) {
             performGlobalAction(GLOBAL_ACTION_BACK)
-            mKeymapDetectionDelegate.keyMapListCache.getOrNull(0)?.actionList?.forEach {
-                mActionPerformerDelegate.performAction(PerformAction(it), mChosenImePackageName, currentPackageName)
+
+            mActiveEdgeMapRepository.activeEdgeMapLiveData.value?.actionList?.forEach {
+                mActionPerformerDelegate.performAction(
+                    PerformAction(it), mChosenImePackageName, currentPackageName)
             }
         }
     }
