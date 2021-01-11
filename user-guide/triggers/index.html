@@ -441,19 +441,19 @@
                   </a>
                 
                 
-                <h1 id="triggers">Triggers</h1>
-<h2 id="options">Options</h2>
+                <h1 id="triggers">Triggers<a class="headerlink" href="#triggers" title="Permanent link">&para;</a></h1>
+<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
 <p>There are options for each trigger key by pressing the 3-dots on them. There are also more options for the whole trigger under the "options" tab. Here are explanations of each option.</p>
-<h3 id="trigger-by-intent-v230">Trigger by Intent (v2.3.0+)</h3>
+<h3 id="trigger-by-intent-v230">Trigger by Intent (v2.3.0+)<a class="headerlink" href="#trigger-by-intent-v230" title="Permanent link">&para;</a></h3>
 <p>This allows you to trigger the key map by sending an <a href="https://developer.android.com/reference/android/content/Intent">Intent</a> to Key Mapper. There are many apps that can automate broadcasting Intents such as Tasker and Automate.</p>
-<h4 id="intent-action">Intent action</h4>
+<h4 id="intent-action">Intent action<a class="headerlink" href="#intent-action" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper.TRIGGER_KEYMAP_BY_UID
 </code></pre>
-<h4 id="intent-string-extra">Intent string extra</h4>
+<h4 id="intent-string-extra">Intent string extra<a class="headerlink" href="#intent-string-extra" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper.KEYMAP_UID
 </code></pre>
 <p>and the value is the UUID of the key map. You can copy the UUID in Key Mapper by turning on the "Trigger by Intent" option.</p>
-<h4 id="intent-package-optional-but-recommended">Intent package (optional but recommended)</h4>
+<h4 id="intent-package-optional-but-recommended">Intent package (optional but recommended)<a class="headerlink" href="#intent-package-optional-but-recommended" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper
 </code></pre>
 <p>This will only send the Intent to Key Mapper and no other packages.</p>
