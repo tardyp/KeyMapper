@@ -233,36 +233,8 @@
     "Why don't my volume buttons work when I press them?"
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-give-the-app-more-permissions" class="md-nav__link">
-    "How do I give the app more permissions?"
-  </a>
-  
-    <nav class="md-nav" aria-label=""How do I give the app more permissions?"">
+    <nav class="md-nav" aria-label=""Why don't my volume buttons work when I press them?"">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#prepare-debug-interface-adb" class="md-nav__link">
-    Prepare debug interface (ADB)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enabled_accessibility_services" class="md-nav__link">
-    ENABLED_ACCESSIBILITY_SERVICES
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write_secure_settings" class="md-nav__link">
-    WRITE_SECURE_SETTINGS
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#why-arent-my-key-maps-being-triggered" class="md-nav__link">
@@ -429,8 +401,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../user-guide/special-permissions.md" class="md-nav__link">
-      Special Permissions
+    <a href="../user-guide/adb-permissions/" class="md-nav__link">
+      ADB Permissions
     </a>
   </li>
 
@@ -487,36 +459,8 @@
     "Why don't my volume buttons work when I press them?"
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-give-the-app-more-permissions" class="md-nav__link">
-    "How do I give the app more permissions?"
-  </a>
-  
-    <nav class="md-nav" aria-label=""How do I give the app more permissions?"">
+    <nav class="md-nav" aria-label=""Why don't my volume buttons work when I press them?"">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#prepare-debug-interface-adb" class="md-nav__link">
-    Prepare debug interface (ADB)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enabled_accessibility_services" class="md-nav__link">
-    ENABLED_ACCESSIBILITY_SERVICES
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#write_secure_settings" class="md-nav__link">
-    WRITE_SECURE_SETTINGS
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#why-arent-my-key-maps-being-triggered" class="md-nav__link">
@@ -631,30 +575,6 @@ See the Quick Start Guide for more general help with using Key Mapper.</p>
 <p>Key Mapper Basic Input Method (the keyboard built-in to the app) has no GUI/buttons. You can install the <a href="https://play.google.com/store/apps/details?id=io.github.sds100.keymapper.inputmethod.latin">Key Mapper GUI Keyboard</a> to get a proper keyboard that can also perform Key Mapper actions.</p>
 <h2 id="why-dont-my-volume-buttons-work-when-i-press-them">"Why don't my volume buttons work when I press them?"<a class="headerlink" href="#why-dont-my-volume-buttons-work-when-i-press-them" title="Permanent link">&para;</a></h2>
 <p>Give the app Do Not Disturb access in your device settings. At the top of the homescreen in the Key Mapper app there is a "Fix" button to do this.</p>
-<h2 id="how-do-i-give-the-app-more-permissions">"How do I give the app more permissions?"<a class="headerlink" href="#how-do-i-give-the-app-more-permissions" title="Permanent link">&para;</a></h2>
-<p>If your device is <strong>rooted</strong>, Key Mapper can grant itself the permission by enabling the "Key Mapper has root permissions" toggle in the settings.</p>
-<p>If your device is <strong>not rooted</strong> you may have to do the following...</p>
-<h3 id="prepare-debug-interface-adb">Prepare debug interface (ADB)<a class="headerlink" href="#prepare-debug-interface-adb" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Enable developer options on your device by going to device Settings -&gt; About Phone and tapping Build Number many times until it says you've enabled developer options. The location of the Build Number may vary between devices.</li>
-<li>Enable USB Debugging in developer options and plug your device into your PC.</li>
-<li>Download the <a href="https://developer.android.com/studio/releases/platform-tools.html">Android SDK platform tools</a> from here and unzip it.</li>
-<li>Open a terminal/command prompt in the unzipped folder.</li>
-<li>Type <code>adb devices</code> and your device should show up in the list after you click the prompt on your phone to allow USB debugging from your PC.</li>
-</ol>
-<h3 id="enabled_accessibility_services">ENABLED_ACCESSIBILITY_SERVICES<a class="headerlink" href="#enabled_accessibility_services" title="Permanent link">&para;</a></h3>
-<p>You may wish to enable Key Mapper's accessibility service using ADB if you cannot do so in-app due to manufacturer constraints.</p>
-<p>To add Key Mapper to the List of the enabled accessibility providers, type or paste in a terminal:</p>
-<pre><code>adb shell settings put secure ENABLED_ACCESSIBILITY_SERVICES io.github.sds100.keymapper/io.github.sds100.keymapper.service.MyAccessibilityService
-</code></pre>
-<h3 id="write_secure_settings">WRITE_SECURE_SETTINGS<a class="headerlink" href="#write_secure_settings" title="Permanent link">&para;</a></h3>
-<p>If you need more features of Key Mapper, you may grant the app an entire set of permissions called <a href="https://developer.android.com/reference/android/provider/Settings.Secure.html">Settings.Secure</a>.</p>
-<p>Type or paste in a terminal:</p>
-<pre><code>adb shell pm grant io.github.sds100.keymapper android.permission.WRITE_SECURE_SETTINGS
-</code></pre>
-<p>You can now choose the Key Mapper keyboard without going into the Android settings. <a href="#enabled_accessibility_services">Ensure the accessibility service is enabled.</a></p>
-<p><em>For CI builds the package name is</em> <code>io.github.sds100.keymapper.ci</code>.</p>
-<p>More features which rely on this set of permission will come in the future. These permissions persist across reboots but need to be granted again if the app is reinstalled.</p>
 <h3 id="why-arent-my-key-maps-being-triggered">"Why aren't my key maps being triggered?"<a class="headerlink" href="#why-arent-my-key-maps-being-triggered" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Disable all battery and memory optimisation features on your device. Consult https://dontkillmyapp.com for how to do this on your device.</li>
