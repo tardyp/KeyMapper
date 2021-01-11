@@ -215,6 +215,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#creating-a-key-map" class="md-nav__link">
+    Creating a key map
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -384,6 +391,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#creating-a-key-map" class="md-nav__link">
+    Creating a key map
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -413,11 +427,38 @@ For specific troubleshooting, consult the FAQ.</p>
 <p>App interface pictured: <code>keymapper-2.3.0-alpha-ci.709</code></p>
 <p>The guide is updated to match current stable release UI. <a href="https://github.com/sds100/KeyMapper/issues/new">Report inaccuracies.</a></p>
 <h2 id="first-time-setup">First time setup<a class="headerlink" href="#first-time-setup" title="Permanent link">&para;</a></h2>
-<p>When Key Mapper is launched for the first time, a sequence of prompts are displayed.</p>
-<p><img alt="" src="../images/hg-first-time.png" /></p>
-<p>For full functionality of the app, you should tap the ENABLE, TURN OFF, and GRANT buttons on the required screens.</p>
-<p>Another opportunity to do the same thing is presented on the next screen. This screen is referred to as the <em>Key Mapper home screen</em>.</p>
+<p>When you open Key Mapper, you will be presented with this screen.
+This screen is referred to as the <em>Key Mapper home screen</em>.</p>
 <p><img alt="" src="../images/hg-home-empty.png" /></p>
+<p>Tapping the FIX button next to the accessibility service prompt will allow you to grant Key Mapper permission to run its accessibility service. You must do this for the app to work at all.</p>
+<p><img alt="" src="../images/hg-warn-service.png" /></p>
+<p>You can then tap Key Mapper in your list of available services. There may be many others on this screen and your interface may be slightly different. If nothing happens when you tap FIX, or if you can't enable the service, see <a href="#">this page</a> or ask for help in the <a href="http://keymapper.club">Discord server</a>.</p>
+<p><img alt="" src="../images/hg-settings-services.png" /></p>
+<p>Tapping the FIX button next to the input method prompt will allow you to enable a Key Mapper compatible keyboard. If you want to perform actions like pressing keyboard keys or entering text you must enable this.</p>
+<p><img alt="" src="../images/hg-warn-input-method.png" /></p>
+<p>If you have only installed the Key Mapper app, your list of available keyboards will contain "Key Mapper Basic Input Method" only. If you aim to use a physical keyboard (not on-screen) when using Key Mapper, this will be suitable for you.</p>
+<p>If you want an on-screen keyboard to be available while using Key Mapper, you need to install "Key Mapper GUI Keyboard". It is available on the <a href="http://gui.keymapper.club">Google Play Store</a>, <a href="https://www.f-droid.org/en/packages/io.github.sds100.keymapper.inputmethod.latin/">F-Droid</a> and <a href="https://github.com/sds100/KeyMapperKeyboard/releases">GitHub</a>.</p>
+<p><img alt="" src="../images/hg-settings-input-method.png" /></p>
+<p>If you are using a Huawei or Xiaomi branded device, a device with 2GB of RAM or less, or intend to use the app while playing a mobile game, it is especially important to follow the next step.</p>
+<p>Tapping the FIX button next to the battery optimisation prompt will allow you to turn off features of your device that may prevent Key Mapper's essential services from running in the background. This is usually the source of the common 'Key Mapper randomly stops working' issue.</p>
+<p><img alt="" src="../images/hg-warn-battery-optimisation.png" /></p>
+<p>The screen that opens after tapping FIX may vary depending on your device. In my case, to disable optimisation I found the app(s) in the list, tapped them to open their settings, and chose 'Don't optimise'.</p>
+<p>There is an excellent guide at <a href="http://dontkillmyapp.com">dontkillmyapp.com</a> that explains how to disable battery and/or memory optimisation for your specific device. If Key Mapper randomly stops working even after you complete these steps, ask for help in <a href="http://keymapper.club">the Discord server.</a></p>
+<p><img alt="" src="../images/hg-settings-battery-optimisation.png" /></p>
+<p>If you want to remap volume buttons and use them when Do Not Disturb is enabled, you should grant Key Mapper permission to do so.</p>
+<p><img alt="" src="../images/hg-warn-dnd.png" /></p>
+<p>Tapping FIX will allow you to grant the permission. Find Key Mapper in the list and tap it in order to choose 'Allowed'.</p>
+<p><img alt="" src="../images/hg-settings-dnd.png" /></p>
+<p>Most people can ignore the final prompt. If you want to create an action to change input method, you need to grant an additional set of permissions called WRITE_SECURE_SETTINGS. For help with this <a href="http://docs.keymapper.club/user-guide/adb-permissions/#write_secure_settings">click here.</a></p>
+<p><img alt="" src="../images/hg-warn-secure-settings.png" /></p>
+<h2 id="creating-a-key-map">Creating a key map<a class="headerlink" href="#creating-a-key-map" title="Permanent link">&para;</a></h2>
+<p>A key map is an association between a user input (such as pushing a key or button) and a response from the device (sending information about what key was pressed and for how long).</p>
+<p>In Key Mapper, 'user inputs' that are recognised by the app are called 'triggers'. The responses from your device that were due to a trigger being pressed are called 'actions'.</p>
+<p>Key Mapper lets you assign actions to triggers that may be different from their default use. A 'volume-up' trigger normally increases the volume when pressed, but this app can change that to something else.</p>
+<p>To create your first key map, tap the + icon at the bottom of the Key Mapper home screen. You will see one of the two menus below.</p>
+<p><img alt="" src="../images/hg-keymap-0.png" /></p>
+<p>In either case, the first step is to record a trigger. Tap the red RECORD TRIGGER button and then push the button that you want to change the function of. In this guide I will demonstrate with Volume Down.</p>
+<p><img alt="" src="../images/hg-keymap-1.png" /></p>
                 
               
               
