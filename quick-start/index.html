@@ -332,6 +332,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#special-options" class="md-nav__link">
+    Special options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constraints" class="md-nav__link">
+    Constraints
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#managing-key-maps" class="md-nav__link">
     Managing key maps
   </a>
@@ -454,7 +468,7 @@
   
     <li class="md-nav__item">
       <a href="../user-guide/backup-restore/" class="md-nav__link">
-        Backup and Restore (2.1.0+, Android 4.4+)
+        Back up and Restore (2.1.0+, Android 4.4+)
       </a>
     </li>
   
@@ -609,6 +623,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#special-options" class="md-nav__link">
+    Special options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constraints" class="md-nav__link">
+    Constraints
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#managing-key-maps" class="md-nav__link">
     Managing key maps
   </a>
@@ -641,7 +669,7 @@ For specific troubleshooting, <a href="../faq">consult the FAQ.</a></p>
 <li>OnePlus 7 Pro, Android 10, Dark theme, 1440p, tiny font size</li>
 <li>Samsung J3 6, Android 5, Light theme, 720p, medium font size</li>
 </ol>
-<p>App interface pictured: <code>keymapper-2.3.0-alpha-ci.715</code></p>
+<p>App interface pictured: <code>keymapper-2.3.0-alpha-ci.778</code></p>
 <p>This guide is updated to match current stable release UI. <a href="https://github.com/sds100/KeyMapper/issues/new">Report inaccuracies.</a></p>
 <h2 id="first-time-setup">First time setup<a class="headerlink" href="#first-time-setup" title="Permanent link">&para;</a></h2>
 <p>When you open Key Mapper, you will be presented with this screen.
@@ -649,12 +677,12 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p><img alt="" src="../images/hg-home-empty.png" /> <img alt="" src="../images/hg-home-empty-light.png" /></p>
 <p>Tapping the FIX button next to the accessibility service prompt will allow you to grant Key Mapper permission to run its accessibility service. You must do this for the app to work at all.</p>
 <p><img alt="" src="../images/hg-warn-service.png" /></p>
-<p>You can then tap Key Mapper in your list of available services. There may be many others on this screen and your interface may be slightly different. If nothing happens when you tap FIX, or if you can't enable the service, see <a href="#">this page</a> or ask for help in the <a href="http://keymapper.club">Discord server</a>.</p>
+<p>You can then tap Key Mapper in your list of available services. There may be many others on this screen and your interface may be slightly different. If nothing happens when you tap FIX, or if you can't enable the service, see <a href="#">this page</a> or ask for help in the <a href="http://keymapper.club">Discord server.</a></p>
 <p><img alt="" src="../images/hg-settings-services.png" /> <img alt="" src="../images/hg-settings-services-light.png" /></p>
 <p>Tapping the FIX button next to the input method prompt will allow you to enable a Key Mapper compatible keyboard. If you want to perform actions like pressing keyboard keys or entering text you must enable this.</p>
 <p><img alt="" src="../images/hg-warn-input-method.png" /></p>
 <p>If you have only installed the Key Mapper app, your list of available keyboards will contain "Key Mapper Basic Input Method" only. If you aim to use a physical keyboard (not on-screen) when using Key Mapper, this will be suitable for you.</p>
-<p>If you want an on-screen keyboard to be available while using Key Mapper, you need to install "Key Mapper GUI Keyboard". It is available on the <a href="http://gui.keymapper.club">Google Play Store</a>, <a href="https://www.f-droid.org/en/packages/io.github.sds100.keymapper.inputmethod.latin/">F-Droid</a> and <a href="https://github.com/sds100/KeyMapperKeyboard/releases">GitHub</a>.</p>
+<p>If you want an on-screen keyboard to be available while using Key Mapper, you need to install "Key Mapper GUI Keyboard". It is available on the <a href="http://gui.keymapper.club">Google Play Store</a>, <a href="https://www.f-droid.org/en/packages/io.github.sds100.keymapper.inputmethod.latin/">F-Droid</a> and <a href="https://github.com/sds100/KeyMapperKeyboard/releases">GitHub.</a></p>
 <p><img alt="" src="../images/hg-settings-input-method.png" /> <img alt="" src="../images/hg-settings-input-method-light.png" /></p>
 <p>If you are using a Huawei or Xiaomi branded device, a device with 2GB of RAM or less, or intend to use the app while playing a mobile game, it is especially important to follow the next step.</p>
 <p>Tapping the FIX button next to the battery optimisation prompt will allow you to turn off features of your device that may prevent Key Mapper's essential services from running in the background. This is usually the source of the common 'Key Mapper randomly stops working' issue.</p>
@@ -678,6 +706,7 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p><img alt="" src="../images/hg-keymap-0.png" /> <img alt="" src="../images/hg-keymap-0-light.png" /></p>
 <p>In either case, the first step is to record a trigger. Tap the red RECORD TRIGGER button and then press the physical button that you want to change the function of. In this guide I will demonstrate with Volume Down.</p>
 <p>Key Mapper can also create a key map with multiple triggers. If you want to use more than one trigger for one key map, you can press the buttons in the order you will press them to execute the key map. For example, if you wanted to map 'Ctrl' + 'H' to show the device home menu, you should press 'Ctrl' and then 'H'.</p>
+<p>Key Mapper can also remap fingerprint gestures on many devices. You can learn how to do this <a href="#">here.</a></p>
 <p><img alt="" src="../images/hg-keymap-1.png" /> <img alt="" src="../images/hg-keymap-1-light.png" /></p>
 <h3 id="setting-the-actions">Setting the action(s)<a class="headerlink" href="#setting-the-actions" title="Permanent link">&para;</a></h3>
 <p>Next, it's time to choose an action. If you have a high-resolution display, you will see the ADD ACTION button at the bottom of the screen (pictured left). Otherwise, tap the ACTIONS tab at the top of the screen (pictured right).</p>
@@ -741,7 +770,7 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p><img alt="" src="../images/hg-keymap-3.png" /> <img alt="" src="../images/hg-keymap-3-light.png" /></p>
 <p>Key Mapper can also create a key map with multiple actions. If you want to add more actions to execute in series you can do so by tapping ADD ACTION again and choosing the next action in the chain. In the next section you can specify a delay between those actions if you wish.</p>
 <h2 id="customising-a-key-map">Customising a key map<a class="headerlink" href="#customising-a-key-map" title="Permanent link">&para;</a></h2>
-<p>In the next section, I will explain in more detail how to customise your triggers and actions to be more in line with what you want. Most people will want to do at least some customisation.</p>
+<p>You may wish to customise your triggers and actions to have specific behaviours. Most people will want to do at least some customisation.</p>
 <h3 id="trigger-settings">Trigger settings<a class="headerlink" href="#trigger-settings" title="Permanent link">&para;</a></h3>
 <p>Starting with the triggers, tap the 3 dot <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg></span> menu to the right of the trigger's name to bring up the following menu.</p>
 <p><img alt="" src="../images/hg-trigger-settings.png" /> <img alt="" src="../images/hg-trigger-settings-light.png" /> </p>
@@ -749,12 +778,13 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>One trigger can have three different click types. Choose from short press, long press and double press. <a href="#">Read more.</a></p>
 <h3 id="action-settings">Action settings<a class="headerlink" href="#action-settings" title="Permanent link">&para;</a></h3>
 <p>Next, tap the 3 stacked dots <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg></span> to the right of the action's name to bring up the following menu.</p>
-<p><img alt="" src="../images/hg-action-settings.png" /> <img alt="" src="images/hg-action-settings-light.png" /></p>
+<p><img alt="" src="../images/hg-action-settings.png" /> <img alt="" src="../images/hg-action-settings-light.png" /></p>
 <p>Here you can customise a lot of the operation of your key map, including timing, multipliers and debug messages.</p>
 <hr />
 <p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Show a toast message when performing</p>
 <p>When this is turned on, the following notice will come up at the bottom of the screen when ever your trigger is pressed.</p>
 <p><img alt="" src="../images/ui-toast.png" /></p>
+<p>You can have your device vibrate instead of an on-screen message if you want. The setting <a href="#">is found here.</a></p>
 <hr />
 <p>The following details refer to action timing settings.</p>
 <p>&nbsp;Delay before next action (ms)<br /> 
@@ -798,17 +828,27 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>&nbsp;Hold down duration (ms)<br /> 
 <img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
 <p>This allows you to set how long the action is held down for before repeating.</p>
+<h2 id="special-options">Special options<a class="headerlink" href="#special-options" title="Permanent link">&para;</a></h2>
+<p>For extra key map customisation, tap the 'Constraints and more' tab at the top of the screen when editing or creating a key map.</p>
+<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Trigger by Intent</p>
+<p>For information about Trigger by Intent go to <a href="../user-guide/actions/#intent-230">this page.</a></p>
+<hr />
+<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Vibrate</p>
+<p>&nbsp;Vibrate duration (ms)<br /> 
+<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<p>Tapping 'Vibrate' will cause your device to vibrate whenever your key map is triggered (and therefore behaves similarly to the <a href="#">toast message</a>)</p>
+<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<p>You can add special constraints to your key maps in order to customise when they are allowed to run.</p>
 <h2 id="managing-key-maps">Managing key maps<a class="headerlink" href="#managing-key-maps" title="Permanent link">&para;</a></h2>
 <p>To save your key map and return to the home screen, tap the save <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 129.941l-83.882-83.882A48 48 0 00316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 00-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 01320 111.48z"/></svg></span> icon in the bottom right of the screen.</p>
 <p>Now your key map should already be working. To pause/unpause all of your key maps, pull down the notification tray and tap the Key Mapper notification to toggle between Paused and Running.</p>
-<p><img alt="" src="../images/hg-notification.png" /> <img alt="" src="images/hg-notification-light.png" /></p>
+<p><img alt="" src="../images/hg-notification.png" /> <img alt="" src="../images/hg-notification-light.png" /></p>
 <p>On the Key Mapper home screen, tap the 3 bar <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"/></svg></span> menu to open the Key Mapper general settings. You will see the following options.</p>
-<p><img alt="" src="../images/hg-general-settings.png" /> <img alt="" src="images/hg-general-settings-light.png" /></p>
+<p><img alt="" src="../images/hg-general-settings.png" /> <img alt="" src="../images/hg-general-settings-light.png" /></p>
 <p>Here you can pause/unpause/enable/disable all of your key maps at once.<br />
-You can also backup and restore key maps here. <a href="#">Learn more about backup and restore.</a></p>
+You can also back up and restore key maps here. <a href="#">Learn more about back up and restore.</a></p>
 <p>Tapping 'Show input method picker' allows for switching between a Key Mapper compatible keyboard and any other.<br /></p>
-<p>The 'About' menu is explained <a href="#">here.</a><br />
-Tapping 'Settings' shows more advanced settings and preferences you can learn about <a href="#">here.</a></p>
+<p>Key Mapper can also remap fingerprint gestures on many devices. You can learn how to do this <a href="#">here.</a></p>
 <p><a href="#">Go to top.</a></p>
                 
               
