@@ -339,8 +339,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
-    Constraints
+  <a href="#adding-constraints" class="md-nav__link">
+    Adding constraints
   </a>
   
 </li>
@@ -456,7 +456,7 @@
   
     <li class="md-nav__item">
       <a href="../user-guide/fingerprint-gestures/" class="md-nav__link">
-        Fingerprint Gestures (2.2.0+)
+        Fingerprint Gestures (2.2.0+, Android 8.0+)
       </a>
     </li>
   
@@ -630,8 +630,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
-    Constraints
+  <a href="#adding-constraints" class="md-nav__link">
+    Adding constraints
   </a>
   
 </li>
@@ -700,11 +700,12 @@ This screen is referred to as the Key Mapper home screen.</p>
 <h2 id="creating-a-key-map">Creating a key map<a class="headerlink" href="#creating-a-key-map" title="Permanent link">&para;</a></h2>
 <p>A key map is an association between a user input (such as pushing a key or button) and a response from the device (sending information about what key was pressed and for how long).</p>
 <p>In Key Mapper, 'user inputs' that are recognised by the app are called 'triggers'. The responses from your device that were due to a trigger being pressed are called 'actions'.</p>
-<p>Key Mapper lets you assign actions to triggers that may be different from their default use. A 'volume-up' trigger normally increases the volume when pressed, but this app can change that to something else.</p>
+<p>Key Mapper lets you assign actions to triggers that may be different from their default use. A 'volume up' trigger normally increases the volume when pressed, but this app can change that to something else.</p>
+<p>This guide deals with 'Key event' triggers. If you want to remap fingerprint gestures, <a href="#">check out this guide.</a></p>
 <h3 id="setting-the-triggers">Setting the trigger(s)<a class="headerlink" href="#setting-the-triggers" title="Permanent link">&para;</a></h3>
 <p>To create your first key map, tap the + icon at the bottom of the Key Mapper home screen. You will see one of the two menus below.</p>
 <p><img alt="" src="../images/hg-keymap-0.png" /> <img alt="" src="../images/hg-keymap-0-light.png" /></p>
-<p>In either case, the first step is to record a trigger. Tap the red RECORD TRIGGER button and then press the physical button that you want to change the function of. In this guide I will demonstrate with Volume Down.</p>
+<p>In either case, the first step is to record a trigger. Tap the red 'Record trigger' button and then press the physical button that you want to change the function of. In this guide I will demonstrate with 'volume down'.</p>
 <p>Key Mapper can also create a key map with multiple triggers. If you want to use more than one trigger for one key map, you can press the buttons in the order you will press them to execute the key map. For example, if you wanted to map 'Ctrl' + 'H' to show the device home menu, you should press 'Ctrl' and then 'H'.</p>
 <p>Key Mapper can also remap fingerprint gestures on many devices. You can learn how to do this <a href="#">here.</a></p>
 <p><img alt="" src="../images/hg-keymap-1.png" /> <img alt="" src="../images/hg-keymap-1-light.png" /></p>
@@ -797,7 +798,7 @@ This screen is referred to as the Key Mapper home screen.</p>
 <hr />
 <h4 id="repeating-actions">Repeating actions<a class="headerlink" href="#repeating-actions" title="Permanent link">&para;</a></h4>
 <p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Repeat</p>
-<p>When this is turned on, Key Mapper will execute your key map repeatedly. This is particularly useful when emulating a keyboard key press, where in most applications holding down the key would result in a repeating output. The default settings in Key Mapper are designed to emulate that behaviour when 'Repeat' is turned on.</p>
+<p>When this is turned on, Key Mapper will execute your actions repeatedly. This is particularly useful when emulating a keyboard key press, where in most applications holding down the key would result in a repeating output. The default settings in Key Mapper are designed to emulate that behaviour when 'Repeat' is turned on.</p>
 <hr />
 <p>&nbsp;Repeat every... (ms)<br /> 
 <img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
@@ -830,6 +831,7 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>This allows you to set how long the action is held down for before repeating.</p>
 <h2 id="special-options">Special options<a class="headerlink" href="#special-options" title="Permanent link">&para;</a></h2>
 <p>For extra key map customisation, tap the 'Constraints and more' tab at the top of the screen when editing or creating a key map.</p>
+<p><img alt="" src="../images/hg-keymap-4.png" /> <img alt="" src="images/hg-keymap-4-light.png" /></p>
 <p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Trigger by Intent</p>
 <p>For information about Trigger by Intent go to <a href="../user-guide/actions/#intent-230">this page.</a></p>
 <hr />
@@ -837,8 +839,16 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>&nbsp;Vibrate duration (ms)<br /> 
 <img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
 <p>Tapping 'Vibrate' will cause your device to vibrate whenever your key map is triggered (and therefore behaves similarly to the <a href="#">toast message</a>)</p>
-<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<h2 id="adding-constraints">Adding constraints<a class="headerlink" href="#adding-constraints" title="Permanent link">&para;</a></h2>
 <p>You can add special constraints to your key maps in order to customise when they are allowed to run.</p>
+<p>To add a constraint fron the 'Constraints and more' tab, tap 'Add constraint'.</p>
+<p>You can choose from the following options:</p>
+<p><img alt="" src="images/hg-constraints-add.png" /> <img alt="" src="images/hg-constraints-add-light.png" /> </p>
+<p>Choosing 'App in foreground' will allow you to restrict your key map to working only if your app of choice is the actively selected window, i.e. on screen and being interacted with. 'App not in foreground' will likewise restrict your key map to working only if your app of choice isn't in focus.</p>
+<p>Choosing 'Bluetooth device is connected/disconnected' can restrict your key map to working only if a specific bluetooth device is connected/disconnected.</p>
+<p>If you have <a href="#">root permission</a>, you can restrict your key maps to work only when the screen is on or off.</p>
+<p>Choosing 'Orientation' can restrict your key map to working only when the device is set to specific screen orientation.</p>
+<p>Make sure to save <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 129.941l-83.882-83.882A48 48 0 00316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 00-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 01320 111.48z"/></svg></span> your key map after applying these changes.</p>
 <h2 id="managing-key-maps">Managing key maps<a class="headerlink" href="#managing-key-maps" title="Permanent link">&para;</a></h2>
 <p>To save your key map and return to the home screen, tap the save <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 129.941l-83.882-83.882A48 48 0 00316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 00-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 01320 111.48z"/></svg></span> icon in the bottom right of the screen.</p>
 <p>Now your key map should already be working. To pause/unpause all of your key maps, pull down the notification tray and tap the Key Mapper notification to toggle between Paused and Running.</p>
