@@ -664,6 +664,8 @@
                 
                 <p>This page aims to give users an introduction to the Key Mapper interface and a demonstration on how to perform typical tasks with the app.
 For specific troubleshooting, <a href="../faq">consult the FAQ.</a></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
 <p>Where screenshots are necessary, this guide uses two devices to demonstrate.</p>
 <ol>
 <li>OnePlus 7 Pro, Android 10, Dark theme, 1440p, tiny font size</li>
@@ -671,25 +673,39 @@ For specific troubleshooting, <a href="../faq">consult the FAQ.</a></p>
 </ol>
 <p>App interface pictured: <code>keymapper-2.3.0-alpha-ci.778</code></p>
 <p>This guide is updated to match current stable release UI. <a href="https://github.com/sds100/KeyMapper/issues/new">Report inaccuracies.</a></p>
+</div>
 <h2 id="first-time-setup">First time setup<a class="headerlink" href="#first-time-setup" title="Permanent link">&para;</a></h2>
 <p>When you open Key Mapper, you will be presented with this screen.
 This screen is referred to as the Key Mapper home screen.</p>
 <p><img alt="" src="../images/hg-home-empty.png" /> <img alt="" src="../images/hg-home-empty-light.png" /></p>
 <p>Tapping the FIX button next to the accessibility service prompt will allow you to grant Key Mapper permission to run its accessibility service. You must do this for the app to work at all.</p>
 <p><img alt="" src="../images/hg-warn-service.png" /></p>
-<p>You can then tap Key Mapper in your list of available services. There may be many others on this screen and your interface may be slightly different. If nothing happens when you tap FIX, or if you can't enable the service, see <a href="#">this page</a> or ask for help in the <a href="http://keymapper.club">Discord server.</a></p>
+<p>You can then tap Key Mapper in your list of available services. There may be many others on this screen and your interface may be slightly different.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If nothing happens when you tap FIX, or if you can't enable the service, see <a href="#">this page</a> or ask for help in the <a href="http://keymapper.club">Discord server.</a></p>
+</div>
 <p><img alt="" src="../images/hg-settings-services.png" /> <img alt="" src="../images/hg-settings-services-light.png" /></p>
 <p>Tapping the FIX button next to the input method prompt will allow you to enable a Key Mapper compatible keyboard. If you want to perform actions like pressing keyboard keys or entering text you must enable this.</p>
 <p><img alt="" src="../images/hg-warn-input-method.png" /></p>
 <p>If you have only installed the Key Mapper app, your list of available keyboards will contain "Key Mapper Basic Input Method" only. If you aim to use a physical keyboard (not on-screen) when using Key Mapper, this will be suitable for you.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
 <p>If you want an on-screen keyboard to be available while using Key Mapper, you need to install "Key Mapper GUI Keyboard". It is available on the <a href="http://gui.keymapper.club">Google Play Store</a>, <a href="https://www.f-droid.org/en/packages/io.github.sds100.keymapper.inputmethod.latin/">F-Droid</a> and <a href="https://github.com/sds100/KeyMapperKeyboard/releases">GitHub.</a></p>
+</div>
 <p><img alt="" src="../images/hg-settings-input-method.png" /> <img alt="" src="../images/hg-settings-input-method-light.png" /></p>
+<div class="admonition failure">
+<p class="admonition-title">Important</p>
 <p>If you are using a Huawei or Xiaomi branded device, a device with 2GB of RAM or less, or intend to use the app while playing a mobile game, it is especially important to follow the next step.</p>
 <p>Tapping the FIX button next to the battery optimisation prompt will allow you to turn off features of your device that may prevent Key Mapper's essential services from running in the background. This is usually the source of the common 'Key Mapper randomly stops working' issue.</p>
+</div>
 <p>Older devices (such as my Android 5 device pictured here) do not have this prompt in Key Mapper. However, I was still able to find the setting in my device settings app. Read more below for details.</p>
 <p><img alt="" src="../images/hg-warn-battery-optimisation.png" /></p>
 <p>The screen that opens after tapping FIX may vary depending on your device. In my case, to disable optimisation I found the app(s) in the list, tapped them to open their settings, and chose 'Don't optimise' and on the second device, 'Disabled'.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
 <p>There is an excellent guide at <a href="http://dontkillmyapp.com">dontkillmyapp.com</a> that explains how to disable battery and/or memory optimisation for your specific device. If Key Mapper randomly stops working even after you complete these steps, ask for help in <a href="http://keymapper.club">the Discord server.</a></p>
+</div>
 <p><img alt="" src="../images/hg-settings-battery-optimisation.png" /> <img alt="" src="../images/hg-settings-battery-optimisation-light.png" /></p>
 <p>If you want to remap volume buttons and use them when Do Not Disturb is enabled, you should grant Key Mapper permission to do so. If you have an older device, you may not have this as an option.</p>
 <p><img alt="" src="../images/hg-warn-dnd.png" /></p>
@@ -698,9 +714,12 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>Most people can ignore the final prompt. If you want to create an action to change input method, you need to grant an additional set of permissions called WRITE_SECURE_SETTINGS. For help with this <a href="../user-guide/adb-permissions/#write_secure_settings">click here.</a></p>
 <p><img alt="" src="../images/hg-warn-secure-settings.png" /></p>
 <h2 id="creating-a-key-map">Creating a key map<a class="headerlink" href="#creating-a-key-map" title="Permanent link">&para;</a></h2>
+<div class="admonition summary">
+<p class="admonition-title">Summary</p>
 <p>A key map is an association between a user input (such as pushing a key or button) and a response from the device (sending information about what key was pressed and for how long).</p>
 <p>In Key Mapper, 'user inputs' that are recognised by the app are called 'triggers'. The responses from your device that were due to a trigger being pressed are called 'actions'.</p>
 <p>Key Mapper lets you assign actions to triggers that may be different from their default use. A 'volume up' trigger normally increases the volume when pressed, but this app can change that to something else.</p>
+</div>
 <p>This guide deals with 'Key event' triggers. If you want to remap fingerprint gestures, <a href="#">check out this guide.</a></p>
 <h3 id="setting-the-triggers">Setting the trigger(s)<a class="headerlink" href="#setting-the-triggers" title="Permanent link">&para;</a></h3>
 <p>To create your first key map, tap the + icon at the bottom of the Key Mapper home screen. You will see one of the two menus below.</p>
@@ -710,9 +729,9 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>Key Mapper can also remap fingerprint gestures on many devices. You can learn how to do this <a href="#">here.</a></p>
 <p><img alt="" src="../images/hg-keymap-1.png" /> <img alt="" src="../images/hg-keymap-1-light.png" /></p>
 <h3 id="setting-the-actions">Setting the action(s)<a class="headerlink" href="#setting-the-actions" title="Permanent link">&para;</a></h3>
-<p>Next, it's time to choose an action. If you have a high-resolution display, you will see the ADD ACTION button at the bottom of the screen (pictured left). Otherwise, tap the ACTIONS tab at the top of the screen (pictured right).</p>
+<p>Next, it's time to choose an action. If you have a high-resolution display, you will see the 'Add action' button at the bottom of the screen (pictured left). Otherwise, tap the 'Actions' tab at the top of the screen (pictured right).</p>
 <p><img alt="" src="../images/hg-keymap-1.png" /> <img alt="" src="../images/hg-keymap-2-light.png" /></p>
-<p>Tap the ADD ACTION button at the bottom of this screen. The action selection screen will open. Here you can choose from a wide variety of actions. Swipe left and right to change category, and scroll up and down the list until you find the action you want to add. Below is a table of the different kinds of actions you can choose from in each tab.</p>
+<p>Tap the 'Add action' button at the bottom of this screen. The action selection screen will open. Here you can choose from a wide variety of actions. Swipe left and right to change category, and scroll up and down the list until you find the action you want to add. Below is a table of the different kinds of actions you can choose from in each tab.</p>
 <table>
 <thead>
 <tr>
@@ -769,7 +788,10 @@ This screen is referred to as the Key Mapper home screen.</p>
 </table>
 <p>For this simple demonstration I will choose KEYCODE_E from the Keycode tab. This action will emulate pressing an E key on a keyboard.</p>
 <p><img alt="" src="../images/hg-keymap-3.png" /> <img alt="" src="../images/hg-keymap-3-light.png" /></p>
-<p>Key Mapper can also create a key map with multiple actions. If you want to add more actions to execute in series you can do so by tapping ADD ACTION again and choosing the next action in the chain. In the next section you can specify a delay between those actions if you wish.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Key Mapper can also create a key map with multiple actions. If you want to add more actions to execute in series you can do so by tapping 'Add action' again and choosing the next action in the chain. In the next section you can specify a delay between those actions if you wish.</p>
+</div>
 <h2 id="customising-a-key-map">Customising a key map<a class="headerlink" href="#customising-a-key-map" title="Permanent link">&para;</a></h2>
 <p>You may wish to customise your triggers and actions to have specific behaviours. Most people will want to do at least some customisation.</p>
 <h3 id="trigger-settings">Trigger settings<a class="headerlink" href="#trigger-settings" title="Permanent link">&para;</a></h3>
@@ -848,7 +870,6 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>Choosing 'Bluetooth device is connected/disconnected' can restrict your key map to working only if a specific bluetooth device is connected/disconnected.</p>
 <p>If you have <a href="#">root permission</a>, you can restrict your key maps to work only when the screen is on or off.</p>
 <p>Choosing 'Orientation' can restrict your key map to working only when the device is set to specific screen orientation.</p>
-<p>Make sure to save <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 129.941l-83.882-83.882A48 48 0 00316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 00-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 01320 111.48z"/></svg></span> your key map after applying these changes.</p>
 <h2 id="managing-key-maps">Managing key maps<a class="headerlink" href="#managing-key-maps" title="Permanent link">&para;</a></h2>
 <p>To save your key map and return to the home screen, tap the save <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 129.941l-83.882-83.882A48 48 0 00316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 00-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 01320 111.48z"/></svg></span> icon in the bottom right of the screen.</p>
 <p>Now your key map should already be working. To pause/unpause all of your key maps, pull down the notification tray and tap the Key Mapper notification to toggle between Paused and Running.</p>
@@ -858,7 +879,10 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p>Here you can pause/unpause/enable/disable all of your key maps at once.<br />
 You can also back up and restore key maps here. <a href="#">Learn more about back up and restore.</a></p>
 <p>Tapping 'Show input method picker' allows for switching between a Key Mapper compatible keyboard and any other.<br /></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
 <p>Key Mapper can also remap fingerprint gestures on many devices. You can learn how to do this <a href="#">here.</a></p>
+</div>
 <p><a href="#">Go to top.</a></p>
                 
               
