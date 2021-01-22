@@ -308,11 +308,11 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trigger-by-intent-230" class="md-nav__link">
-    Trigger by Intent (2.3.0+)
+  <a href="#trigger-from-other-apps-230" class="md-nav__link">
+    Trigger from other apps (2.3.0+)
   </a>
   
-    <nav class="md-nav" aria-label="Trigger by Intent (2.3.0+)">
+    <nav class="md-nav" aria-label="Trigger from other apps (2.3.0+)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -342,8 +342,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#detect-trigger-when-screen-is-off-root-200" class="md-nav__link">
-    Detect Trigger When Screen is Off (ROOT, 2.0.0+)
+  <a href="#detect-trigger-when-screen-is-off-root" class="md-nav__link">
+    Detect Trigger When Screen is Off (ROOT)
   </a>
   
 </li>
@@ -490,11 +490,11 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trigger-by-intent-230" class="md-nav__link">
-    Trigger by Intent (2.3.0+)
+  <a href="#trigger-from-other-apps-230" class="md-nav__link">
+    Trigger from other apps (2.3.0+)
   </a>
   
-    <nav class="md-nav" aria-label="Trigger by Intent (2.3.0+)">
+    <nav class="md-nav" aria-label="Trigger from other apps (2.3.0+)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -524,8 +524,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#detect-trigger-when-screen-is-off-root-200" class="md-nav__link">
-    Detect Trigger When Screen is Off (ROOT, 2.0.0+)
+  <a href="#detect-trigger-when-screen-is-off-root" class="md-nav__link">
+    Detect Trigger When Screen is Off (ROOT)
   </a>
   
 </li>
@@ -556,23 +556,28 @@
                 
                 <h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
 <p>There are options for each trigger key by pressing the 3-dots on them. There are also more options for the whole trigger under the "options" tab. Here are explanations of each option.</p>
-<h3 id="trigger-by-intent-230">Trigger by Intent (2.3.0+)<a class="headerlink" href="#trigger-by-intent-230" title="Permanent link">&para;</a></h3>
-<p>This allows you to trigger the key map by sending an <a href="https://developer.android.com/reference/android/content/Intent">Intent</a> to Key Mapper. There are many apps that can automate broadcasting Intents such as Tasker and Automate.</p>
+<h3 id="trigger-from-other-apps-230">Trigger from other apps (2.3.0+)<a class="headerlink" href="#trigger-from-other-apps-230" title="Permanent link">&para;</a></h3>
+<p><img alt="" src="../../images/hg-trigger-from-other-apps.png" /></p>
+<p>This allows you to trigger the key map by using a shortcut or by sending an <a href="https://developer.android.com/reference/android/content/Intent">Intent</a> to Key Mapper. Turning this option will stop any shortcuts or Intents for this key map from working.</p>
+<p>You can add the shortcut to your home screen by tapping "create launcher shortcut" or by adding the shortcut to your home screen like it is a widget. You can use the shortcut from automation apps like Tasker and Automate.</p>
+<p>There are many apps that can automate broadcasting Intents such as Tasker and Automate.</p>
 <h4 id="intent-action">Intent action<a class="headerlink" href="#intent-action" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper.TRIGGER_KEYMAP_BY_UID
 </code></pre>
 <h4 id="intent-string-extra">Intent string extra<a class="headerlink" href="#intent-string-extra" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper.KEYMAP_UID
 </code></pre>
-<p>and the value is the UUID of the key map. You can copy the UUID in Key Mapper by turning on the "Trigger by Intent" option.</p>
+<p>and the value is the UUID of the key map. You can copy the UUID in Key Mapper by turning on the "Trigger from other apps" option.</p>
 <h4 id="intent-package-optional-but-recommended">Intent package (optional but recommended)<a class="headerlink" href="#intent-package-optional-but-recommended" title="Permanent link">&para;</a></h4>
 <pre><code>io.github.sds100.keymapper
 </code></pre>
 <p>This will only send the Intent to Key Mapper and no other packages.</p>
-<p><strong><span style="color:red">Important!!!</span></strong></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Add <code>.debug</code> or <code>.ci</code> to the end of all <code>io.github.sds100.keymapper</code> instances in the action, extra and package if your Key Mapper build is a debug or ci build respectively.</p>
-<h3 id="detect-trigger-when-screen-is-off-root-200">Detect Trigger When Screen is Off (ROOT, 2.0.0+)<a class="headerlink" href="#detect-trigger-when-screen-is-off-root-200" title="Permanent link">&para;</a></h3>
-<p>These are the buttons which can be detected when the screen is off. Let the developer know about any keys you would also like to be supported.</p>
+</div>
+<h3 id="detect-trigger-when-screen-is-off-root">Detect Trigger When Screen is Off (ROOT)<a class="headerlink" href="#detect-trigger-when-screen-is-off-root" title="Permanent link">&para;</a></h3>
+<p>These are the buttons which can be detected when the screen is off. Let the developer know about any buttons you would also like to be supported.</p>
 <ul>
 <li>Volume Up</li>
 <li>Volume Down</li>
