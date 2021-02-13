@@ -3,10 +3,10 @@ package io.github.sds100.keymapper.util.delegate
 import androidx.annotation.MainThread
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.IGlobalPreferences
-import io.github.sds100.keymapper.data.holdDownDuration
+import io.github.sds100.keymapper.data.defaultHoldDownDuration
+import io.github.sds100.keymapper.data.defaultRepeatRate
+import io.github.sds100.keymapper.data.defaultVibrationDuration
 import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.repeatRate
-import io.github.sds100.keymapper.data.vibrationDuration
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.isFailure
 import io.github.sds100.keymapper.util.result.valueOrNull
@@ -100,7 +100,7 @@ abstract class SimpleMappingController(
                 .getData(FingerprintMap.EXTRA_VIBRATION_DURATION)
                 .valueOrNull()
                 ?.toLong()
-                ?: globalPreferences.vibrationDuration.firstBlocking().toLong()
+                ?: globalPreferences.defaultVibrationDuration.firstBlocking().toLong()
 
             vibrateEvent.value = VibrateEvent(duration)
         }
@@ -125,10 +125,10 @@ abstract class SimpleMappingController(
 
     private fun repeatAction(action: Action) = coroutineScope.launch(start = CoroutineStart.LAZY) {
         val repeatRate = action.repeatRate?.toLong()
-            ?: globalPreferences.repeatRate.firstBlocking().toLong()
+            ?: globalPreferences.defaultRepeatRate.firstBlocking().toLong()
 
         val holdDownDuration = action.holdDownDuration?.toLong()
-            ?: globalPreferences.holdDownDuration.firstBlocking().toLong()
+            ?: globalPreferences.defaultHoldDownDuration.firstBlocking().toLong()
 
         val holdDown = action.holdDown
 

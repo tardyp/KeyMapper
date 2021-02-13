@@ -475,7 +475,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //long press delay
         SeekBarPreference(requireContext()).apply {
-            key = Keys.longPressDelay.name
+            key = Keys.defaultLongPressDelay.name
             setDefaultValue(PreferenceDefaults.LONG_PRESS_DELAY)
 
             setTitle(R.string.title_pref_long_press_delay)
@@ -489,7 +489,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //double press delay
         SeekBarPreference(requireContext()).apply {
-            key = Keys.doublePressDelay.name
+            key = Keys.defaultDoublePressDelay.name
             setDefaultValue(PreferenceDefaults.DOUBLE_PRESS_DELAY)
 
             setTitle(R.string.title_pref_double_press_delay)
@@ -503,7 +503,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //vibration duration
         SeekBarPreference(requireContext()).apply {
-            key = Keys.vibrateDuration.name
+            key = Keys.defaultVibrateDuration.name
             setDefaultValue(PreferenceDefaults.VIBRATION_DURATION)
 
             setTitle(R.string.title_pref_vibration_duration)
@@ -517,7 +517,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //repeat delay
         SeekBarPreference(requireContext()).apply {
-            key = Keys.repeatDelay.name
+            key = Keys.defaultRepeatDelay.name
             setDefaultValue(PreferenceDefaults.REPEAT_DELAY)
 
             setTitle(R.string.title_pref_repeat_delay)
@@ -531,7 +531,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //repeat rate
         SeekBarPreference(requireContext()).apply {
-            key = Keys.repeatRate.name
+            key = Keys.defaultRepeatRate.name
             setDefaultValue(PreferenceDefaults.REPEAT_RATE)
 
             setTitle(R.string.title_pref_repeat_rate)
@@ -545,7 +545,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //sequence trigger timeout
         SeekBarPreference(requireContext()).apply {
-            key = Keys.sequenceTriggerTimeout.name
+            key = Keys.defaultSequenceTriggerTimeout.name
             setDefaultValue(PreferenceDefaults.SEQUENCE_TRIGGER_TIMEOUT)
 
             setTitle(R.string.title_pref_sequence_trigger_timeout)

@@ -109,37 +109,37 @@ val IGlobalPreferences.approvedFingerprintFeaturePrompt
         it ?: false
     }
 
-val IGlobalPreferences.longPressDelay
-    get() = getFlow(Keys.longPressDelay).map {
+val IGlobalPreferences.defaultLongPressDelay
+    get() = getFlow(Keys.defaultLongPressDelay).map {
         it ?: PreferenceDefaults.LONG_PRESS_DELAY
     }
 
-val IGlobalPreferences.doublePressDelay
-    get() = getFlow(Keys.doublePressDelay).map {
+val IGlobalPreferences.defaultDoublePressDelay
+    get() = getFlow(Keys.defaultDoublePressDelay).map {
         it ?: PreferenceDefaults.DOUBLE_PRESS_DELAY
     }
 
-val IGlobalPreferences.vibrationDuration
-    get() = getFlow(Keys.vibrateDuration).map {
+val IGlobalPreferences.defaultVibrationDuration
+    get() = getFlow(Keys.defaultVibrateDuration).map {
         it ?: PreferenceDefaults.VIBRATION_DURATION
     }
 
-val IGlobalPreferences.repeatDelay
-    get() = getFlow(Keys.repeatDelay).map {
+val IGlobalPreferences.defaultRepeatDelay
+    get() = getFlow(Keys.defaultRepeatDelay).map {
         it ?: PreferenceDefaults.REPEAT_DELAY
     }
 
-val IGlobalPreferences.repeatRate
-    get() = getFlow(Keys.repeatRate).map {
+val IGlobalPreferences.defaultRepeatRate
+    get() = getFlow(Keys.defaultRepeatRate).map {
         it ?: PreferenceDefaults.REPEAT_RATE
     }
 
-val IGlobalPreferences.sequenceTriggerTimeout
-    get() = getFlow(Keys.sequenceTriggerTimeout).map {
+val IGlobalPreferences.defaultSequenceTriggerTimeout
+    get() = getFlow(Keys.defaultSequenceTriggerTimeout).map {
         it ?: PreferenceDefaults.SEQUENCE_TRIGGER_TIMEOUT
     }
 
-val IGlobalPreferences.holdDownDuration
-    get() = getFlow(Keys.holdDownDuration).map {
+val IGlobalPreferences.defaultHoldDownDuration
+    get() = getFlow(Keys.defaultHoldDownDuration).map {
         it ?: PreferenceDefaults.HOLD_DOWN_DURATION
     }

@@ -320,43 +320,43 @@ class AccessibilityServiceController(
     }
 
     private fun getKeymapDetectionDelegatePreferences() = KeymapDetectionPreferences(
-        globalPreferences.longPressDelay.firstBlocking(),
-        globalPreferences.doublePressDelay.firstBlocking(),
-        globalPreferences.repeatDelay.firstBlocking(),
-        globalPreferences.repeatRate.firstBlocking(),
-        globalPreferences.sequenceTriggerTimeout.firstBlocking(),
-        globalPreferences.vibrationDuration.firstBlocking(),
-        globalPreferences.holdDownDuration.firstBlocking(),
+        globalPreferences.defaultLongPressDelay.firstBlocking(),
+        globalPreferences.defaultDoublePressDelay.firstBlocking(),
+        globalPreferences.defaultRepeatDelay.firstBlocking(),
+        globalPreferences.defaultRepeatRate.firstBlocking(),
+        globalPreferences.defaultSequenceTriggerTimeout.firstBlocking(),
+        globalPreferences.defaultVibrationDuration.firstBlocking(),
+        globalPreferences.defaultHoldDownDuration.firstBlocking(),
         globalPreferences.getFlow(Keys.forceVibrate).firstBlocking() ?: false
     )
 
 
     private fun subscribeToPreferenceChanges() {
-        globalPreferences.longPressDelay.collectWhenStarted(this) {
+        globalPreferences.defaultLongPressDelay.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultLongPressDelay = it
         }
 
-        globalPreferences.doublePressDelay.collectWhenStarted(this) {
+        globalPreferences.defaultDoublePressDelay.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultDoublePressDelay = it
         }
 
-        globalPreferences.repeatDelay.collectWhenStarted(this) {
+        globalPreferences.defaultRepeatDelay.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultRepeatDelay = it
         }
 
-        globalPreferences.repeatRate.collectWhenStarted(this) {
+        globalPreferences.defaultRepeatRate.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultRepeatRate = it
         }
 
-        globalPreferences.sequenceTriggerTimeout.collectWhenStarted(this) {
+        globalPreferences.defaultSequenceTriggerTimeout.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultSequenceTriggerTimeout = it
         }
 
-        globalPreferences.vibrationDuration.collectWhenStarted(this) {
+        globalPreferences.defaultVibrationDuration.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultVibrateDuration = it
         }
 
-        globalPreferences.holdDownDuration.collectWhenStarted(this) {
+        globalPreferences.defaultHoldDownDuration.collectWhenStarted(this) {
             keymapDetectionDelegate.preferences.defaultHoldDownDuration = it
         }
 
