@@ -7,7 +7,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.activity.HomeActivity
+import io.github.sds100.keymapper.ui.activity.KeyMapperActivity
 
 /**
  * Created by sds100 on 06/08/2019.
@@ -87,9 +87,9 @@ object AccessibilityUtils {
 
         } catch (e: ActivityNotFoundException) {
             //open the app to show a dialog to tell the user to give the app WRITE_SECURE_SETTINGS permission
-            Intent(context, HomeActivity::class.java).apply {
+            Intent(context, KeyMapperActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                putExtra(HomeActivity.KEY_SHOW_ACCESSIBILITY_SETTINGS_NOT_FOUND_DIALOG, true)
+                putExtra(KeyMapperActivity.KEY_SHOW_ACCESSIBILITY_SETTINGS_NOT_FOUND_DIALOG, true)
 
                 context.startActivity(this)
             }

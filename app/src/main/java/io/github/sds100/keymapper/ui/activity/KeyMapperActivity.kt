@@ -32,7 +32,7 @@ import splitties.toast.toast
  * Created by sds100 on 19/02/2020.
  */
 
-class HomeActivity : AppCompatActivity() {
+class KeyMapperActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_SHOW_ACCESSIBILITY_SETTINGS_NOT_FOUND_DIALOG =
@@ -63,7 +63,7 @@ class HomeActivity : AppCompatActivity() {
 
                 okButton {
                     PermissionUtils.requestWriteSecureSettingsPermission(
-                        this@HomeActivity, findNavController(R.id.container))
+                        this@KeyMapperActivity, findNavController(R.id.container))
                 }
 
                 show()
@@ -71,7 +71,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         ServiceLocator.keymapRepository(this).apply {
-            keymapList.observe(this@HomeActivity, {
+            keymapList.observe(this@KeyMapperActivity, {
 
                 sendPackageBroadcast(
                     MyAccessibilityService.ACTION_UPDATE_KEYMAP_LIST_CACHE,
