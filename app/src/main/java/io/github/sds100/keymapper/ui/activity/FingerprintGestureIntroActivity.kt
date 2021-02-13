@@ -33,7 +33,7 @@ class FingerprintGestureIntroActivity : AppIntro2() {
                 .set(Keys.approvedFingerprintFeaturePrompt, true)
         }
 
-        startActivity(Intent(this, KeyMapperActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java))
 
         finish()
     }

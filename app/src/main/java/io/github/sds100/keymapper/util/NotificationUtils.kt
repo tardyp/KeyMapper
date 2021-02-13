@@ -19,7 +19,7 @@ import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.broadcastreceiver.KeyMapperBroadcastReceiver
 import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.activity.KeyMapperActivity
+import io.github.sds100.keymapper.ui.activity.MainActivity
 import io.github.sds100.keymapper.util.AppNotification.*
 
 /**
@@ -268,7 +268,7 @@ object NotificationUtils {
         title = R.string.notification_feature_fingerprint_title,
         text = R.string.notification_feature_fingerprint_text,
         icon = R.drawable.ic_notification_fingerprint,
-        pendingIntent = IntentUtils.createPendingActivityIntent(ctx, KeyMapperActivity::class.java),
+        pendingIntent = IntentUtils.createPendingActivityIntent(ctx, MainActivity::class.java),
         autoCancel = true,
         priority = NotificationCompat.PRIORITY_LOW
     )
@@ -292,7 +292,7 @@ object NotificationUtils {
     private fun openKeyMapperAction(ctx: Context) = NotificationCompat.Action(
         0,
         ctx.str(R.string.notification_action_open_app),
-        IntentUtils.createPendingActivityIntent(ctx, KeyMapperActivity::class.java)
+        IntentUtils.createPendingActivityIntent(ctx, MainActivity::class.java)
     )
 
     private fun toggleKeyboardAction(ctx: Context) = NotificationCompat.Action(

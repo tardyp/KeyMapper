@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.activity.KeyMapperActivity
+import io.github.sds100.keymapper.ui.activity.MainActivity
 import io.github.sds100.keymapper.util.AccessibilityUtils
 import io.github.sds100.keymapper.util.DismissNotification
 import io.github.sds100.keymapper.util.KeyboardUtils
@@ -60,7 +60,7 @@ class KeyMapperBroadcastReceiver : BroadcastReceiver() {
                         .set(Keys.approvedFingerprintFeaturePrompt, true)
                 }
 
-                Intent(context, KeyMapperActivity::class.java).apply {
+                Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(this)
                 }

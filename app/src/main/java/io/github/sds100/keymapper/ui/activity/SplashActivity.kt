@@ -25,7 +25,7 @@ class SplashActivity : FragmentActivity() {
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
                 startActivity(Intent(this, FingerprintGestureIntroActivity::class.java))
 
-            else -> startActivity(Intent(this, KeyMapperActivity::class.java))
+            else -> startActivity(Intent(this, MainActivity::class.java))
         }
 
         finish()

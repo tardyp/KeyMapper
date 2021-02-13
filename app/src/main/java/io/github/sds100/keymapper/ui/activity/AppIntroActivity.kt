@@ -68,7 +68,7 @@ class AppIntroActivity : AppIntro2() {
         globalPreferences.set(Keys.shownAppIntro, true)
         globalPreferences.set(Keys.approvedFingerprintFeaturePrompt, true)
 
-        startActivity(Intent(this, KeyMapperActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java))
 
         finish()
     }

@@ -52,7 +52,7 @@
         </activity>
 
         <activity android:name=".ui.activity.AppIntroActivity" />
-        <activity android:name=".ui.activity.KeyMapperActivity" />
+        <activity android:name=".ui.activity.MainActivity" />
         <activity android:name=".ui.activity.FingerprintGestureIntroActivity" />
 
         <!-- Use a different task affinity so this activity doesn't close other activities -->
