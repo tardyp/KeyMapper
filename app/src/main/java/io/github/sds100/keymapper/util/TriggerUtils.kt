@@ -10,8 +10,6 @@ import io.github.sds100.keymapper.data.model.Trigger.Companion.PARALLEL
 import io.github.sds100.keymapper.data.model.Trigger.Companion.SEQUENCE
 import io.github.sds100.keymapper.data.model.Trigger.Companion.TRIGGER_FLAG_LABEL_MAP
 import io.github.sds100.keymapper.data.model.TriggerKeyModel
-import io.github.sds100.keymapper.data.showDeviceDescriptors
-import io.github.sds100.keymapper.globalPreferences
 import splitties.bitflags.hasFlag
 
 /**
@@ -36,7 +34,11 @@ fun Trigger.buildTriggerFlagsDescription(ctx: Context): String = buildString {
     }
 }
 
-fun Trigger.buildDescription(ctx: Context, deviceInfoList: List<DeviceInfo>): String = buildString {
+fun Trigger.buildDescription(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptor: Boolean
+): String = buildString {
     val separator = when (mode) {
         PARALLEL -> ctx.str(R.string.plus)
         SEQUENCE -> ctx.str(R.string.arrow)
@@ -58,7 +60,7 @@ fun Trigger.buildDescription(ctx: Context, deviceInfoList: List<DeviceInfo>): St
 
         append(" ${KeyEventUtils.keycodeToString(key.keyCode)}")
 
-        val deviceName = key.getDeviceName(ctx, deviceInfoList)
+        val deviceName = key.getDeviceName(ctx, deviceInfoList, showDeviceDescriptor)
         append(" (")
 
         append(deviceName)
@@ -74,10 +76,14 @@ fun Trigger.buildDescription(ctx: Context, deviceInfoList: List<DeviceInfo>): St
     }
 }
 
-fun Trigger.Key.buildModel(ctx: Context, deviceInfoList: List<DeviceInfo>): TriggerKeyModel {
+fun Trigger.Key.buildModel(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptors: Boolean
+): TriggerKeyModel {
 
     val extraInfo = buildString {
-        append(getDeviceName(ctx, deviceInfoList))
+        append(getDeviceName(ctx, deviceInfoList, showDeviceDescriptors))
 
         val flagLabels = getFlagLabelList(ctx)
 
@@ -96,7 +102,11 @@ fun Trigger.Key.buildModel(ctx: Context, deviceInfoList: List<DeviceInfo>): Trig
     )
 }
 
-fun Trigger.Key.getDeviceName(ctx: Context, deviceInfoList: List<DeviceInfo>): String =
+fun Trigger.Key.getDeviceName(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptor: Boolean
+): String =
     when (deviceId) {
         Trigger.Key.DEVICE_ID_THIS_DEVICE -> ctx.str(R.string.this_device)
         Trigger.Key.DEVICE_ID_ANY_DEVICE -> ctx.str(R.string.any_device)
@@ -106,7 +116,7 @@ fun Trigger.Key.getDeviceName(ctx: Context, deviceInfoList: List<DeviceInfo>): S
             when {
                 deviceInfo == null -> ctx.str(R.string.dont_know_device_name)
 
-                ctx.globalPreferences.showDeviceDescriptors.firstBlocking() ->
+                showDeviceDescriptor ->
                     "${deviceInfo.name} ${deviceInfo.descriptor.substring(0..4)}"
 
                 else -> deviceInfo.name

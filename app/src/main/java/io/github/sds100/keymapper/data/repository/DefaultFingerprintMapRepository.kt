@@ -17,9 +17,9 @@ import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.Constraint
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.FingerprintMapUtils
 import io.github.sds100.keymapper.util.MigrationUtils
-import io.github.sds100.keymapper.util.RequestBackup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -44,7 +44,8 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
         )
     }
 
-    override val requestBackup = MutableLiveData<RequestBackup<Map<String, FingerprintMap>>>()
+    override val requestAutomaticBackup =
+        MutableLiveData<BackupRequest<Map<String, FingerprintMap>>>()
 
     private val gson = GsonBuilder()
         .registerTypeAdapter(FingerprintMap.DESERIALIZER)
@@ -161,7 +162,7 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
         //don't back up if they haven't been migrated
         if (maps.any { it.value.version < FingerprintMap.CURRENT_VERSION }) return
 
-        requestBackup.value = RequestBackup(maps)
+        requestAutomaticBackup.value = BackupRequest(maps)
     }
 
     private suspend fun Preferences.getGesture(key: Preferences.Key<String>): FingerprintMap {

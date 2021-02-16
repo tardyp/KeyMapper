@@ -15,17 +15,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.Keys
-import io.github.sds100.keymapper.data.PreferenceDefaults
-import io.github.sds100.keymapper.data.automaticBackupLocation
-import io.github.sds100.keymapper.data.hasRootPermission
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.SettingsViewModel
 import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
-import io.github.sds100.keymapper.globalPreferences
+import io.github.sds100.keymapper.domain.preferences.Keys
+import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
+import io.github.sds100.keymapper.domain.utils.ThemeUtils
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
 
 class SettingsFragment : Fragment() {
@@ -37,7 +34,11 @@ class SettingsFragment : Fragment() {
     val binding: FragmentSettingsBinding
         get() = _binding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         FragmentSettingsBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             _binding = this
@@ -68,7 +69,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     companion object {
         private val KEYS_REQUIRING_WRITE_SECURE_SETTINGS = arrayOf(
-            Keys.autoChangeImeOnBtConnect,
+            Keys.changeImeOnBtConnect,
             Keys.toggleKeyboardOnToggleKeymaps,
             Keys.showToggleKeyboardNotification,
             Keys.bluetoothDevicesThatToggleKeyboard
@@ -81,20 +82,25 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         InjectorUtils.provideBackupRestoreViewModel(requireContext())
     }
 
-    private val chooseAutomaticBackupLocationLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument()) {
-        it ?: return@registerForActivityResult
+    private val chooseAutomaticBackupLocationLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+            it ?: return@registerForActivityResult
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            globalPreferences.set(Keys.automaticBackupLocation, it.toString())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                viewModel.setAutomaticBackupLocation(it.toString())
 
-            val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 
-            requireContext().contentResolver.takePersistableUriPermission(it, takeFlags)
+                requireContext().contentResolver.takePersistableUriPermission(it, takeFlags)
 
-            backupRestoreViewModel.backupAll(requireContext().contentResolver.openOutputStream(it))
+                backupRestoreViewModel.backupAll(
+                    requireContext().contentResolver.openOutputStream(
+                        it
+                    )
+                )
+            }
         }
-    }
 
     private val viewModel by viewModels<SettingsViewModel> {
         InjectorUtils.provideSettingsViewModel(requireContext())
@@ -148,7 +154,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_dark_theme)
             entries = strArray(R.array.pref_dark_theme_entries)
-            entryValues = arrayOf("0", "1", "2")
+            entryValues = ThemeUtils.THEMES.map { it.toString() }.toTypedArray()
             summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
 
             addPreference(this)
@@ -162,18 +168,16 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
                 setTitle(R.string.title_pref_automatic_backup_location)
 
-                viewLifecycleScope.launchWhenResumed {
-                    globalPreferences.automaticBackupLocation.collectLatest { backupLocation ->
-                        summary = if (backupLocation.isBlank()) {
-                            str(R.string.summary_pref_automatic_backup_location_disabled)
-                        } else {
-                            backupLocation
-                        }
+                viewModel.automaticBackupLocation.collectWhenResumed(viewLifecycleOwner, {
+                    summary = if (it.isBlank()) {
+                        str(R.string.summary_pref_automatic_backup_location_disabled)
+                    } else {
+                        it
                     }
-                }
+                })
 
                 setOnPreferenceClickListener {
-                    val backupLocation = globalPreferences.automaticBackupLocation.firstBlocking()
+                    val backupLocation = viewModel.automaticBackupLocation.firstBlocking()
 
                     if (backupLocation.isBlank()) {
                         chooseAutomaticBackupLocationLauncher.launch(BackupUtils.DEFAULT_AUTOMATIC_BACKUP_NAME)
@@ -187,7 +191,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                             }
 
                             negativeButton(R.string.neg_turn_off) {
-                                globalPreferences.set(Keys.automaticBackupLocation, "")
+                                viewModel.disableAutomaticBackup()
                             }
 
                             show()
@@ -304,12 +308,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //only show the options to show the keyboard picker when rooted in these versions
         if (Build.VERSION.SDK_INT in Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P) {
-            viewLifecycleScope.launchWhenResumed {
-                globalPreferences.hasRootPermission.collectLatest {
-                    findPreference<Preference>(Keys.showImePickerNotification.name)?.isEnabled = it
-                    findPreference<Preference>(Keys.autoShowImePicker.name)?.isEnabled = it
-                    findPreference<Preference>(Keys.bluetoothDevicesThatShowImePicker.name)?.isEnabled = it
-                }
+            viewModel.hasRootPermission.collectWhenResumed(viewLifecycleOwner) {
+                findPreference<Preference>(Keys.showImePickerNotification.name)?.isEnabled = it
+                findPreference<Preference>(Keys.showImePickerOnBtConnect.name)?.isEnabled = it
+                findPreference<Preference>(Keys.bluetoothDevicesThatShowImePicker.name)?.isEnabled =
+                    it
             }
 
             //show a preference linking to the notification management screen
@@ -332,7 +335,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             }
 
             SwitchPreferenceCompat(requireContext()).apply {
-                key = Keys.autoShowImePicker.name
+                key = Keys.showImePickerOnBtConnect.name
                 setDefaultValue(false)
 
                 setTitle(R.string.title_pref_auto_show_ime_picker)
@@ -358,7 +361,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //automatically change the keyboard when a bluetooth device (dis)connects
         SwitchPreferenceCompat(requireContext()).apply {
-            key = Keys.autoChangeImeOnBtConnect.name
+            key = Keys.changeImeOnBtConnect.name
             setDefaultValue(false)
 
             isSingleLineTitle = false
@@ -457,7 +460,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         //auto show keyboard picker
         SwitchPreferenceCompat(requireContext()).apply {
-            key = Keys.autoShowImePicker.name
+            key = Keys.showImePickerOnBtConnect.name
             setDefaultValue(false)
 
             setTitle(R.string.title_pref_auto_show_ime_picker)

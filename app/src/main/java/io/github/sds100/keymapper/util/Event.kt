@@ -17,7 +17,6 @@ package io.github.sds100.keymapper.util
 
 import android.os.Parcelable
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatDelegate
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.BaseOptions
@@ -33,9 +32,11 @@ open class MessageEvent(@StringRes val textRes: Int) : Event()
 class FixFailure(val failure: Failure) : Event()
 class VibrateEvent(val duration: Long) : Event()
 object ShowTriggeredKeymapToast : Event()
-data class PerformAction(val action: Action,
-                         val additionalMetaState: Int = 0,
-                         val keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP) : Event()
+data class PerformAction(
+    val action: Action,
+    val additionalMetaState: Int = 0,
+    val keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
+) : Event()
 
 data class ImitateButtonPress(
     val keyCode: Int,
@@ -54,18 +55,26 @@ class SelectScreenshot : Event()
 class ChooseKeycode : Event()
 class BuildDeviceInfoModels : Event()
 class RequestBackupSelectedKeymaps : Event()
-class BuildKeymapListModels(val keymapList: List<KeyMap>) : Event()
+
+class BuildKeymapListModels(
+    val keymapList: List<KeyMap>,
+    val deviceInfoList: List<DeviceInfo>,
+    val hasRootPermission: Boolean,
+    val showDeviceDescriptors: Boolean
+) : Event()
+
 class OkDialog(val responseKey: String, @StringRes val message: Int) : Event()
 class EnableAccessibilityServicePrompt : Event()
-class RequestBackup<T>(val model: T) : Event()
+class BackupRequest<T>(val model: T) : Event()
 class RequestRestore : Event()
 class RequestBackupAll : Event()
 class ShowErrorMessage(val failure: Failure) : Event()
 class BuildIntentExtraListItemModels(val extraModels: List<IntentExtraModel>) : Event()
-class SetTheme(@AppCompatDelegate.NightMode val theme: Int) : Event()
 class CreateKeymapShortcutEvent(
     val uuid: String,
-    val actionList: List<Action>
+    val actionList: List<Action>,
+    val deviceInfoList: List<DeviceInfo>,
+    val showDeviceDescriptors: Boolean
 ) : Event()
 
 data class SaveEvent<T>(val model: T) : Event()
@@ -96,14 +105,25 @@ object OnHideKeyboard : Event(), UpdateNotificationEvent
 object OnShowKeyboard : Event(), UpdateNotificationEvent
 
 //trigger
-class BuildTriggerKeyModels(val source: List<Trigger.Key>) : Event()
+class BuildTriggerKeyModels(
+    val source: List<Trigger.Key>,
+    val deviceInfoList: List<DeviceInfo>,
+    val showDeviceDescriptors: Boolean
+) : Event()
+
 class EditTriggerKeyOptions(val options: TriggerKeyOptions) : Event()
 class EnableCapsLockKeyboardLayoutPrompt : Event()
 class StartRecordingTriggerInService : Event()
 class StopRecordingTriggerInService : Event()
 
 //action list
-class BuildActionListModels(val source: List<Action>) : Event()
+class BuildActionListModels(
+    val source: List<Action>,
+    val deviceInfoList: List<DeviceInfo>,
+    val hasRootPermission: Boolean,
+    val showDeviceDescriptors: Boolean
+) : Event()
+
 class TestAction(val action: Action) : Event()
 class EditActionOptions(val options: BaseOptions<Action>) : Event()
 
@@ -113,7 +133,13 @@ class BuildConstraintListModels(val source: List<Constraint>) : Event()
 class SelectConstraint(val constraint: Constraint) : Event()
 
 //fingerprint gesture maps
-class BuildFingerprintMapModels(val maps: Map<String, FingerprintMap>) : Event()
+class BuildFingerprintMapModels(
+    val maps: Map<String, FingerprintMap>,
+    val deviceInfoList: List<DeviceInfo>,
+    val hasRootPermission: Boolean,
+    val showDeviceDescriptors: Boolean
+) : Event()
+
 class BackupFingerprintMaps : Event()
 class RequestFingerprintMapReset : Event()
 
@@ -122,8 +148,6 @@ class OpenSettings : Event()
 class OpenAbout : Event()
 class ChooseKeyboard : Event()
 class SendFeedback : Event()
-class ResumeKeymaps : Event()
-class PauseKeymaps : Event()
 class EnableAccessibilityService : Event()
 
 //notifications
@@ -131,3 +155,6 @@ object ShowFingerprintFeatureNotification : Event(), UpdateNotificationEvent
 object DismissFingerprintFeatureNotification : Event(), UpdateNotificationEvent
 class DismissNotification(val id: Int) : Event(), UpdateNotificationEvent
 interface UpdateNotificationEvent
+
+//home
+object ShowWhatsNewEvent : Event()

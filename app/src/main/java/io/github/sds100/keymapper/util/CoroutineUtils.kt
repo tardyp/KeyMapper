@@ -4,9 +4,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -16,8 +18,10 @@ import kotlinx.coroutines.runBlocking
 val Fragment.viewLifecycleScope: LifecycleCoroutineScope
     get() = viewLifecycleOwner.lifecycle.coroutineScope
 
-fun <T> Flow<T>.collectWhenResumed(lifecycleOwner: LifecycleOwner,
-                                   block: suspend (value: T) -> Unit) {
+fun <T> Flow<T>.collectWhenResumed(
+    lifecycleOwner: LifecycleOwner,
+    block: suspend (value: T) -> Unit
+) {
     lifecycleOwner.lifecycle.coroutineScope.launchWhenResumed {
         collect {
             block.invoke(it)
@@ -25,8 +29,10 @@ fun <T> Flow<T>.collectWhenResumed(lifecycleOwner: LifecycleOwner,
     }
 }
 
-fun <T> Flow<T>.collectWhenStarted(lifecycleOwner: LifecycleOwner,
-                                   block: suspend (value: T) -> Unit) {
+fun <T> Flow<T>.collectWhenStarted(
+    lifecycleOwner: LifecycleOwner,
+    block: suspend (value: T) -> Unit
+) {
     lifecycleOwner.lifecycle.coroutineScope.launchWhenStarted {
         collect {
             block.invoke(it)
@@ -35,3 +41,12 @@ fun <T> Flow<T>.collectWhenStarted(lifecycleOwner: LifecycleOwner,
 }
 
 fun <T> Flow<T>.firstBlocking(): T = runBlocking { first() }
+
+fun <T> Flow<T>.collectIn(
+    coroutineScope: CoroutineScope,
+    block: suspend (value: T) -> Unit
+) {
+    coroutineScope.launch {
+        collect(block)
+    }
+}

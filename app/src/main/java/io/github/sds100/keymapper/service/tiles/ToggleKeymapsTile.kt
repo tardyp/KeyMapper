@@ -13,9 +13,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.Keys
-import io.github.sds100.keymapper.data.keymapsPaused
-import io.github.sds100.keymapper.globalPreferences
+import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.domain.usecases.ControlKeymapsPausedState
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.util.AccessibilityUtils
 import io.github.sds100.keymapper.util.collectWhenStarted
@@ -28,11 +27,13 @@ import io.github.sds100.keymapper.util.str
 @RequiresApi(Build.VERSION_CODES.N)
 class ToggleKeymapsTile : TileService(), LifecycleOwner {
 
+    private val useCase = ControlKeymapsPausedState(ServiceLocator.preferenceRepository(this))
+
     private val state: State
         get() = when {
             !AccessibilityUtils.isServiceEnabled(this) -> State.DISABLED
 
-            else -> if (globalPreferences.keymapsPaused.firstBlocking()) {
+            else -> if (useCase.keymapsPaused.firstBlocking()) {
                 State.PAUSED
             } else {
                 State.RESUMED
@@ -87,7 +88,7 @@ class ToggleKeymapsTile : TileService(), LifecycleOwner {
         invalidateTile()
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
-        globalPreferences.keymapsPaused.collectWhenStarted(this, {
+        useCase.keymapsPaused.collectWhenStarted(this, {
             invalidateTile()
         })
 
@@ -115,7 +116,7 @@ class ToggleKeymapsTile : TileService(), LifecycleOwner {
 
         if (!AccessibilityUtils.isServiceEnabled(this)) return
 
-        globalPreferences.toggle(Keys.keymapsPaused)
+        useCase.toggleKeymaps()
 
         qsTile?.updateTile()
     }
@@ -140,7 +141,8 @@ class ToggleKeymapsTile : TileService(), LifecycleOwner {
 
             State.DISABLED -> {
                 qsTile.label = str(R.string.tile_service_disabled)
-                qsTile.contentDescription = str(R.string.tile_accessibility_service_disabled_content_description)
+                qsTile.contentDescription =
+                    str(R.string.tile_accessibility_service_disabled_content_description)
                 qsTile.icon = Icon.createWithResource(this, R.drawable.ic_tile_error)
                 qsTile.state = Tile.STATE_UNAVAILABLE
             }

@@ -22,11 +22,9 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.data.model.Trigger
 import io.github.sds100.keymapper.data.model.TriggerKeyModel
-import io.github.sds100.keymapper.data.showDeviceDescriptors
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
 import io.github.sds100.keymapper.data.viewmodel.TriggerViewModel
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.util.*
@@ -80,7 +78,12 @@ class TriggerFragment : Fragment() {
                                 val deviceDescriptor = event.deviceDescriptor
                                 val isExternal = event.isExternal
 
-                                triggerViewModel.addTriggerKey(event.keyCode, deviceDescriptor, deviceName, isExternal)
+                                triggerViewModel.addTriggerKey(
+                                    event.keyCode,
+                                    deviceDescriptor,
+                                    deviceName,
+                                    isExternal
+                                )
                             }
                         }
                 }
@@ -144,7 +147,11 @@ class TriggerFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         FragmentTriggerBinding.inflate(inflater, container, false).apply {
             binding = this
             lifecycleOwner = viewLifecycleOwner
@@ -181,11 +188,13 @@ class TriggerFragment : Fragment() {
                 }
 
                 is BuildTriggerKeyModels -> viewLifecycleScope.launchWhenResumed {
-                    val deviceInfoList = triggerViewModel.getDeviceInfoList()
-
                     val modelList = sequence {
                         event.source.forEach {
-                            val model = it.buildModel(requireContext(), deviceInfoList)
+                            val model = it.buildModel(
+                                requireContext(),
+                                event.deviceInfoList,
+                                event.showDeviceDescriptors
+                            )
                             yield(model)
                         }
                     }.toList()
@@ -200,8 +209,10 @@ class TriggerFragment : Fragment() {
                     }.showAndAwait(okValue = true, cancelValue = null, dismissValue = false)
 
                     if (approvedWarning) {
-                        triggerViewModel.onDialogResponse(event.responseKey,
-                            DialogResponse.POSITIVE)
+                        triggerViewModel.onDialogResponse(
+                            event.responseKey,
+                            UserResponse.POSITIVE
+                        )
                     }
                 }
 
@@ -216,7 +227,8 @@ class TriggerFragment : Fragment() {
                 }
 
                 is EnableCapsLockKeyboardLayoutPrompt -> requireContext().alertDialog {
-                    messageResource = R.string.dialog_message_enable_physical_keyboard_caps_lock_a_keyboard_layout
+                    messageResource =
+                        R.string.dialog_message_enable_physical_keyboard_caps_lock_a_keyboard_layout
 
                     okButton()
 
@@ -224,7 +236,8 @@ class TriggerFragment : Fragment() {
                 }
 
                 is EditTriggerKeyOptions -> {
-                    val direction = ConfigKeymapFragmentDirections.actionTriggerKeyOptionsFragment(event.options)
+                    val direction =
+                        ConfigKeymapFragmentDirections.actionTriggerKeyOptionsFragment(event.options)
                     findNavController().navigate(direction)
                 }
             }
@@ -280,7 +293,9 @@ class TriggerFragment : Fragment() {
         })
     }
 
-    private suspend fun showChooseDeviceDialog() = suspendCoroutine<String> {
+    private suspend fun showChooseDeviceDialog(
+        showDeviceDescriptors: Boolean
+    ) = suspendCoroutine<String> {
         requireContext().alertDialog {
 
             val deviceIds = sequence {
@@ -295,7 +310,7 @@ class TriggerFragment : Fragment() {
                 yield(str(R.string.this_device))
                 yield(str(R.string.any_device))
 
-                if (globalPreferences.showDeviceDescriptors.firstBlocking()) {
+                if (showDeviceDescriptors) {
                     InputDeviceUtils.getExternalDeviceDescriptors().forEach { descriptor ->
                         InputDeviceUtils.getName(descriptor).onSuccess { name ->
                             yield("$name ${descriptor.substring(0..4)}")
@@ -379,7 +394,8 @@ class TriggerFragment : Fragment() {
 
                     onDeviceClick { _ ->
                         viewLifecycleScope.launch {
-                            val deviceId = showChooseDeviceDialog()
+                            val deviceId =
+                                showChooseDeviceDialog(triggerViewModel.showDeviceDescriptors)
 
                             triggerViewModel.setTriggerKeyDevice(model.id, deviceId)
                         }

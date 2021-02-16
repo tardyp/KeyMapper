@@ -11,7 +11,7 @@ import android.os.Build
 /**
  * Created by sds100 on 27/01/2020.
  */
-class DefaultPackageRepository(private val packageManager: PackageManager) : PackageRepository {
+class AndroidPackageRepository(private val packageManager: PackageManager) : PackageRepository {
 
     override suspend fun getAllAppList(): List<ApplicationInfo> {
         return packageManager.getInstalledApplications(GET_META_DATA)

@@ -7,7 +7,7 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.ActionModel
 import io.github.sds100.keymapper.data.model.options.BaseOptions
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.IModelState
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +20,8 @@ import java.util.*
 
 abstract class ActionListViewModel<O : BaseOptions<Action>>(
     private val coroutineScope: CoroutineScope,
-    private val deviceInfoRepository: DeviceInfoRepository) : IModelState<List<ActionModel>> {
+    private val showActionsUseCase: ShowActionsUseCase,
+) : IModelState<List<ActionModel>> {
 
     private val _actionList = MutableLiveData<List<Action>>(listOf())
     val actionList: LiveData<List<Action>> = _actionList
@@ -31,7 +32,16 @@ abstract class ActionListViewModel<O : BaseOptions<Action>>(
 
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(actionList) {
-            value = BuildActionListModels(it ?: listOf())
+            coroutineScope.launch {
+                postValue(
+                    BuildActionListModels(
+                        it ?: listOf(),
+                        showActionsUseCase.getDeviceInfo(),
+                        showActionsUseCase.hasRootPermission,
+                        showActionsUseCase.showDeviceDescriptors
+                    )
+                )
+            }
         }
     }
 
@@ -122,7 +132,16 @@ abstract class ActionListViewModel<O : BaseOptions<Action>>(
     }
 
     fun rebuildModels() {
-        _eventStream.value = BuildActionListModels(actionList.value ?: emptyList())
+        coroutineScope.launch {
+            _eventStream.postValue(
+                BuildActionListModels(
+                    actionList.value ?: emptyList(),
+                    showActionsUseCase.getDeviceInfo(),
+                    showActionsUseCase.hasRootPermission,
+                    showActionsUseCase.showDeviceDescriptors
+                )
+            )
+        }
     }
 
     fun invalidateOptions() {
@@ -144,8 +163,6 @@ abstract class ActionListViewModel<O : BaseOptions<Action>>(
     }
 
     abstract val stateKey: String
-
-    suspend fun getDeviceInfoList() = deviceInfoRepository.getAll()
 
     abstract fun getActionOptions(action: Action): O
     open fun onAddAction(action: Action) {}

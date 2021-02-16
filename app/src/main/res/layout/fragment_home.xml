@@ -75,14 +75,6 @@
             type="View.OnClickListener" />
 
         <variable
-            name="showNewGuiKeyboardAd"
-            type="Boolean" />
-
-        <variable
-            name="dismissNewGuiKeyboardAd"
-            type="View.OnClickListener" />
-
-        <variable
             name="getNewGuiKeyboard"
             type="View.OnClickListener" />
 
@@ -97,6 +89,10 @@
         <variable
             name="isFingerprintGestureDetectionAvailable"
             type="Boolean" />
+
+        <variable
+            name="viewModel"
+            type="io.github.sds100.keymapper.data.viewmodel.HomeViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -244,7 +240,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="@{getNewGuiKeyboard}"
-                android:visibility="@{showNewGuiKeyboardAd ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/headerLayout"
@@ -259,7 +255,7 @@
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="48dp"
                         android:layout_height="0dp"
-                        android:onClick="@{dismissNewGuiKeyboardAd}"
+                        android:onClick="@{() -> viewModel.shownGuiKeyboardAd()}"
                         android:tint="?attr/colorOnSurface"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

@@ -10,8 +10,8 @@ import io.github.sds100.keymapper.data.db.migration.JsonMigration
 import io.github.sds100.keymapper.data.db.migration.keymaps.Migration_9_10
 import io.github.sds100.keymapper.data.model.KeyMap
 import io.github.sds100.keymapper.data.usecase.*
+import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.MigrationUtils
-import io.github.sds100.keymapper.util.RequestBackup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ class DefaultKeymapRepository internal constructor(
 
     private val gson = Gson()
 
-    override val requestBackup = MutableLiveData<RequestBackup<List<KeyMap>>>()
+    override val requestAutomaticBackup = MutableLiveData<BackupRequest<List<KeyMap>>>()
     override val keymapList: LiveData<List<KeyMap>> = keymapDao.observeAll()
 
     override suspend fun getKeymaps(): List<KeyMap> = keymapDao.getAll()
@@ -144,7 +144,7 @@ class DefaultKeymapRepository internal constructor(
 
     private suspend fun requestBackup() {
         withContext(Dispatchers.Default) {
-            requestBackup.postValue(RequestBackup(getKeymaps()))
+            requestAutomaticBackup.postValue(BackupRequest(getKeymaps()))
         }
     }
 }

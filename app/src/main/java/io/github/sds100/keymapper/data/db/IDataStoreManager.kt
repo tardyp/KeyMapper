@@ -8,5 +8,4 @@ import androidx.datastore.preferences.core.Preferences
  */
 interface IDataStoreManager {
     val fingerprintGestureDataStore: DataStore<Preferences>
-    val globalPreferenceDataStore: DataStore<Preferences>
 }

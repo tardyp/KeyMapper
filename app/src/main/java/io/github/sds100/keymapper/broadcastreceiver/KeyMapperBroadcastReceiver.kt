@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.Keys
-import io.github.sds100.keymapper.globalPreferences
+import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.activity.MainActivity
 import io.github.sds100.keymapper.util.AccessibilityUtils
@@ -27,7 +26,8 @@ class KeyMapperBroadcastReceiver : BroadcastReceiver() {
         const val ACTION_TOGGLE_KEYBOARD = "$PACKAGE_NAME.ACTION_TOGGLE_KEYBOARD"
         const val ACTION_DISMISS_NOTIFICATION = "$PACKAGE_NAME.ACTION_DISMISS_NOTIFICATION"
         const val EXTRA_DISMISS_NOTIFICATION_ID = "$PACKAGE_NAME.EXTRA_DISMISS_NOTIFICATION_ID"
-        const val ACTION_ON_FINGERPRINT_FEAT_NOTIFICATION_CLICK = "$PACKAGE_NAME.ACTION_ON_FINGERPRINT_FEAT_NOTIFICATION_CLICK"
+        const val ACTION_ON_FINGERPRINT_FEAT_NOTIFICATION_CLICK =
+            "$PACKAGE_NAME.ACTION_ON_FINGERPRINT_FEAT_NOTIFICATION_CLICK"
         const val ACTION_PAUSE_KEYMAPS = "$PACKAGE_NAME.PAUSE_KEYMAPS"
         const val ACTION_RESUME_KEYMAPS = "$PACKAGE_NAME.RESUME_KEYMAPS"
     }
@@ -39,8 +39,11 @@ class KeyMapperBroadcastReceiver : BroadcastReceiver() {
             ACTION_SHOW_IME_PICKER -> KeyboardUtils.showInputMethodPickerDialogOutsideApp(context)
             ACTION_TOGGLE_KEYBOARD -> KeyboardUtils.toggleCompatibleIme(context)
 
-            ACTION_PAUSE_KEYMAPS -> context.globalPreferences.set(Keys.keymapsPaused, true)
-            ACTION_RESUME_KEYMAPS -> context.globalPreferences.set(Keys.keymapsPaused, false)
+            ACTION_PAUSE_KEYMAPS -> ServiceLocator.preferenceRepository(context)
+                .set(Keys.keymapsPaused, true)
+
+            ACTION_RESUME_KEYMAPS -> ServiceLocator.preferenceRepository(context)
+                .set(Keys.keymapsPaused, false)
 
             MyAccessibilityService.ACTION_START_SERVICE -> AccessibilityUtils.enableService(context)
 
@@ -56,7 +59,7 @@ class KeyMapperBroadcastReceiver : BroadcastReceiver() {
 
             ACTION_ON_FINGERPRINT_FEAT_NOTIFICATION_CLICK -> {
                 runBlocking {
-                    ServiceLocator.globalPreferences(context)
+                    ServiceLocator.preferenceRepository(context)
                         .set(Keys.approvedFingerprintFeaturePrompt, true)
                 }
 

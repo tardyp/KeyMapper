@@ -18,6 +18,7 @@ object BluetoothUtils {
         return bluetoothAdapter.bondedDevices.toList()
     }
 
+    //TODO split up into multiple methods
     fun changeBluetoothState(state: StateChange) {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 

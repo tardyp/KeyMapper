@@ -3,8 +3,9 @@ package io.github.sds100.keymapper.data.viewmodel
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.domain.usecases.ListFingerprintMapsUseCase
+import io.github.sds100.keymapper.domain.usecases.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.IModelState
 import io.github.sds100.keymapper.util.result.Failure
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class FingerprintMapListViewModel(
     private val repository: FingerprintMapRepository,
-    private val deviceInfoRepository: DeviceInfoRepository
+    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+    private val listUseCase: ListFingerprintMapsUseCase
 ) : ViewModel(), IModelState<List<FingerprintMapListItemModel>> {
 
     private val fingerprintGestureMaps =
@@ -39,7 +41,16 @@ class FingerprintMapListViewModel(
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(fingerprintGestureMaps.asLiveData()) {
             //this is important to prevent events being sent in the wrong order
-            postValue(BuildFingerprintMapModels(it))
+            viewModelScope.launch {
+                postValue(
+                    BuildFingerprintMapModels(
+                        it,
+                        showDeviceInfoUseCase.getAll(),
+                        listUseCase.hasRootPermission,
+                        showDeviceInfoUseCase.showDeviceDescriptors
+                    )
+                )
+            }
         }
     }
 
@@ -70,7 +81,14 @@ class FingerprintMapListViewModel(
 
         viewModelScope.launch {
             fingerprintGestureMaps.firstOrNull()?.let {
-                _eventStream.postValue(BuildFingerprintMapModels(it))
+                _eventStream.postValue(
+                    BuildFingerprintMapModels(
+                        it,
+                        showDeviceInfoUseCase.getAll(),
+                        listUseCase.hasRootPermission,
+                        showDeviceInfoUseCase.showDeviceDescriptors
+                    )
+                )
             }
         }
     }
@@ -85,16 +103,15 @@ class FingerprintMapListViewModel(
 
     fun reset() = repository.reset()
 
-    suspend fun getDeviceInfoList() = deviceInfoRepository.getAll()
-
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val repository: FingerprintMapRepository,
-        private val deviceInfoRepository: DeviceInfoRepository
+        private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+        private val listUseCase: ListFingerprintMapsUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return FingerprintMapListViewModel(repository, deviceInfoRepository) as T
+            return FingerprintMapListViewModel(repository, showDeviceInfoUseCase, listUseCase) as T
         }
     }
 }

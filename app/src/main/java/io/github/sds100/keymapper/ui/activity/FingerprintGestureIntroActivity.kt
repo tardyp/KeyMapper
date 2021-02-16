@@ -3,12 +3,12 @@ package io.github.sds100.keymapper.ui.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.github.appintro.AppIntro2
-import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.Keys
-import kotlinx.coroutines.runBlocking
+import io.github.sds100.keymapper.data.viewmodel.FingerprintGestureMapIntroViewModel
+import io.github.sds100.keymapper.util.InjectorUtils
 
 /**
  * Created by sds100 on 07/07/2019.
@@ -16,6 +16,10 @@ import kotlinx.coroutines.runBlocking
 
 @RequiresApi(Build.VERSION_CODES.O)
 class FingerprintGestureIntroActivity : AppIntro2() {
+
+    private val viewModel by viewModels<FingerprintGestureMapIntroViewModel> {
+        InjectorUtils.provideFingerprintGestureIntroViewModel(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +32,7 @@ class FingerprintGestureIntroActivity : AppIntro2() {
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
 
-        runBlocking {
-            ServiceLocator.globalPreferences(this@FingerprintGestureIntroActivity)
-                .set(Keys.approvedFingerprintFeaturePrompt, true)
-        }
+        viewModel.shownIntro()
 
         startActivity(Intent(this, MainActivity::class.java))
 

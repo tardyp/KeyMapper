@@ -2,25 +2,38 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.IGlobalPreferences
-import io.github.sds100.keymapper.data.keymapsPaused
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.MenuKeymapUseCase
+import io.github.sds100.keymapper.domain.usecases.ControlKeymapsPausedState
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * Created by sds100 on 17/11/20.
  */
-class MenuFragmentViewModel(private val keymapUseCase: MenuKeymapUseCase,
-                            private val fingerprintMapRepository: FingerprintMapRepository,
-                            globalPreferences: IGlobalPreferences
+class MenuFragmentViewModel(
+    private val keymapUseCase: MenuKeymapUseCase,
+    private val fingerprintMapRepository: FingerprintMapRepository,
+    private val manageKeymapsUseCase: ControlKeymapsPausedState
 ) : ViewModel() {
 
-    val keymapsPaused = globalPreferences.keymapsPaused.asLiveData()
+    private val _keymapsPaused = MutableStateFlow(false)
+    val keymapsPaused: StateFlow<Boolean> = _keymapsPaused
     val accessibilityServiceEnabled = MutableLiveData(false)
 
     private val _eventStream = LiveEvent<Event>()
     val eventStream: LiveData<Event> = _eventStream
+
+    init {
+        viewModelScope.launch {
+            manageKeymapsUseCase.keymapsPaused.collect {
+                _keymapsPaused.value = it
+            }
+        }
+    }
 
     fun enableAll() {
         keymapUseCase.enableAll()
@@ -48,22 +61,22 @@ class MenuFragmentViewModel(private val keymapUseCase: MenuKeymapUseCase,
     fun sendFeedback() = run { _eventStream.value = SendFeedback() }
     fun backupAll() = run { _eventStream.value = RequestBackupAll() }
     fun restore() = run { _eventStream.value = RequestRestore() }
-    fun resumeKeymaps() = run { _eventStream.value = ResumeKeymaps() }
-    fun pauseKeymaps() = run { _eventStream.value = PauseKeymaps() }
+    fun resumeKeymaps() = run { manageKeymapsUseCase.resumeKeymaps() }
+    fun pauseKeymaps() = run { manageKeymapsUseCase.pauseKeymaps() }
     fun enableAccessibilityService() = run { _eventStream.value = EnableAccessibilityService() }
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val keymapUseCase: MenuKeymapUseCase,
         private val fingerprintMapRepository: FingerprintMapRepository,
-        private val globalPreferences: IGlobalPreferences
+        private val manageKeymapsUseCase: ControlKeymapsPausedState
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return MenuFragmentViewModel(
                 keymapUseCase,
                 fingerprintMapRepository,
-                globalPreferences
+                manageKeymapsUseCase
             ) as T
         }
     }

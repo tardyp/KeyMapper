@@ -23,7 +23,6 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.*
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.KeyMap
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.*
 import io.github.sds100.keymapper.util.result.*
@@ -42,7 +41,8 @@ class MyAccessibilityService : AccessibilityService(),
     IClock,
     IAccessibilityService,
     IConstraintState,
-    IActionError {
+    IActionError,
+    FingerprintGestureDetectionState {
 
     companion object {
 
@@ -52,7 +52,8 @@ class MyAccessibilityService : AccessibilityService(),
         const val ACTION_RECORD_TRIGGER = "$PACKAGE_NAME.RECORD_TRIGGER"
         const val ACTION_TEST_ACTION = "$PACKAGE_NAME.TEST_ACTION"
         const val ACTION_RECORDED_TRIGGER_KEY = "$PACKAGE_NAME.RECORDED_TRIGGER_KEY"
-        const val ACTION_RECORD_TRIGGER_TIMER_INCREMENTED = "$PACKAGE_NAME.RECORD_TRIGGER_TIMER_INCREMENTED"
+        const val ACTION_RECORD_TRIGGER_TIMER_INCREMENTED =
+            "$PACKAGE_NAME.RECORD_TRIGGER_TIMER_INCREMENTED"
         const val ACTION_STOP_RECORDING_TRIGGER = "$PACKAGE_NAME.STOP_RECORDING_TRIGGER"
         const val ACTION_STOPPED_RECORDING_TRIGGER = "$PACKAGE_NAME.STOPPED_RECORDING_TRIGGER"
         const val ACTION_ON_START = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_START"
@@ -63,7 +64,8 @@ class MyAccessibilityService : AccessibilityService(),
         const val ACTION_TRIGGER_KEYMAP_BY_UID = "$PACKAGE_NAME.TRIGGER_KEYMAP_BY_UID"
         const val EXTRA_KEYMAP_UID = "$PACKAGE_NAME.KEYMAP_UID"
 
-        const val EXTRA_RECORDED_TRIGGER_KEY_EVENT = "$PACKAGE_NAME.EXTRA_RECORDED_TRIGGER_KEY_EVENT"
+        const val EXTRA_RECORDED_TRIGGER_KEY_EVENT =
+            "$PACKAGE_NAME.EXTRA_RECORDED_TRIGGER_KEY_EVENT"
 
         const val EXTRA_TIME_LEFT = "$PACKAGE_NAME.EXTRA_TIME_LEFT"
         const val EXTRA_ACTION = "$PACKAGE_NAME.EXTRA_ACTION"
@@ -78,8 +80,9 @@ class MyAccessibilityService : AccessibilityService(),
             when (intent?.action) {
 
                 BluetoothDevice.ACTION_ACL_CONNECTED, BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                        ?: return
+                    val device =
+                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                            ?: return
 
                     if (intent.action == BluetoothDevice.ACTION_ACL_DISCONNECTED) {
                         connectedBtAddresses.remove(device.address)
@@ -98,11 +101,7 @@ class MyAccessibilityService : AccessibilityService(),
 
                 ACTION_TEST_ACTION -> {
                     intent.getParcelableExtra<Action>(EXTRA_ACTION)?.let {
-                        actionPerformerDelegate.performAction(
-                            it,
-                            chosenImePackageName,
-                            currentPackageName
-                        )
+                        controller.testAction(it)
                     }
                 }
 
@@ -193,10 +192,7 @@ class MyAccessibilityService : AccessibilityService(),
         lifecycleRegistry = LifecycleRegistry(this)
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
-        actionPerformerDelegate = ActionPerformerDelegate(
-            context = this,
-            iAccessibilityService = this,
-            lifecycle = lifecycle)
+        actionPerformerDelegate = InjectorUtils.providePerformActionsDelegate(this)
 
         IntentFilter().apply {
             addAction(ACTION_SHOW_KEYBOARD)
@@ -237,41 +233,11 @@ class MyAccessibilityService : AccessibilityService(),
             }
         }
 
-        controller = AccessibilityServiceController(
-            lifecycleOwner = this,
-            constraintState = this,
-            iAccessibilityService = this,
-            clock = this,
-            actionError = this,
-            appUpdateManager = ServiceLocator.appUpdateManager(this),
-            globalPreferences = ServiceLocator.globalPreferences(this),
-            fingerprintMapRepository = ServiceLocator.fingerprintMapRepository(this),
-            keymapRepository = ServiceLocator.keymapRepository(this)
-        )
+        controller = InjectorUtils.provideAccessibilityServiceController(this)
 
         controller.eventStream.observe(this, Observer {
             onControllerEvent(it)
         })
-
-        globalPreferences.keymapsPaused.collectWhenStarted(this) { paused ->
-            if (paused) {
-                globalPreferences.getFlow(Keys.toggleKeyboardOnToggleKeymaps)
-                    .firstBlocking()
-                    .let {
-                        if (it == true) {
-                            KeyboardUtils.chooseLastUsedIncompatibleInputMethod(this)
-                        }
-                    }
-            } else {
-                globalPreferences.getFlow(Keys.toggleKeyboardOnToggleKeymaps)
-                    .firstBlocking()
-                    .let {
-                        if (it == true) {
-                            KeyboardUtils.chooseCompatibleInputMethod(this)
-                        }
-                    }
-            }
-        }
     }
 
     override fun onInterrupt() {}
@@ -301,19 +267,22 @@ class MyAccessibilityService : AccessibilityService(),
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         event ?: return super.onKeyEvent(event)
 
-        return controller.onKeyEvent(event.keyCode,
+        return controller.onKeyEvent(
+            event.keyCode,
             event.action,
             event.device.name,
             event.device.descriptor,
             event.device.isExternalCompat,
             event.metaState,
             event.deviceId,
-            event.scanCode)
+            event.scanCode
+        )
     }
 
-    override fun isBluetoothDeviceConnected(address: String) = connectedBtAddresses.contains(address)
+    override fun isBluetoothDeviceConnected(address: String) =
+        connectedBtAddresses.contains(address)
 
-    override fun canActionBePerformed(action: Action): Result<Action> {
+    override fun canActionBePerformed(action: Action, hasRootPermission: Boolean): Result<Action> {
         if (action.requiresIME) {
             return if (isCompatibleImeChosen) {
                 Success(action)
@@ -322,7 +291,7 @@ class MyAccessibilityService : AccessibilityService(),
             }
         }
 
-        return action.canBePerformed(this)
+        return action.canBePerformed(this, hasRootPermission)
     }
 
     override fun getLifecycle() = lifecycleRegistry
@@ -371,7 +340,10 @@ class MyAccessibilityService : AccessibilityService(),
 
                 if (VERSION.SDK_INT >= VERSION_CODES.O) {
                     val effect =
-                        VibrationEffect.createOneShot(event.duration, VibrationEffect.DEFAULT_AMPLITUDE)
+                        VibrationEffect.createOneShot(
+                            event.duration,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
 
                     vibrator.vibrate(effect)
                 } else {
@@ -388,8 +360,10 @@ class MyAccessibilityService : AccessibilityService(),
             is ShowTriggeredKeymapToast -> toast(R.string.toast_triggered_keymap)
 
             is RecordedTriggerKeyEvent ->  //tell the UI that a key has been pressed
-                sendPackageBroadcast(ACTION_RECORDED_TRIGGER_KEY,
-                    bundleOf(EXTRA_RECORDED_TRIGGER_KEY_EVENT to event))
+                sendPackageBroadcast(
+                    ACTION_RECORDED_TRIGGER_KEY,
+                    bundleOf(EXTRA_RECORDED_TRIGGER_KEY_EVENT to event)
+                )
 
             is ImitateButtonPress -> when (event.keyCode) {
                 KeyEvent.KEYCODE_VOLUME_UP ->

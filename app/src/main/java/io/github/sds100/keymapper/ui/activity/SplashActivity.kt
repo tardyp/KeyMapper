@@ -4,24 +4,24 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import io.github.sds100.keymapper.data.approvedFingerprintFeaturePrompt
-import io.github.sds100.keymapper.data.shownAppIntro
-import io.github.sds100.keymapper.globalPreferences
-import io.github.sds100.keymapper.util.firstBlocking
+import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 
 /**
  * Created by sds100 on 20/01/21.
  */
 class SplashActivity : FragmentActivity() {
 
+    private val useCase = OnboardingUseCase(ServiceLocator.preferenceRepository(this))
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         when {
-            !globalPreferences.shownAppIntro.firstBlocking() ->
+            !useCase.shownAppIntro ->
                 startActivity(Intent(this, AppIntroActivity::class.java))
 
-            !globalPreferences.approvedFingerprintFeaturePrompt.firstBlocking()
+            !useCase.approvedFingerprintFeaturePrompt
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
                 startActivity(Intent(this, FingerprintGestureIntroActivity::class.java))
 

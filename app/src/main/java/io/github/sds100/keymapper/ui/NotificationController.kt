@@ -3,7 +3,7 @@ package io.github.sds100.keymapper
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.annotation.RequiresApi
-import io.github.sds100.keymapper.data.*
+import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.NotificationUtils.CHANNEL_ID_PERSISTENT
 import io.github.sds100.keymapper.util.NotificationUtils.CHANNEL_ID_WARNINGS
@@ -28,17 +28,18 @@ import kotlinx.coroutines.launch
 class NotificationController(
     coroutineScope: CoroutineScope,
     private val manager: INotificationManagerWrapper,
-    private val globalPreferences: IGlobalPreferences,
+    private val useCase: ManageNotificationsUseCase,
     iNotificationController: INotificationController
 ) : INotificationController by iNotificationController {
 
     init {
         coroutineScope.launch {
             combine(
-                globalPreferences.showImePickerNotification,
-                globalPreferences.showToggleKeyboardNotification,
-                globalPreferences.showToggleKeymapsNotification,
-                globalPreferences.keymapsPaused) { _, _, _, _ ->
+                useCase.showImePickerNotification,
+                useCase.showToggleKeyboardNotification,
+                useCase.showToggleKeymapsNotification,
+                useCase.keymapsPaused
+            ) { _, _, _, _ ->
 
                 invalidateNotifications()
             }.collect()
@@ -54,9 +55,7 @@ class NotificationController(
             is OnBootEvent -> invalidateNotifications()
 
             is OnAccessibilityServiceStarted -> {
-                val keymapsPaused = globalPreferences.keymapsPaused.firstBlocking()
-
-                invalidateToggleKeymapsNotification(keymapsPaused)
+                invalidateToggleKeymapsNotification(useCase.keymapsPaused.firstBlocking())
             }
 
             is OnAccessibilityServiceStopped -> {
@@ -86,7 +85,7 @@ class NotificationController(
         }
 
         if (isAccessibilityServiceEnabled()) {
-            val keymapsPaused = globalPreferences.keymapsPaused.firstBlocking()
+            val keymapsPaused = useCase.keymapsPaused.firstBlocking()
             invalidateToggleKeymapsNotification(keymapsPaused)
 
         } else {
@@ -94,8 +93,9 @@ class NotificationController(
         }
 
         //visibility of the notification is handled by the system on API >= 26 but is only supported up to API 28
-        if (globalPreferences.showImePickerNotification.firstBlocking() ||
-            (SDK_INT >= Build.VERSION_CODES.O && SDK_INT < Build.VERSION_CODES.Q)) {
+        if (useCase.showImePickerNotification.firstBlocking() ||
+            (SDK_INT >= Build.VERSION_CODES.O && SDK_INT < Build.VERSION_CODES.Q)
+        ) {
 
             manager.showNotification(AppNotification.SHOW_IME_PICKER)
         } else if (SDK_INT < Build.VERSION_CODES.O) {
@@ -103,9 +103,7 @@ class NotificationController(
         }
 
         val showToggleKeyboardNotification =
-            globalPreferences
-                .getFlow(Keys.showToggleKeyboardNotification).firstBlocking()
-                ?: false
+            useCase.showToggleKeyboardNotification.firstBlocking()
 
         if (haveWriteSecureSettingsPermission() || showToggleKeyboardNotification) {
             manager.showNotification(AppNotification.TOGGLE_KEYBOARD)
@@ -117,9 +115,7 @@ class NotificationController(
 
     private fun invalidateToggleKeymapsNotification(keymapsPaused: Boolean) {
         if (SDK_INT < Build.VERSION_CODES.O) {
-            val showNotification = globalPreferences
-                .getFlow(Keys.showToggleKeymapsNotification)
-                .firstBlocking() ?: false
+            val showNotification = useCase.showToggleKeymapsNotification.firstBlocking()
 
             if (!showNotification) {
                 manager.dismissNotification(ID_TOGGLE_KEYMAPS)
@@ -151,9 +147,10 @@ class NotificationController(
             manager.deleteChannel(CHANNEL_TOGGLE_KEYBOARD)
         }
 
-        if ((globalPreferences.hasRootPermission.firstBlocking()
+        if ((useCase.hasRootPermission.firstBlocking()
                 && SDK_INT >= Build.VERSION_CODES.O_MR1 && SDK_INT < Build.VERSION_CODES.Q)
-            || SDK_INT < Build.VERSION_CODES.O_MR1) {
+            || SDK_INT < Build.VERSION_CODES.O_MR1
+        ) {
 
             channels.add(CHANNEL_IME_PICKER)
         } else {

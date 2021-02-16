@@ -12,11 +12,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.MenuFragmentViewModel
 import io.github.sds100.keymapper.databinding.FragmentMenuBinding
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.util.*
 import splitties.alertdialog.appcompat.*
@@ -107,9 +105,6 @@ class MenuFragment : BottomSheetDialogFragment() {
                         findNavController().navigate(R.id.action_global_aboutFragment)
                         dismiss()
                     }
-
-                    is PauseKeymaps -> globalPreferences.set(Keys.keymapsPaused, true)
-                    is ResumeKeymaps -> globalPreferences.set(Keys.keymapsPaused, false)
 
                     is EnableAccessibilityService ->
                         AccessibilityUtils.enableService(requireContext())

@@ -9,7 +9,6 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.KeyMap
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
@@ -49,7 +48,8 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         recoverFailureDelegate = RecoverFailureDelegate(
             "CreateKeymapShortcutFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner) {
+            viewLifecycleOwner
+        ) {
 
             viewModel.rebuildModels()
         }
@@ -76,7 +76,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
                     binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
 
                 is BuildKeymapListModels -> viewLifecycleScope.launchWhenResumed {
-                    viewModel.setModelList(buildModelList(event.keymapList))
+                    viewModel.setModelList(buildModelList(event))
                 }
 
                 is CreateKeymapShortcutEvent -> viewLifecycleScope.launch {
@@ -85,7 +85,8 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
                         viewLifecycleOwner,
                         event.uuid,
                         event.actionList,
-                        viewModel.getDeviceInfoList()
+                        event.deviceInfoList,
+                        event.showDeviceDescriptors
                     )
 
                     ShortcutManagerCompat.createShortcutResultIntent(requireContext(), shortcutInfo)
@@ -98,8 +99,10 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         })
     }
 
-    override fun populateList(binding: FragmentRecyclerviewBinding,
-                              model: List<KeymapListItemModel>?) {
+    override fun populateList(
+        binding: FragmentRecyclerviewBinding,
+        model: List<KeymapListItemModel>?
+    ) {
         binding.epoxyRecyclerView.withModels {
             model?.forEach {
                 keymap {
@@ -127,14 +130,25 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         viewModel.rebuildModels()
     }
 
-    private suspend fun buildModelList(keymapList: List<KeyMap>) =
-        keymapList.map { keymap ->
-            val deviceInfoList = viewModel.getDeviceInfoList()
-
+    private fun buildModelList(payload: BuildKeymapListModels) =
+        payload.keymapList.map { keymap ->
             KeymapListItemModel(
                 id = keymap.id,
-                actionList = keymap.actionList.map { it.buildChipModel(requireContext(), deviceInfoList) },
-                triggerDescription = keymap.trigger.buildDescription(requireContext(), deviceInfoList),
+                actionList = keymap.actionList.map {
+                    it.buildChipModel(
+                        requireContext(),
+                        payload.deviceInfoList,
+                        payload.showDeviceDescriptors,
+                        payload.hasRootPermission
+                    )
+                },
+
+                triggerDescription = keymap.trigger.buildDescription(
+                    requireContext(),
+                    payload.deviceInfoList,
+                    payload.showDeviceDescriptors
+                ),
+
                 constraintList = keymap.constraintList.map { it.buildModel(requireContext()) },
                 constraintMode = keymap.constraintMode,
                 flagsDescription = keymap.trigger.buildTriggerFlagsDescription(requireContext()),

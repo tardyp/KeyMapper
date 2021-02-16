@@ -14,11 +14,15 @@ import java.io.IOException
 /**
  * Created by sds100 on 21/06/2020.
  */
-class GetEventDelegate(val onKeyEvent: suspend (keyCode: Int,
-                                                action: Int,
-                                                deviceDescriptor: String,
-                                                isExternal: Boolean,
-                                                deviceId: Int) -> Unit) {
+class GetEventDelegate(
+    private val onKeyEvent: suspend (
+        keyCode: Int,
+        action: Int,
+        deviceDescriptor: String,
+        isExternal: Boolean,
+        deviceId: Int
+    ) -> Unit
+) {
 
     companion object {
         private const val REGEX_GET_DEVICE_LOCATION = "\\/.*(?=:)"
@@ -47,7 +51,8 @@ class GetEventDelegate(val onKeyEvent: suspend (keyCode: Int,
 
                     inputManager.inputDeviceIds.forEach { id ->
                         val device = inputManager.getInputDevice(id)
-                        val deviceLocation = getDeviceLocation(getEventDevices, device.name) ?: return@forEach
+                        val deviceLocation =
+                            getDeviceLocation(getEventDevices, device.name) ?: return@forEach
                         deviceLocationToDescriptorMap[deviceLocation] = device.descriptor
                         descriptorToIsExternalMap[device.descriptor] = device.isExternalCompat
                     }
@@ -61,24 +66,40 @@ class GetEventDelegate(val onKeyEvent: suspend (keyCode: Int,
                     val inputStream = Shell.getShellCommandStdOut("su", "-c", "getevent -lq")
                     var line: String?
 
-                    while (inputStream.bufferedReader().readLine().also { line = it } != null && isActive) {
+                    while (inputStream.bufferedReader().readLine()
+                            .also { line = it } != null && isActive
+                    ) {
                         line ?: continue
 
                         getEventLabels.forEach { label ->
                             if (line?.contains(label) == true) {
                                 val keycode = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE[label]!!
-                                val deviceLocation = deviceLocationRegex.find(line!!)?.value ?: return@forEach
-                                val deviceDescriptor = deviceLocationToDescriptorMap[deviceLocation]!!
+                                val deviceLocation =
+                                    deviceLocationRegex.find(line!!)?.value ?: return@forEach
+                                val deviceDescriptor =
+                                    deviceLocationToDescriptorMap[deviceLocation]!!
                                 val isExternal = descriptorToIsExternalMap[deviceDescriptor]!!
                                 val actionString = actionRegex.find(line!!)?.value ?: return@forEach
 
                                 when (actionString) {
                                     "UP" -> {
-                                        onKeyEvent.invoke(keycode, KeyEvent.ACTION_UP, deviceDescriptor, isExternal, 0)
+                                        onKeyEvent.invoke(
+                                            keycode,
+                                            KeyEvent.ACTION_UP,
+                                            deviceDescriptor,
+                                            isExternal,
+                                            0
+                                        )
                                     }
 
                                     "DOWN" -> {
-                                        onKeyEvent.invoke(keycode, KeyEvent.ACTION_DOWN, deviceDescriptor, isExternal, 0)
+                                        onKeyEvent.invoke(
+                                            keycode,
+                                            KeyEvent.ACTION_DOWN,
+                                            deviceDescriptor,
+                                            isExternal,
+                                            0
+                                        )
                                     }
                                 }
 

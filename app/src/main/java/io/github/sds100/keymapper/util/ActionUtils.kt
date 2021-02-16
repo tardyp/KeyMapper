@@ -9,10 +9,7 @@ import android.os.Build
 import android.view.KeyEvent
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.hasRootPermission
 import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.showDeviceDescriptors
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.util.SystemActionUtils.getDescriptionWithOption
 import io.github.sds100.keymapper.util.SystemActionUtils.getDescriptionWithOptionSet
 import io.github.sds100.keymapper.util.result.*
@@ -38,13 +35,18 @@ object ActionUtils {
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-fun Action.buildModel(ctx: Context, deviceInfoList: List<DeviceInfo>): ActionModel {
+fun Action.buildModel(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptors: Boolean,
+    hasRootPermission: Boolean
+): ActionModel {
     var title: String? = null
     var icon: Drawable? = null
 
-    val error = getTitle(ctx, deviceInfoList).onSuccess { title = it }
+    val error = getTitle(ctx, deviceInfoList, showDeviceDescriptors).onSuccess { title = it }
         .then { getIcon(ctx).onSuccess { icon = it } }
-        .then { canBePerformed(ctx) }
+        .then { canBePerformed(ctx, hasRootPermission) }
         .failureOrNull()
 
     val extraInfo = buildString {
@@ -71,13 +73,18 @@ fun Action.buildModel(ctx: Context, deviceInfoList: List<DeviceInfo>): ActionMod
     return ActionModel(uid, type, title, icon, extraInfo, error, error?.getBriefMessage(ctx))
 }
 
-fun Action.buildChipModel(ctx: Context, deviceInfoList: List<DeviceInfo>): ActionChipModel {
+fun Action.buildChipModel(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptors: Boolean,
+    hasRootPermission: Boolean
+): ActionChipModel {
     var title: String? = null
     var icon: Drawable? = null
 
-    val error = getTitle(ctx, deviceInfoList).onSuccess { title = it }
+    val error = getTitle(ctx, deviceInfoList, showDeviceDescriptors).onSuccess { title = it }
         .then { getIcon(ctx).onSuccess { icon = it } }
-        .then { canBePerformed(ctx) }
+        .then { canBePerformed(ctx, hasRootPermission) }
         .failureOrNull()
 
     val description = buildString {
@@ -103,11 +110,16 @@ fun Action.buildChipModel(ctx: Context, deviceInfoList: List<DeviceInfo>): Actio
     return ActionChipModel(type, description, error, icon)
 }
 
-fun Action.getTitle(ctx: Context, deviceInfoList: List<DeviceInfo>): Result<String> {
+fun Action.getTitle(
+    ctx: Context,
+    deviceInfoList: List<DeviceInfo>,
+    showDeviceDescriptors: Boolean
+): Result<String> {
     return when (type) {
         ActionType.APP -> {
             try {
-                val applicationInfo = ctx.packageManager.getApplicationInfo(data, PackageManager.GET_META_DATA)
+                val applicationInfo =
+                    ctx.packageManager.getApplicationInfo(data, PackageManager.GET_META_DATA)
 
                 val applicationLabel = ctx.packageManager.getApplicationLabel(applicationInfo)
 
@@ -149,13 +161,14 @@ fun Action.getTitle(ctx: Context, deviceInfoList: List<DeviceInfo>): Result<Stri
 
             val title = extras.getData(Action.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR).handle(
                 onSuccess = { descriptor ->
-                    val deviceName = deviceInfoList.find { it.descriptor == descriptor }?.name?.let { name ->
-                        if (ctx.globalPreferences.showDeviceDescriptors.firstBlocking()) {
-                            "$name (${descriptor.substring(0..4)})"
-                        } else {
-                            name
+                    val deviceName =
+                        deviceInfoList.find { it.descriptor == descriptor }?.name?.let { name ->
+                            if (showDeviceDescriptors) {
+                                "$name (${descriptor.substring(0..4)})"
+                            } else {
+                                name
+                            }
                         }
-                    }
 
                     val strRes = if (useShell) {
                         R.string.description_keyevent_from_device_through_shell
@@ -240,9 +253,19 @@ fun Action.getTitle(ctx: Context, deviceInfoList: List<DeviceInfo>): Result<Stri
             val y = data.split(',')[1]
 
             extras.getData(Action.EXTRA_COORDINATE_DESCRIPTION) then {
-                Success(ctx.str(resId = R.string.description_tap_coordinate_with_description, formatArgArray = arrayOf(x, y, it)))
+                Success(
+                    ctx.str(
+                        resId = R.string.description_tap_coordinate_with_description,
+                        formatArgArray = arrayOf(x, y, it)
+                    )
+                )
             } otherwise {
-                Success(ctx.str(resId = R.string.description_tap_coordinate_default, formatArgArray = arrayOf(x, y)))
+                Success(
+                    ctx.str(
+                        resId = R.string.description_tap_coordinate_default,
+                        formatArgArray = arrayOf(x, y)
+                    )
+                )
             }
         }
 
@@ -269,9 +292,10 @@ fun Action.getTitle(ctx: Context, deviceInfoList: List<DeviceInfo>): Result<Stri
 
     }
         .then {
-            extras.getData(Action.EXTRA_MULTIPLIER).valueOrNull()?.toIntOrNull()?.let { multiplier ->
-                return@then Success("(${multiplier}x) $it")
-            }
+            extras.getData(Action.EXTRA_MULTIPLIER).valueOrNull()?.toIntOrNull()
+                ?.let { multiplier ->
+                    return@then Success("(${multiplier}x) $it")
+                }
 
             Success(it)
         }
@@ -311,11 +335,7 @@ fun Action.getIcon(ctx: Context): Result<Drawable?> = when (type) {
     else -> Success(null)
 }
 
-/**
- * @return if the action can't be performed, it returns an error code.
- * returns null if their if the action can be performed.
- */
-fun Action.canBePerformed(ctx: Context): Result<Action> {
+fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Action> {
     //the action has no data
     if (data.isEmpty()) return NoActionData()
 
@@ -366,7 +386,7 @@ fun Action.canBePerformed(ctx: Context): Result<Action> {
                 .valueOrNull()
                 .toBoolean()
 
-            if (useShell && !ctx.globalPreferences.hasRootPermission.firstBlocking()) {
+            if (useShell && !hasRootPermission) {
                 return PermissionDenied(Constants.PERMISSION_ROOT)
             }
         }
@@ -389,7 +409,10 @@ fun Action.canBePerformed(ctx: Context): Result<Action> {
                 //If an activity to open doesn't exist, the app crashes.
                 if (systemActionDef.id == SystemAction.OPEN_VOICE_ASSISTANT) {
                     val activityExists =
-                        Intent(Intent.ACTION_VOICE_COMMAND).resolveActivityInfo(ctx.packageManager, 0) != null
+                        Intent(Intent.ACTION_VOICE_COMMAND).resolveActivityInfo(
+                            ctx.packageManager,
+                            0
+                        ) != null
 
                     if (!activityExists) {
                         return GoogleAppNotFound()
@@ -419,7 +442,8 @@ fun Action.canBePerformed(ctx: Context): Result<Action> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (systemActionDef.id == SystemAction.TOGGLE_FLASHLIGHT
                         || systemActionDef.id == SystemAction.ENABLE_FLASHLIGHT
-                        || systemActionDef.id == SystemAction.DISABLE_FLASHLIGHT) {
+                        || systemActionDef.id == SystemAction.DISABLE_FLASHLIGHT
+                    ) {
 
                         extras.getData(Action.EXTRA_LENS).onSuccess { lensOptionId ->
                             val sdkLensId = Option.OPTION_ID_SDK_ID_MAP[lensOptionId]

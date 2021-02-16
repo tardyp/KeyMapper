@@ -6,7 +6,8 @@ import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
 import io.github.sds100.keymapper.data.model.DeviceInfo
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.domain.usecases.SaveDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.usecases.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.util.BuildDeviceInfoModels
 import io.github.sds100.keymapper.util.ChooseKeycode
 import io.github.sds100.keymapper.util.Event
@@ -21,7 +22,9 @@ import splitties.bitflags.withFlag
  * Created by sds100 on 30/03/2020.
  */
 
-class KeyEventActionTypeViewModel(private val deviceInfoRepository: DeviceInfoRepository
+class KeyEventActionTypeViewModel(
+    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+    private val saveDeviceInfo: SaveDeviceInfoUseCase
 ) : ViewModel() {
 
     val keyCode = MutableLiveData<String>(null)
@@ -73,6 +76,9 @@ class KeyEventActionTypeViewModel(private val deviceInfoRepository: DeviceInfoRe
         }
     }
 
+    val showDeviceDescriptors
+        get() = showDeviceInfoUseCase.showDeviceDescriptors
+
     init {
         refreshDevices()
     }
@@ -96,7 +102,7 @@ class KeyEventActionTypeViewModel(private val deviceInfoRepository: DeviceInfoRe
 
     fun chooseDevice(index: Int) {
         deviceInfoModels.value?.getOrNull(index)?.let {
-            deviceInfoRepository.insertDeviceInfo(it)
+            saveDeviceInfo(it)
 
             chosenDevice.value = it
         }
@@ -111,11 +117,16 @@ class KeyEventActionTypeViewModel(private val deviceInfoRepository: DeviceInfoRe
     }
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val deviceInfoRepository: DeviceInfoRepository
+    class Factory(
+        private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+        private val saveDeviceInfoUseCase: SaveDeviceInfoUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return KeyEventActionTypeViewModel(deviceInfoRepository) as T
+            return KeyEventActionTypeViewModel(
+                showDeviceInfoUseCase,
+                saveDeviceInfoUseCase
+            ) as T
         }
     }
 }

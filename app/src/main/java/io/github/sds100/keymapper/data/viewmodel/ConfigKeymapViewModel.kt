@@ -3,14 +3,15 @@ package io.github.sds100.keymapper.data.viewmodel
 import android.os.Bundle
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.IGlobalPreferences
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.Constraint
 import io.github.sds100.keymapper.data.model.KeyMap
 import io.github.sds100.keymapper.data.model.Trigger
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
 import io.github.sds100.keymapper.data.usecase.ConfigKeymapUseCase
+import io.github.sds100.keymapper.domain.usecases.CreateTriggerUseCase
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -19,9 +20,11 @@ import java.util.*
  * Created by sds100 on 22/11/20.
  */
 
-class ConfigKeymapViewModel(private val keymapRepository: ConfigKeymapUseCase,
-                            private val deviceInfoRepository: DeviceInfoRepository,
-                            globalPreferences: IGlobalPreferences
+class ConfigKeymapViewModel(
+    private val keymapRepository: ConfigKeymapUseCase,
+    showActionsUseCase: ShowActionsUseCase,
+    createTriggerUseCase: CreateTriggerUseCase,
+    onboardingUseCase: OnboardingUseCase
 ) : ViewModel(), IConfigMappingViewModel {
 
     companion object {
@@ -35,7 +38,7 @@ class ConfigKeymapViewModel(private val keymapRepository: ConfigKeymapUseCase,
     val uid: LiveData<String> = _uid
 
     override val actionListViewModel =
-        object : ActionListViewModel<KeymapActionOptions>(viewModelScope, deviceInfoRepository) {
+        object : ActionListViewModel<KeymapActionOptions>(viewModelScope, showActionsUseCase) {
             override val stateKey = "keymap_action_list_view_model"
 
             override fun getActionOptions(action: Action): KeymapActionOptions {
@@ -64,8 +67,9 @@ class ConfigKeymapViewModel(private val keymapRepository: ConfigKeymapUseCase,
         }
 
     val triggerViewModel = TriggerViewModel(
-        deviceInfoRepository,
-        globalPreferences,
+        viewModelScope,
+        onboardingUseCase,
+        createTriggerUseCase,
         this.uid
     )
 
@@ -176,11 +180,18 @@ class ConfigKeymapViewModel(private val keymapRepository: ConfigKeymapUseCase,
 
     class Factory(
         private val configKeymapUseCase: ConfigKeymapUseCase,
-        private val deviceInfoRepository: DeviceInfoRepository,
-        private val globalPreferences: IGlobalPreferences) : ViewModelProvider.Factory {
+        private val onboardingUseCase: OnboardingUseCase,
+        private val showActionsUseCase: ShowActionsUseCase,
+        private val createTriggerUseCase: CreateTriggerUseCase,
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            ConfigKeymapViewModel(configKeymapUseCase, deviceInfoRepository, globalPreferences) as T
+            ConfigKeymapViewModel(
+                configKeymapUseCase,
+                showActionsUseCase,
+                createTriggerUseCase,
+                onboardingUseCase
+            ) as T
     }
 }

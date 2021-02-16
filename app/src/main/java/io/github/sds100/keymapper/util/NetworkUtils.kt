@@ -38,6 +38,7 @@ object NetworkUtils {
                 it.resume(Success(file))
             },
 
+
             { error ->
                 if (error.cause is SSLHandshakeException) {
                     it.resume(SSLHandshakeError())

@@ -4,25 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.IGlobalPreferences
-import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.BoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.nullIfDefault
 import io.github.sds100.keymapper.data.model.options.TriggerOptions
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
-import io.github.sds100.keymapper.util.DialogResponse
+import io.github.sds100.keymapper.domain.usecases.CreateTriggerUseCase
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.util.Event
 import io.github.sds100.keymapper.util.OkDialog
-import io.github.sds100.keymapper.util.firstBlocking
+import io.github.sds100.keymapper.util.UserResponse
 
 /**
  * Created by sds100 on 29/11/20.
  */
 class TriggerOptionsViewModel(
-    private val prefs: IGlobalPreferences,
-    private val deviceInfoRepository: DeviceInfoRepository,
+    private val onboardingUseCase: OnboardingUseCase,
+    private val createTriggerUseCase: CreateTriggerUseCase,
     val getTriggerKeys: () -> List<Trigger.Key>,
     val getTriggerMode: () -> Int,
     private val keymapUid: LiveData<String>
@@ -36,6 +34,8 @@ class TriggerOptionsViewModel(
 
     private val _eventStream = LiveEvent<Event>()
     val eventStream: LiveData<Event> = _eventStream
+
+    val showDeviceDescriptors = createTriggerUseCase.showDeviceDescriptors
 
     override fun createSliderListItemModel(option: IntOption) = when (option.id) {
 
@@ -148,10 +148,13 @@ class TriggerOptionsViewModel(
         super.setValue(id, newValue)
 
         if (id == TriggerOptions.ID_SCREEN_OFF_TRIGGER &&
-            prefs.getFlow(Keys.shownScreenOffTriggersExplanation).firstBlocking() == false) {
+            !onboardingUseCase.shownScreenOffTriggersExplanation
+        ) {
 
-            _eventStream.value = OkDialog(KEY_SCREEN_OFF_TRIGGERS,
-                R.string.showcase_screen_off_triggers)
+            _eventStream.value = OkDialog(
+                KEY_SCREEN_OFF_TRIGGERS,
+                R.string.showcase_screen_off_triggers
+            )
         }
 
         invalidateOptions()
@@ -163,11 +166,11 @@ class TriggerOptionsViewModel(
         }
     }
 
-    fun onDialogResponse(key: String, response: DialogResponse) {
+    fun onDialogResponse(key: String, response: UserResponse) {
         when (key) {
-            KEY_SCREEN_OFF_TRIGGERS -> prefs.set(Keys.shownScreenOffTriggersExplanation, true)
+            KEY_SCREEN_OFF_TRIGGERS -> onboardingUseCase.shownScreenOffTriggersExplanation = true
         }
     }
 
-    suspend fun getDeviceInfoList() = deviceInfoRepository.getAll()
+    suspend fun getDeviceInfoList() = createTriggerUseCase.getDeviceInfo()
 }

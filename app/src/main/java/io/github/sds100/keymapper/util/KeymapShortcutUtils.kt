@@ -23,11 +23,18 @@ object KeymapShortcutUtils {
         lifecycleOwner: LifecycleOwner,
         uuid: String,
         actionList: List<Action>,
-        deviceInfoList: List<DeviceInfo>
+        deviceInfoList: List<DeviceInfo>,
+        showDeviceDescriptors: Boolean
     ): ShortcutInfoCompat = ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
 
         val icon = createShortcutIcon(ctx, actionList)
-        val shortcutLabel = createShortcutLabel(ctx, lifecycleOwner, actionList, deviceInfoList)
+        val shortcutLabel = createShortcutLabel(
+            ctx,
+            lifecycleOwner,
+            actionList,
+            deviceInfoList,
+            showDeviceDescriptors
+        )
 
         setIcon(icon)
         setShortLabel(shortcutLabel)
@@ -58,13 +65,14 @@ object KeymapShortcutUtils {
         ctx: Context,
         lifecycleOwner: LifecycleOwner,
         actionList: List<Action>,
-        deviceInfoList: List<DeviceInfo>
+        deviceInfoList: List<DeviceInfo>,
+        showDeviceDescriptors: Boolean
     ): String {
         if (actionList.size == 1) {
             val action = actionList[0]
 
             action
-                .getTitle(ctx, deviceInfoList)
+                .getTitle(ctx, deviceInfoList, showDeviceDescriptors)
                 .valueOrNull()
                 ?.let {
                     return it

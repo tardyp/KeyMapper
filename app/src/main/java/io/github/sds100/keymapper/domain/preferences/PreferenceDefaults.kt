@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.data
+package io.github.sds100.keymapper.domain.preferences
 
 /**
  * Created by sds100 on 30/01/21.

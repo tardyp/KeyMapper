@@ -5,7 +5,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
-import io.github.sds100.keymapper.data.model.KeyMap
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
@@ -40,7 +39,8 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
 
             backupRestoreViewModel.backupKeymaps(
                 requireContext().contentResolver.openOutputStream(it),
-                selectionProvider.selectedIds.toList())
+                selectionProvider.selectedIds.toList()
+            )
 
             selectionProvider.stopSelecting()
         }
@@ -67,7 +67,7 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
             when (it) {
                 is BuildKeymapListModels ->
                     viewLifecycleScope.launchWhenResumed {
-                        viewModel.setModelList(buildModelList(it.keymapList))
+                        viewModel.setModelList(buildModelList(it))
                     }
 
                 is RequestBackupSelectedKeymaps -> {
@@ -79,19 +79,32 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
         })
     }
 
-    override fun populateList(binding: FragmentRecyclerviewBinding,
-                              model: List<KeymapListItemModel>?) {
+    override fun populateList(
+        binding: FragmentRecyclerviewBinding,
+        model: List<KeymapListItemModel>?
+    ) {
         controller.keymapList = model ?: emptyList()
     }
 
-    private suspend fun buildModelList(keymapList: List<KeyMap>) =
-        keymapList.map { keymap ->
-            val deviceInfoList = viewModel.getDeviceInfoList()
-
+    private fun buildModelList(payload: BuildKeymapListModels) =
+        payload.keymapList.map { keymap ->
             KeymapListItemModel(
                 id = keymap.id,
-                actionList = keymap.actionList.map { it.buildChipModel(requireContext(), deviceInfoList) },
-                triggerDescription = keymap.trigger.buildDescription(requireContext(), deviceInfoList),
+                actionList = keymap.actionList.map {
+                    it.buildChipModel(
+                        requireContext(),
+                        payload.deviceInfoList,
+                        payload.showDeviceDescriptors,
+                        payload.hasRootPermission
+                    )
+                },
+
+                triggerDescription = keymap.trigger.buildDescription(
+                    requireContext(),
+                    payload.deviceInfoList,
+                    payload.showDeviceDescriptors
+                ),
+
                 constraintList = keymap.constraintList.map { it.buildModel(requireContext()) },
                 constraintMode = keymap.constraintMode,
                 flagsDescription = keymap.trigger.buildTriggerFlagsDescription(requireContext()),

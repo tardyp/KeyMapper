@@ -8,15 +8,15 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.github.appintro.AppIntro2
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.viewmodel.AppIntroViewModel
 import io.github.sds100.keymapper.databinding.FragmentAppIntroSlideBinding
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.fragment.AppIntroScrollableFragment
 import io.github.sds100.keymapper.util.*
@@ -30,6 +30,10 @@ import splitties.toast.longToast
 
 class AppIntroActivity : AppIntro2() {
 
+    private val viewModel by viewModels<AppIntroViewModel> {
+        InjectorUtils.provideAppIntroViewModel(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,13 +43,15 @@ class AppIntroActivity : AppIntro2() {
         addSlide(AccessibilityServiceSlide())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            && !powerManager.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME)) {
+            && !powerManager.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME)
+        ) {
 
             addSlide(BatteryOptimisationSlide())
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            && packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
+            && packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
+        ) {
             addSlide(FingerprintGestureSupportSlide())
         }
 
@@ -54,7 +60,11 @@ class AppIntroActivity : AppIntro2() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            && !PermissionUtils.isPermissionGranted(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
+            && !PermissionUtils.isPermissionGranted(
+                this,
+                Manifest.permission.ACCESS_NOTIFICATION_POLICY
+            )
+        ) {
 
             addSlide(DndAccessSlide())
         }
@@ -65,8 +75,7 @@ class AppIntroActivity : AppIntro2() {
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
 
-        globalPreferences.set(Keys.shownAppIntro, true)
-        globalPreferences.set(Keys.approvedFingerprintFeaturePrompt, true)
+        viewModel.shownAppIntro()
 
         startActivity(Intent(this, MainActivity::class.java))
 
@@ -309,7 +318,8 @@ class DndAccessSlide : AppIntroScrollableFragment() {
         if (PermissionUtils.isPermissionGranted(
                 requireContext(),
                 Manifest.permission.ACCESS_NOTIFICATION_POLICY
-            )) {
+            )
+        ) {
             binding.enabledLayout()
         } else {
             binding.disabledLayout()

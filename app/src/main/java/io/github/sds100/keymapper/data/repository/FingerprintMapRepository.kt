@@ -2,14 +2,14 @@ package io.github.sds100.keymapper.data.repository
 
 import androidx.lifecycle.LiveData
 import io.github.sds100.keymapper.data.model.FingerprintMap
-import io.github.sds100.keymapper.util.RequestBackup
+import io.github.sds100.keymapper.util.BackupRequest
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by sds100 on 24/01/21.
  */
 interface FingerprintMapRepository {
-    val requestBackup: LiveData<RequestBackup<Map<String, FingerprintMap>>>
+    val requestAutomaticBackup: LiveData<BackupRequest<Map<String, FingerprintMap>>>
 
     val swipeDown: Flow<FingerprintMap>
     val swipeUp: Flow<FingerprintMap>

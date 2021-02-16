@@ -21,11 +21,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.lifecycle.Lifecycle
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.hasRootPermission
 import io.github.sds100.keymapper.data.model.Action
 import io.github.sds100.keymapper.data.model.Option
 import io.github.sds100.keymapper.data.model.getData
-import io.github.sds100.keymapper.globalPreferences
+import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.delay
@@ -40,9 +39,11 @@ import splitties.toast.toast
  * Created by sds100 on 25/11/2018.
  */
 
-class ActionPerformerDelegate(context: Context,
-                              iAccessibilityService: IAccessibilityService,
-                              lifecycle: Lifecycle
+class ActionPerformerDelegate(
+    context: Context,
+    iAccessibilityService: IAccessibilityService,
+    private val performActionsUseCase: PerformActionsUseCase,
+    lifecycle: Lifecycle
 ) : IAccessibilityService by iAccessibilityService {
 
     companion object {
@@ -66,14 +67,17 @@ class ActionPerformerDelegate(context: Context,
         action: Action,
         chosenImePackageName: String?,
         currentPackageName: String?
-    ) = performAction(PerformAction(action), chosenImePackageName, currentPackageName)
+    ) = performAction(
+        PerformAction(action),
+        chosenImePackageName,
+        currentPackageName
+    )
 
     fun performAction(
         performActionModel: PerformAction,
         chosenImePackageName: String?,
-        currentPackageName: String?,
-
-        ) {
+        currentPackageName: String?
+    ) {
         val (action, additionalMetaState, keyEventAction) = performActionModel
 
         ctx.apply {
@@ -164,18 +168,30 @@ class ActionPerformerDelegate(context: Context,
                             moveTo(x.toFloat(), y.toFloat())
                         }
 
-                        val strokeDescription = if (action.flags.hasFlag(Action.ACTION_FLAG_HOLD_DOWN)
-                            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val strokeDescription =
+                            if (action.flags.hasFlag(Action.ACTION_FLAG_HOLD_DOWN)
+                                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                            ) {
 
-                            when (keyEventAction) {
-                                KeyEventAction.DOWN -> GestureDescription.StrokeDescription(path, 0, duration, true)
-                                KeyEventAction.UP -> GestureDescription.StrokeDescription(path, 59999, duration, false)
-                                else -> null
+                                when (keyEventAction) {
+                                    KeyEventAction.DOWN -> GestureDescription.StrokeDescription(
+                                        path,
+                                        0,
+                                        duration,
+                                        true
+                                    )
+                                    KeyEventAction.UP -> GestureDescription.StrokeDescription(
+                                        path,
+                                        59999,
+                                        duration,
+                                        false
+                                    )
+                                    else -> null
+                                }
+
+                            } else {
+                                GestureDescription.StrokeDescription(path, 0, duration)
                             }
-
-                        } else {
-                            GestureDescription.StrokeDescription(path, 0, duration)
-                        }
 
                         strokeDescription?.let {
                             val gestureDescription = GestureDescription.Builder().apply {
@@ -216,7 +232,8 @@ class ActionPerformerDelegate(context: Context,
                                     ?: 0
                             ),
                             keyEventAction = keyEventAction,
-                            deviceId = deviceId ?: 0)
+                            deviceId = deviceId ?: 0
+                        )
                     }
                 }
 
@@ -260,9 +277,11 @@ class ActionPerformerDelegate(context: Context,
         currentPackageName
     )
 
-    private fun performSystemAction(action: Action,
-                                    chosenImePackageName: String?,
-                                    currentPackageName: String?) {
+    private fun performSystemAction(
+        action: Action,
+        chosenImePackageName: String?,
+        currentPackageName: String?
+    ) {
 
         val id = action.data
 
@@ -296,9 +315,18 @@ class ActionPerformerDelegate(context: Context,
 
         ctx.apply {
             when (id) {
-                SystemAction.ENABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(this, StateChange.ENABLE)
-                SystemAction.DISABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(this, StateChange.DISABLE)
-                SystemAction.TOGGLE_WIFI -> NetworkUtils.changeWifiStatePreQ(this, StateChange.TOGGLE)
+                SystemAction.ENABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                    this,
+                    StateChange.ENABLE
+                )
+                SystemAction.DISABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                    this,
+                    StateChange.DISABLE
+                )
+                SystemAction.TOGGLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                    this,
+                    StateChange.TOGGLE
+                )
 
                 SystemAction.TOGGLE_WIFI_ROOT -> NetworkUtils.toggleWifiRoot()
                 SystemAction.ENABLE_WIFI_ROOT -> NetworkUtils.enableWifiRoot()
@@ -314,10 +342,16 @@ class ActionPerformerDelegate(context: Context,
 
                 SystemAction.TOGGLE_AUTO_BRIGHTNESS -> BrightnessUtils.toggleAutoBrightness(this)
                 SystemAction.ENABLE_AUTO_BRIGHTNESS ->
-                    BrightnessUtils.setBrightnessMode(this, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                    BrightnessUtils.setBrightnessMode(
+                        this,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+                    )
 
                 SystemAction.DISABLE_AUTO_BRIGHTNESS ->
-                    BrightnessUtils.setBrightnessMode(this, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    BrightnessUtils.setBrightnessMode(
+                        this,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+                    )
 
                 SystemAction.INCREASE_BRIGHTNESS -> BrightnessUtils.increaseBrightness(this)
                 SystemAction.DECREASE_BRIGHTNESS -> BrightnessUtils.decreaseBrightness(this)
@@ -333,11 +367,23 @@ class ActionPerformerDelegate(context: Context,
                     ScreenRotationUtils.cycleRotations(this, it)
                 }
 
-                SystemAction.VOLUME_UP -> AudioUtils.adjustVolume(this, AudioManager.ADJUST_RAISE, showVolumeUi)
-                SystemAction.VOLUME_DOWN -> AudioUtils.adjustVolume(this, AudioManager.ADJUST_LOWER, showVolumeUi)
+                SystemAction.VOLUME_UP -> AudioUtils.adjustVolume(
+                    this,
+                    AudioManager.ADJUST_RAISE,
+                    showVolumeUi
+                )
+                SystemAction.VOLUME_DOWN -> AudioUtils.adjustVolume(
+                    this,
+                    AudioManager.ADJUST_LOWER,
+                    showVolumeUi
+                )
 
                 //the volume UI should always be shown for this action
-                SystemAction.VOLUME_SHOW_DIALOG -> AudioUtils.adjustVolume(this, AudioManager.ADJUST_SAME, true)
+                SystemAction.VOLUME_SHOW_DIALOG -> AudioUtils.adjustVolume(
+                    this,
+                    AudioManager.ADJUST_SAME,
+                    true
+                )
 
                 SystemAction.VOLUME_DECREASE_STREAM -> getSdkValueForOption { stream ->
                     AudioUtils.adjustSpecificStream(
@@ -380,7 +426,7 @@ class ActionPerformerDelegate(context: Context,
                 SystemAction.GO_HOME -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
                 SystemAction.OPEN_RECENTS -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
                 SystemAction.OPEN_MENU -> {
-                    if (ctx.globalPreferences.hasRootPermission.firstBlocking()) {
+                    if (performActionsUseCase.hasRootPermission) {
 
                         suProcessDelegate.runCommand("input keyevent ${KeyEvent.KEYCODE_MENU}\n")
                     } else {
@@ -403,7 +449,8 @@ class ActionPerformerDelegate(context: Context,
                 }
 
                 SystemAction.OPEN_VOICE_ASSISTANT -> {
-                    val intent = Intent(Intent.ACTION_VOICE_COMMAND).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    val intent =
+                        Intent(Intent.ACTION_VOICE_COMMAND).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
 
@@ -415,7 +462,8 @@ class ActionPerformerDelegate(context: Context,
                 }
 
                 SystemAction.OPEN_CAMERA -> {
-                    val intent = Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    val intent =
+                        Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
 
@@ -457,9 +505,17 @@ class ActionPerformerDelegate(context: Context,
                     }
                 }
 
-                SystemAction.TOGGLE_AIRPLANE_MODE -> AirplaneModeUtils.toggleAirplaneMode(this)
-                SystemAction.ENABLE_AIRPLANE_MODE -> AirplaneModeUtils.enableAirplaneMode(this)
-                SystemAction.DISABLE_AIRPLANE_MODE -> AirplaneModeUtils.disableAirplaneMode(this)
+                SystemAction.TOGGLE_AIRPLANE_MODE ->
+                    AirplaneModeUtils.toggleAirplaneMode(
+                        this,
+                        performActionsUseCase.hasRootPermission
+                    )
+
+                SystemAction.ENABLE_AIRPLANE_MODE ->
+                    AirplaneModeUtils.enableAirplaneMode(performActionsUseCase.hasRootPermission)
+
+                SystemAction.DISABLE_AIRPLANE_MODE ->
+                    AirplaneModeUtils.disableAirplaneMode(performActionsUseCase.hasRootPermission)
 
                 SystemAction.SCREENSHOT_ROOT -> ScreenshotUtils.takeScreenshotRoot()
 
@@ -496,7 +552,10 @@ class ActionPerformerDelegate(context: Context,
                                                 to wordBoundary.second + 1
                                         )
 
-                                        it.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, bundle)
+                                        it.performAction(
+                                            AccessibilityNodeInfo.ACTION_SET_SELECTION,
+                                            bundle
+                                        )
                                     }
                                 }
                             }
@@ -581,11 +640,23 @@ class ActionPerformerDelegate(context: Context,
                             )
 
                             SystemAction.VOLUME_TOGGLE_MUTE ->
-                                AudioUtils.adjustVolume(this, AudioManager.ADJUST_TOGGLE_MUTE, showVolumeUi)
+                                AudioUtils.adjustVolume(
+                                    this,
+                                    AudioManager.ADJUST_TOGGLE_MUTE,
+                                    showVolumeUi
+                                )
 
-                            SystemAction.TOGGLE_FLASHLIGHT -> flashlightController.toggleFlashlight(lensFacing)
-                            SystemAction.ENABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(true, lensFacing)
-                            SystemAction.DISABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(false, lensFacing)
+                            SystemAction.TOGGLE_FLASHLIGHT -> flashlightController.toggleFlashlight(
+                                lensFacing
+                            )
+                            SystemAction.ENABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
+                                true,
+                                lensFacing
+                            )
+                            SystemAction.DISABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
+                                false,
+                                lensFacing
+                            )
 
                             SystemAction.TOGGLE_DND_MODE,
                             SystemAction.ENABLE_DND_MODE -> {
@@ -593,8 +664,12 @@ class ActionPerformerDelegate(context: Context,
                                     val mode = Option.OPTION_ID_SDK_ID_MAP[it] ?: return@onSuccess
 
                                     when (id) {
-                                        SystemAction.TOGGLE_DND_MODE -> AudioUtils.toggleDndMode(mode)
-                                        SystemAction.ENABLE_DND_MODE -> AudioUtils.enableDndMode(mode)
+                                        SystemAction.TOGGLE_DND_MODE -> AudioUtils.toggleDndMode(
+                                            mode
+                                        )
+                                        SystemAction.ENABLE_DND_MODE -> AudioUtils.enableDndMode(
+                                            mode
+                                        )
                                     }
                                 }
                             }

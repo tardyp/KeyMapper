@@ -156,7 +156,7 @@ class ChooseConstraintListViewModel(
     }
 
 
-    fun onDialogResponse(key: String, response: DialogResponse) {
+    fun onDialogResponse(key: String, response: UserResponse) {
         when (key) {
             KEY_BT_CONSTRAINT_LIMITATION ->
                 _eventStream.value = ChooseBluetoothDevice()

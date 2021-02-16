@@ -71,7 +71,8 @@ class TriggerOptionsFragment : OptionsFragment<TriggerOptions>() {
 
                     onClick { view ->
                         viewModel.setValue(
-                            TriggerOptions.ID_TRIGGER_FROM_OTHER_APPS, (view as CheckBox).isChecked)
+                            TriggerOptions.ID_TRIGGER_FROM_OTHER_APPS, (view as CheckBox).isChecked
+                        )
                     }
 
                     onCopyClick { _ ->
@@ -79,7 +80,8 @@ class TriggerOptionsFragment : OptionsFragment<TriggerOptions>() {
 
                         val clipData = ClipData.newPlainText(
                             str(R.string.clipboard_label_keymap_uid),
-                            triggerByIntentModel?.uid)
+                            triggerByIntentModel?.uid
+                        )
 
                         clipboardManager.setPrimaryClip(clipData)
 
@@ -121,7 +123,8 @@ class TriggerOptionsFragment : OptionsFragment<TriggerOptions>() {
             viewLifecycleOwner,
             uuid,
             actionList,
-            optionsViewModel.getDeviceInfoList()
+            optionsViewModel.getDeviceInfoList(),
+            optionsViewModel.showDeviceDescriptors
         )
 
         ShortcutManagerCompat.requestPinShortcut(requireContext(), shortcutInfo, null)

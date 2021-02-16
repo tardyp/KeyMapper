@@ -21,13 +21,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.*
-import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.model.ChooseAppStoreModel
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
-import io.github.sds100.keymapper.data.showGuiKeyboardAd
 import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.databinding.DialogChooseAppStoreBinding
 import io.github.sds100.keymapper.databinding.FragmentHomeBinding
+import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
 import io.github.sds100.keymapper.ui.view.StatusLayout
@@ -51,6 +50,10 @@ class HomeFragment : Fragment() {
 
     private val keymapListViewModel: KeymapListViewModel by activityViewModels {
         InjectorUtils.provideKeymapListViewModel(requireContext())
+    }
+
+    private val homeViewModel: HomeViewModel by activityViewModels {
+        InjectorUtils.provideHomeViewModel(requireContext())
     }
 
     private val fingerprintMapListViewModel: FingerprintMapListViewModel by activityViewModels {
@@ -151,7 +154,8 @@ class HomeFragment : Fragment() {
         recoverFailureDelegate = RecoverFailureDelegate(
             "HomeFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner) {
+            viewLifecycleOwner
+        ) {
 
             keymapListViewModel.rebuildModels()
         }
@@ -167,6 +171,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
+
+            viewModel = this@HomeFragment.homeViewModel
 
             val pagerAdapter = HomePagerAdapter(
                 this@HomeFragment,
@@ -323,7 +329,8 @@ class HomeFragment : Fragment() {
             setGrantWriteSecureSettingsPermission {
                 PermissionUtils.requestWriteSecureSettingsPermission(
                     requireContext(),
-                    findNavController())
+                    findNavController()
+                )
             }
 
             setGrantDndAccess {
@@ -356,22 +363,6 @@ class HomeFragment : Fragment() {
 
             updateStatusLayouts()
 
-            val appUpdateManager = ServiceLocator.appUpdateManager(requireContext())
-
-            viewLifecycleScope.launchWhenResumed {
-                val oldVersion = appUpdateManager.getLastVersionCodeHomeScreen()
-
-                if (oldVersion == Constants.VERSION_CODE) return@launchWhenResumed
-
-                val direction = NavAppDirections.actionGlobalOnlineFileFragment(
-                    R.string.whats_new,
-                    R.string.url_changelog
-                )
-                findNavController().navigate(direction)
-
-                appUpdateManager.handledAppUpdateOnHomeScreen()
-            }
-
             setGetNewGuiKeyboard {
                 requireContext().alertDialog {
                     messageResource = R.string.dialog_message_select_app_store_gui_keyboard
@@ -392,24 +383,14 @@ class HomeFragment : Fragment() {
                 }
             }
 
-
-            setDismissNewGuiKeyboardAd {
-                globalPreferences.set(Keys.showGuiKeyboardAd, false)
-            }
-
-            showNewGuiKeyboardAd = globalPreferences.showGuiKeyboardAd.firstBlocking()
-
-            globalPreferences.showGuiKeyboardAd.collectWhenResumed(viewLifecycleOwner, {
-                binding.showNewGuiKeyboardAd = it
-            })
-
             keymapListViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
                     is FixFailure -> coordinatorLayout.showFixActionSnackBar(
                         it.failure,
                         requireContext(),
                         recoverFailureDelegate,
-                        findNavController())
+                        findNavController()
+                    )
                 }
             })
 
@@ -419,15 +400,32 @@ class HomeFragment : Fragment() {
                         it.failure,
                         requireContext(),
                         recoverFailureDelegate,
-                        findNavController())
+                        findNavController()
+                    )
                 }
             })
 
-            viewLifecycleScope.launchWhenResumed {
-                QuickStartGuideTapTarget().show(
-                    this@HomeFragment,
-                    R.id.action_help)
-            }
+            homeViewModel.showQuickStartGuide.observe(viewLifecycleOwner, { show ->
+                if (!show) return@observe
+
+                viewLifecycleScope.launchWhenResumed {
+                    QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
+
+                    }
+                }
+            })
+
+            homeViewModel.showWhatsNew.observe(viewLifecycleOwner, {
+                if (!it) return@observe
+
+                val direction = NavAppDirections.actionGlobalOnlineFileFragment(
+                    R.string.whats_new,
+                    R.string.url_changelog
+                )
+                findNavController().navigate(direction)
+
+                homeViewModel.shownWhatsNew()
+            })
         }
     }
 
@@ -439,9 +437,13 @@ class HomeFragment : Fragment() {
 
         updateStatusLayouts()
 
-        if (PackageUtils.isAppInstalled(requireContext(), KeyboardUtils.KEY_MAPPER_GUI_IME_PACKAGE)
-            || Build.VERSION.SDK_INT < KeyboardUtils.KEY_MAPPER_GUI_IME_MIN_API) {
-            globalPreferences.set(Keys.showGuiKeyboardAd, false)
+        if (PackageUtils.isAppInstalled(
+                requireContext(),
+                KeyboardUtils.KEY_MAPPER_GUI_IME_PACKAGE
+            )
+            || Build.VERSION.SDK_INT < KeyboardUtils.KEY_MAPPER_GUI_IME_MIN_API
+        ) {
+            ServiceLocator.preferenceRepository(requireContext()).set(Keys.showGuiKeyboardAd, false)
         }
 
         ServiceLocator.notificationController(requireContext())
@@ -461,8 +463,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateStatusLayouts() {
-        binding.hideAlerts = globalPreferences
-            .getFlow(Keys.hideHomeScreenAlerts).firstBlocking()
+        binding.hideAlerts = ServiceLocator.preferenceRepository(requireContext())
+            .get(Keys.hideHomeScreenAlerts).firstBlocking()
 
         if (AccessibilityUtils.isServiceEnabled(requireContext())) {
             accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
@@ -485,7 +487,8 @@ class HomeFragment : Fragment() {
             if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
                     .data.any { keymap ->
                         keymap.actionList.any { it.error is NoCompatibleImeEnabled }
-                    }) {
+                    }
+            ) {
 
                 imeServiceStatusState.value = StatusLayout.State.ERROR
             }
@@ -497,7 +500,9 @@ class HomeFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionUtils.isPermissionGranted(
                     requireContext(),
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
+                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                )
+            ) {
 
                 dndAccessStatusState.value = StatusLayout.State.POSITIVE
             } else {

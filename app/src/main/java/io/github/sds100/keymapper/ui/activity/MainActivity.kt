@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
@@ -13,7 +12,6 @@ import com.google.gson.Gson
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
-import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.ActivityHomeBinding
 import io.github.sds100.keymapper.service.MyAccessibilityService
@@ -47,10 +45,6 @@ class MainActivity : AppCompatActivity() {
         InjectorUtils.provideBackupRestoreViewModel(this)
     }
 
-    private val homeViewModel: HomeViewModel by viewModels {
-        InjectorUtils.provideHomeViewModel(this)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,7 +57,8 @@ class MainActivity : AppCompatActivity() {
 
                 okButton {
                     PermissionUtils.requestWriteSecureSettingsPermission(
-                        this@MainActivity, findNavController(R.id.container))
+                        this@MainActivity, findNavController(R.id.container)
+                    )
                 }
 
                 show()
@@ -77,12 +72,14 @@ class MainActivity : AppCompatActivity() {
                     MyAccessibilityService.ACTION_UPDATE_KEYMAP_LIST_CACHE,
                     bundleOf(
                         MyAccessibilityService.EXTRA_KEYMAP_LIST to Gson().toJson(it)
-                    ))
+                    )
+                )
             })
         }
 
         if (BuildConfig.DEBUG
-            && PermissionUtils.isPermissionGranted(this, Manifest.permission.WRITE_SECURE_SETTINGS)) {
+            && PermissionUtils.isPermissionGranted(this, Manifest.permission.WRITE_SECURE_SETTINGS)
+        ) {
             AccessibilityUtils.enableService(this)
         }
 
@@ -94,12 +91,6 @@ class MainActivity : AppCompatActivity() {
                     it.result.onFailure { failure ->
                         if (failure is FileAccessDenied) showFileAccessDeniedSnackBar()
                     }
-            }
-        })
-
-        homeViewModel.eventStream.observe(this, {
-            when (it) {
-                is SetTheme -> AppCompatDelegate.setDefaultNightMode(it.theme)
             }
         })
     }

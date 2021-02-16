@@ -345,6 +345,7 @@ fun ChipGroup.bindFlagModels(flagModels: List<FlagModel>) {
     }
 }
 
+
 @BindingAdapter("app:onChangeListener")
 fun SeekBar.setOnChangeListener(onChangeListener: SeekBar.OnSeekBarChangeListener) {
     setOnSeekBarChangeListener(onChangeListener)

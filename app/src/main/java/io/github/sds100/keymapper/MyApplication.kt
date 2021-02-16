@@ -4,8 +4,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
-import io.github.sds100.keymapper.data.automaticBackupLocation
-import io.github.sds100.keymapper.data.darkThemeMode
+import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
+import io.github.sds100.keymapper.framework.adapters.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FileAccessDenied
 import io.github.sds100.keymapper.util.result.GenericFailure
@@ -26,27 +26,34 @@ class MyApplication : MultiDexApplication(),
         NotificationController(
             appCoroutineScope,
             manager = this,
-            ServiceLocator.globalPreferences(this),
+            ManageNotificationsUseCase(ServiceLocator.preferenceRepository(this)),
             iNotificationController = this
         )
     }
 
+    internal val bluetoothMonitor by lazy {
+        AndroidBluetoothMonitor(appCoroutineScope)
+    }
+
+    private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
+
     override fun onCreate() {
 
-        ServiceLocator.globalPreferences(this@MyApplication)
-            .darkThemeMode
-            .firstBlocking()
-            .let { AppCompatDelegate.setDefaultNightMode(it) }
+        applicationViewModel.theme.observeForever {
+            AppCompatDelegate.setDefaultNightMode(it)
+        }
 
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
+        initialiseManagers()
     }
 
     override fun openOutputStream(uriString: String): Result<OutputStream> {
-        val uri = Uri.parse(globalPreferences.automaticBackupLocation.firstBlocking())
+        val uri = Uri.parse(uriString)
 
         return try {
             val outputStream = contentResolver.openOutputStream(uri)!!
@@ -84,5 +91,9 @@ class MyApplication : MultiDexApplication(),
 
     override fun haveWriteSecureSettingsPermission(): Boolean {
         return PermissionUtils.haveWriteSecureSettingsPermission(this)
+    }
+
+    private fun initialiseManagers() {
+        ServiceLocator.backupManager(this)
     }
 }

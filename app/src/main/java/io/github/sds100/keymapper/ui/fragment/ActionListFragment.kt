@@ -114,8 +114,10 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
                 is TestAction -> {
                     if (AccessibilityUtils.isServiceEnabled(requireContext())) {
 
-                        requireContext().sendPackageBroadcast(MyAccessibilityService.ACTION_TEST_ACTION,
-                            bundleOf(MyAccessibilityService.EXTRA_ACTION to event.action))
+                        requireContext().sendPackageBroadcast(
+                            MyAccessibilityService.ACTION_TEST_ACTION,
+                            bundleOf(MyAccessibilityService.EXTRA_ACTION to event.action)
+                        )
 
                     } else {
                         actionListViewModel.promptToEnableAccessibilityService()
@@ -126,11 +128,16 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
 
                 is BuildActionListModels -> {
                     viewLifecycleScope.launchWhenStarted {
-                        val deviceInfoList = actionListViewModel.getDeviceInfoList()
-
                         val models = sequence {
                             event.source.forEach {
-                                yield(it.buildModel(requireContext(), deviceInfoList))
+                                yield(
+                                    it.buildModel(
+                                        requireContext(),
+                                        event.deviceInfoList,
+                                        event.showDeviceDescriptors,
+                                        event.hasRootPermission
+                                    )
+                                )
                             }
                         }.toList()
 
@@ -141,13 +148,15 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
         })
 
         binding.setOnAddActionClick {
-            val direction = NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
+            val direction =
+                NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
             findNavController().navigate(direction)
         }
     }
 
     private fun FragmentActionListBinding.enableActionDragging(
-        controller: EpoxyController): ItemTouchHelper {
+        controller: EpoxyController
+    ): ItemTouchHelper {
 
         return EpoxyTouchHelper.initDragging(controller)
             .withRecyclerView(epoxyRecyclerViewActions)

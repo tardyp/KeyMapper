@@ -8,15 +8,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.IGlobalPreferences
-import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.model.DeviceInfo
 import io.github.sds100.keymapper.data.model.Trigger
 import io.github.sds100.keymapper.data.model.TriggerKeyModel
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.data.model.options.TriggerOptions
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.domain.preferences.Keys
+import io.github.sds100.keymapper.domain.usecases.CreateTriggerUseCase
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -24,14 +26,14 @@ import java.util.*
  */
 
 class TriggerViewModel(
-    private val deviceInfoRepository: DeviceInfoRepository,
-    private val prefs: IGlobalPreferences,
+    private val coroutineScope: CoroutineScope,
+    private val onboardingUseCase: OnboardingUseCase,
+    private val createTriggerUseCase: CreateTriggerUseCase,
     keymapUid: LiveData<String>
 ) {
-
     val optionsViewModel = TriggerOptionsViewModel(
-        prefs,
-        deviceInfoRepository,
+        onboardingUseCase,
+        createTriggerUseCase,
         getTriggerKeys = { keys.value ?: emptyList() },
         getTriggerMode = { mode.value ?: Trigger.DEFAULT_TRIGGER_MODE },
         keymapUid
@@ -51,12 +53,12 @@ class TriggerViewModel(
                 /* when the user first chooses to make parallel a trigger, show a dialog informing them that
                 the order in which they list the keys is the order in which they will need to be held down.
                  */
-                if (keys.value?.size!! > 1 &&
-                    prefs.getFlow(Keys.shownParallelTriggerOrderExplanation)
-                        .firstBlocking() == false) {
+                if (keys.value?.size!! > 1 && !onboardingUseCase.shownParallelTriggerOrderExplanation) {
 
-                    notifyUser(Keys.shownParallelTriggerOrderExplanation.name,
-                        R.string.dialog_message_parallel_trigger_order)
+                    notifyUser(
+                        Keys.shownParallelTriggerOrderExplanation.name,
+                        R.string.dialog_message_parallel_trigger_order
+                    )
                 }
 
                 if (value != Trigger.PARALLEL) {
@@ -74,7 +76,8 @@ class TriggerViewModel(
                         }.toMutableList()
 
                         //remove duplicates of keys that have the same keycode and device id
-                        newKeys = newKeys.distinctBy { Pair(it.keyCode, it.deviceId) }.toMutableList()
+                        newKeys =
+                            newKeys.distinctBy { Pair(it.keyCode, it.deviceId) }.toMutableList()
 
                         _keys.value = newKeys
                     }
@@ -88,12 +91,12 @@ class TriggerViewModel(
             if (it == true) {
                 value = Trigger.SEQUENCE
 
-                if (_keys.value?.size!! > 1 &&
-                    prefs.getFlow(Keys.shownSequenceTriggerExplanation)
-                        .firstBlocking() == false) {
+                if (_keys.value?.size!! > 1 && !onboardingUseCase.shownSequenceTriggerExplanation) {
 
-                    notifyUser(Keys.shownSequenceTriggerExplanation.name,
-                        R.string.dialog_message_sequence_trigger_explanation)
+                    notifyUser(
+                        Keys.shownSequenceTriggerExplanation.name,
+                        R.string.dialog_message_sequence_trigger_explanation
+                    )
                 }
             }
         }
@@ -141,9 +144,20 @@ class TriggerViewModel(
     val recordTriggerTimeLeft = MutableLiveData(0)
     val recordingTrigger = MutableLiveData(false)
 
+    val showDeviceDescriptors = createTriggerUseCase.showDeviceDescriptors
+
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(keys) {
-            value = BuildTriggerKeyModels(it ?: listOf())
+
+            coroutineScope.launch {
+                postValue(
+                    BuildTriggerKeyModels(
+                        it ?: listOf(),
+                        createTriggerUseCase.getDeviceInfo(),
+                        createTriggerUseCase.showDeviceDescriptors
+                    )
+                )
+            }
         }
 
         addSource(optionsViewModel.eventStream) {
@@ -184,7 +198,8 @@ class TriggerViewModel(
             Trigger(
                 keys = keys.value ?: listOf(),
                 mode = mode.value ?: Trigger.DEFAULT_TRIGGER_MODE
-            ))
+            )
+        )
     }
 
     fun setParallelTriggerClickType(@Trigger.ClickType clickType: Int) {
@@ -210,8 +225,13 @@ class TriggerViewModel(
     /**
      * @return whether the key already exists has been added to the list
      */
-    fun addTriggerKey(keyCode: Int, deviceDescriptor: String, deviceName: String, isExternal: Boolean): Boolean {
-        deviceInfoRepository.insertDeviceInfo(DeviceInfo(deviceDescriptor, deviceName))
+    fun addTriggerKey(
+        keyCode: Int,
+        deviceDescriptor: String,
+        deviceName: String,
+        isExternal: Boolean
+    ): Boolean {
+        createTriggerUseCase.saveDeviceInfo(DeviceInfo(deviceDescriptor, deviceName))
 
         var clickType = Trigger.SHORT_PRESS
 
@@ -229,7 +249,8 @@ class TriggerViewModel(
                 val sameDeviceId = if (
                     (it.deviceId == Trigger.Key.DEVICE_ID_THIS_DEVICE
                         || it.deviceId == Trigger.Key.DEVICE_ID_ANY_DEVICE)
-                    && !isExternal) {
+                    && !isExternal
+                ) {
                     true
 
                 } else {
@@ -246,10 +267,11 @@ class TriggerViewModel(
         if (containsKey) {
             triggerInSequence.value = true
 
-            if (prefs.getFlow(Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation)
-                    .firstBlocking() == false) {
-                notifyUser(Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation.name,
-                    R.string.dialog_message_use_key_multiple_times_in_sequence_trigger)
+            if (!onboardingUseCase.shownMultipleOfSameKeyInSequenceTriggerExplanation) {
+                notifyUser(
+                    Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation.name,
+                    R.string.dialog_message_use_key_multiple_times_in_sequence_trigger
+                )
             }
         }
 
@@ -265,11 +287,12 @@ class TriggerViewModel(
             if (keysWithSameKeycodeAndDevice.isNotEmpty()) {
                 clickType = keysWithSameKeycodeAndDevice[0].clickType
 
-                if (prefs.getFlow(Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation)
-                        .firstBlocking() == false) {
+                if (!onboardingUseCase.shownMultipleOfSameKeyInSequenceTriggerExplanation) {
 
-                    notifyUser(Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation.name,
-                        R.string.dialog_message_use_key_multiple_times_in_sequence_trigger)
+                    notifyUser(
+                        Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation.name,
+                        R.string.dialog_message_use_key_multiple_times_in_sequence_trigger
+                    )
 
                 }
             }
@@ -354,7 +377,15 @@ class TriggerViewModel(
     }
 
     fun rebuildModels() {
-        _eventStream.value = BuildTriggerKeyModels(keys.value ?: emptyList())
+        coroutineScope.launch {
+            _eventStream.postValue(
+                BuildTriggerKeyModels(
+                    keys.value ?: emptyList(),
+                    createTriggerUseCase.getDeviceInfo(),
+                    createTriggerUseCase.showDeviceDescriptors
+                )
+            )
+        }
     }
 
     fun setModelList(models: List<TriggerKeyModel>) {
@@ -368,16 +399,16 @@ class TriggerViewModel(
         _eventStream.value = EnableAccessibilityServicePrompt()
     }
 
-    fun onDialogResponse(key: String, response: DialogResponse) {
+    fun onDialogResponse(key: String, response: UserResponse) {
         when (key) {
             Keys.shownParallelTriggerOrderExplanation.name ->
-                prefs.set(Keys.shownParallelTriggerOrderExplanation, true)
+                onboardingUseCase.shownParallelTriggerOrderExplanation = true
 
             Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation.name ->
-                prefs.set(Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation, true)
+                onboardingUseCase.shownMultipleOfSameKeyInSequenceTriggerExplanation = true
 
             Keys.shownSequenceTriggerExplanation.name ->
-                prefs.set(Keys.shownSequenceTriggerExplanation, true)
+                onboardingUseCase.shownSequenceTriggerExplanation = true
 
             else -> optionsViewModel.onDialogResponse(key, response)
         }
@@ -386,6 +417,4 @@ class TriggerViewModel(
     private fun notifyUser(responseKey: String, @StringRes message: Int) {
         _eventStream.value = OkDialog(responseKey, message)
     }
-
-    suspend fun getDeviceInfoList() = deviceInfoRepository.getAll()
 }

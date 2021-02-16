@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.util.delegate
 
-import io.github.sds100.keymapper.data.IGlobalPreferences
 import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
 
@@ -10,10 +10,15 @@ import kotlinx.coroutines.CoroutineScope
  */
 class TriggerKeymapByIntentController(
     coroutineScope: CoroutineScope,
-    globalPreferences: IGlobalPreferences,
+    performActionsUseCase: PerformActionsUseCase,
     iConstraintDelegate: IConstraintDelegate,
     iActionError: IActionError
-) : SimpleMappingController(coroutineScope, globalPreferences, iConstraintDelegate, iActionError) {
+) : SimpleMappingController(
+    coroutineScope,
+    performActionsUseCase,
+    iConstraintDelegate,
+    iActionError
+) {
 
     private var keymapList = emptyList<KeyMap>()
 
@@ -21,7 +26,8 @@ class TriggerKeymapByIntentController(
         keymapList
             .find { it.uid == uid }
             ?.let {
-                onDetected(it.uid,
+                onDetected(
+                    it.uid,
                     it.actionList,
                     it.constraintList,
                     it.constraintMode,

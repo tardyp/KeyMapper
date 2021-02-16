@@ -26,13 +26,13 @@ import splitties.bitflags.withFlag
  * Created by sds100 on 05/05/2020.
  */
 
-class KeymapDetectionDelegate(private val coroutineScope: CoroutineScope,
-                              val preferences: KeymapDetectionPreferences,
-                              iClock: IClock,
-                              iActionError: IActionError,
-                              iConstraintDelegate: IConstraintDelegate
-) : IClock by iClock, IActionError by iActionError,
-    IConstraintDelegate by iConstraintDelegate {
+class KeymapDetectionDelegate(
+    private val coroutineScope: CoroutineScope,
+    val preferences: KeymapDetectionPreferences,
+    iClock: IClock,
+    iConstraintDelegate: IConstraintDelegate,
+    private val canActionBePerformed: (action: Action) -> Result<Action>
+) : IClock by iClock, IConstraintDelegate by iConstraintDelegate {
 
     companion object {
 

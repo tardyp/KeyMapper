@@ -17,8 +17,8 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.hasRootPermission
-import io.github.sds100.keymapper.globalPreferences
+import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.DeviceAdmin
 import splitties.alertdialog.appcompat.*
 import splitties.systemservices.devicePolicyManager
@@ -45,11 +45,13 @@ object PermissionUtils {
 
                 intent.putExtra(
                     DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                    ComponentName(ctx, DeviceAdmin::class.java))
+                    ComponentName(ctx, DeviceAdmin::class.java)
+                )
 
                 intent.putExtra(
                     DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    ctx.str(R.string.error_need_to_enable_device_admin))
+                    ctx.str(R.string.error_need_to_enable_device_admin)
+                )
 
                 launcher.launch(intent)
             }
@@ -134,7 +136,10 @@ object PermissionUtils {
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     fun isPermissionGranted(ctx: Context, permission: String): Boolean {
-        val hasRootPermission = ctx.globalPreferences.hasRootPermission.firstBlocking()
+        val hasRootPermission =
+            ServiceLocator.preferenceRepository(ctx)
+                .get(Keys.hasRootPermission)
+                .firstBlocking() ?: false
 
         when {
             permission == Manifest.permission.WRITE_SETTINGS &&
@@ -145,7 +150,12 @@ object PermissionUtils {
                 return hasRootPermission
 
             permission == Manifest.permission.BIND_DEVICE_ADMIN -> {
-                return devicePolicyManager?.isAdminActive(ComponentName(ctx, DeviceAdmin::class.java)) == true
+                return devicePolicyManager?.isAdminActive(
+                    ComponentName(
+                        ctx,
+                        DeviceAdmin::class.java
+                    )
+                ) == true
             }
 
             permission == Manifest.permission.ACCESS_NOTIFICATION_POLICY ->
@@ -156,7 +166,8 @@ object PermissionUtils {
                 }
 
             permission == Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> {
-                return NotificationManagerCompat.getEnabledListenerPackages(ctx).contains(Constants.PACKAGE_NAME)
+                return NotificationManagerCompat.getEnabledListenerPackages(ctx)
+                    .contains(Constants.PACKAGE_NAME)
             }
 
             permission == Manifest.permission.WRITE_SECURE_SETTINGS && hasRootPermission -> {

@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.util.delegate
 
-import io.github.sds100.keymapper.data.IGlobalPreferences
 import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.FingerprintMapUtils
 import io.github.sds100.keymapper.util.IActionError
 import io.github.sds100.keymapper.util.IConstraintDelegate
@@ -13,10 +13,15 @@ import splitties.bitflags.hasFlag
  */
 class FingerprintGestureMapController(
     coroutineScope: CoroutineScope,
-    globalPreferences: IGlobalPreferences,
+    performActionsUseCase: PerformActionsUseCase,
     iConstraintDelegate: IConstraintDelegate,
     iActionError: IActionError
-) : SimpleMappingController(coroutineScope, globalPreferences, iConstraintDelegate, iActionError) {
+) : SimpleMappingController(
+    coroutineScope,
+    performActionsUseCase,
+    iConstraintDelegate,
+    iActionError
+) {
 
     var fingerprintMaps: Map<String, FingerprintMap> = emptyMap()
         set(value) {

@@ -2,11 +2,8 @@ package io.github.sds100.keymapper.util.delegate
 
 import androidx.annotation.MainThread
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.IGlobalPreferences
-import io.github.sds100.keymapper.data.defaultHoldDownDuration
-import io.github.sds100.keymapper.data.defaultRepeatRate
-import io.github.sds100.keymapper.data.defaultVibrationDuration
 import io.github.sds100.keymapper.data.model.*
+import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.isFailure
 import io.github.sds100.keymapper.util.result.valueOrNull
@@ -17,7 +14,7 @@ import kotlinx.coroutines.*
  */
 abstract class SimpleMappingController(
     private val coroutineScope: CoroutineScope,
-    private val globalPreferences: IGlobalPreferences,
+    private val useCase: PerformActionsUseCase,
     iConstraintDelegate: IConstraintDelegate,
     iActionError: IActionError
 ) : IActionError by iActionError, IConstraintDelegate by iConstraintDelegate {
@@ -52,7 +49,7 @@ abstract class SimpleMappingController(
             val repeatJobs = mutableListOf<RepeatJob>()
 
             actionList.forEach {
-                if (canActionBePerformed(it).isFailure) return@forEach
+                if (canActionBePerformed(it, useCase.hasRootPermission).isFailure) return@forEach
 
                 if (it.repeat) {
                     var alreadyRepeating = false
@@ -100,7 +97,7 @@ abstract class SimpleMappingController(
                 .getData(FingerprintMap.EXTRA_VIBRATION_DURATION)
                 .valueOrNull()
                 ?.toLong()
-                ?: globalPreferences.defaultVibrationDuration.firstBlocking().toLong()
+                ?: useCase.defaultVibrateDuration.firstBlocking().toLong()
 
             vibrateEvent.value = VibrateEvent(duration)
         }
@@ -125,10 +122,10 @@ abstract class SimpleMappingController(
 
     private fun repeatAction(action: Action) = coroutineScope.launch(start = CoroutineStart.LAZY) {
         val repeatRate = action.repeatRate?.toLong()
-            ?: globalPreferences.defaultRepeatRate.firstBlocking().toLong()
+            ?: useCase.defaultRepeatRate.firstBlocking().toLong()
 
         val holdDownDuration = action.holdDownDuration?.toLong()
-            ?: globalPreferences.defaultHoldDownDuration.firstBlocking().toLong()
+            ?: useCase.defaultHoldDownDuration.firstBlocking().toLong()
 
         val holdDown = action.holdDown
 

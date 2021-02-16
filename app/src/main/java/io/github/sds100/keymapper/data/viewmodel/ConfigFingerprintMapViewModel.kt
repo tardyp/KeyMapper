@@ -6,8 +6,8 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.data.model.options.FingerprintMapOptions
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
 import io.github.sds100.keymapper.util.EnableAccessibilityServicePrompt
 import io.github.sds100.keymapper.util.Event
 import io.github.sds100.keymapper.util.FingerprintMapUtils.SWIPE_DOWN
@@ -22,8 +22,9 @@ import kotlinx.coroutines.launch
  * Created by sds100 on 08/11/20.
  */
 
-class ConfigFingerprintMapViewModel(private val fingerprintMapRepository: FingerprintMapRepository,
-                                    private val deviceInfoRepository: DeviceInfoRepository
+class ConfigFingerprintMapViewModel(
+    private val fingerprintMapRepository: FingerprintMapRepository,
+    private val showActionsUseCase: ShowActionsUseCase
 ) : ViewModel(), IConfigMappingViewModel {
 
     companion object {
@@ -34,7 +35,8 @@ class ConfigFingerprintMapViewModel(private val fingerprintMapRepository: Finger
     private var gestureId: String? = null
 
     override val actionListViewModel = object : ActionListViewModel<FingerprintActionOptions>(
-        viewModelScope, deviceInfoRepository) {
+        viewModelScope, showActionsUseCase
+    ) {
 
         override val stateKey = "fingerprint_action_list_view_model"
 
@@ -132,13 +134,14 @@ class ConfigFingerprintMapViewModel(private val fingerprintMapRepository: Finger
 
     class Factory(
         private val fingerprintMapRepository: FingerprintMapRepository,
-        private val deviceInfoRepository: DeviceInfoRepository) : ViewModelProvider.Factory {
+        private val showActionsUseCase: ShowActionsUseCase
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
             ConfigFingerprintMapViewModel(
                 fingerprintMapRepository,
-                deviceInfoRepository
+                showActionsUseCase
             ) as T
     }
 }

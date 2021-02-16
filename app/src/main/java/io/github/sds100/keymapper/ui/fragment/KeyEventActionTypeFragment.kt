@@ -14,10 +14,8 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.checkbox
-import io.github.sds100.keymapper.data.showDeviceDescriptors
 import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentKeyeventActionTypeBinding
-import io.github.sds100.keymapper.globalPreferences
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.getFullMessage
 
@@ -106,7 +104,7 @@ class KeyEventActionTypeFragment : Fragment() {
             val text = when {
                 it == null -> str(R.string.from_no_device)
 
-                globalPreferences.showDeviceDescriptors.firstBlocking() ->
+                viewModel.showDeviceDescriptors ->
                     "${it.name} ${it.descriptor.substring(0..4)}"
 
                 else -> it.name
@@ -144,7 +142,7 @@ class KeyEventActionTypeFragment : Fragment() {
                     add(str(R.string.from_no_device))
 
                     models.forEach {
-                        if (globalPreferences.showDeviceDescriptors.firstBlocking()) {
+                        if (viewModel.showDeviceDescriptors) {
                             add("${it.name} ${it.descriptor.substring(0..4)}")
                         } else {
                             add(it.name)

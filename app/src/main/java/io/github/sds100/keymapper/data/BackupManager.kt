@@ -15,6 +15,7 @@ import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.BackupRestoreUseCase
+import io.github.sds100.keymapper.domain.usecases.IBackupRestoreUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.*
@@ -33,7 +34,7 @@ class BackupManager(
     private val deviceInfoRepository: DeviceInfoRepository,
     private val coroutineScope: CoroutineScope,
     private val contentResolver: IContentResolver,
-    private val globalPreferences: IGlobalPreferences,
+    private val backupRestoreUseCase: IBackupRestoreUseCase,
     private val throwExceptions: Boolean = false,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : IBackupManager {
@@ -63,13 +64,13 @@ class BackupManager(
     private val gson = Gson()
 
     init {
-        fingerprintMapRepository.requestBackup.observeForever {
+        fingerprintMapRepository.requestAutomaticBackup.observeForever {
             coroutineScope.launch(dispatchers.default()) {
                 doAutomaticBackup(keymapRepository.getKeymaps(), it.model)
             }
         }
 
-        keymapRepository.requestBackup.observeForever { event ->
+        keymapRepository.requestAutomaticBackup.observeForever { event ->
             coroutineScope.launch(dispatchers.default()) {
                 val fingerprintMaps =
                     fingerprintMapRepository.fingerprintGestureMaps.first()
@@ -257,8 +258,9 @@ class BackupManager(
 
         if (!shouldBackupAutomatically()) return
 
-        val uriString = globalPreferences.get(Keys.automaticBackupLocation)
-            ?: return
+        val uriString = backupRestoreUseCase.automaticBackupLocation
+
+        if (uriString.isEmpty()) return
 
         val result = contentResolver
             .openOutputStream(uriString)
@@ -279,7 +281,7 @@ class BackupManager(
     }
 
     private suspend fun shouldBackupAutomatically() =
-        globalPreferences.get(Keys.automaticBackupLocation)?.isNotBlank() ?: false
+        backupRestoreUseCase.automaticBackupLocation.isNotBlank()
 
     private class BackupModel(
         @SerializedName(NAME_KEYMAP_DB_VERSION)

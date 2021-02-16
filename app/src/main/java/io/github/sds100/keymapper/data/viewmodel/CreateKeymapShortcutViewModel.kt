@@ -4,8 +4,8 @@ import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.model.Trigger
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
 import io.github.sds100.keymapper.data.usecase.CreateKeymapShortcutUseCase
+import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.IModelState
 import io.github.sds100.keymapper.util.result.Failure
@@ -17,7 +17,7 @@ import splitties.bitflags.withFlag
  */
 class CreateKeymapShortcutViewModel(
     private val keymapRepository: CreateKeymapShortcutUseCase,
-    private val deviceInfoRepository: DeviceInfoRepository
+    private val showActionsUseCase: ShowActionsUseCase
 ) : ViewModel(), IModelState<List<KeymapListItemModel>> {
 
     private val _model: MutableLiveData<DataState<List<KeymapListItemModel>>> =
@@ -28,24 +28,42 @@ class CreateKeymapShortcutViewModel(
 
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(keymapRepository.keymapList) {
-            postValue(BuildKeymapListModels(it))
+            viewModelScope.launch {
+                postValue(
+                    BuildKeymapListModels(
+                        it,
+                        showActionsUseCase.getDeviceInfo(),
+                        showActionsUseCase.hasRootPermission,
+                        showActionsUseCase.showDeviceDescriptors
+                    )
+                )
+            }
         }
     }
 
     val eventStream: LiveData<Event> = _eventStream
 
     fun rebuildModels() {
-        if (keymapRepository.keymapList.value == null) return
+        viewModelScope.launch {
 
-        if (keymapRepository.keymapList.value?.isEmpty() == true) {
-            _model.value = Empty()
-            return
+            if (keymapRepository.keymapList.value == null) return@launch
+
+            if (keymapRepository.keymapList.value?.isEmpty() == true) {
+                _model.value = Empty()
+                return@launch
+            }
+
+            _model.value = Loading()
+
+            _eventStream.postValue(
+                BuildKeymapListModels(
+                    keymapRepository.keymapList.value ?: emptyList(),
+                    showActionsUseCase.getDeviceInfo(),
+                    showActionsUseCase.hasRootPermission,
+                    showActionsUseCase.showDeviceDescriptors
+                )
+            )
         }
-
-        _model.value = Loading()
-
-        _eventStream.value =
-            BuildKeymapListModels(keymapRepository.keymapList.value ?: emptyList())
     }
 
     fun setModelList(list: List<KeymapListItemModel>) {
@@ -67,7 +85,12 @@ class CreateKeymapShortcutViewModel(
                 viewModelScope.launch {
                     keymapRepository.updateKeymap(newKeymap)
 
-                    _eventStream.value = CreateKeymapShortcutEvent(uid, newKeymap.actionList)
+                    _eventStream.value = CreateKeymapShortcutEvent(
+                        uid,
+                        newKeymap.actionList,
+                        showActionsUseCase.getDeviceInfo(),
+                        showActionsUseCase.showDeviceDescriptors
+                    )
                 }
             }
     }
@@ -76,14 +99,16 @@ class CreateKeymapShortcutViewModel(
         _eventStream.value = FixFailure(failure)
     }
 
-    suspend fun getDeviceInfoList() = deviceInfoRepository.getAll()
-
     class Factory(
         private val keymapRepository: CreateKeymapShortcutUseCase,
-        private val deviceInfoRepository: DeviceInfoRepository) : ViewModelProvider.Factory {
+        private val showActionsUseCase: ShowActionsUseCase
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            CreateKeymapShortcutViewModel(keymapRepository, deviceInfoRepository) as T
+            CreateKeymapShortcutViewModel(
+                keymapRepository,
+                showActionsUseCase
+            ) as T
     }
 }

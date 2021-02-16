@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.switchmaterial.SwitchMaterial
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.FingerprintMap
 import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel
@@ -50,12 +49,17 @@ class FingerprintMapListFragment
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
         recoverFailureDelegate = RecoverFailureDelegate(
             "FingerprintGestureFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner) {
+            viewLifecycleOwner
+        ) {
 
             viewModel.rebuildModels()
         }
@@ -100,7 +104,7 @@ class FingerprintMapListFragment
                 when (it) {
                     is BuildFingerprintMapModels -> {
                         viewLifecycleScope.launchWhenResumed {
-                            viewModel.setModels(buildModels(it.maps))
+                            viewModel.setModels(buildModels(it))
                         }
                     }
 
@@ -125,14 +129,18 @@ class FingerprintMapListFragment
         viewModel.rebuildModels()
     }
 
-    private suspend fun buildModels(maps: Map<String, FingerprintMap>) =
-        maps.map {
+    private fun buildModels(payload: BuildFingerprintMapModels) =
+        payload.maps.map {
             FingerprintMapListItemModel(
                 id = it.key,
                 header = str(FingerprintMapUtils.HEADERS[it.key]!!),
 
                 actionModels = it.value.actionList.map { action ->
-                    action.buildChipModel(requireContext(), viewModel.getDeviceInfoList())
+                    action.buildChipModel(
+                        requireContext(), payload.deviceInfoList,
+                        payload.showDeviceDescriptors,
+                        payload.hasRootPermission
+                    )
                 },
 
                 constraintModels = it.value.constraintList.map { constraint ->
