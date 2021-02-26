@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.ui.fragment
 
 import android.Manifest
 import android.content.*
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -19,6 +20,7 @@ import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.data.Keys
@@ -43,6 +45,7 @@ import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
 import splitties.systemservices.powerManager
+import splitties.systemservices.uiModeManager
 import splitties.toast.longToast
 import splitties.toast.toast
 import java.util.*
@@ -122,14 +125,17 @@ class HomeFragment : Fragment() {
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             if (position == 0) {
-                fab.show()
+                binding.fab.show()
             } else {
-                fab.hide()
+                binding.fab.hide()
             }
         }
     }
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
+
+    private val isTvDevice: Boolean
+        get() = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +157,8 @@ class HomeFragment : Fragment() {
         recoverFailureDelegate = RecoverFailureDelegate(
             "HomeFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner) {
+            viewLifecycleOwner
+        ) {
 
             keymapListViewModel.rebuildModels()
         }
@@ -323,7 +330,8 @@ class HomeFragment : Fragment() {
             setGrantWriteSecureSettingsPermission {
                 PermissionUtils.requestWriteSecureSettingsPermission(
                     requireContext(),
-                    findNavController())
+                    findNavController()
+                )
             }
 
             setGrantDndAccess {
@@ -392,6 +400,24 @@ class HomeFragment : Fragment() {
                 }
             }
 
+            // set initial state
+            viewLifecycleScope.launchWhenResumed {
+                if (fab.hasFocus() && isTvDevice) {
+                    fab.extend()
+                } else {
+                    fab.shrink()
+                }
+            }
+
+            fab.setOnFocusChangeListener { v, hasFocus ->
+                if (v !is ExtendedFloatingActionButton) return@setOnFocusChangeListener
+
+                if (hasFocus && isTvDevice) {
+                    v.extend()
+                } else {
+                    v.shrink()
+                }
+            }
 
             setDismissNewGuiKeyboardAd {
                 globalPreferences.set(Keys.showGuiKeyboardAd, false)
@@ -409,7 +435,8 @@ class HomeFragment : Fragment() {
                         it.failure,
                         requireContext(),
                         recoverFailureDelegate,
-                        findNavController())
+                        findNavController()
+                    )
                 }
             })
 
@@ -419,14 +446,16 @@ class HomeFragment : Fragment() {
                         it.failure,
                         requireContext(),
                         recoverFailureDelegate,
-                        findNavController())
+                        findNavController()
+                    )
                 }
             })
 
             viewLifecycleScope.launchWhenResumed {
                 QuickStartGuideTapTarget().show(
                     this@HomeFragment,
-                    R.id.action_help)
+                    R.id.action_help
+                )
             }
         }
     }
@@ -440,7 +469,8 @@ class HomeFragment : Fragment() {
         updateStatusLayouts()
 
         if (PackageUtils.isAppInstalled(requireContext(), KeyboardUtils.KEY_MAPPER_GUI_IME_PACKAGE)
-            || Build.VERSION.SDK_INT < KeyboardUtils.KEY_MAPPER_GUI_IME_MIN_API) {
+            || Build.VERSION.SDK_INT < KeyboardUtils.KEY_MAPPER_GUI_IME_MIN_API
+        ) {
             globalPreferences.set(Keys.showGuiKeyboardAd, false)
         }
 
@@ -485,7 +515,8 @@ class HomeFragment : Fragment() {
             if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
                     .data.any { keymap ->
                         keymap.actionList.any { it.error is NoCompatibleImeEnabled }
-                    }) {
+                    }
+            ) {
 
                 imeServiceStatusState.value = StatusLayout.State.ERROR
             }
@@ -497,7 +528,9 @@ class HomeFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionUtils.isPermissionGranted(
                     requireContext(),
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
+                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                )
+            ) {
 
                 dndAccessStatusState.value = StatusLayout.State.POSITIVE
             } else {
