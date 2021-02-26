@@ -57,6 +57,7 @@
     <string name="from_no_device">No device</string>
     <string name="intent_extras_recycler_view_placeholder">¯\\_(ツ)_/¯\n\nNo extras!</string>
     <string name="content_description_fab_new_keymap">Create a new key map</string>
+    <string name="fab_new_keymap">New key map</string>
 
     <string name="whats_new">What\'s New</string>
     <string name="caption_action_type_key">Click the key on the device which you want to be entered.

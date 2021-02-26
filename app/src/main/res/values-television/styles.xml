@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Issue #601. Use outlined button style on TV instead of a filled in button style
+      so it is easier to tell which button is being hovered. People who are colour blind find it even harder
+      to distinguish. -->
+    <style name="FilledInButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton" />
+
+    <style name="RecordTriggerButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton" />
+</resources>

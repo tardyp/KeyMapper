@@ -18,6 +18,12 @@
 
     <style name="AppTheme" parent="Base.AppTheme" />
 
+    <style name="FilledInButtonStyle" parent="Widget.MaterialComponents.Button" />
+
+    <style name="RecordTriggerButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/red</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

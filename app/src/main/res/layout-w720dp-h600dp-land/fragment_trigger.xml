@@ -158,7 +158,7 @@
             android:layout_marginBottom="4dp"
             android:onClick="@{() -> viewModel.recordingTrigger ? viewModel.stopRecording() : viewModel.recordTrigger()}"
             android:text="@{viewModel.recordingTrigger ? @string/button_recording_trigger_countdown(viewModel.recordTriggerTimeLeft) : @string/button_record_trigger}"
-            app:backgroundTint="@color/red"
+            style="@style/RecordTriggerButtonStyle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

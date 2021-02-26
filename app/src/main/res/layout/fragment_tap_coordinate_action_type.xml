@@ -96,6 +96,7 @@
 
                 <Button
                     android:id="@+id/buttonSelectScreenshot"
+                    style="@style/FilledInButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -125,6 +126,7 @@
 
         <Button
             android:id="@+id/buttonDone"
+            style="@style/FilledInButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
