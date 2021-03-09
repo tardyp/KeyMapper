@@ -41,12 +41,3 @@ fun <T> Flow<T>.collectWhenStarted(
 }
 
 fun <T> Flow<T>.firstBlocking(): T = runBlocking { first() }
-
-fun <T> Flow<T>.collectIn(
-    coroutineScope: CoroutineScope,
-    block: suspend (value: T) -> Unit
-) {
-    coroutineScope.launch {
-        collect(block)
-    }
-}

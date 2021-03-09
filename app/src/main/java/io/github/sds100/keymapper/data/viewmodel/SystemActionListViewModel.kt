@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.data.model.SystemActionListItemModel
 import io.github.sds100.keymapper.data.repository.SystemActionRepository
 import io.github.sds100.keymapper.ui.callback.StringResourceProvider
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -17,7 +17,7 @@ import java.util.*
 class SystemActionListViewModel(
     private val repository: SystemActionRepository,
     private var stringResourceProvider: StringResourceProvider? = null
-) : ViewModel(), IModelState<Map<Int, List<SystemActionListItemModel>>> {
+) : ViewModel(), ModelState<Map<Int, List<SystemActionListItemModel>>> {
 
     val searchQuery = MutableLiveData("")
 
@@ -40,7 +40,7 @@ class SystemActionListViewModel(
                         yield(categoryLabel to systemActions)
                     }
                 }
-            }.toMap().getState()
+            }.toMap().getDataState()
         }
 
         emit(systemActionsSortedByCategory)
@@ -69,7 +69,7 @@ class SystemActionListViewModel(
                         }
                     }.toMap()
 
-                    value = filteredModels.getState()
+                    value = filteredModels.getDataState()
                 }
             }
         }

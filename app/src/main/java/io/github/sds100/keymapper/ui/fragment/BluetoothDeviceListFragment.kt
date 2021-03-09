@@ -6,13 +6,13 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 22/02/2020.
  */
 class BluetoothDeviceListFragment
-    : DefaultRecyclerViewFragment<List<BluetoothDevice>>(), IModelState<List<BluetoothDevice>> {
+    : DefaultRecyclerViewFragment<List<BluetoothDevice>>(), ModelState<List<BluetoothDevice>> {
 
     companion object {
         const val REQUEST_KEY = "request_key_bluetooth_device"
@@ -25,7 +25,7 @@ class BluetoothDeviceListFragment
     override val model = MutableLiveData<DataState<List<BluetoothDevice>>>(Loading())
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
-    override val modelState: IModelState<List<BluetoothDevice>>
+    override val modelState: ModelState<List<BluetoothDevice>>
         get() = this
 
     override fun populateList(

@@ -1,10 +1,10 @@
 package io.github.sds100.keymapper.ui.callback
 
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.result.Error
 
 /**
  * Created by sds100 on 07/03/2020.
  */
 interface ErrorClickCallback {
-    fun onErrorClick(failure: Failure)
+    fun onErrorClick(error: Error)
 }

@@ -15,13 +15,13 @@ data class FingerprintMap(
     val version: Int = CURRENT_VERSION,
 
     @SerializedName(NAME_ACTION_LIST)
-    val actionList: List<Action> = listOf(),
+    val actionList: List<ActionEntity> = listOf(),
 
     @SerializedName(NAME_CONSTRAINTS)
-    val constraintList: List<Constraint> = listOf(),
+    val constraintList: List<ConstraintEntity> = listOf(),
 
     @SerializedName(NAME_CONSTRAINT_MODE)
-    val constraintMode: Int = Constraint.DEFAULT_MODE,
+    val constraintMode: Int = ConstraintEntity.DEFAULT_MODE,
 
     @SerializedName(NAME_EXTRAS)
     val extras: List<Extra> = listOf(),
@@ -48,13 +48,13 @@ data class FingerprintMap(
             val version by it.json.byNullableInt(NAME_VERSION)
 
             val actionListJson by it.json.byArray(NAME_ACTION_LIST)
-            val actionList = it.context.deserialize<List<Action>>(actionListJson)
+            val actionList = it.context.deserialize<List<ActionEntity>>(actionListJson)
 
             val extrasJson by it.json.byArray(NAME_EXTRAS)
             val extras = it.context.deserialize<List<Extra>>(extrasJson)
 
             val constraintsJson by it.json.byArray(NAME_CONSTRAINTS)
-            val constraints = it.context.deserialize<List<Constraint>>(constraintsJson)
+            val constraints = it.context.deserialize<List<ConstraintEntity>>(constraintsJson)
 
             val constraintMode by it.json.byInt(NAME_CONSTRAINT_MODE)
 

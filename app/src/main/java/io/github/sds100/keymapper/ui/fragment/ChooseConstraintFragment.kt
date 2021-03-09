@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.sectionHeader
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.getFullMessage
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.messageResource
@@ -34,7 +34,7 @@ class ChooseConstraintFragment
         InjectorUtils.provideChooseConstraintListViewModel(supportedConstraints.toList())
     }
 
-    override val modelState: IModelState<Map<Int, List<ChooseConstraintListItemModel>>>
+    override val modelState: ModelState<Map<Int, List<ChooseConstraintListItemModel>>>
         get() = viewModel
 
     @Suppress("SuspiciousVarProperty")

@@ -4,16 +4,16 @@ import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.usecase.KeymapListUseCase
-import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.result.Error
 import kotlinx.coroutines.launch
 
 class KeymapListViewModel internal constructor(
     private val keymapRepository: KeymapListUseCase,
-    private val showActionsUseCase: ShowActionsUseCase,
-) : ViewModel(), IModelState<List<KeymapListItemModel>> {
+    private val showActionsUseCase: GetActionErrorUseCase,
+) : ViewModel(), ModelState<List<KeymapListItemModel>> {
 
     private val _model: MutableLiveData<DataState<List<KeymapListItemModel>>> =
         MutableLiveData(Loading())
@@ -82,14 +82,14 @@ class KeymapListViewModel internal constructor(
 
     fun requestBackupSelectedKeymaps() = run { _eventStream.value = RequestBackupSelectedKeymaps() }
 
-    fun fixError(failure: Failure) {
-        _eventStream.value = FixFailure(failure)
+    fun fixError(error: Error) {
+        _eventStream.value = FixFailure(error)
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val keymapListUseCase: KeymapListUseCase,
-        private val showActionsUseCase: ShowActionsUseCase
+        private val showActionsUseCase: GetActionErrorUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {

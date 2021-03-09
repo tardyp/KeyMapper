@@ -3,6 +3,7 @@ package io.github.sds100.keymapper.util
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.SeekBar
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import io.github.sds100.keymapper.databinding.DialogSeekbarListBinding
 import io.github.sds100.keymapper.util.result.*
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
+import splitties.alertdialog.appcompat.message
 import splitties.alertdialog.appcompat.okButton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -21,9 +23,11 @@ import kotlin.coroutines.suspendCoroutine
  * Created by sds100 on 30/03/2020.
  */
 
-suspend fun Context.editTextStringAlertDialog(lifecycleOwner: LifecycleOwner,
-                                              hint: String,
-                                              allowEmpty: Boolean = false) = suspendCoroutine<String> {
+suspend fun Context.editTextStringAlertDialog(
+    lifecycleOwner: LifecycleOwner,
+    hint: String,
+    allowEmpty: Boolean = false
+) = suspendCoroutine<String> {
     alertDialog {
         val inflater = LayoutInflater.from(this@editTextStringAlertDialog)
 
@@ -113,7 +117,7 @@ suspend fun Context.editTextNumberAlertDialog(
 
                     getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = result.isSuccess
 
-                    textInputLayout.error = result.failureOrNull()?.getFullMessage(context)
+                    textInputLayout.error = result.errorOrNull()?.getFullMessage(context)
                 })
             }
         }
@@ -122,7 +126,8 @@ suspend fun Context.editTextNumberAlertDialog(
 
 suspend fun Context.seekBarAlertDialog(
     lifecycleOwner: LifecycleOwner,
-    seekBarListItemModel: SeekBarListItemModel) = suspendCoroutine<Int> {
+    seekBarListItemModel: SeekBarListItemModel
+) = suspendCoroutine<Int> {
     alertDialog {
         val inflater = LayoutInflater.from(this@seekBarAlertDialog)
         DialogSeekbarListBinding.inflate(inflater).apply {
@@ -132,7 +137,11 @@ suspend fun Context.seekBarAlertDialog(
             model = seekBarListItemModel
 
             onChangeListener = object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
                     result = seekBarListItemModel.calculateValue(progress)
 
                     textViewValue.text = result.toString()
@@ -154,5 +163,18 @@ suspend fun Context.seekBarAlertDialog(
         cancelButton()
 
         show()
+    }
+}
+
+/**
+ * @return whether the ok button was pressed
+ */
+suspend fun Context.okDialog(@StringRes messageRes: Int) = suspendCoroutine<Boolean> { continuation ->
+    alertDialog {
+        message = str(messageRes)
+
+        okButton {
+            continuation.resume(true)
+        }
     }
 }

@@ -1,0 +1,214 @@
+package io.github.sds100.keymapper.ui.mappings.keymap
+
+import android.view.KeyEvent
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import com.hadilq.liveevent.LiveEvent
+import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
+import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUidUseCase
+import io.github.sds100.keymapper.domain.models.TriggerKey
+import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCase
+import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
+import io.github.sds100.keymapper.domain.trigger.TriggerMode
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.utils.ClickType
+import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
+import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
+import io.github.sds100.keymapper.util.Data
+import io.github.sds100.keymapper.util.DataState
+import io.github.sds100.keymapper.util.Empty
+import io.github.sds100.keymapper.util.Loading
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+
+/**
+ * Created by sds100 on 24/11/20.
+ */
+
+class TriggerViewModel(
+    private val coroutineScope: CoroutineScope,
+    private val onboardingUseCase: OnboardingUseCase,
+    private val useCase: ConfigKeymapTriggerUseCase,
+    private val listItemMapper: TriggerKeyListItemMapper,
+    private val recordTrigger: RecordTriggerUseCase,
+    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+    getKeymapUidUseCase: GetKeymapUidUseCase,
+) {
+
+    val optionsViewModel = TriggerOptionsViewModel(
+        onboardingUseCase,
+        useCase,
+        getKeymapUidUseCase
+    )
+
+    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
+    val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
+
+    private val _showParallelTriggerOrderExplanation = MutableStateFlow(false)
+    val showParallelTriggerOrderExplanation = _showParallelTriggerOrderExplanation.asStateFlow()
+
+    fun approvedParallelTriggerOrderExplanation() {
+        _showParallelTriggerOrderExplanation.value = false
+        onboardingUseCase.shownParallelTriggerOrderExplanation = true
+    }
+
+    private val _showSequenceTriggerExplanation = MutableStateFlow(false)
+    val showSequenceTriggerExplanation = _showSequenceTriggerExplanation.asStateFlow()
+
+    private val _showEnableCapsLockKeyboardLayoutPrompt = MutableSharedFlow<Unit>()
+    val showEnableCapsLockKeyboardLayoutPrompt =
+        _showEnableCapsLockKeyboardLayoutPrompt.asSharedFlow()
+
+    fun approvedSequenceTriggerExplanation() {
+        _showSequenceTriggerExplanation.value = false
+        onboardingUseCase.shownSequenceTriggerExplanation = true
+    }
+
+    val triggerInParallel = useCase.mode.map { it == TriggerMode.PARALLEL }
+    fun setParallelTriggerMode() = useCase.setMode(TriggerMode.PARALLEL)
+
+    val triggerInSequence = useCase.mode.map { it == TriggerMode.SEQUENCE }
+    fun setSequenceTriggerMode() = useCase.setMode(TriggerMode.SEQUENCE)
+
+    val triggerModeUndefined = useCase.mode.map { it == TriggerMode.UNDEFINED }
+    fun setUndefinedTriggerMode() = useCase.setMode(TriggerMode.UNDEFINED)
+
+    val isParallelTriggerClickTypeShortPress = useCase.keys.map {
+        if (!it.isNullOrEmpty()) {
+            it[0].clickType == ClickType.SHORT_PRESS
+        } else {
+            false
+        }
+    }
+
+    val isParallelTriggerClickTypeLongPress = useCase.keys.map {
+        if (!it.isNullOrEmpty()) {
+            it[0].clickType == ClickType.LONG_PRESS
+        } else {
+            false
+        }
+    }.stateIn(coroutineScope, SharingStarted.Eagerly, false)
+
+    private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
+    val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
+
+    private val _modelList = MutableLiveData<DataState<List<TriggerKeyListItemModel>>>()
+    val modelList: LiveData<DataState<List<TriggerKeyListItemModel>>> = _modelList
+
+    val triggerKeyCount = modelList.map {
+        when (it) {
+            is Data -> it.data.size
+            else -> 0
+        }
+    }
+
+    val recordTriggerTimeLeft = MutableLiveData(0)
+    val recordingTrigger = MutableLiveData(false)
+
+    /**
+     * The number of times the user has attempted to record a trigger.
+     */
+    private var recordingTriggerCount = 0
+
+    /**
+     * Whether the user has successfully recorded a trigger.
+     */
+    private var successfullyRecordedTrigger = false
+
+    init {
+        triggerInParallel.onEach {
+            /* when the user first chooses to make parallel a trigger,
+            show a dialog informing them that the order in which they
+            list the keys is the order in which they will need to be held down.
+            */
+            if (it
+                && useCase.keys.value.size > 1
+                && !onboardingUseCase.shownParallelTriggerOrderExplanation
+            ) {
+                _showParallelTriggerOrderExplanation.value = true
+            }
+
+            useCase.setMode(TriggerMode.PARALLEL)
+        }.launchIn(coroutineScope)
+
+        triggerInSequence.onEach {
+            if (it
+                && useCase.keys.value.size > 1
+                && !onboardingUseCase.shownSequenceTriggerExplanation
+            ) {
+                _showSequenceTriggerExplanation.value = true
+            }
+        }.launchIn(coroutineScope)
+
+        recordTrigger.onRecordKey.onEach {
+
+            if (it.keyCode == KeyEvent.KEYCODE_CAPS_LOCK) {
+                _showEnableCapsLockKeyboardLayoutPrompt.emit(Unit)
+            }
+
+            useCase.addTriggerKey(it.keyCode, it.device)
+        }.launchIn(coroutineScope)
+
+        combine(useCase.mode, useCase.keys) { mode, keys ->
+            rebuildModels(mode, keys)
+        }
+    }
+
+    fun setParallelTriggerClickType(clickType: ClickType) =
+        useCase.setParallelTriggerClickType(clickType)
+
+    fun setTriggerKeyDevice(uid: String, device: TriggerKeyDevice) =
+        useCase.setTriggerKeyDevice(uid, device)
+
+    fun onRemoveKeyClick(uid: String) = useCase.removeTriggerKey(uid)
+
+    fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = useCase.moveTriggerKey(fromIndex, toIndex)
+
+    fun onTriggerKeyOptionsClick(id: String) {
+        TODO()
+    }
+
+    fun setTriggerKeyOptions(options: TriggerKeyOptions) {
+        TODO()
+    }
+
+    fun onChooseDeviceClick(keyUid: String) {
+        coroutineScope.launch {
+            val externalDevices = showDeviceInfoUseCase.getAll().map {
+                TriggerKeyDevice.External(it.descriptor, it.name)
+            }
+
+            val devices = sequence {
+                yield(TriggerKeyDevice.Internal)
+                yield(TriggerKeyDevice.Any)
+                yieldAll(externalDevices)
+            }.toList()
+
+            _showChooseDeviceDialog.emit(ChooseTriggerKeyDeviceModel(keyUid, devices))
+        }
+    }
+
+    fun recordTrigger() = recordTrigger.record()
+
+    fun stopRecording() = recordTrigger.stopRecording()
+
+    fun rebuildModels() = rebuildModels(useCase.mode.value, useCase.keys.value)
+
+    private fun rebuildModels(mode: TriggerMode, keys: List<TriggerKey>) {
+        coroutineScope.launch {
+
+            _modelList.value = Loading()
+
+            _modelList.value = with(listItemMapper.map(keys, mode)) {
+                when {
+                    isEmpty() -> Empty()
+                    else -> Data(this)
+                }
+            }
+        }
+    }
+}

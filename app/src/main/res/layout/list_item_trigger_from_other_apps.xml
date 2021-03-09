@@ -9,7 +9,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.data.model.TriggerByIntentModel" />
+            type="io.github.sds100.keymapper.data.model.TriggerFromOtherAppsModel" />
 
         <variable
             name="onClick"

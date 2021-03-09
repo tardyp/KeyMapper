@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.data.model.ConstraintModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import splitties.toast.toast
 
 /**
@@ -24,7 +24,7 @@ abstract class ConstraintListFragment
 
     abstract val constraintListViewModel: ConstraintListViewModel
 
-    override val modelState: IModelState<List<ConstraintModel>>
+    override val modelState: ModelState<List<ConstraintModel>>
         get() = constraintListViewModel
 
     override fun onResume() {

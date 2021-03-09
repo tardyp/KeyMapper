@@ -21,8 +21,8 @@ import androidx.core.os.bundleOf
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.lifecycle.Lifecycle
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.Option
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
@@ -64,7 +64,7 @@ class ActionPerformerDelegate(
     }
 
     fun performAction(
-        action: Action,
+        action: ActionEntity,
         chosenImePackageName: String?,
         currentPackageName: String?
     ) = performAction(
@@ -169,7 +169,7 @@ class ActionPerformerDelegate(
                         }
 
                         val strokeDescription =
-                            if (action.flags.hasFlag(Action.ACTION_FLAG_HOLD_DOWN)
+                            if (action.flags.hasFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)
                                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                             ) {
 
@@ -204,7 +204,7 @@ class ActionPerformerDelegate(
                 }
 
                 ActionType.KEY_EVENT -> {
-                    val useShell = action.extras.getData(Action.EXTRA_KEY_EVENT_USE_SHELL)
+                    val useShell = action.extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL)
                         .valueOrNull()
                         .toBoolean()
 
@@ -214,7 +214,7 @@ class ActionPerformerDelegate(
                     }
 
                     val deviceId = action.extras
-                        .getData(Action.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR)
+                        .getData(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR)
                         .handle(
                             onSuccess = { InputDeviceUtils.getDeviceIdFromDescriptor(it) },
                             onFailure = { 0 }
@@ -226,7 +226,7 @@ class ActionPerformerDelegate(
                             it,
                             keyCode = action.data.toInt(),
                             metaState = additionalMetaState.withFlag(
-                                action.extras.getData(Action.EXTRA_KEY_EVENT_META_STATE)
+                                action.extras.getData(ActionEntity.EXTRA_KEY_EVENT_META_STATE)
                                     .valueOrNull()
                                     ?.toInt()
                                     ?: 0
@@ -241,7 +241,7 @@ class ActionPerformerDelegate(
                     val intent = Intent.parseUri(action.data, 0)
 
                     try {
-                        action.extras.getData(Action.EXTRA_INTENT_TARGET).onSuccess {
+                        action.extras.getData(ActionEntity.EXTRA_INTENT_TARGET).onSuccess {
                             when (IntentTarget.valueOf(it)) {
                                 IntentTarget.ACTIVITY -> {
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -272,13 +272,13 @@ class ActionPerformerDelegate(
         chosenImePackageName: String?,
         currentPackageName: String?
     ) = performSystemAction(
-        Action(ActionType.SYSTEM_ACTION, id),
+        ActionEntity(ActionType.SYSTEM_ACTION, id),
         chosenImePackageName,
         currentPackageName
     )
 
     private fun performSystemAction(
-        action: Action,
+        action: ActionEntity,
         chosenImePackageName: String?,
         currentPackageName: String?
     ) {
@@ -286,10 +286,10 @@ class ActionPerformerDelegate(
         val id = action.data
 
         fun getSdkValueForOption(onSuccess: (sdkOptionValue: Int) -> Unit) {
-            val extraId = Option.getExtraIdForOption(id)
+            val extraId = SystemActionOption.getExtraIdForOption(id)
 
             action.extras.getData(extraId).onSuccess { option ->
-                val sdkOptionValue = Option.OPTION_ID_SDK_ID_MAP[option]
+                val sdkOptionValue = SystemActionOption.OPTION_ID_SDK_ID_MAP[option]
 
                 if (sdkOptionValue != null) {
                     onSuccess(sdkOptionValue)
@@ -298,12 +298,12 @@ class ActionPerformerDelegate(
         }
 
         fun getSdkValuesForOptionSet(onSuccess: (values: List<Int>) -> Unit) {
-            val extraId = Option.getExtraIdForOption(id)
+            val extraId = SystemActionOption.getExtraIdForOption(id)
 
             action.extras.getData(extraId).onSuccess { data ->
                 val optionIds = data.split(',')
 
-                val sdkValues = optionIds.map { Option.OPTION_ID_SDK_ID_MAP[it] }
+                val sdkValues = optionIds.map { SystemActionOption.OPTION_ID_SDK_ID_MAP[it] }
 
                 if (sdkValues.all { it != null }) {
                     onSuccess(sdkValues.map { it!! })
@@ -311,7 +311,7 @@ class ActionPerformerDelegate(
             }
         }
 
-        val showVolumeUi = action.flags.hasFlag(Action.ACTION_FLAG_SHOW_VOLUME_UI)
+        val showVolumeUi = action.flags.hasFlag(ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI)
 
         ctx.apply {
             when (id) {
@@ -500,7 +500,7 @@ class ActionPerformerDelegate(
                 }
 
                 SystemAction.SWITCH_KEYBOARD -> {
-                    action.extras.getData(Action.EXTRA_IME_ID).onSuccess {
+                    action.extras.getData(ActionEntity.EXTRA_IME_ID).onSuccess {
                         KeyboardUtils.switchIme(this, it)
                     }
                 }
@@ -580,37 +580,37 @@ class ActionPerformerDelegate(
                                 performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
 
                             SystemAction.PLAY_MEDIA_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.playMediaForPackage(ctx, it)
                                 }
                             }
                             SystemAction.PLAY_PAUSE_MEDIA_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.playPauseMediaPlaybackForPackage(ctx, it)
                                 }
                             }
                             SystemAction.PAUSE_MEDIA_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.pauseMediaForPackage(ctx, it)
                                 }
                             }
                             SystemAction.NEXT_TRACK_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.nextTrackForPackage(ctx, it)
                                 }
                             }
                             SystemAction.PREVIOUS_TRACK_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.previousTrackForPackage(ctx, it)
                                 }
                             }
                             SystemAction.FAST_FORWARD_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.fastForwardForPackage(ctx, it)
                                 }
                             }
                             SystemAction.REWIND_PACKAGE -> {
-                                action.extras.getData(Action.EXTRA_PACKAGE_NAME).onSuccess {
+                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.rewindForPackage(ctx, it)
                                 }
                             }
@@ -620,8 +620,8 @@ class ActionPerformerDelegate(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         var lensFacing = CameraCharacteristics.LENS_FACING_BACK
 
-                        action.extras.getData(Action.EXTRA_LENS).onSuccess {
-                            val sdkLensFacing = Option.OPTION_ID_SDK_ID_MAP[it]!!
+                        action.extras.getData(ActionEntity.EXTRA_LENS).onSuccess {
+                            val sdkLensFacing = SystemActionOption.OPTION_ID_SDK_ID_MAP[it]!!
 
                             lensFacing = sdkLensFacing
                         }
@@ -660,8 +660,8 @@ class ActionPerformerDelegate(
 
                             SystemAction.TOGGLE_DND_MODE,
                             SystemAction.ENABLE_DND_MODE -> {
-                                action.extras.getData(Action.EXTRA_DND_MODE).onSuccess {
-                                    val mode = Option.OPTION_ID_SDK_ID_MAP[it] ?: return@onSuccess
+                                action.extras.getData(ActionEntity.EXTRA_DND_MODE).onSuccess {
+                                    val mode = SystemActionOption.OPTION_ID_SDK_ID_MAP[it] ?: return@onSuccess
 
                                     when (id) {
                                         SystemAction.TOGGLE_DND_MODE -> AudioUtils.toggleDndMode(

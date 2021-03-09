@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.data.model.options
 
 import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.saveIntOption
@@ -28,7 +28,7 @@ class TriggerOptions(
     private val sequenceTriggerTimeout: IntOption,
     val triggerFromOtherApps: BoolOption,
     private val showToast: BoolOption
-) : BaseOptions<Trigger> {
+) : BaseOptions<TriggerEntity> {
 
     companion object {
         const val ID_LONG_PRESS_DELAY = "long_press_delay"
@@ -42,21 +42,21 @@ class TriggerOptions(
         const val ID_SHOW_TOAST = "show_toast"
     }
 
-    constructor(trigger: Trigger) : this(
+    constructor(trigger: TriggerEntity) : this(
         vibrate = BoolOption(
             id = ID_VIBRATE,
-            value = trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_VIBRATE),
+            value = trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE),
             isAllowed = true
         ),
         longPressDoubleVibration = BoolOption(
             id = ID_LONG_PRESS_DOUBLE_VIBRATION,
-            value = trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION),
-            isAllowed = (trigger.keys.size == 1 || (trigger.mode == Trigger.PARALLEL))
-                && trigger.keys.getOrNull(0)?.clickType == Trigger.LONG_PRESS
+            value = trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION),
+            isAllowed = (trigger.keys.size == 1 || (trigger.mode == TriggerEntity.PARALLEL))
+                && trigger.keys.getOrNull(0)?.clickType == TriggerEntity.LONG_PRESS
         ),
         screenOffTrigger = BoolOption(
             id = ID_SCREEN_OFF_TRIGGER,
-            value = trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS),
+            value = trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS),
             isAllowed = trigger.keys.isNotEmpty() && trigger.keys.all {
                 KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE.containsValue(it.keyCode)
             }
@@ -64,34 +64,34 @@ class TriggerOptions(
 
         longPressDelay = IntOption(
             id = ID_LONG_PRESS_DELAY,
-            value = trigger.extras.getData(Trigger.EXTRA_LONG_PRESS_DELAY).valueOrNull()?.toInt()
+            value = trigger.extras.getData(TriggerEntity.EXTRA_LONG_PRESS_DELAY).valueOrNull()?.toInt()
                 ?: IntOption.DEFAULT,
-            isAllowed = trigger.keys.any { it.clickType == Trigger.LONG_PRESS }
+            isAllowed = trigger.keys.any { it.clickType == TriggerEntity.LONG_PRESS }
         ),
 
         doublePressDelay = IntOption(
             id = ID_DOUBLE_PRESS_DELAY,
-            value = trigger.extras.getData(Trigger.EXTRA_DOUBLE_PRESS_DELAY).valueOrNull()?.toInt()
+            value = trigger.extras.getData(TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY).valueOrNull()?.toInt()
                 ?: IntOption.DEFAULT,
-            isAllowed = trigger.keys.any { it.clickType == Trigger.DOUBLE_PRESS }
+            isAllowed = trigger.keys.any { it.clickType == TriggerEntity.DOUBLE_PRESS }
         ),
 
         vibrateDuration = IntOption(
             id = ID_VIBRATE_DURATION,
-            value = trigger.extras.getData(Trigger.EXTRA_VIBRATION_DURATION).valueOrNull()?.toInt()
+            value = trigger.extras.getData(TriggerEntity.EXTRA_VIBRATION_DURATION).valueOrNull()?.toInt()
                 ?: IntOption.DEFAULT,
-            isAllowed = trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_VIBRATE)
-                || trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
+            isAllowed = trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
+                || trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
         ),
 
         sequenceTriggerTimeout = IntOption(
             id = ID_SEQUENCE_TRIGGER_TIMEOUT,
             value =
-            trigger.extras.getData(Trigger.EXTRA_SEQUENCE_TRIGGER_TIMEOUT).valueOrNull()?.toInt()
+            trigger.extras.getData(TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT).valueOrNull()?.toInt()
                 ?: IntOption.DEFAULT,
             isAllowed = !trigger.keys.isNullOrEmpty()
                 && trigger.keys.size > 1
-                && trigger.mode == Trigger.SEQUENCE
+                && trigger.mode == TriggerEntity.SEQUENCE
         ),
         triggerFromOtherApps = BoolOption(
             id = ID_TRIGGER_FROM_OTHER_APPS,
@@ -154,34 +154,34 @@ class TriggerOptions(
         return this
     }
 
-    override fun apply(old: Trigger): Trigger {
+    override fun apply(old: TriggerEntity): TriggerEntity {
         val newFlags = applyToTriggerFlags(old.flags)
         val newExtras = applyToTriggerExtras(old.extras)
 
         return old.copy(extras = newExtras, flags = newFlags)
     }
 
-    fun dependentDataChanged(keys: List<Trigger.Key>, @Trigger.Mode mode: Int): TriggerOptions {
+    fun dependentDataChanged(keys: List<TriggerEntity.KeyEntity>, @TriggerEntity.Mode mode: Int): TriggerOptions {
         val flags = applyToTriggerFlags(0)
         val extras = applyToTriggerExtras(listOf())
 
-        return TriggerOptions(Trigger(keys, extras, mode, flags))
+        return TriggerOptions(TriggerEntity(keys, extras, mode, flags))
     }
 
     private fun applyToTriggerFlags(flags: Int): Int {
         return flags
-            .saveBoolOption(vibrate, Trigger.TRIGGER_FLAG_VIBRATE)
-            .saveBoolOption(longPressDoubleVibration, Trigger.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
-            .saveBoolOption(screenOffTrigger, Trigger.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
-            .saveBoolOption(triggerFromOtherApps, Trigger.TRIGGER_FLAG_FROM_OTHER_APPS)
-            .saveBoolOption(showToast, Trigger.TRIGGER_FLAG_SHOW_TOAST)
+            .saveBoolOption(vibrate, TriggerEntity.TRIGGER_FLAG_VIBRATE)
+            .saveBoolOption(longPressDoubleVibration, TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
+            .saveBoolOption(screenOffTrigger, TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
+            .saveBoolOption(triggerFromOtherApps, TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
+            .saveBoolOption(showToast, TriggerEntity.TRIGGER_FLAG_SHOW_TOAST)
     }
 
     private fun applyToTriggerExtras(extras: List<Extra>): List<Extra> {
         return extras
-            .saveIntOption(vibrateDuration, Trigger.EXTRA_VIBRATION_DURATION)
-            .saveIntOption(longPressDelay, Trigger.EXTRA_LONG_PRESS_DELAY)
-            .saveIntOption(doublePressDelay, Trigger.EXTRA_DOUBLE_PRESS_DELAY)
-            .saveIntOption(sequenceTriggerTimeout, Trigger.EXTRA_SEQUENCE_TRIGGER_TIMEOUT)
+            .saveIntOption(vibrateDuration, TriggerEntity.EXTRA_VIBRATION_DURATION)
+            .saveIntOption(longPressDelay, TriggerEntity.EXTRA_LONG_PRESS_DELAY)
+            .saveIntOption(doublePressDelay, TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY)
+            .saveIntOption(sequenceTriggerTimeout, TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT)
     }
 }

@@ -52,7 +52,7 @@ fun FingerprintMap.getFlagLabelList(ctx: Context): List<String> = sequence {
 fun FingerprintMap.buildOptionsDescription(ctx: Context): String = buildString {
     getFlagLabelList(ctx).forEachIndexed { index, label ->
         if (index > 0) {
-            append(" ${ctx.str(R.string.interpunct)} ")
+            append(" ${ctx.str(R.string.middot)} ")
         }
 
         append(label)

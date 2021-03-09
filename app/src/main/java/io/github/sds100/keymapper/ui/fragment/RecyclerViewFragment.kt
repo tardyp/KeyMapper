@@ -16,7 +16,7 @@ import androidx.savedstate.SavedStateRegistry
 import com.google.android.material.bottomappbar.BottomAppBar
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 22/02/2020.
@@ -42,7 +42,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     private val isSearchEnabled: Boolean
         get() = searchStateKey != null
 
-    abstract val modelState: IModelState<T>
+    abstract val modelState: ModelState<T>
 
     open var isAppBarVisible = true
     open var requestKey: String? = null

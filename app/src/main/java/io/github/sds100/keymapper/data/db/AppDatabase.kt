@@ -13,13 +13,13 @@ import io.github.sds100.keymapper.data.db.typeconverter.ActionListTypeConverter
 import io.github.sds100.keymapper.data.db.typeconverter.ConstraintListTypeConverter
 import io.github.sds100.keymapper.data.db.typeconverter.ExtraListTypeConverter
 import io.github.sds100.keymapper.data.db.typeconverter.TriggerTypeConverter
-import io.github.sds100.keymapper.data.model.DeviceInfo
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.DeviceInfoEntity
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 
 /**
  * Created by sds100 on 24/01/2020.
  */
-@Database(entities = [KeyMap::class, DeviceInfo::class], version = DATABASE_VERSION, exportSchema = true)
+@Database(entities = [KeyMapEntity::class, DeviceInfoEntity::class], version = DATABASE_VERSION, exportSchema = true)
 @TypeConverters(
     ActionListTypeConverter::class,
     ExtraListTypeConverter::class,

@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.data.model.options
 
-import io.github.sds100.keymapper.data.model.Action
+import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.saveIntOption
 import io.github.sds100.keymapper.util.*
@@ -15,7 +15,7 @@ class ActionShortcutOptions(
     val showVolumeUi: BoolOption,
     val delayBeforeNextAction: IntOption,
     val multiplier: IntOption
-) : BaseOptions<Action> {
+) : BaseOptions<ActionEntity> {
 
     companion object {
         const val ID_SHOW_VOLUME_UI = "show_volume_ui"
@@ -23,7 +23,7 @@ class ActionShortcutOptions(
         const val ID_DELAY_BEFORE_NEXT_ACTION = "delay_before_next_action"
     }
 
-    constructor(action: Action,
+    constructor(action: ActionEntity,
                 actionCount: Int) : this(
         id = action.uid,
 
@@ -55,7 +55,7 @@ class ActionShortcutOptions(
         showVolumeUi
     )
 
-    override fun setValue(id: String, value: Int): BaseOptions<Action> {
+    override fun setValue(id: String, value: Int): BaseOptions<ActionEntity> {
         when (id) {
             ID_MULTIPLIER -> multiplier.value = value
             ID_DELAY_BEFORE_NEXT_ACTION -> delayBeforeNextAction.value = value
@@ -64,7 +64,7 @@ class ActionShortcutOptions(
         return this
     }
 
-    override fun setValue(id: String, value: Boolean): BaseOptions<Action> {
+    override fun setValue(id: String, value: Boolean): BaseOptions<ActionEntity> {
         when (id) {
 
             ID_SHOW_VOLUME_UI -> showVolumeUi.value = value
@@ -73,16 +73,16 @@ class ActionShortcutOptions(
         return this
     }
 
-    override fun apply(old: Action): Action {
+    override fun apply(old: ActionEntity): ActionEntity {
         val newFlags = old.flags
-            .saveBoolOption(showVolumeUi, Action.ACTION_FLAG_SHOW_VOLUME_UI)
+            .saveBoolOption(showVolumeUi, ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI)
 
         val newExtras = old.extras
-            .saveIntOption(multiplier, Action.EXTRA_MULTIPLIER)
-            .saveIntOption(delayBeforeNextAction, Action.EXTRA_DELAY_BEFORE_NEXT_ACTION)
+            .saveIntOption(multiplier, ActionEntity.EXTRA_MULTIPLIER)
+            .saveIntOption(delayBeforeNextAction, ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION)
 
         newExtras.removeAll {
-            it.id in arrayOf(Action.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR, Action.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR)
+            it.id in arrayOf(ActionEntity.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR, ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR)
         }
 
         return old.copy(flags = newFlags, extras = newExtras, uid = old.uid)

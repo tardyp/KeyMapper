@@ -6,11 +6,11 @@ import android.widget.CheckBox
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.TriggerByIntentModel
+import io.github.sds100.keymapper.data.model.TriggerFromOtherAppsModel
 import io.github.sds100.keymapper.data.model.options.TriggerOptions
 import io.github.sds100.keymapper.data.viewmodel.BaseOptionsViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
-import io.github.sds100.keymapper.data.viewmodel.TriggerOptionsViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.TriggerOptionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.adapter.OptionsController
@@ -50,7 +50,7 @@ class TriggerOptionsFragment : OptionsFragment<TriggerOptions>() {
     }
 
     inner class TriggerOptionsController : OptionsController(viewLifecycleOwner) {
-        var triggerByIntentModel: TriggerByIntentModel? = null
+        var triggerByIntentModel: TriggerFromOtherAppsModel? = null
             set(value) {
                 field = value
                 requestModelBuild()

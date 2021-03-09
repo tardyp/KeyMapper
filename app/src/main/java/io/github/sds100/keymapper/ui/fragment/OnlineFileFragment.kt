@@ -63,7 +63,7 @@ class OnlineFileFragment : BottomSheetDialogFragment() {
         viewModel.eventStream.observe(viewLifecycleOwner, {
             when (it) {
                 is CloseDialog -> dismiss()
-                is ShowErrorMessage -> toast(it.failure.getFullMessage(requireContext()))
+                is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
                 is OpenUrl -> {
                     Intent(Intent.ACTION_VIEW, Uri.parse(it.url)).apply {
                         startActivity(this)

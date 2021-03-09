@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.domain.usecases
 
 import io.github.sds100.keymapper.domain.adapter.BluetoothMonitor
-import io.github.sds100.keymapper.domain.adapter.KeyboardAdapter
+import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
  * Created by sds100 on 14/02/2021.
  */
 class ControlKeyboardOnBluetoothEventUseCaseImpl(
-    private val keyboardAdapter: KeyboardAdapter,
+    private val inputMethodAdapter: InputMethodAdapter,
     private val preferenceRepository: PreferenceRepository,
     private val bluetoothMonitor: BluetoothMonitor
 ) : PreferenceRepository by preferenceRepository, ControlKeyboardOnBluetoothEventUseCase {
@@ -28,21 +28,21 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
     override fun start(coroutineScope: CoroutineScope) {
         bluetoothMonitor.onDeviceConnect.collectIn(coroutineScope) { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
-                keyboardAdapter.chooseCompatibleInputMethod()
+                inputMethodAdapter.chooseCompatibleInputMethod()
             }
 
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
-                keyboardAdapter.showImePickerOutsideApp()
+                inputMethodAdapter.showImePickerOutsideApp()
             }
         }
 
         bluetoothMonitor.onDeviceDisconnect.collectIn(coroutineScope) { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
-                keyboardAdapter.chooseLastUsedIncompatibleInputMethod()
+                inputMethodAdapter.chooseLastUsedIncompatibleInputMethod()
             }
 
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
-                keyboardAdapter.showImePickerOutsideApp()
+                inputMethodAdapter.showImePickerOutsideApp()
             }
         }
     }

@@ -52,7 +52,7 @@ class RecoverFailureDelegate(
             }
         }
 
-    fun recover(ctx: Context, failure: RecoverableFailure, navController: NavController) {
+    fun recover(ctx: Context, failure: RecoverableError, navController: NavController) {
         when (failure) {
             is PermissionDenied -> {
                 when (failure.permission) {

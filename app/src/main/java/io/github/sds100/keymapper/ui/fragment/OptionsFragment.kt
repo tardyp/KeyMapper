@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.data.model.options.OptionsListModel
 import io.github.sds100.keymapper.data.viewmodel.BaseOptionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.ui.adapter.OptionsController
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 15/01/21.
@@ -15,7 +15,7 @@ abstract class OptionsFragment<O : BaseOptions<*>>
     abstract val optionsViewModel: BaseOptionsViewModel<O>
     abstract val controller: OptionsController
 
-    override val modelState: IModelState<OptionsListModel>
+    override val modelState: ModelState<OptionsListModel>
         get() = optionsViewModel
 
     override fun subscribeUi(binding: FragmentRecyclerviewBinding) {

@@ -8,7 +8,7 @@ import android.os.Build
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.model.Option
+import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.util.SystemAction.CATEGORY_AIRPLANE_MODE
@@ -103,6 +103,7 @@ import io.github.sds100.keymapper.util.SystemAction.TOGGLE_QUICK_SETTINGS_DRAWER
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_SPLIT_SCREEN
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI_ROOT
+import io.github.sds100.keymapper.util.SystemAction.VOLUME_DOWN
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_MUTE
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_TOGGLE_MUTE
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_UNMUTE
@@ -133,6 +134,16 @@ object SystemActionUtils {
         CATEGORY_NFC to R.string.system_action_cat_nfc,
         CATEGORY_AIRPLANE_MODE to R.string.system_action_cat_airplane_mode,
         CATEGORY_OTHER to R.string.system_action_cat_other
+    )
+
+    val TITLE_MAP = mapOf(
+        GO_BACK to R.string.action_go_back,
+
+        VOLUME_DOWN to R.string.action_volume_down
+    )
+
+    val TITLE_WITH_OPTIONS_RES_MAP = mapOf<String, Int>(
+
     )
 
     /**
@@ -454,7 +465,7 @@ object SystemActionUtils {
             descriptionRes = R.string.action_increase_stream,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY),
             descriptionFormattedRes = R.string.action_increase_stream_formatted,
-            options = Option.STREAMS
+            options = SystemActionOption.STREAMS
         ),
         SystemActionDef(
             id = SystemAction.VOLUME_DECREASE_STREAM,
@@ -462,7 +473,7 @@ object SystemActionUtils {
             iconRes = R.drawable.ic_outline_volume_down_24,
             descriptionRes = R.string.action_decrease_stream,
             descriptionFormattedRes = R.string.action_increase_stream_formatted,
-            options = Option.STREAMS,
+            options = SystemActionOption.STREAMS,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
@@ -488,9 +499,9 @@ object SystemActionUtils {
             descriptionFormattedRes = R.string.action_change_ringer_mode_formatted,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY),
             options = listOf(
-                Option.RINGER_MODE_NORMAL,
-                Option.RINGER_MODE_VIBRATE,
-                Option.RINGER_MODE_SILENT
+                SystemActionOption.RINGER_MODE_NORMAL,
+                SystemActionOption.RINGER_MODE_VIBRATE,
+                SystemActionOption.RINGER_MODE_SILENT
             )
         ),
 
@@ -527,7 +538,7 @@ object SystemActionUtils {
             descriptionRes = R.string.action_toggle_dnd_mode,
             descriptionFormattedRes = R.string.action_toggle_dnd_mode_formatted,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY),
-            options = Option.DND_MODES),
+            options = SystemActionOption.DND_MODES),
 
         SystemActionDef(id = SystemAction.ENABLE_DND_MODE,
             category = CATEGORY_VOLUME,
@@ -536,7 +547,7 @@ object SystemActionUtils {
             descriptionRes = R.string.action_enable_dnd_mode,
             descriptionFormattedRes = R.string.action_enable_dnd_mode_formatted,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY),
-            options = Option.DND_MODES),
+            options = SystemActionOption.DND_MODES),
 
         SystemActionDef(id = SystemAction.DISABLE_DND_MODE,
             category = CATEGORY_VOLUME,
@@ -597,7 +608,7 @@ object SystemActionUtils {
             descriptionRes = R.string.action_cycle_rotations,
             descriptionFormattedRes = R.string.action_cycle_rotations_formatted,
             optionType = OptionType.MULTIPLE,
-            options = Option.ROTATIONS
+            options = SystemActionOption.ROTATIONS
         ),
         //SCREEN ORIENTATION
 
@@ -648,7 +659,7 @@ object SystemActionUtils {
             iconRes = R.drawable.ic_flashlight,
             descriptionRes = R.string.action_toggle_flashlight,
             descriptionFormattedRes = R.string.action_toggle_flashlight_formatted,
-            options = Option.LENSES
+            options = SystemActionOption.LENSES
         ),
         SystemActionDef(
             id = SystemAction.ENABLE_FLASHLIGHT,
@@ -659,7 +670,7 @@ object SystemActionUtils {
             iconRes = R.drawable.ic_flashlight,
             descriptionRes = R.string.action_enable_flashlight,
             descriptionFormattedRes = R.string.action_enable_flashlight_formatted,
-            options = Option.LENSES
+            options = SystemActionOption.LENSES
         ),
         SystemActionDef(
             id = SystemAction.DISABLE_FLASHLIGHT,
@@ -670,7 +681,7 @@ object SystemActionUtils {
             iconRes = R.drawable.ic_flashlight_off,
             descriptionRes = R.string.action_disable_flashlight,
             descriptionFormattedRes = R.string.action_disable_flashlight_formatted,
-            options = Option.LENSES
+            options = SystemActionOption.LENSES
         ),
 
         //NFC
@@ -890,10 +901,10 @@ object SystemActionUtils {
         SYSTEM_ACTION_DEFINITIONS
             .filter { it.isSupported(ctx) is Success }
 
-    fun getUnsupportedSystemActionsWithReasons(ctx: Context): Map<SystemActionDef, Failure> =
+    fun getUnsupportedSystemActionsWithReasons(ctx: Context): Map<SystemActionDef, Error> =
         SYSTEM_ACTION_DEFINITIONS
-            .filter { it.isSupported(ctx) is Failure }
-            .map { it to (it.isSupported(ctx) as Failure) }
+            .filter { it.isSupported(ctx) is Error }
+            .map { it to (it.isSupported(ctx) as Error) }
             .toMap()
 
     /**

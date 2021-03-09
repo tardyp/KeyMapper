@@ -215,7 +215,7 @@ fun ChipGroup.bindActionsAndConstraints(
 @BindingAdapter("app:isKeymapEnabled", "app:noActions", "app:noTrigger", "app:actionsHaveErrors", requireAll = false)
 fun TextView.setKeymapExtraInfo(isKeymapEnabled: Boolean = false, noActions: Boolean = false, noTrigger: Boolean = false, actionsHaveErrors: Boolean = false) {
     text = buildString {
-        val interpunct = str(R.string.interpunct)
+        val interpunct = str(R.string.middot)
 
         if (!isKeymapEnabled) {
             append(str(R.string.disabled))
@@ -249,8 +249,8 @@ fun TextView.setKeymapExtraInfo(isKeymapEnabled: Boolean = false, noActions: Boo
 @BindingAdapter("app:triggerModel")
 fun ChipGroup.bindTriggerModel(triggerChipModel: TriggerChipModel) {
     val separatorDrawable = when (triggerChipModel.triggerMode) {
-        Trigger.PARALLEL -> drawable(R.drawable.ic_baseline_add_24)
-        Trigger.SEQUENCE -> drawable(R.drawable.ic_baseline_arrow_forward_24)
+        TriggerEntity.PARALLEL -> drawable(R.drawable.ic_baseline_add_24)
+        TriggerEntity.SEQUENCE -> drawable(R.drawable.ic_baseline_arrow_forward_24)
         else -> drawable(R.drawable.ic_baseline_add_24)
     }
 
@@ -288,8 +288,8 @@ fun ChipGroup.bindConstraints(
     callback: ErrorClickCallback
 ) {
     val separatorText = when (constraintMode) {
-        Constraint.MODE_AND -> str(R.string.constraint_mode_and)
-        Constraint.MODE_OR -> str(R.string.constraint_mode_or)
+        ConstraintEntity.MODE_AND -> str(R.string.constraint_mode_and)
+        ConstraintEntity.MODE_OR -> str(R.string.constraint_mode_or)
         else -> str(R.string.constraint_mode_and)
     }
 
@@ -322,7 +322,7 @@ fun ChipGroup.bindConstraints(
             if (model.hasError) {
                 isClickable = true
                 setOnClickListener {
-                    callback.onErrorClick(model.failure!!)
+                    callback.onErrorClick(model.error!!)
                 }
             }
 

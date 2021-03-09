@@ -3,10 +3,10 @@ package io.github.sds100.keymapper.data.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.Constraint
+import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.ConstraintModel
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -16,10 +16,10 @@ import kotlinx.coroutines.launch
 
 class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
                               val supportedConstraintList: List<String>) :
-    IModelState<List<ConstraintModel>> {
+    ModelState<List<ConstraintModel>> {
 
-    private val _constraintList = MutableLiveData<List<Constraint>>()
-    val constraintList: LiveData<List<Constraint>> = _constraintList
+    private val _constraintList = MutableLiveData<List<ConstraintEntity>>()
+    val constraintList: LiveData<List<ConstraintEntity>> = _constraintList
 
     val constraintAndMode = MutableLiveData<Boolean>()
     val constraintOrMode = MutableLiveData<Boolean>()
@@ -37,16 +37,16 @@ class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
 
     val eventStream: LiveData<Event> = _eventStream
 
-    fun setConstraintList(constraintList: List<Constraint>, constraintMode: Int) {
+    fun setConstraintList(constraintList: List<ConstraintEntity>, constraintMode: Int) {
         _constraintList.value = constraintList
 
         when (constraintMode) {
-            Constraint.MODE_AND -> {
+            ConstraintEntity.MODE_AND -> {
                 constraintAndMode.value = true
                 constraintOrMode.value = false
             }
 
-            Constraint.MODE_OR -> {
+            ConstraintEntity.MODE_OR -> {
                 constraintOrMode.value = true
                 constraintAndMode.value = false
             }
@@ -54,12 +54,12 @@ class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
     }
 
     fun getConstraintMode(): Int = when {
-        constraintAndMode.value == true -> Constraint.MODE_AND
-        constraintOrMode.value == true -> Constraint.MODE_OR
-        else -> Constraint.DEFAULT_MODE
+        constraintAndMode.value == true -> ConstraintEntity.MODE_AND
+        constraintOrMode.value == true -> ConstraintEntity.MODE_OR
+        else -> ConstraintEntity.DEFAULT_MODE
     }
 
-    fun addConstraint(constraint: Constraint) {
+    fun addConstraint(constraint: ConstraintEntity) {
         if (constraintList.value?.any { it.uniqueId == constraint.uniqueId } == true) {
             _eventStream.postValue(DuplicateConstraints())
 
@@ -83,7 +83,7 @@ class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
                 val constraint = modelList.singleOrNull { it.id == id } ?: return@launch
 
                 if (constraint.hasError) {
-                    _eventStream.postValue(FixFailure(constraint.failure!!))
+                    _eventStream.postValue(FixFailure(constraint.error!!))
                 }
             }
         }

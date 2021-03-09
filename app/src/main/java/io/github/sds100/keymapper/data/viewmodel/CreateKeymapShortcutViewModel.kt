@@ -3,12 +3,12 @@ package io.github.sds100.keymapper.data.viewmodel
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.KeymapListItemModel
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.usecase.CreateKeymapShortcutUseCase
-import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.result.Error
 import kotlinx.coroutines.launch
 import splitties.bitflags.withFlag
 
@@ -17,8 +17,8 @@ import splitties.bitflags.withFlag
  */
 class CreateKeymapShortcutViewModel(
     private val keymapRepository: CreateKeymapShortcutUseCase,
-    private val showActionsUseCase: ShowActionsUseCase
-) : ViewModel(), IModelState<List<KeymapListItemModel>> {
+    private val showActionsUseCase: GetActionErrorUseCase
+) : ViewModel(), ModelState<List<KeymapListItemModel>> {
 
     private val _model: MutableLiveData<DataState<List<KeymapListItemModel>>> =
         MutableLiveData(Loading())
@@ -78,7 +78,7 @@ class CreateKeymapShortcutViewModel(
             ?.find { it.uid == uid }
             ?.let {
                 val newTriggerFlags =
-                    it.trigger.flags.withFlag(Trigger.TRIGGER_FLAG_FROM_OTHER_APPS)
+                    it.trigger.flags.withFlag(TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
 
                 val newKeymap = it.copy(trigger = it.trigger.copy(flags = newTriggerFlags))
 
@@ -95,13 +95,13 @@ class CreateKeymapShortcutViewModel(
             }
     }
 
-    fun fixError(failure: Failure) {
-        _eventStream.value = FixFailure(failure)
+    fun fixError(error: Error) {
+        _eventStream.value = FixFailure(error)
     }
 
     class Factory(
         private val keymapRepository: CreateKeymapShortcutUseCase,
-        private val showActionsUseCase: ShowActionsUseCase
+        private val showActionsUseCase: GetActionErrorUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")

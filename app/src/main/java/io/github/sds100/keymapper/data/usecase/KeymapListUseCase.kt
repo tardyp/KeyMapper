@@ -1,14 +1,14 @@
 package io.github.sds100.keymapper.data.usecase
 
 import androidx.lifecycle.LiveData
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 
 /**
  * Created by sds100 on 06/11/20.
  */
 
 interface KeymapListUseCase {
-    val keymapList: LiveData<List<KeyMap>>
+    val keymapList: LiveData<List<KeyMapEntity>>
     fun duplicateKeymap(vararg id: Long)
 
     fun enableKeymapById(vararg id: Long)

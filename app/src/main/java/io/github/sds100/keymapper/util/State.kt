@@ -27,50 +27,39 @@ fun <T, O> DataState<T>.mapData(block: (data: T) -> O): DataState<O> = when (thi
     is Data -> Data(block.invoke(this.data))
 }
 
-fun <T, O> LiveData<DataState<T>>.mapData(block: (data: T) -> O): LiveData<DataState<O>> =
-    map {
-        when (it) {
-            is Loading -> Loading()
-            is Empty -> Empty()
-            is Data -> Data(block.invoke(it.data))
-        }
-    }
-
-fun <T, O> DataState<T>.switchMapData(block: (data: T) -> DataState<O>): DataState<O> =
-    when (this) {
-        is Loading -> Loading()
-        is Empty -> Empty()
-        is Data -> block.invoke(this.data)
-    }
-
 inline fun <T> DataState<T>.ifIsData(block: (data: T) -> Unit) {
     if (this is Data) {
         block.invoke(this.data)
     }
 }
 
-fun <T> List<T>?.getState() =
+fun <T> List<T>?.getDataState() =
     if (this.isNullOrEmpty()) {
         Empty()
     } else {
         Data(this)
     }
 
-fun <K, T> Map<K, T>?.getState() =
+fun <K, T> Map<K, T>?.getDataState() =
     if (this.isNullOrEmpty()) {
         Empty()
     } else {
         Data(this)
     }
 
+fun <T> T.data() = Data(this)
+
+//TODO remove
 fun MutableLiveData<ViewState>.populated() {
     value = ViewPopulated()
 }
 
+//TODO remove
 fun MutableLiveData<ViewState>.loading() {
     value = ViewLoading()
 }
 
+//TODO remove
 fun MutableLiveData<ViewState>.empty() {
     value = ViewEmpty()
 }

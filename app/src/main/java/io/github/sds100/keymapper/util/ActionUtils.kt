@@ -35,9 +35,9 @@ object ActionUtils {
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-fun Action.buildModel(
+fun ActionEntity.buildModel(
     ctx: Context,
-    deviceInfoList: List<DeviceInfo>,
+    deviceInfoList: List<DeviceInfoEntity>,
     showDeviceDescriptors: Boolean,
     hasRootPermission: Boolean
 ): ActionModel {
@@ -47,10 +47,10 @@ fun Action.buildModel(
     val error = getTitle(ctx, deviceInfoList, showDeviceDescriptors).onSuccess { title = it }
         .then { getIcon(ctx).onSuccess { icon = it } }
         .then { canBePerformed(ctx, hasRootPermission) }
-        .failureOrNull()
+        .errorOrNull()
 
     val extraInfo = buildString {
-        val interpunct = ctx.str(R.string.interpunct)
+        val interpunct = ctx.str(R.string.middot)
         val flagLabels = getFlagLabelList(ctx)
 
         flagLabels.forEachIndexed { index, label ->
@@ -61,7 +61,7 @@ fun Action.buildModel(
             append(label)
         }
 
-        extras.getData(Action.EXTRA_DELAY_BEFORE_NEXT_ACTION).onSuccess {
+        extras.getData(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION).onSuccess {
             if (this.isNotBlank()) {
                 append(" $interpunct ")
             }
@@ -73,9 +73,9 @@ fun Action.buildModel(
     return ActionModel(uid, type, title, icon, extraInfo, error, error?.getBriefMessage(ctx))
 }
 
-fun Action.buildChipModel(
+fun ActionEntity.buildChipModel(
     ctx: Context,
-    deviceInfoList: List<DeviceInfo>,
+    deviceInfoList: List<DeviceInfoEntity>,
     showDeviceDescriptors: Boolean,
     hasRootPermission: Boolean
 ): ActionChipModel {
@@ -85,10 +85,10 @@ fun Action.buildChipModel(
     val error = getTitle(ctx, deviceInfoList, showDeviceDescriptors).onSuccess { title = it }
         .then { getIcon(ctx).onSuccess { icon = it } }
         .then { canBePerformed(ctx, hasRootPermission) }
-        .failureOrNull()
+        .errorOrNull()
 
     val description = buildString {
-        val interpunct = ctx.str(R.string.interpunct)
+        val interpunct = ctx.str(R.string.middot)
 
         val flagLabels = getFlagLabelList(ctx)
 
@@ -102,7 +102,7 @@ fun Action.buildChipModel(
             append(" $interpunct $it")
         }
 
-        extras.getData(Action.EXTRA_DELAY_BEFORE_NEXT_ACTION).onSuccess {
+        extras.getData(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION).onSuccess {
             append(" $interpunct ${ctx.str(R.string.action_title_wait, it)}")
         }
     }.takeIf { it.isNotBlank() }
@@ -110,9 +110,9 @@ fun Action.buildChipModel(
     return ActionChipModel(type, description, error, icon)
 }
 
-fun Action.getTitle(
+fun ActionEntity.getTitle(
     ctx: Context,
-    deviceInfoList: List<DeviceInfo>,
+    deviceInfoList: List<DeviceInfoEntity>,
     showDeviceDescriptors: Boolean
 ): Result<String> {
     return when (type) {
@@ -131,7 +131,7 @@ fun Action.getTitle(
         }
 
         ActionType.APP_SHORTCUT -> {
-            extras.getData(Action.EXTRA_SHORTCUT_TITLE)
+            extras.getData(ActionEntity.EXTRA_SHORTCUT_TITLE)
         }
 
         ActionType.KEY_EVENT -> {
@@ -143,7 +143,7 @@ fun Action.getTitle(
 
             val metaStateString = buildString {
 
-                extras.getData(Action.EXTRA_KEY_EVENT_META_STATE).onSuccess { metaState ->
+                extras.getData(ActionEntity.EXTRA_KEY_EVENT_META_STATE).onSuccess { metaState ->
                     KeyEventUtils.MODIFIER_LABELS.entries.forEach {
                         val modifier = it.key
                         val labelRes = it.value
@@ -155,11 +155,11 @@ fun Action.getTitle(
                 }
             }
 
-            val useShell = extras.getData(Action.EXTRA_KEY_EVENT_USE_SHELL)
+            val useShell = extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL)
                 .valueOrNull()
                 .toBoolean()
 
-            val title = extras.getData(Action.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR).handle(
+            val title = extras.getData(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR).handle(
                 onSuccess = { descriptor ->
                     val deviceName =
                         deviceInfoList.find { it.descriptor == descriptor }?.name?.let { name ->
@@ -210,19 +210,20 @@ fun Action.getTitle(
 
             SystemActionUtils.getSystemActionDef(systemActionId) then { systemActionDef ->
                 if (systemActionDef.hasOptions) {
-                    val optionData = extras.getData(Option.getExtraIdForOption(systemActionId))
+                    val optionData =
+                        extras.getData(SystemActionOption.getExtraIdForOption(systemActionId))
 
                     when (systemActionDef.optionType) {
                         OptionType.SINGLE -> {
                             optionData then {
-                                Option.getOptionLabel(ctx, systemActionId, it)
+                                SystemActionOption.getOptionLabel(ctx, systemActionId, it)
                             } then {
                                 Success(systemActionDef.getDescriptionWithOption(ctx, it))
 
                             } otherwise {
                                 if (systemActionId == SystemAction.SWITCH_KEYBOARD) {
 
-                                    extras.getData(Action.EXTRA_IME_NAME) then {
+                                    extras.getData(ActionEntity.EXTRA_IME_NAME) then {
                                         Success(systemActionDef.getDescriptionWithOption(ctx, it))
                                     }
 
@@ -234,9 +235,9 @@ fun Action.getTitle(
 
                         OptionType.MULTIPLE -> {
                             optionData then {
-                                Option.optionSetFromString(it)
+                                SystemActionOption.optionSetFromString(it)
                             } then {
-                                Option.labelsFromOptionSet(ctx, systemActionId, it)
+                                SystemActionOption.labelsFromOptionSet(ctx, systemActionId, it)
                             } then {
                                 Success(systemActionDef.getDescriptionWithOptionSet(ctx, it))
                             }
@@ -252,7 +253,7 @@ fun Action.getTitle(
             val x = data.split(',')[0]
             val y = data.split(',')[1]
 
-            extras.getData(Action.EXTRA_COORDINATE_DESCRIPTION) then {
+            extras.getData(ActionEntity.EXTRA_COORDINATE_DESCRIPTION) then {
                 Success(
                     ctx.str(
                         resId = R.string.description_tap_coordinate_with_description,
@@ -270,8 +271,8 @@ fun Action.getTitle(
         }
 
         ActionType.INTENT -> {
-            extras.getData(Action.EXTRA_INTENT_DESCRIPTION) then { description ->
-                extras.getData(Action.EXTRA_INTENT_TARGET) then { target ->
+            extras.getData(ActionEntity.EXTRA_INTENT_DESCRIPTION) then { description ->
+                extras.getData(ActionEntity.EXTRA_INTENT_TARGET) then { target ->
                     val title = when (IntentTarget.valueOf(target)) {
                         IntentTarget.ACTIVITY ->
                             ctx.str(R.string.action_title_intent_start_activity, description)
@@ -292,7 +293,7 @@ fun Action.getTitle(
 
     }
         .then {
-            extras.getData(Action.EXTRA_MULTIPLIER).valueOrNull()?.toIntOrNull()
+            extras.getData(ActionEntity.EXTRA_MULTIPLIER).valueOrNull()?.toIntOrNull()
                 ?.let { multiplier ->
                     return@then Success("(${multiplier}x) $it")
                 }
@@ -304,7 +305,7 @@ fun Action.getTitle(
 /**
  * Get the icon for any Action
  */
-fun Action.getIcon(ctx: Context): Result<Drawable?> = when (type) {
+fun ActionEntity.getIcon(ctx: Context): Result<Drawable?> = when (type) {
     ActionType.APP -> {
         try {
             Success(ctx.packageManager.getApplicationIcon(data))
@@ -314,7 +315,7 @@ fun Action.getIcon(ctx: Context): Result<Drawable?> = when (type) {
         }
     }
 
-    ActionType.APP_SHORTCUT -> extras.getData(Action.EXTRA_PACKAGE_NAME).then {
+    ActionType.APP_SHORTCUT -> extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).then {
         try {
             Success(ctx.packageManager.getApplicationIcon(it))
         } catch (e: PackageManager.NameNotFoundException) {
@@ -335,7 +336,7 @@ fun Action.getIcon(ctx: Context): Result<Drawable?> = when (type) {
     else -> Success(null)
 }
 
-fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Action> {
+fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<ActionEntity> {
     //the action has no data
     if (data.isEmpty()) return NoActionData()
 
@@ -355,7 +356,7 @@ fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Acti
                 if (type == ActionType.APP) {
                     Success(data)
                 } else {
-                    extras.getData(Action.EXTRA_PACKAGE_NAME)
+                    extras.getData(ActionEntity.EXTRA_PACKAGE_NAME)
                 }
 
             return packageName.then {
@@ -382,7 +383,7 @@ fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Acti
         }
 
         ActionType.KEY_EVENT -> {
-            val useShell = extras.getData(Action.EXTRA_KEY_EVENT_USE_SHELL)
+            val useShell = extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL)
                 .valueOrNull()
                 .toBoolean()
 
@@ -445,15 +446,15 @@ fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Acti
                         || systemActionDef.id == SystemAction.DISABLE_FLASHLIGHT
                     ) {
 
-                        extras.getData(Action.EXTRA_LENS).onSuccess { lensOptionId ->
-                            val sdkLensId = Option.OPTION_ID_SDK_ID_MAP[lensOptionId]
+                        extras.getData(ActionEntity.EXTRA_LENS).onSuccess { lensOptionId ->
+                            val sdkLensId = SystemActionOption.OPTION_ID_SDK_ID_MAP[lensOptionId]
                                 ?: error("Can't find sdk id for that option id")
 
                             if (!CameraUtils.hasFlashFacing(sdkLensId)) {
 
                                 when (lensOptionId) {
-                                    Option.LENS_FRONT -> FrontFlashNotFound()
-                                    Option.LENS_BACK -> BackFlashNotFound()
+                                    SystemActionOption.LENS_FRONT -> FrontFlashNotFound()
+                                    SystemActionOption.LENS_BACK -> BackFlashNotFound()
                                 }
                             }
                         }
@@ -462,11 +463,11 @@ fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Acti
 
                 if (systemActionDef.id == SystemAction.SWITCH_KEYBOARD) {
 
-                    extras.getData(Action.EXTRA_IME_ID).onSuccess { imeId ->
+                    extras.getData(ActionEntity.EXTRA_IME_ID).onSuccess { imeId ->
                         if (!KeyboardUtils.isImeEnabled(imeId)) {
                             var errorData = imeId
 
-                            extras.getData(Action.EXTRA_IME_NAME).onSuccess { imeName ->
+                            extras.getData(ActionEntity.EXTRA_IME_NAME).onSuccess { imeName ->
                                 errorData = imeName
                             }
 
@@ -481,64 +482,67 @@ fun Action.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<Acti
     return Success(this)
 }
 
-val Action.canBeHeldDown: Boolean
+val ActionEntity.canBeHeldDown: Boolean
     get() {
-        val useShell = extras.getData(Action.EXTRA_KEY_EVENT_USE_SHELL).valueOrNull().toBoolean()
+        val useShell =
+            extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL).valueOrNull().toBoolean()
 
         return (type == ActionType.KEY_EVENT && !useShell)
             || (type == ActionType.TAP_COORDINATE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
     }
 
-val Action.requiresIME: Boolean
+val ActionEntity.requiresIME: Boolean
     get() {
-        val useShell = extras.getData(Action.EXTRA_KEY_EVENT_USE_SHELL).valueOrNull().toBoolean()
+        val useShell =
+            extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL).valueOrNull().toBoolean()
         return (type == ActionType.KEY_EVENT && !useShell) ||
             type == ActionType.TEXT_BLOCK ||
             data == SystemAction.MOVE_CURSOR_TO_END
     }
 
-val Action.repeat: Boolean
-    get() = flags.hasFlag(Action.ACTION_FLAG_REPEAT)
+val ActionEntity.repeat: Boolean
+    get() = flags.hasFlag(ActionEntity.ACTION_FLAG_REPEAT)
 
-val Action.holdDown: Boolean
-    get() = flags.hasFlag(Action.ACTION_FLAG_HOLD_DOWN)
+val ActionEntity.holdDown: Boolean
+    get() = flags.hasFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)
 
-val Action.showVolumeUi: Boolean
-    get() = flags.hasFlag(Action.ACTION_FLAG_SHOW_VOLUME_UI)
+val ActionEntity.showVolumeUi: Boolean
+    get() = flags.hasFlag(ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI)
 
-val Action.stopRepeatingWhenTriggerPressedAgain: Boolean
-    get() = extras.getData(Action.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR).valueOrNull()?.toInt() ==
-        Action.STOP_REPEAT_BEHAVIOUR_TRIGGER_PRESSED_AGAIN
+val ActionEntity.stopRepeatingWhenTriggerPressedAgain: Boolean
+    get() = extras.getData(ActionEntity.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR).valueOrNull()
+        ?.toInt() ==
+        ActionEntity.STOP_REPEAT_BEHAVIOUR_TRIGGER_PRESSED_AGAIN
 
-val Action.stopRepeatingWhenTriggerReleased: Boolean
+val ActionEntity.stopRepeatingWhenTriggerReleased: Boolean
     get() = !stopRepeatingWhenTriggerPressedAgain
 
-val Action.stopHoldDownWhenTriggerPressedAgain: Boolean
-    get() = extras.getData(Action.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR).valueOrNull()?.toInt() ==
-        Action.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN
+val ActionEntity.stopHoldDownWhenTriggerPressedAgain: Boolean
+    get() = extras.getData(ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR).valueOrNull()?.toInt() ==
+        ActionEntity.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN
 
-val Action.stopHoldDownWhenTriggerReleased: Boolean
+val ActionEntity.stopHoldDownWhenTriggerReleased: Boolean
     get() = !stopHoldDownWhenTriggerPressedAgain
 
-val Action.delayBeforeNextAction: Int?
-    get() = extras.getData(Action.EXTRA_DELAY_BEFORE_NEXT_ACTION).valueOrNull()?.toInt()
+val ActionEntity.delayBeforeNextAction: Int?
+    get() = extras.getData(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION).valueOrNull()?.toInt()
 
-val Action.multiplier: Int?
-    get() = extras.getData(Action.EXTRA_MULTIPLIER).valueOrNull()?.toInt()
+val ActionEntity.multiplier: Int?
+    get() = extras.getData(ActionEntity.EXTRA_MULTIPLIER).valueOrNull()?.toInt()
 
-val Action.holdDownDuration: Int?
-    get() = extras.getData(Action.EXTRA_HOLD_DOWN_DURATION).valueOrNull()?.toInt()
+val ActionEntity.holdDownDuration: Int?
+    get() = extras.getData(ActionEntity.EXTRA_HOLD_DOWN_DURATION).valueOrNull()?.toInt()
 
-val Action.repeatRate: Int?
-    get() = extras.getData(Action.EXTRA_REPEAT_RATE).valueOrNull()?.toInt()
+val ActionEntity.repeatRate: Int?
+    get() = extras.getData(ActionEntity.EXTRA_REPEAT_RATE).valueOrNull()?.toInt()
 
-val Action.repeatDelay: Int?
-    get() = extras.getData(Action.EXTRA_REPEAT_DELAY).valueOrNull()?.toInt()
+val ActionEntity.repeatDelay: Int?
+    get() = extras.getData(ActionEntity.EXTRA_REPEAT_DELAY).valueOrNull()?.toInt()
 
-fun Action.getFlagLabelList(ctx: Context): List<String> = sequence {
-    Action.ACTION_FLAG_LABEL_MAP.keys.forEach { flag ->
+fun ActionEntity.getFlagLabelList(ctx: Context): List<String> = sequence {
+    ActionEntity.ACTION_FLAG_LABEL_MAP.keys.forEach { flag ->
         if (flags.hasFlag(flag)) {
-            yield(ctx.str(Action.ACTION_FLAG_LABEL_MAP.getValue(flag)))
+            yield(ctx.str(ActionEntity.ACTION_FLAG_LABEL_MAP.getValue(flag)))
         }
     }
 }.toList()

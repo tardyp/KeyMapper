@@ -11,8 +11,8 @@ import io.github.sds100.keymapper.data.BackupManager
 import io.github.sds100.keymapper.data.IBackupManager
 import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.model.FingerprintMap
-import io.github.sds100.keymapper.data.model.KeyMap
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.BackupRestoreUseCase
 import io.github.sds100.keymapper.util.*
@@ -92,7 +92,7 @@ class BackupManagerTest {
         backupManager = BackupManager(
             mockKeymapRepository,
             mockFingerprintMapRepository,
-            Mockito.mock(DeviceInfoRepository::class.java),
+            Mockito.mock(DeviceInfoCache::class.java),
             coroutineScope,
             mockContentResolver,
             mockUseCase,
@@ -305,7 +305,7 @@ class BackupManagerTest {
     @Test
     fun `backup key maps, return list of default key maps, keymap db version should be current database version`() =
         coroutineScope.runBlockingTest {
-            val keymapList = listOf(KeyMap(0), KeyMap(1))
+            val keymapList = listOf(KeyMapEntity(0), KeyMapEntity(1))
             Mockito.`when`(mockKeymapRepository.getKeymaps()).then { keymapList }
 
             val outputStream = PipedOutputStream()
@@ -341,7 +341,7 @@ class BackupManagerTest {
     @Test
     fun `backup everything, return list of default keymaps and default fingerprint maps, keymap db version should be current database version`() =
         coroutineScope.runBlockingTest {
-            val keymapList = listOf(KeyMap(0), KeyMap(1))
+            val keymapList = listOf(KeyMapEntity(0), KeyMapEntity(1))
             Mockito.`when`(mockKeymapRepository.getKeymaps()).then { keymapList }
             Mockito.`when`(mockFingerprintMapRepository.swipeDown)
                 .then { flow { emit(FingerprintMap()) } }

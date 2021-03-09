@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.IConfigMappingViewModel" />
+            type="io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.util.delegate
 
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +20,7 @@ class TriggerKeymapByIntentController(
     iActionError
 ) {
 
-    private var keymapList = emptyList<KeyMap>()
+    private var keymapList = emptyList<KeyMapEntity>()
 
     fun onDetected(uid: String) {
         keymapList
@@ -39,7 +39,7 @@ class TriggerKeymapByIntentController(
             }
     }
 
-    fun onKeymapListUpdate(keymapList: List<KeyMap>) {
+    fun onKeymapListUpdate(keymapList: List<KeyMapEntity>) {
         reset()
 
         this.keymapList = keymapList.filter { it.trigger.triggerFromOtherApps }

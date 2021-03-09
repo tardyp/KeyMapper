@@ -1,14 +1,19 @@
 package io.github.sds100.keymapper
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
+import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
+import io.github.sds100.keymapper.framework.adapters.AndroidAppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.AndroidBluetoothMonitor
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.framework.adapters.ResourceProviderImpl
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FileAccessDenied
-import io.github.sds100.keymapper.util.result.GenericFailure
+import io.github.sds100.keymapper.util.result.GenericError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.MainScope
@@ -31,9 +36,11 @@ class MyApplication : MultiDexApplication(),
         )
     }
 
-    internal val bluetoothMonitor by lazy {
-        AndroidBluetoothMonitor(appCoroutineScope)
-    }
+    internal val appRepository = AndroidAppRepository(packageManager)
+    internal val appInfoAdapter = AndroidAppInfoAdapter(packageManager)
+    internal val resourceProvider = ResourceProviderImpl(this)
+
+    internal val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }
 
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 
@@ -62,7 +69,7 @@ class MyApplication : MultiDexApplication(),
         } catch (e: Exception) {
             when (e) {
                 is SecurityException -> FileAccessDenied()
-                else -> GenericFailure(e)
+                else -> GenericError(e)
             }
         }
     }

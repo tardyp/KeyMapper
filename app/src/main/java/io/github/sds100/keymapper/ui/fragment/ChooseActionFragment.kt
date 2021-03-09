@@ -17,7 +17,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Action
+import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
@@ -52,7 +52,7 @@ class ChooseActionFragment : Fragment() {
 
         setResultListener(AppListFragment.REQUEST_KEY) {
             val packageName = it.getString(AppListFragment.EXTRA_PACKAGE_NAME)
-            Action.appAction(packageName!!)
+            ActionEntity.appAction(packageName!!)
         }
 
         setResultListener(AppShortcutListFragment.REQUEST_KEY) {
@@ -60,13 +60,13 @@ class ChooseActionFragment : Fragment() {
             val packageName = it.getString(AppShortcutListFragment.EXTRA_PACKAGE_NAME)
             val uri = it.getString(AppShortcutListFragment.EXTRA_URI)
 
-            Action.appShortcutAction(name!!, packageName, uri!!)
+            ActionEntity.appShortcutAction(name!!, packageName, uri!!)
         }
 
         setResultListener(KeyActionTypeFragment.REQUEST_KEY) {
             val keyCode = it.getInt(KeyActionTypeFragment.EXTRA_KEYCODE)
 
-            Action.keyAction(keyCode)
+            ActionEntity.keyAction(keyCode)
         }
 
         setResultListener(KeyEventActionTypeFragment.REQUEST_KEY) {
@@ -75,32 +75,32 @@ class ChooseActionFragment : Fragment() {
             val deviceDescriptor = it.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_DESCRIPTOR)
             val useShell = it.getBoolean(KeyEventActionTypeFragment.EXTRA_USE_SHELL)
 
-            Action.keyEventAction(keyCode, metaState, deviceDescriptor, useShell)
+            ActionEntity.keyEventAction(keyCode, metaState, deviceDescriptor, useShell)
         }
 
         setResultListener(TextBlockActionTypeFragment.REQUEST_KEY) {
             val text = it.getString(TextBlockActionTypeFragment.EXTRA_TEXT_BLOCK)
 
-            Action.textBlockAction(text!!)
+            ActionEntity.textBlockAction(text!!)
         }
 
         setResultListener(UrlActionTypeFragment.REQUEST_KEY) {
             val url = it.getString(UrlActionTypeFragment.EXTRA_URL)
 
-            Action.urlAction(url!!)
+            ActionEntity.urlAction(url!!)
         }
 
         setResultListener(SystemActionListFragment.REQUEST_KEY) {
             val id = it.getString(SystemActionListFragment.EXTRA_SYSTEM_ACTION_ID)
             val optionData = it.getString(SystemActionListFragment.EXTRA_SYSTEM_ACTION_OPTION_DATA)
 
-            Action.systemAction(requireContext(), id!!, optionData)
+            ActionEntity.systemAction(requireContext(), id!!, optionData)
         }
 
         setResultListener(KeycodeListFragment.REQUEST_KEY) {
             val keyCode = it.getInt(KeycodeListFragment.EXTRA_KEYCODE)
 
-            Action.keyCodeAction(keyCode)
+            ActionEntity.keyCodeAction(keyCode)
         }
 
         setResultListener(TapCoordinateActionTypeFragment.REQUEST_KEY) {
@@ -108,7 +108,7 @@ class ChooseActionFragment : Fragment() {
             val y = it.getInt(TapCoordinateActionTypeFragment.EXTRA_Y)
             val description = it.getString(TapCoordinateActionTypeFragment.EXTRA_DESCRIPTION)
 
-            Action.tapCoordinateAction(x, y, description)
+            ActionEntity.tapCoordinateAction(x, y, description)
         }
 
         setResultListener(IntentActionTypeFragment.REQUEST_KEY) { bundle ->
@@ -118,13 +118,13 @@ class ChooseActionFragment : Fragment() {
             }
             val uri = bundle.getString(IntentActionTypeFragment.EXTRA_URI)!!
 
-            Action.intentAction(description, target, uri)
+            ActionEntity.intentAction(description, target, uri)
         }
 
         setResultListener(PhoneCallActionTypeFragment.REQUEST_KEY) {
             val number = it.getString(PhoneCallActionTypeFragment.EXTRA_PHONE_NUMBER)
 
-            Action.phoneCallAction(number!!)
+            ActionEntity.phoneCallAction(number!!)
         }
 
         setFragmentResultListener(KeycodeListFragment.REQUEST_KEY) { _, result ->
@@ -186,7 +186,7 @@ class ChooseActionFragment : Fragment() {
     @Suppress("UNCHECKED_CAST")
     private fun setResultListener(
         requestKey: String,
-        createAction: (bundle: Bundle) -> Action
+        createAction: (bundle: Bundle) -> ActionEntity
     ) {
         childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { _, result ->
             val action = createAction(result)

@@ -14,8 +14,8 @@ import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
 import io.github.sds100.keymapper.ui.fragment.DefaultRecyclerViewFragment
 import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.result.Error
 
 /**
  * Created by sds100 on 22/02/2020.
@@ -47,7 +47,7 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
 
     private val controller = KeymapController()
 
-    override val modelState: IModelState<List<KeymapListItemModel>>
+    override val modelState: ModelState<List<KeymapListItemModel>>
         get() = viewModel
 
     override fun subscribeUi(binding: FragmentRecyclerviewBinding) {
@@ -77,6 +77,12 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
                 }
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        //TODO rebuild models
     }
 
     override fun populateList(
@@ -129,8 +135,8 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
                     isSelected(selectionProvider.isSelected(it.id))
 
                     onErrorClick(object : ErrorClickCallback {
-                        override fun onErrorClick(failure: Failure) {
-                            viewModel.fixError(failure)
+                        override fun onErrorClick(error: Error) {
+                            viewModel.fixError(error)
                         }
                     })
 

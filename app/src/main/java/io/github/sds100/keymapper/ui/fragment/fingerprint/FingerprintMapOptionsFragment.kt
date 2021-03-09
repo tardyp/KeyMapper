@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.ui.adapter.OptionsController
 import io.github.sds100.keymapper.ui.fragment.DefaultRecyclerViewFragment
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 29/11/20.
@@ -31,7 +31,7 @@ class FingerprintMapOptionsFragment : DefaultRecyclerViewFragment<OptionsListMod
         }.value.optionsViewModel
     }
 
-    override val modelState: IModelState<OptionsListModel>
+    override val modelState: ModelState<OptionsListModel>
         get() = optionsViewModel
 
     override var isAppBarVisible = false

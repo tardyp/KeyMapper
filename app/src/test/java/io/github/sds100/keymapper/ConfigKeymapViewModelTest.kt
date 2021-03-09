@@ -2,15 +2,15 @@ package io.github.sds100.keymapper
 
 import android.view.KeyEvent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.KeyMap
-import io.github.sds100.keymapper.data.model.Trigger
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.data.model.TriggerEntity
+import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.usecase.ConfigKeymapUseCase
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
-import io.github.sds100.keymapper.domain.usecases.CreateTriggerUseCase
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
-import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.util.KeyEventUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import splitties.bitflags.hasFlag
 
 /**
  * Created by sds100 on 30/01/21.
@@ -38,7 +37,7 @@ class ConfigKeymapViewModelTest {
     private val testDispatcher = TestCoroutineDispatcher()
     private val coroutineScope = TestCoroutineScope(testDispatcher)
 
-    private lateinit var mockDeviceInfoRepository: DeviceInfoRepository
+    private lateinit var mockDeviceInfoRepository: DeviceInfoCache
     private lateinit var mockKeymapRepository: ConfigKeymapUseCase
 
     private lateinit var viewModel: ConfigKeymapViewModel
@@ -46,14 +45,14 @@ class ConfigKeymapViewModelTest {
     @Before
     fun init() {
         mockKeymapRepository = mock(ConfigKeymapUseCase::class.java)
-        mockDeviceInfoRepository = mock(DeviceInfoRepository::class.java)
+        mockDeviceInfoRepository = mock(DeviceInfoCache::class.java)
 
         Dispatchers.setMain(testDispatcher)
 
         viewModel = ConfigKeymapViewModel(
             mockKeymapRepository,
-            mock(ShowActionsUseCase::class.java),
-            mock(CreateTriggerUseCase::class.java),
+            mock(GetActionErrorUseCase::class.java),
+            mock(ConfigKeymapTriggerUseCase::class.java),
             mock(OnboardingUseCase::class.java)
         )
     }
@@ -71,12 +70,12 @@ class ConfigKeymapViewModelTest {
     fun `key map with hold down action, load key map, hold down flag shouldn't disappear`() =
         coroutineScope.runBlockingTest {
             //given
-            val action = Action.tapCoordinateAction(100, 100, null)
-                .copy(flags = Action.ACTION_FLAG_HOLD_DOWN)
+            val action = ActionEntity.tapCoordinateAction(100, 100, null)
+                .copy(flags = ActionEntity.ACTION_FLAG_HOLD_DOWN)
 
-            val keymap = KeyMap(
+            val keymap = KeyMapEntity(
                 0,
-                trigger = Trigger(keys = listOf(Trigger.Key(KeyEvent.KEYCODE_0))),
+                trigger = TriggerEntity(keys = listOf(TriggerEntity.KeyEntity(KeyEvent.KEYCODE_0))),
                 actionList = listOf(action)
             )
 
@@ -95,7 +94,7 @@ class ConfigKeymapViewModelTest {
     fun `add modifier key event action, enable hold down option and disable repeat option`() =
         coroutineScope.runBlockingTest {
             KeyEventUtils.MODIFIER_KEYCODES.forEach { keyCode ->
-                val action = Action.keyCodeAction(keyCode)
+                val action = ActionEntity.keyCodeAction(keyCode)
                 viewModel.actionListViewModel.addAction(action)
 
                 viewModel.actionListViewModel.actionList.value!!
@@ -103,11 +102,11 @@ class ConfigKeymapViewModelTest {
                     .let {
                         assertThat(
                             "action doesn't have hold down flag",
-                            it.flags.hasFlag(Action.ACTION_FLAG_HOLD_DOWN)
+                            it.flags.hasFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)
                         )
                         assertThat(
                             "action has repeat flag",
-                            !it.flags.hasFlag(Action.ACTION_FLAG_REPEAT)
+                            !it.flags.hasFlag(ActionEntity.ACTION_FLAG_REPEAT)
                         )
                     }
             }

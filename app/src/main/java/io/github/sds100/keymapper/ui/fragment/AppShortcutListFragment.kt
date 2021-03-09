@@ -14,7 +14,7 @@ import io.github.sds100.keymapper.data.viewmodel.AppShortcutListViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import splitties.toast.toast
 
 /**
@@ -38,7 +38,7 @@ class AppShortcutListFragment : DefaultRecyclerViewFragment<List<AppShortcutList
         InjectorUtils.provideAppShortcutListViewModel(requireContext())
     }
 
-    override val modelState: IModelState<List<AppShortcutListItemModel>>
+    override val modelState: ModelState<List<AppShortcutListItemModel>>
         get() = viewModel
 
     private val appShortcutConfigLauncher =

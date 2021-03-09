@@ -21,19 +21,19 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.android.parcel.Parcelize
 
-sealed class Event
+abstract class Event
 
 open class MessageEvent(@StringRes val textRes: Int) : Event()
 
-class FixFailure(val failure: Failure) : Event()
+class FixFailure(val error: Error) : Event()
 class VibrateEvent(val duration: Long) : Event()
 object ShowTriggeredKeymapToast : Event()
 data class PerformAction(
-    val action: Action,
+    val action: ActionEntity,
     val additionalMetaState: Int = 0,
     val keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
 ) : Event()
@@ -57,8 +57,8 @@ class BuildDeviceInfoModels : Event()
 class RequestBackupSelectedKeymaps : Event()
 
 class BuildKeymapListModels(
-    val keymapList: List<KeyMap>,
-    val deviceInfoList: List<DeviceInfo>,
+    val keymapList: List<KeyMapEntity>,
+    val deviceInfoList: List<DeviceInfoEntity>,
     val hasRootPermission: Boolean,
     val showDeviceDescriptors: Boolean
 ) : Event()
@@ -68,12 +68,12 @@ class EnableAccessibilityServicePrompt : Event()
 class BackupRequest<T>(val model: T) : Event()
 class RequestRestore : Event()
 class RequestBackupAll : Event()
-class ShowErrorMessage(val failure: Failure) : Event()
+class ShowErrorMessage(val error: Error) : Event()
 class BuildIntentExtraListItemModels(val extraModels: List<IntentExtraModel>) : Event()
 class CreateKeymapShortcutEvent(
     val uuid: String,
-    val actionList: List<Action>,
-    val deviceInfoList: List<DeviceInfo>,
+    val actionList: List<ActionEntity>,
+    val deviceInfoList: List<DeviceInfoEntity>,
     val showDeviceDescriptors: Boolean
 ) : Event()
 
@@ -105,37 +105,22 @@ object OnHideKeyboard : Event(), UpdateNotificationEvent
 object OnShowKeyboard : Event(), UpdateNotificationEvent
 
 //trigger
-class BuildTriggerKeyModels(
-    val source: List<Trigger.Key>,
-    val deviceInfoList: List<DeviceInfo>,
-    val showDeviceDescriptors: Boolean
-) : Event()
 
 class EditTriggerKeyOptions(val options: TriggerKeyOptions) : Event()
-class EnableCapsLockKeyboardLayoutPrompt : Event()
-class StartRecordingTriggerInService : Event()
-class StopRecordingTriggerInService : Event()
 
 //action list
-class BuildActionListModels(
-    val source: List<Action>,
-    val deviceInfoList: List<DeviceInfo>,
-    val hasRootPermission: Boolean,
-    val showDeviceDescriptors: Boolean
-) : Event()
 
-class TestAction(val action: Action) : Event()
-class EditActionOptions(val options: BaseOptions<Action>) : Event()
+class EditActionOptions(val options: BaseOptions<ActionEntity>) : Event()
 
 //constraints
 class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)
-class BuildConstraintListModels(val source: List<Constraint>) : Event()
-class SelectConstraint(val constraint: Constraint) : Event()
+class BuildConstraintListModels(val source: List<ConstraintEntity>) : Event()
+class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
 //fingerprint gesture maps
 class BuildFingerprintMapModels(
     val maps: Map<String, FingerprintMap>,
-    val deviceInfoList: List<DeviceInfo>,
+    val deviceInfoList: List<DeviceInfoEntity>,
     val hasRootPermission: Boolean,
     val showDeviceDescriptors: Boolean
 ) : Event()

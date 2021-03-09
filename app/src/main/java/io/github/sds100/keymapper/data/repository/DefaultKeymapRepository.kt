@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.db.dao.KeyMapDao
 import io.github.sds100.keymapper.data.db.migration.JsonMigration
 import io.github.sds100.keymapper.data.db.migration.keymaps.Migration_9_10
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.data.usecase.*
 import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.MigrationUtils
@@ -25,10 +25,10 @@ class DefaultKeymapRepository internal constructor(
     private val coroutineScope: CoroutineScope
 ) : GlobalKeymapUseCase,
     KeymapListUseCase,
-    ConfigKeymapUseCase,
     BackupRestoreUseCase,
     MenuKeymapUseCase,
-    CreateKeymapShortcutUseCase {
+    CreateKeymapShortcutUseCase,
+KeymapRepository{
 
     companion object {
         private val MIGRATIONS = listOf(
@@ -38,10 +38,10 @@ class DefaultKeymapRepository internal constructor(
 
     private val gson = Gson()
 
-    override val requestAutomaticBackup = MutableLiveData<BackupRequest<List<KeyMap>>>()
-    override val keymapList: LiveData<List<KeyMap>> = keymapDao.observeAll()
+    override val requestAutomaticBackup = MutableLiveData<BackupRequest<List<KeyMapEntity>>>()
+    override val keymapList: LiveData<List<KeyMapEntity>> = keymapDao.observeAll()
 
-    override suspend fun getKeymaps(): List<KeyMap> = keymapDao.getAll()
+    override suspend fun getKeymaps(): List<KeyMapEntity> = keymapDao.getAll()
 
     override suspend fun getKeymap(id: Long) = keymapDao.getById(id)
 
@@ -58,7 +58,7 @@ class DefaultKeymapRepository internal constructor(
                 AppDatabase.DATABASE_VERSION
             )
 
-            gson.fromJson<KeyMap>(migratedJson)
+            gson.fromJson<KeyMapEntity>(migratedJson)
         }
 
         coroutineScope.launch {
@@ -66,7 +66,7 @@ class DefaultKeymapRepository internal constructor(
         }
     }
 
-    override fun insertKeymap(vararg keymap: KeyMap) {
+    override fun insertKeymap(vararg keymap: KeyMapEntity) {
         coroutineScope.launch {
             keymapDao.insert(*keymap)
 
@@ -74,7 +74,7 @@ class DefaultKeymapRepository internal constructor(
         }
     }
 
-    override fun updateKeymap(keymap: KeyMap) {
+    override fun updateKeymap(keymap: KeyMapEntity) {
         coroutineScope.launch {
             keymapDao.update(keymap)
 
@@ -84,7 +84,7 @@ class DefaultKeymapRepository internal constructor(
 
     override fun duplicateKeymap(vararg id: Long) {
         coroutineScope.launch {
-            val keymaps = mutableListOf<KeyMap>()
+            val keymaps = mutableListOf<KeyMapEntity>()
 
             id.forEach {
                 keymaps.add(getKeymap(it).copy(id = 0))

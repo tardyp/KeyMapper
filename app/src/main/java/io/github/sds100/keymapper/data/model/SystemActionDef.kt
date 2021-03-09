@@ -30,6 +30,7 @@ class SystemActionDef(
     @StringRes val descriptionRes: Int,
     @StringRes val descriptionFormattedRes: Int? = null,
 
+    //TODO remove option stuff
     val optionType: OptionType = OptionType.SINGLE,
 
     options: List<String>? = null,

@@ -2,9 +2,9 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.AppShortcutListItemModel
-import io.github.sds100.keymapper.data.repository.PackageRepository
+import io.github.sds100.keymapper.data.repository.AppRepository
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -13,8 +13,8 @@ import java.util.*
  * Created by sds100 on 27/01/2020.
  */
 class AppShortcutListViewModel internal constructor(
-    private val repository: PackageRepository
-) : ViewModel(), IModelState<List<AppShortcutListItemModel>> {
+    private val repository: AppRepository
+) : ViewModel(), ModelState<List<AppShortcutListItemModel>> {
 
     val searchQuery: MutableLiveData<String> = MutableLiveData("")
 
@@ -29,7 +29,7 @@ class AppShortcutListViewModel internal constructor(
                 val icon = repository.getIntentIcon(it)
 
                 AppShortcutListItemModel(it.activityInfo, name, icon)
-            }.sortedBy { it.label.toLowerCase(Locale.getDefault()) }.getState()
+            }.sortedBy { it.label.toLowerCase(Locale.getDefault()) }.getDataState()
         }
 
         emit(appShortcutList)
@@ -51,7 +51,7 @@ class AppShortcutListViewModel internal constructor(
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
     class Factory(
-        private val repository: PackageRepository
+        private val repository: AppRepository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")

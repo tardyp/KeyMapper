@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.data.model.options
 
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import kotlinx.android.parcel.Parcelize
 import splitties.bitflags.hasFlag
@@ -10,25 +10,25 @@ class TriggerKeyOptions(
     override val id: String,
     val clickType: IntOption,
     private val doNotConsumeKeyEvents: BoolOption
-) : BaseOptions<Trigger> {
+) : BaseOptions<TriggerEntity> {
 
     companion object {
         const val ID_DO_NOT_CONSUME_KEY_EVENT = "do_not_consume_key_event"
         const val ID_CLICK_TYPE = "click_type"
     }
 
-    constructor(key: Trigger.Key, @Trigger.Mode mode: Int) : this(
+    constructor(key: TriggerEntity.KeyEntity, @TriggerEntity.Mode mode: Int) : this(
         id = key.uid,
 
         clickType = IntOption(
             id = ID_CLICK_TYPE,
             value = key.clickType,
-            isAllowed = mode == Trigger.SEQUENCE || mode == Trigger.UNDEFINED
+            isAllowed = mode == TriggerEntity.SEQUENCE || mode == TriggerEntity.UNDEFINED
         ),
 
         doNotConsumeKeyEvents = BoolOption(
             id = ID_DO_NOT_CONSUME_KEY_EVENT,
-            value = key.flags.hasFlag(Trigger.Key.FLAG_DO_NOT_CONSUME_KEY_EVENT),
+            value = key.flags.hasFlag(TriggerEntity.KeyEntity.FLAG_DO_NOT_CONSUME_KEY_EVENT),
             isAllowed = true
         )
     )
@@ -55,34 +55,19 @@ class TriggerKeyOptions(
     override val boolOptions: List<BoolOption>
         get() = listOf(doNotConsumeKeyEvents)
 
-    override fun apply(trigger: Trigger): Trigger {
-        var keyToApplyOptions: Trigger.Key? = null
+    override fun apply(trigger: TriggerEntity): TriggerEntity {
 
         val newTriggerKeys = trigger.keys
             .toMutableList()
             .map {
                 if (it.uid == id) {
-                    val newKey = it.copy(
+                    return@map it.copy(
                         clickType = clickType.value,
                         flags = it.flags.saveBoolOption(
                             doNotConsumeKeyEvents,
-                            Trigger.Key.FLAG_DO_NOT_CONSUME_KEY_EVENT
+                            TriggerEntity.KeyEntity.FLAG_DO_NOT_CONSUME_KEY_EVENT
                         )
                     )
-
-                    keyToApplyOptions = it
-
-                    return@map newKey
-                }
-
-                it
-            }.map {
-                //set the click type of all duplicate keys to the same click type
-                if (trigger.mode == Trigger.SEQUENCE
-                    && it.keyCode == keyToApplyOptions?.keyCode
-                    && it.deviceId == keyToApplyOptions?.deviceId) {
-
-                    return@map it.copy(clickType = clickType.value)
                 }
 
                 it

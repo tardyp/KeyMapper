@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.TintType
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.drawable
 import io.github.sds100.keymapper.util.result.SdkVersionTooLow
 import io.github.sds100.keymapper.util.result.getFullMessage
@@ -25,7 +25,7 @@ class UnsupportedActionListFragment
         InjectorUtils.provideUnsupportedActionListViewModel(requireContext())
     }
 
-    override val modelState: IModelState<List<UnsupportedSystemActionListItemModel>>
+    override val modelState: ModelState<List<UnsupportedSystemActionListItemModel>>
         get() = viewModel
 
     override fun populateList(

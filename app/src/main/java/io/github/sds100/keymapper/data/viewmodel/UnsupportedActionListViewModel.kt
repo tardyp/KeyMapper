@@ -7,8 +7,8 @@ import io.github.sds100.keymapper.data.repository.SystemActionRepository
 import io.github.sds100.keymapper.util.Loading
 import io.github.sds100.keymapper.util.ViewLoading
 import io.github.sds100.keymapper.util.ViewState
-import io.github.sds100.keymapper.util.delegate.IModelState
-import io.github.sds100.keymapper.util.getState
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.getDataState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
  */
 class UnsupportedActionListViewModel(
     private val repository: SystemActionRepository
-) : ViewModel(), IModelState<List<UnsupportedSystemActionListItemModel>> {
+) : ViewModel(), ModelState<List<UnsupportedSystemActionListItemModel>> {
 
     val isTapCoordinateActionSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
@@ -33,7 +33,7 @@ class UnsupportedActionListViewModel(
                     systemAction.descriptionRes,
                     systemAction.iconRes,
                     failure)
-            }.getState()
+            }.getDataState()
         }
 
         emit(unsupportedActions)

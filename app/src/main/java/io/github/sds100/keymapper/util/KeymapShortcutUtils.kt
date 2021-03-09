@@ -7,8 +7,8 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.DeviceInfo
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.DeviceInfoEntity
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.activity.LaunchKeymapShortcutActivity
 import io.github.sds100.keymapper.util.result.valueOrNull
@@ -22,8 +22,8 @@ object KeymapShortcutUtils {
         ctx: Context,
         lifecycleOwner: LifecycleOwner,
         uuid: String,
-        actionList: List<Action>,
-        deviceInfoList: List<DeviceInfo>,
+        actionList: List<ActionEntity>,
+        deviceInfoList: List<DeviceInfoEntity>,
         showDeviceDescriptors: Boolean
     ): ShortcutInfoCompat = ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
 
@@ -47,7 +47,7 @@ object KeymapShortcutUtils {
         }
     }.build()
 
-    private fun createShortcutIcon(ctx: Context, actionList: List<Action>): IconCompat {
+    private fun createShortcutIcon(ctx: Context, actionList: List<ActionEntity>): IconCompat {
         if (actionList.size == 1) {
             val action = actionList[0]
 
@@ -64,8 +64,8 @@ object KeymapShortcutUtils {
     private suspend fun createShortcutLabel(
         ctx: Context,
         lifecycleOwner: LifecycleOwner,
-        actionList: List<Action>,
-        deviceInfoList: List<DeviceInfo>,
+        actionList: List<ActionEntity>,
+        deviceInfoList: List<DeviceInfoEntity>,
         showDeviceDescriptors: Boolean
     ): String {
         if (actionList.size == 1) {

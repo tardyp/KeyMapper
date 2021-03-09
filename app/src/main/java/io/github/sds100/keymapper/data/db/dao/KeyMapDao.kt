@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.data.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 
 /**
  * Created by sds100 on 18/02/20.
@@ -24,13 +24,13 @@ interface KeyMapDao {
     }
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $KEY_ID = (:id)")
-    suspend fun getById(id: Long): KeyMap
+    suspend fun getById(id: Long): KeyMapEntity
 
     @Query("SELECT * FROM $TABLE_NAME")
-    fun observeAll(): LiveData<List<KeyMap>>
+    fun observeAll(): LiveData<List<KeyMapEntity>>
 
     @Query("SELECT * FROM $TABLE_NAME")
-    fun getAll(): List<KeyMap>
+    fun getAll(): List<KeyMapEntity>
 
     @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=0")
     suspend fun disableAll()
@@ -45,10 +45,10 @@ interface KeyMapDao {
     suspend fun disableKeymapById(vararg id: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg keyMap: KeyMap)
+    suspend fun insert(vararg keyMap: KeyMapEntity)
 
     @Delete
-    suspend fun delete(vararg keyMap: KeyMap)
+    suspend fun delete(vararg keyMap: KeyMapEntity)
 
     @Query("DELETE FROM $TABLE_NAME")
     suspend fun deleteAll()
@@ -57,5 +57,5 @@ interface KeyMapDao {
     suspend fun deleteById(vararg id: Long)
 
     @Update
-    suspend fun update(vararg keyMap: KeyMap)
+    suspend fun update(vararg keyMap: KeyMapEntity)
 }

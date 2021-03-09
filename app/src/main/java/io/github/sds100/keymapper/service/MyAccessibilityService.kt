@@ -21,8 +21,8 @@ import io.github.sds100.keymapper.NotificationController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.*
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.KeyMap
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.*
 import io.github.sds100.keymapper.util.result.*
@@ -100,7 +100,7 @@ class MyAccessibilityService : AccessibilityService(),
                 ACTION_RECORD_TRIGGER -> controller.startRecordingTrigger()
 
                 ACTION_TEST_ACTION -> {
-                    intent.getParcelableExtra<Action>(EXTRA_ACTION)?.let {
+                    intent.getParcelableExtra<ActionEntity>(EXTRA_ACTION)?.let {
                         controller.testAction(it)
                     }
                 }
@@ -109,7 +109,7 @@ class MyAccessibilityService : AccessibilityService(),
 
                 ACTION_UPDATE_KEYMAP_LIST_CACHE -> {
                     intent.getStringExtra(EXTRA_KEYMAP_LIST)?.let {
-                        val keymapList = Gson().fromJson<List<KeyMap>>(it)
+                        val keymapList = Gson().fromJson<List<KeyMapEntity>>(it)
 
                         controller.updateKeymapListCache(keymapList)
                     }
@@ -282,7 +282,7 @@ class MyAccessibilityService : AccessibilityService(),
     override fun isBluetoothDeviceConnected(address: String) =
         connectedBtAddresses.contains(address)
 
-    override fun canActionBePerformed(action: Action, hasRootPermission: Boolean): Result<Action> {
+    override fun canActionBePerformed(action: ActionEntity, hasRootPermission: Boolean): Result<ActionEntity> {
         if (action.requiresIME) {
             return if (isCompatibleImeChosen) {
                 Success(action)

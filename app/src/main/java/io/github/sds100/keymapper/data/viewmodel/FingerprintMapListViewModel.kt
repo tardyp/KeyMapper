@@ -5,10 +5,10 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.usecases.ListFingerprintMapsUseCase
-import io.github.sds100.keymapper.domain.usecases.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.result.Error
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,7 +18,7 @@ class FingerprintMapListViewModel(
     private val repository: FingerprintMapRepository,
     private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
     private val listUseCase: ListFingerprintMapsUseCase
-) : ViewModel(), IModelState<List<FingerprintMapListItemModel>> {
+) : ViewModel(), ModelState<List<FingerprintMapListItemModel>> {
 
     private val fingerprintGestureMaps =
         combine(
@@ -93,8 +93,8 @@ class FingerprintMapListViewModel(
         }
     }
 
-    fun fixError(failure: Failure) {
-        _eventStream.value = FixFailure(failure)
+    fun fixError(error: Error) {
+        _eventStream.value = FixFailure(error)
     }
 
     fun backupAll() = run { _eventStream.value = BackupFingerprintMaps() }

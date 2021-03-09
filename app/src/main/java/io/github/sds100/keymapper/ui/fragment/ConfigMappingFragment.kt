@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.IConfigMappingViewModel
 import io.github.sds100.keymapper.databinding.FragmentConfigMappingBinding
 import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
+import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
 import splitties.alertdialog.appcompat.alertDialog
@@ -27,7 +27,7 @@ import splitties.alertdialog.appcompat.positiveButton
  */
 abstract class ConfigMappingFragment : Fragment() {
 
-    abstract val viewModel: IConfigMappingViewModel
+    abstract val viewModel: ConfigMappingViewModel
 
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
@@ -126,7 +126,7 @@ abstract class ConfigMappingFragment : Fragment() {
         viewModel.eventStream.observe(viewLifecycleOwner, { event ->
             when (event) {
                 is FixFailure -> binding.coordinatorLayout.showFixActionSnackBar(
-                    event.failure,
+                    event.error,
                     requireContext(),
                     recoverFailureDelegate,
                     findNavController()

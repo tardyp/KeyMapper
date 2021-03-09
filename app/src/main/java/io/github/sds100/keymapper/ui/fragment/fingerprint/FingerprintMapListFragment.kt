@@ -17,9 +17,9 @@ import io.github.sds100.keymapper.databinding.FragmentFingerprintMapListBinding
 import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.result.Error
 import splitties.alertdialog.appcompat.*
 
 /**
@@ -44,7 +44,7 @@ class FingerprintMapListFragment
         InjectorUtils.provideBackupRestoreViewModel(requireContext())
     }
 
-    override val modelState: IModelState<List<FingerprintMapListItemModel>>
+    override val modelState: ModelState<List<FingerprintMapListItemModel>>
         get() = viewModel
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
@@ -82,8 +82,8 @@ class FingerprintMapListFragment
                     }
 
                     onErrorClick(object : ErrorClickCallback {
-                        override fun onErrorClick(failure: Failure) {
-                            viewModel.fixError(failure)
+                        override fun onErrorClick(error: Error) {
+                            viewModel.fixError(error)
                         }
                     })
 

@@ -11,10 +11,12 @@ import io.github.sds100.keymapper.data.db.IDataStoreManager
 import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repository.*
 import io.github.sds100.keymapper.domain.adapter.BluetoothMonitor
-import io.github.sds100.keymapper.domain.adapter.KeyboardAdapter
+import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
-import io.github.sds100.keymapper.framework.adapters.AndroidKeyboardAdapter
+import io.github.sds100.keymapper.framework.adapters.AndroidInputMethodAdapter
+import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -44,17 +46,17 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var deviceInfoRepository: DeviceInfoRepository? = null
+    private var deviceInfoRepository: DeviceInfoCache? = null
 
-    fun deviceInfoRepository(context: Context): DeviceInfoRepository {
+    fun deviceInfoRepository(context: Context): DeviceInfoCache {
         synchronized(this) {
             return deviceInfoRepository ?: createDeviceInfoRepository(context)
         }
     }
 
-    private fun createDeviceInfoRepository(context: Context): DeviceInfoRepository {
+    private fun createDeviceInfoRepository(context: Context): DeviceInfoCache {
         val database = database ?: createDatabase(context.applicationContext)
-        deviceInfoRepository = DefaultDeviceInfoRepository(
+        deviceInfoRepository = RoomDeviceInfoCache(
             database.deviceInfoDao(),
             (context.applicationContext as MyApplication).appCoroutineScope
         )
@@ -129,17 +131,17 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var packageRepository: AndroidPackageRepository? = null
+    private var packageRepository: AndroidAppRepository? = null
 
-    fun packageRepository(context: Context): PackageRepository {
+    fun packageRepository(context: Context): AppRepository {
         synchronized(this) {
             return packageRepository ?: createPackageRepository(context)
         }
     }
 
-    private fun createPackageRepository(context: Context): PackageRepository {
+    private fun createPackageRepository(context: Context): AppRepository {
         return packageRepository
-            ?: AndroidPackageRepository(context.packageManager).also {
+            ?: AndroidAppRepository(context.packageManager).also {
                 this.packageRepository = it
             }
     }
@@ -187,12 +189,12 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var keyboardAdapter: KeyboardAdapter? = null
+    private var inputMethodAdapter: InputMethodAdapter? = null
 
-    fun keyboardController(context: Context): KeyboardAdapter {
+    fun keyboardController(context: Context): InputMethodAdapter {
         synchronized(this) {
-            return keyboardAdapter
-                ?: AndroidKeyboardAdapter(context).also { keyboardAdapter = it }
+            return inputMethodAdapter
+                ?: AndroidInputMethodAdapter(context).also { inputMethodAdapter = it }
         }
     }
 
@@ -202,6 +204,18 @@ object ServiceLocator {
 
     fun notificationController(context: Context): NotificationController {
         return (context.applicationContext as MyApplication).notificationController
+    }
+
+    fun resourceProvider(context: Context): ResourceProvider {
+        return (context.applicationContext as MyApplication).resourceProvider
+    }
+
+    fun appRepository(context: Context): AppRepository {
+        return (context.applicationContext as MyApplication).appRepository
+    }
+
+    fun appInfoAdapter(context: Context): AppInfoAdapter {
+        return (context.applicationContext as MyApplication).appInfoAdapter
     }
 
     @VisibleForTesting

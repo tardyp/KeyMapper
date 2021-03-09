@@ -42,8 +42,6 @@ internal object Keys {
         preferencesKey<Boolean>("key_shown_parallel_trigger_order_warning")
     val shownSequenceTriggerExplanation =
         preferencesKey<Boolean>("key_shown_sequence_trigger_explanation_dialog")
-    val shownMultipleOfSameKeyInSequenceTriggerExplanation =
-        preferencesKey<Boolean>("pref_shown_multiple_of_same_key_in_sequence_trigger_info")
     val lastInstalledVersionCodeHomeScreen =
         preferencesKey<Int>("last_installed_version_home_screen")
     val lastInstalledVersionCodeAccessibilityService =

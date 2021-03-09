@@ -14,14 +14,14 @@ import io.github.sds100.keymapper.util.Data
 import io.github.sds100.keymapper.util.DataState
 import io.github.sds100.keymapper.util.ViewLoading
 import io.github.sds100.keymapper.util.ViewState
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 28/11/20.
  */
 
 abstract class BaseOptionsViewModel<O : BaseOptions<*>>
-    : ViewModel(), IModelState<OptionsListModel> {
+    : ViewModel(), ModelState<OptionsListModel> {
 
     abstract val stateKey: String
     val options = MediatorLiveData<O>()

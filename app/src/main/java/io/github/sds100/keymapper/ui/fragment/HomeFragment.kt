@@ -29,6 +29,7 @@ import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
@@ -80,6 +81,7 @@ class HomeFragment : Fragment() {
             intent ?: return
 
             when (intent.action) {
+                //TODO remove and replace with observing invalidate error in getactionerrorusecase
                 /*when the input method changes, update the action descriptions in case any need to show an error
                 * that they need the input method to be enabled. */
                 Intent.ACTION_INPUT_METHOD_CHANGED -> {
@@ -286,7 +288,7 @@ class HomeFragment : Fragment() {
             backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
                     is MessageEvent -> toast(it.textRes)
-                    is ShowErrorMessage -> toast(it.failure.getFullMessage(requireContext()))
+                    is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
                     is RequestRestore -> restoreLauncher.launch(FileUtils.MIME_TYPE_ALL)
                     is RequestBackupAll ->
                         backupAllKeymapsLauncher.launch(BackupUtils.createFileName())
@@ -386,7 +388,7 @@ class HomeFragment : Fragment() {
             keymapListViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
                     is FixFailure -> coordinatorLayout.showFixActionSnackBar(
-                        it.failure,
+                        it.error,
                         requireContext(),
                         recoverFailureDelegate,
                         findNavController()
@@ -397,7 +399,7 @@ class HomeFragment : Fragment() {
             fingerprintMapListViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
                     is FixFailure -> coordinatorLayout.showFixActionSnackBar(
-                        it.failure,
+                        it.error,
                         requireContext(),
                         recoverFailureDelegate,
                         findNavController()

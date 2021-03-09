@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.data.model.options
 
-import io.github.sds100.keymapper.data.model.Action
+import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.saveIntOption
 import io.github.sds100.keymapper.util.*
@@ -30,7 +30,7 @@ class KeymapActionOptions(
     private val delayBeforeNextAction: IntOption,
     private val multiplier: IntOption
 
-) : BaseOptions<Action> {
+) : BaseOptions<ActionEntity> {
 
     companion object {
         const val ID_REPEAT_RATE = "repeat_rate"
@@ -47,10 +47,10 @@ class KeymapActionOptions(
         const val ID_HOLD_DOWN_DURATION = "hold_down_duration"
     }
 
-    constructor(action: Action,
+    constructor(action: ActionEntity,
                 actionCount: Int,
-                @Trigger.Mode triggerMode: Int? = null,
-                triggerKeys: List<Trigger.Key>? = null) : this(
+                @TriggerEntity.Mode triggerMode: Int? = null,
+                triggerKeys: List<TriggerEntity.KeyEntity>? = null) : this(
         id = action.uid,
 
         showVolumeUi = BoolOption(
@@ -149,7 +149,7 @@ class KeymapActionOptions(
         holdDown
     )
 
-    override fun setValue(id: String, value: Int): BaseOptions<Action> {
+    override fun setValue(id: String, value: Int): BaseOptions<ActionEntity> {
         when (id) {
             ID_REPEAT_RATE -> repeatRate.value = value
             ID_REPEAT_DELAY -> repeatDelay.value = value
@@ -161,7 +161,7 @@ class KeymapActionOptions(
         return this
     }
 
-    override fun setValue(id: String, value: Boolean): BaseOptions<Action> {
+    override fun setValue(id: String, value: Boolean): BaseOptions<ActionEntity> {
         when (id) {
             ID_REPEAT -> {
                 repeatRate.isAllowed = value
@@ -215,36 +215,36 @@ class KeymapActionOptions(
         return this
     }
 
-    override fun apply(old: Action): Action {
+    override fun apply(old: ActionEntity): ActionEntity {
         val newFlags = old.flags
-            .saveBoolOption(repeat, Action.ACTION_FLAG_REPEAT)
-            .saveBoolOption(showVolumeUi, Action.ACTION_FLAG_SHOW_VOLUME_UI)
-            .saveBoolOption(holdDown, Action.ACTION_FLAG_HOLD_DOWN)
+            .saveBoolOption(repeat, ActionEntity.ACTION_FLAG_REPEAT)
+            .saveBoolOption(showVolumeUi, ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI)
+            .saveBoolOption(holdDown, ActionEntity.ACTION_FLAG_HOLD_DOWN)
 
         val newExtras = old.extras
-            .saveIntOption(repeatRate, Action.EXTRA_REPEAT_RATE)
-            .saveIntOption(repeatDelay, Action.EXTRA_REPEAT_DELAY)
-            .saveIntOption(multiplier, Action.EXTRA_MULTIPLIER)
-            .saveIntOption(delayBeforeNextAction, Action.EXTRA_DELAY_BEFORE_NEXT_ACTION)
-            .saveIntOption(holdDownDuration, Action.EXTRA_HOLD_DOWN_DURATION)
+            .saveIntOption(repeatRate, ActionEntity.EXTRA_REPEAT_RATE)
+            .saveIntOption(repeatDelay, ActionEntity.EXTRA_REPEAT_DELAY)
+            .saveIntOption(multiplier, ActionEntity.EXTRA_MULTIPLIER)
+            .saveIntOption(delayBeforeNextAction, ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION)
+            .saveIntOption(holdDownDuration, ActionEntity.EXTRA_HOLD_DOWN_DURATION)
 
         newExtras.removeAll {
-            it.id in arrayOf(Action.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR, Action.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR)
+            it.id in arrayOf(ActionEntity.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR, ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR)
         }
 
         if (stopRepeatingWhenTriggerPressedAgain.value) {
             newExtras.add(
                 Extra(
-                    Action.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR,
-                    Action.STOP_REPEAT_BEHAVIOUR_TRIGGER_PRESSED_AGAIN.toString()
+                    ActionEntity.EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR,
+                    ActionEntity.STOP_REPEAT_BEHAVIOUR_TRIGGER_PRESSED_AGAIN.toString()
                 ))
         }
 
         if (stopHoldDownWhenTriggerPressedAgain.value) {
             newExtras.add(
                 Extra(
-                    Action.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR,
-                    Action.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN.toString()
+                    ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR,
+                    ActionEntity.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN.toString()
                 ))
         }
 

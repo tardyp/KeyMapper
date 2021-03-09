@@ -1,17 +1,18 @@
 package io.github.sds100.keymapper.domain.usecases
 
-import io.github.sds100.keymapper.domain.adapter.KeyboardAdapter
+import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
-import io.github.sds100.keymapper.util.collectIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Created by sds100 on 14/02/2021.
  */
 class ControlKeyboardOnToggleKeymapsUseCaseImpl(
-    private val keyboardAdapter: KeyboardAdapter,
+    private val inputMethodAdapter: InputMethodAdapter,
     private val preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository, ControlKeyboardOnToggleKeymapsUseCase {
 
@@ -25,16 +26,16 @@ class ControlKeyboardOnToggleKeymapsUseCaseImpl(
     )
 
     override fun start(coroutineScope: CoroutineScope) {
-        keymapsPaused.collectIn(coroutineScope) { paused ->
+        keymapsPaused.onEach { paused ->
 
-            if (!toggleKeyboardOnToggleKeymaps) return@collectIn
+            if (!toggleKeyboardOnToggleKeymaps) return@onEach
 
             if (paused) {
-                keyboardAdapter.chooseLastUsedIncompatibleInputMethod()
+                inputMethodAdapter.chooseLastUsedIncompatibleInputMethod()
             } else {
-                keyboardAdapter.chooseCompatibleInputMethod()
+                inputMethodAdapter.chooseCompatibleInputMethod()
             }
-        }
+        }.launchIn(coroutineScope)
     }
 }
 

@@ -1,18 +1,25 @@
 package io.github.sds100.keymapper.util
 
 import android.content.Context
-import io.github.sds100.keymapper.MyApplication
 import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.data.viewmodel.*
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
+import io.github.sds100.keymapper.domain.devices.SaveDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapActionListItemMapper
+import io.github.sds100.keymapper.ui.mappings.keymap.TriggerKeyListItemMapperImpl
 import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
 
 /**
  * Created by sds100 on 26/01/2020.
  */
+
+//TODO rename to Inject. remove provide prefix from functions
 object InjectorUtils {
 
     fun provideAppListViewModel(context: Context): AppListViewModel.Factory {
@@ -26,7 +33,7 @@ object InjectorUtils {
     fun provideKeymapListViewModel(context: Context): KeymapListViewModel.Factory {
         return KeymapListViewModel.Factory(
             ServiceLocator.keymapRepository(context),
-            ShowActionsUseCase(
+            GetActionErrorUseCaseImpl(
                 ServiceLocator.preferenceRepository(context),
                 ServiceLocator.deviceInfoRepository(context)
             )
@@ -52,7 +59,7 @@ object InjectorUtils {
     ): KeyEventActionTypeViewModel.Factory {
         val deviceInfoRepository = ServiceLocator.deviceInfoRepository(context)
         return KeyEventActionTypeViewModel.Factory(
-            ShowDeviceInfoUseCase(
+            ShowDeviceInfoUseCaseImpl(
                 deviceInfoRepository,
                 ServiceLocator.preferenceRepository(context)
             ),
@@ -120,7 +127,7 @@ object InjectorUtils {
     fun provideFingerprintMapListViewModel(context: Context): FingerprintMapListViewModel.Factory {
         return FingerprintMapListViewModel.Factory(
             ServiceLocator.fingerprintMapRepository(context),
-            ShowDeviceInfoUseCase(
+            ShowDeviceInfoUseCaseImpl(
                 ServiceLocator.deviceInfoRepository(context),
                 ServiceLocator.preferenceRepository(context)
             ),
@@ -139,20 +146,27 @@ object InjectorUtils {
     fun provideConfigKeymapViewModel(
         context: Context
     ): ConfigKeymapViewModel.Factory {
-        (context.applicationContext as MyApplication).apply {
-            return ConfigKeymapViewModel.Factory(
-                ServiceLocator.keymapRepository(context),
-                OnboardingUseCase(ServiceLocator.preferenceRepository(context)),
-                ShowActionsUseCase(
-                    ServiceLocator.preferenceRepository(context),
-                    ServiceLocator.deviceInfoRepository(context)
-                ),
-                CreateTriggerUseCase(
-                    ServiceLocator.preferenceRepository(context),
-                    ServiceLocator.deviceInfoRepository(context)
-                ),
+        val configKeymapUseCase = UseCases.configKeymap(context)
+
+        return ConfigKeymapViewModel.Factory(
+            configKeymapUseCase,
+            configKeymapUseCase.configActions,
+            configKeymapUseCase.configTrigger,
+            UseCases.getActionError(context),
+            UseCases.testAction(context),
+            UseCases.onboarding(context),
+            KeymapActionListItemMapper(
+                UseCases.getActionError(context),
+                UseCases.showDeviceInfo(context),
+                ServiceLocator.appInfoAdapter(context),
+                ServiceLocator.resourceProvider(context)
+            ),
+
+            TriggerKeyListItemMapperImpl(
+                ServiceLocator.resourceProvider(context),
+                UseCases.showDeviceInfo(context)
             )
-        }
+        )
     }
 
     fun provideConfigFingerprintMapViewModel(
@@ -160,7 +174,7 @@ object InjectorUtils {
     ): ConfigFingerprintMapViewModel.Factory {
         return ConfigFingerprintMapViewModel.Factory(
             ServiceLocator.fingerprintMapRepository(context),
-            ShowActionsUseCase(
+            GetActionErrorUseCaseImpl(
                 ServiceLocator.preferenceRepository(context),
                 ServiceLocator.deviceInfoRepository(context)
             )
@@ -172,17 +186,12 @@ object InjectorUtils {
     ): CreateKeymapShortcutViewModel.Factory {
         return CreateKeymapShortcutViewModel.Factory(
             ServiceLocator.keymapRepository(context),
-            ShowActionsUseCase(
-                ServiceLocator.preferenceRepository(context),
-                ServiceLocator.deviceInfoRepository(context)
-            )
+            UseCases.getActionError(context)
         )
     }
 
     fun provideHomeViewModel(context: Context): HomeViewModel.Factory {
-        return HomeViewModel.Factory(
-            OnboardingUseCase(ServiceLocator.preferenceRepository(context))
-        )
+        return HomeViewModel.Factory(UseCases.onboarding(context))
     }
 
     fun provideApplicationViewModel(context: Context): ApplicationViewModel {
@@ -212,13 +221,13 @@ object InjectorUtils {
 
     fun provideAppIntroViewModel(context: Context): AppIntroViewModel.Factory {
         return AppIntroViewModel.Factory(
-            OnboardingUseCase(ServiceLocator.preferenceRepository(context))
+            OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(context))
         )
     }
 
     fun provideFingerprintGestureIntroViewModel(context: Context): FingerprintGestureMapIntroViewModel.Factory {
         return FingerprintGestureMapIntroViewModel.Factory(
-            OnboardingUseCase(ServiceLocator.preferenceRepository(context))
+            OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(context))
         )
     }
 
@@ -245,7 +254,7 @@ object InjectorUtils {
             getKeymapsPaused = GetKeymapsPausedUseCase(preferenceRepository),
             detectKeymapsUseCase = DetectKeymapsUseCaseImpl(preferenceRepository),
             performActionsUseCase = PerformActionsUseCaseImpl(preferenceRepository),
-            onboarding = OnboardingUseCase(preferenceRepository),
+            onboarding = UseCases.onboarding(service),
             fingerprintMapRepository = ServiceLocator.fingerprintMapRepository(service),
             keymapRepository = ServiceLocator.keymapRepository(service)
         )

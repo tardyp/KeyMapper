@@ -7,59 +7,92 @@ import io.github.sds100.keymapper.domain.utils.FlowPrefDelegate
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
 import io.github.sds100.keymapper.util.FingerprintMapUtils
 import io.github.sds100.keymapper.util.firstBlocking
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 14/02/21.
  */
-class OnboardingUseCase(
-    preferenceRepository: PreferenceRepository
-) : PreferenceRepository by preferenceRepository {
+class OnboardingUseCaseImpl(
+    private val preferenceRepository: PreferenceRepository
+) : PreferenceRepository by preferenceRepository, OnboardingUseCase {
 
-    var shownAppIntro by PrefDelegate(Keys.shownAppIntro, false)
+    override var shownAppIntro by PrefDelegate(Keys.shownAppIntro, false)
 
-    var showGuiKeyboardAd by PrefDelegate(Keys.showGuiKeyboardAd, true)
-    val showGuiKeyboardAdFlow by FlowPrefDelegate(Keys.showGuiKeyboardAd, true)
+    override val showGuiKeyboardAdFlow by FlowPrefDelegate(Keys.showGuiKeyboardAd, true)
+    override fun shownGuiKeyboardAd() {
+        preferenceRepository.set(Keys.showGuiKeyboardAd, true)
+    }
 
-    var approvedFingerprintFeaturePrompt by PrefDelegate(
+    override var approvedFingerprintFeaturePrompt by PrefDelegate(
         Keys.approvedFingerprintFeaturePrompt,
         false
     )
-    var shownScreenOffTriggersExplanation by PrefDelegate(
+
+    override var shownScreenOffTriggersExplanation by PrefDelegate(
         Keys.shownScreenOffTriggersExplanation,
         false
     )
-    var shownParallelTriggerOrderExplanation by PrefDelegate(
+
+    override var shownParallelTriggerOrderExplanation by PrefDelegate(
         Keys.shownParallelTriggerOrderExplanation,
         false
     )
-    var shownSequenceTriggerExplanation by PrefDelegate(Keys.shownSequenceTriggerExplanation, false)
-    var shownMultipleOfSameKeyInSequenceTriggerExplanation by PrefDelegate(
+    override var shownSequenceTriggerExplanation by PrefDelegate(
+        Keys.shownSequenceTriggerExplanation,
+        false
+    )
+    override var shownMultipleOfSameKeyInSequenceTriggerExplanation by PrefDelegate(
         Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation,
         false
     )
 
-    fun showFingerprintFeatureNotificationIfAvailable(): Boolean {
-        val oldVersionCode = get(Keys.lastInstalledVersionCodeAccessibilityService)
-            .firstBlocking() ?: -1
+    override val showFingerprintFeatureNotificationIfAvailable: Boolean
+        get() {
+            val oldVersionCode = get(Keys.lastInstalledVersionCodeAccessibilityService)
+                .firstBlocking() ?: -1
 
-        val handledUpdateInHomeScreen = !showOnboardingAfterUpdateHomeScreen.firstBlocking()
+            val handledUpdateInHomeScreen = !showOnboardingAfterUpdateHomeScreen.firstBlocking()
 
-        return oldVersionCode < FingerprintMapUtils.FINGERPRINT_GESTURES_MIN_VERSION
-            && !handledUpdateInHomeScreen
-    }
+            return oldVersionCode < FingerprintMapUtils.FINGERPRINT_GESTURES_MIN_VERSION
+                && !handledUpdateInHomeScreen
+        }
 
-    fun showedFingerprintFeatureNotificationIfAvailable() {
+    override fun showedFingerprintFeatureNotificationIfAvailable() {
         set(Keys.lastInstalledVersionCodeAccessibilityService, Constants.VERSION_CODE)
     }
 
-    val showOnboardingAfterUpdateHomeScreen = get(Keys.lastInstalledVersionCodeHomeScreen)
+    override val showOnboardingAfterUpdateHomeScreen = get(Keys.lastInstalledVersionCodeHomeScreen)
         .map { it ?: -1 < Constants.VERSION_CODE }
 
-    fun showedOnboardingAfterUpdateHomeScreen() {
+    override fun showedOnboardingAfterUpdateHomeScreen() {
         set(Keys.lastInstalledVersionCodeHomeScreen, Constants.VERSION_CODE)
     }
 
-    var shownQuickStartGuideHint by PrefDelegate(Keys.shownQuickStartGuideHint, false)
-    val shownQuickStartGuideHintFlow by FlowPrefDelegate(Keys.shownQuickStartGuideHint, false)
+    override var shownQuickStartGuideHint by PrefDelegate(Keys.shownQuickStartGuideHint, false)
+    override fun shownQuickStartGuideHint() {
+        preferenceRepository.set(Keys.shownQuickStartGuideHint, true)
+    }
+}
+
+interface OnboardingUseCase {
+    var shownAppIntro: Boolean
+
+    val showGuiKeyboardAdFlow: Flow<Boolean>
+    fun shownGuiKeyboardAd()
+
+    var approvedFingerprintFeaturePrompt: Boolean
+    var shownScreenOffTriggersExplanation: Boolean
+    var shownParallelTriggerOrderExplanation: Boolean
+    var shownSequenceTriggerExplanation: Boolean
+    var shownMultipleOfSameKeyInSequenceTriggerExplanation: Boolean
+
+    val showFingerprintFeatureNotificationIfAvailable: Boolean
+    fun showedFingerprintFeatureNotificationIfAvailable()
+
+    val showOnboardingAfterUpdateHomeScreen: Flow<Boolean>
+    fun showedOnboardingAfterUpdateHomeScreen()
+
+    var shownQuickStartGuideHint: Boolean
+    fun shownQuickStartGuideHint()
 }

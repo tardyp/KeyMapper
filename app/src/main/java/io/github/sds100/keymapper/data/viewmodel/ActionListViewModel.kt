@@ -1,169 +1,97 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.ActionModel
-import io.github.sds100.keymapper.data.model.options.BaseOptions
-import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
+import io.github.sds100.keymapper.ui.actions.ActionListItemModel
+import io.github.sds100.keymapper.domain.actions.ActionWithOptions
+import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
+import io.github.sds100.keymapper.domain.actions.TestActionUseCase
+import io.github.sds100.keymapper.domain.models.Action
+import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.errorOrNull
+import io.github.sds100.keymapper.util.result.isError
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.*
 
 /**
  * Created by sds100 on 22/11/20.
  */
 
-abstract class ActionListViewModel<O : BaseOptions<Action>>(
+class ActionListViewModel<O>(
     private val coroutineScope: CoroutineScope,
-    private val showActionsUseCase: ShowActionsUseCase,
-) : IModelState<List<ActionModel>> {
+    private val configActions: ConfigActionsUseCase<O>,
+    private val actionError: GetActionErrorUseCase,
+    private val testAction: TestActionUseCase,
+    private val listItemModelMapper: ActionListItemMapper<O>,
+) : ModelState<List<ActionListItemModel>> {
 
-    private val _actionList = MutableLiveData<List<Action>>(listOf())
-    val actionList: LiveData<List<Action>> = _actionList
+    override val model = MutableLiveData<DataState<List<ActionListItemModel>>>(Loading())
 
-    private val _model = MutableLiveData<DataState<List<ActionModel>>>(Loading())
-    override val model = _model
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
-    private val _eventStream = LiveEvent<Event>().apply {
-        addSource(actionList) {
-            coroutineScope.launch {
-                postValue(
-                    BuildActionListModels(
-                        it ?: listOf(),
-                        showActionsUseCase.getDeviceInfo(),
-                        showActionsUseCase.hasRootPermission,
-                        showActionsUseCase.showDeviceDescriptors
-                    )
-                )
-            }
-        }
+    private val _openEditOptions = LiveEvent<O>()
+    val openEditOptions: LiveData<O> = _openEditOptions
+
+    private val _fixError = LiveEvent<RecoverableError>()
+    val fixError: LiveData<RecoverableError> = _fixError
+
+    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
+    val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
+
+    init {
+        configActions.actionList
+            .onEach { buildModels(it) }
+            .launchIn(coroutineScope)
+
+        actionError.invalidateErrors.onEach { rebuildModels() }.launchIn(coroutineScope)
     }
 
-    val eventStream: LiveData<Event> = _eventStream
+    fun addAction(action: Action) = configActions.addAction(action)
+    fun moveAction(fromIndex: Int, toIndex: Int) = configActions.moveAction(fromIndex, toIndex)
+    fun removeAction(uid: String) = configActions.removeAction(uid)
 
-    fun setActionList(actionList: List<Action>) {
-        _actionList.value = actionList
+    fun editOptions(uid: String) {
+        _openEditOptions.value = configActions.getOptions(uid)
     }
 
-    fun setModels(modelList: List<ActionModel>) {
+    fun onModelClick(uid: String) = configActions.actionList.value.ifIsData { data ->
+        val action = data.singleOrNull { it.action.uid == uid }?.action ?: return
+
+        val error = actionError.getError(action)
+
         when {
-            modelList.isEmpty() -> _model.value = Empty()
-            else -> _model.value = Data(modelList)
+            error.isError && error is RecoverableError -> _fixError.value = error
+
+            else -> testAction(action)
         }
     }
 
-    fun addAction(action: Action) {
-        _actionList.value = _actionList.value?.toMutableList()?.apply {
-            add(action)
-        }
-
-        invalidateOptions()
-
-        onAddAction(action)
-    }
-
-    fun moveAction(fromIndex: Int, toIndex: Int) {
-        _actionList.value = actionList.value?.toMutableList()?.apply {
-            if (fromIndex < toIndex) {
-                for (i in fromIndex until toIndex) {
-                    Collections.swap(this, i, i + 1)
-                }
-            } else {
-                for (i in fromIndex downTo toIndex + 1) {
-                    Collections.swap(this, i, i - 1)
-                }
-            }
-        }
-
-        invalidateOptions()
-    }
-
-    fun removeAction(id: String) {
-        _actionList.value = _actionList.value?.toMutableList()?.apply {
-            removeAll { it.uid == id }
-        }
-
-        invalidateOptions()
-    }
-
-    fun editOptions(id: String) {
-        val action = actionList.value?.singleOrNull { it.uid == id } ?: return
-        _eventStream.value = EditActionOptions(getActionOptions(action))
-    }
-
-    fun onModelClick(id: String) {
-        coroutineScope.launch {
-            model.value?.ifIsData { modelList ->
-                modelList.singleOrNull { it.id == id }?.apply {
-                    when {
-                        hasError -> _eventStream.value = FixFailure(failure!!)
-
-                        else -> {
-                            val action = actionList.value?.singleOrNull { it.uid == id }
-                                ?: return@apply
-                            _eventStream.value = TestAction(action)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun setOptions(options: O) {
-        _actionList.value = actionList.value?.map {
-            if (it.uid == options.id) {
-                return@map options.apply(it)
-            }
-
-            it
-        }
-
-        invalidateOptions()
+    fun setOptions(uid: String, options: O) {
+        configActions.setOptions(uid, options)
     }
 
     fun promptToEnableAccessibilityService() {
-        _eventStream.value = EnableAccessibilityServicePrompt()
+        _enableAccessibilityServicePrompt.value = Unit
     }
 
-    fun rebuildModels() {
+    fun rebuildModels() = buildModels(configActions.actionList.value)
+
+    private fun buildModels(actionList: DataState<List<ActionWithOptions<O>>>) {
         coroutineScope.launch {
-            _eventStream.postValue(
-                BuildActionListModels(
-                    actionList.value ?: emptyList(),
-                    showActionsUseCase.getDeviceInfo(),
-                    showActionsUseCase.hasRootPermission,
-                    showActionsUseCase.showDeviceDescriptors
-                )
-            )
+            val newModel = actionList.mapData { data ->
+                data.map {
+                    listItemModelMapper.map(it, actionError.getError(it.action).errorOrNull())
+                }
+            }
+
+            model.postValue(newModel)
         }
     }
-
-    fun invalidateOptions() {
-        val newActionList = actionList.value?.map {
-            getActionOptions(it).apply(it)
-        }
-
-        _actionList.value = newActionList ?: emptyList()
-    }
-
-    fun saveState(outState: Bundle) {
-        outState.putParcelableArray(stateKey, actionList.value?.toTypedArray())
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun restoreState(state: Bundle) {
-        _actionList.value = state.getParcelableArray(stateKey)?.toList() as List<Action>
-        rebuildModels()
-    }
-
-    abstract val stateKey: String
-
-    abstract fun getActionOptions(action: Action): O
-    open fun onAddAction(action: Action) {}
 }

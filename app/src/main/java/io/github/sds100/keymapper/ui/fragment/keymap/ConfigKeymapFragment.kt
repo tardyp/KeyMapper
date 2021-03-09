@@ -5,12 +5,12 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.Constraint
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.fragment.*
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.int
@@ -20,6 +20,8 @@ import io.github.sds100.keymapper.util.intArray
  * Created by sds100 on 22/11/20.
  */
 class ConfigKeymapFragment : ConfigMappingFragment() {
+
+
     private val args by navArgs<ConfigKeymapFragmentArgs>()
 
     override val viewModel: ConfigKeymapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
@@ -35,21 +37,22 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         }
 
         setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
-            result.getParcelable<Action>(ChooseActionFragment.EXTRA_ACTION)?.let {
+            result.getParcelable<ActionEntity>(ChooseActionFragment.EXTRA_ACTION)?.let {
                 viewModel.actionListViewModel.addAction(it)
             }
         }
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
-            result.getParcelable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
+            result.getParcelable<ConstraintEntity>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
                 viewModel.constraintListViewModel.addConstraint(it)
             }
         }
 
         setFragmentResultListener(KeymapActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<KeymapActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)?.let {
-                viewModel.actionListViewModel.setOptions(it)
-            }
+            result.getParcelable<KeymapActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
+                ?.let {
+                    viewModel.actionListViewModel.setOptions(it)
+                }
         }
 
         setFragmentResultListener(TriggerKeyOptionsFragment.REQUEST_KEY) { _, result ->

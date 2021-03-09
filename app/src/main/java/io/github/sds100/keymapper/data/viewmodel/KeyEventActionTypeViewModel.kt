@@ -5,9 +5,9 @@ import android.view.KeyEvent
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
-import io.github.sds100.keymapper.data.model.DeviceInfo
-import io.github.sds100.keymapper.domain.usecases.SaveDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.usecases.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.data.model.DeviceInfoEntity
+import io.github.sds100.keymapper.domain.devices.SaveDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.util.BuildDeviceInfoModels
 import io.github.sds100.keymapper.util.ChooseKeycode
 import io.github.sds100.keymapper.util.Event
@@ -42,9 +42,9 @@ class KeyEventActionTypeViewModel(
         }
     }
 
-    val chosenDevice = MutableLiveData<DeviceInfo?>(null)
+    val chosenDevice = MutableLiveData<DeviceInfoEntity?>(null)
 
-    val deviceInfoModels = MutableLiveData<List<DeviceInfo>>()
+    val deviceInfoModels = MutableLiveData<List<DeviceInfoEntity>>()
 
     val metaState = MutableLiveData(0)
 
@@ -112,7 +112,7 @@ class KeyEventActionTypeViewModel(
         _eventStream.value = BuildDeviceInfoModels()
     }
 
-    fun setDeviceInfoModels(models: List<DeviceInfo>) {
+    fun setDeviceInfoModels(models: List<DeviceInfoEntity>) {
         deviceInfoModels.value = models
     }
 

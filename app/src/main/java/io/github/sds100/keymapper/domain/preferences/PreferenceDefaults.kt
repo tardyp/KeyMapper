@@ -4,7 +4,7 @@ package io.github.sds100.keymapper.domain.preferences
  * Created by sds100 on 30/01/21.
  */
 
-object PreferenceDefaults {
+internal object PreferenceDefaults {
     const val DARK_THEME = "2"
 
     const val LONG_PRESS_DELAY = 500

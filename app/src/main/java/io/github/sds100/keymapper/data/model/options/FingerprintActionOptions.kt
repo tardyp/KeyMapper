@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.data.model.options
 
-import io.github.sds100.keymapper.data.model.Action
+import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.saveIntOption
 import io.github.sds100.keymapper.util.*
@@ -21,7 +21,7 @@ class FingerprintActionOptions(
     private val holdDownUntilSwipedAgain: BoolOption,
     private val holdDownDuration: IntOption
 
-) : BaseOptions<Action> {
+) : BaseOptions<ActionEntity> {
 
     companion object {
         const val ID_SHOW_VOLUME_UI = "show_volume_ui"
@@ -33,7 +33,7 @@ class FingerprintActionOptions(
         const val ID_HOLD_DOWN_DURATION = "hold_down_duration"
     }
 
-    constructor(action: Action,
+    constructor(action: ActionEntity,
                 actionCount: Int) : this(
         id = action.uid,
 
@@ -93,7 +93,7 @@ class FingerprintActionOptions(
         holdDownUntilSwipedAgain
     )
 
-    override fun setValue(id: String, value: Int): BaseOptions<Action> {
+    override fun setValue(id: String, value: Int): BaseOptions<ActionEntity> {
         when (id) {
             ID_REPEAT_RATE -> repeatRate.value = value
             ID_MULTIPLIER -> multiplier.value = value
@@ -104,7 +104,7 @@ class FingerprintActionOptions(
         return this
     }
 
-    override fun setValue(id: String, value: Boolean): BaseOptions<Action> {
+    override fun setValue(id: String, value: Boolean): BaseOptions<ActionEntity> {
         when (id) {
             ID_REPEAT_UNTIL_SWIPED_AGAIN -> {
                 repeatUntilSwipedAgain.value = value
@@ -126,17 +126,17 @@ class FingerprintActionOptions(
         return this
     }
 
-    override fun apply(old: Action): Action {
+    override fun apply(old: ActionEntity): ActionEntity {
         val newFlags = old.flags
-            .saveBoolOption(showVolumeUi, Action.ACTION_FLAG_SHOW_VOLUME_UI)
-            .saveBoolOption(repeatUntilSwipedAgain, Action.ACTION_FLAG_REPEAT)
-            .saveBoolOption(holdDownUntilSwipedAgain, Action.ACTION_FLAG_HOLD_DOWN)
+            .saveBoolOption(showVolumeUi, ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI)
+            .saveBoolOption(repeatUntilSwipedAgain, ActionEntity.ACTION_FLAG_REPEAT)
+            .saveBoolOption(holdDownUntilSwipedAgain, ActionEntity.ACTION_FLAG_HOLD_DOWN)
 
         val newExtras = old.extras
-            .saveIntOption(multiplier, Action.EXTRA_MULTIPLIER)
-            .saveIntOption(delayBeforeNextAction, Action.EXTRA_DELAY_BEFORE_NEXT_ACTION)
-            .saveIntOption(repeatRate, Action.EXTRA_REPEAT_RATE)
-            .saveIntOption(holdDownDuration, Action.EXTRA_HOLD_DOWN_DURATION)
+            .saveIntOption(multiplier, ActionEntity.EXTRA_MULTIPLIER)
+            .saveIntOption(delayBeforeNextAction, ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION)
+            .saveIntOption(repeatRate, ActionEntity.EXTRA_REPEAT_RATE)
+            .saveIntOption(holdDownDuration, ActionEntity.EXTRA_HOLD_DOWN_DURATION)
 
         return old.copy(flags = newFlags, extras = newExtras, uid = old.uid)
     }

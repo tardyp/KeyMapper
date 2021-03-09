@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.util
 
 import android.os.Build
 import android.view.InputDevice
-import io.github.sds100.keymapper.data.model.DeviceInfo
+import io.github.sds100.keymapper.data.model.DeviceInfoEntity
 import io.github.sds100.keymapper.util.result.DeviceNotFound
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
@@ -30,7 +30,7 @@ object InputDeviceUtils {
         InputDevice.getDeviceIds().forEach {
             val device = InputDevice.getDevice(it)
 
-            yield(DeviceInfo(device.descriptor, device.name))
+            yield(DeviceInfoEntity(device.descriptor, device.name))
         }
     }.toList()
 

@@ -3,9 +3,9 @@ package io.github.sds100.keymapper.data.viewmodel
 import android.content.pm.ApplicationInfo
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.AppListItemModel
-import io.github.sds100.keymapper.data.repository.PackageRepository
+import io.github.sds100.keymapper.data.repository.AppRepository
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import kotlinx.coroutines.Dispatchers
 import java.util.*
 
@@ -13,19 +13,19 @@ import java.util.*
  * Created by sds100 on 27/01/2020.
  */
 class AppListViewModel internal constructor(
-    private val repository: PackageRepository
-) : ViewModel(), IModelState<List<AppListItemModel>> {
+    private val repository: AppRepository
+) : ViewModel(), ModelState<List<AppListItemModel>> {
 
     private val launchableAppModelList = liveData(viewModelScope.coroutineContext + Dispatchers.Default) {
         emit(Loading())
 
-        emit(repository.getLaunchableAppList().createModels().getState())
+        emit(repository.getLaunchableAppList().createModels().getDataState())
     }
 
     private val allAppModelList = liveData(viewModelScope.coroutineContext + Dispatchers.Default) {
         emit(Loading())
 
-        emit(repository.getAllAppList().createModels().getState())
+        emit(repository.getAllAppList().createModels().getDataState())
     }
 
     val searchQuery: MutableLiveData<String> = MutableLiveData("")
@@ -94,7 +94,7 @@ class AppListViewModel internal constructor(
         }.sortedBy { it.appName.toLowerCase(Locale.getDefault()) }
 
     class Factory(
-        private val repository: PackageRepository
+        private val repository: AppRepository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")

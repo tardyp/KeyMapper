@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.data.viewmodel.KeycodeListViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 30/03/2020.
@@ -25,7 +25,7 @@ class KeycodeListFragment : DefaultRecyclerViewFragment<Map<Int, String>>() {
         InjectorUtils.provideKeycodeListViewModel()
     }
 
-    override val modelState: IModelState<Map<Int, String>>
+    override val modelState: ModelState<Map<Int, String>>
         get() = viewModel
 
     override fun populateList(binding: FragmentRecyclerviewBinding, model: Map<Int, String>?) {

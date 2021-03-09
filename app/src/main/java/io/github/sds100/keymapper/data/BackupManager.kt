@@ -12,7 +12,7 @@ import com.google.gson.stream.MalformedJsonException
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.repository.DeviceInfoRepository
+import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.BackupRestoreUseCase
 import io.github.sds100.keymapper.domain.usecases.IBackupRestoreUseCase
@@ -31,7 +31,7 @@ import java.io.OutputStream
 class BackupManager(
     private val keymapRepository: BackupRestoreUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,
-    private val deviceInfoRepository: DeviceInfoRepository,
+    private val deviceInfoRepository: DeviceInfoCache,
     private val coroutineScope: CoroutineScope,
     private val contentResolver: IContentResolver,
     private val backupRestoreUseCase: IBackupRestoreUseCase,
@@ -138,7 +138,7 @@ class BackupManager(
 
             } catch (e: Exception) {
 
-                _eventStream.value = RestoreResult(GenericFailure(e))
+                _eventStream.value = RestoreResult(GenericError(e))
 
                 if (throwExceptions) {
                     e.printStackTrace()
@@ -162,7 +162,7 @@ class BackupManager(
         val keymapListJsonArray by rootElement.byNullableArray(NAME_KEYMAP_LIST)
 
         val deviceInfoJsonArray by rootElement.byNullableArray(NAME_DEVICE_INFO)
-        val deviceInfoList = gson.fromJson<List<DeviceInfo>>(deviceInfoJsonArray ?: JsonArray())
+        val deviceInfoList = gson.fromJson<List<DeviceInfoEntity>>(deviceInfoJsonArray ?: JsonArray())
 
         //started storing database version at db version 10
         if (keymapDbVersion > AppDatabase.DATABASE_VERSION) {
@@ -199,7 +199,7 @@ class BackupManager(
     @Suppress("BlockingMethodInNonBlockingContext")
     private fun backupAsync(
         outputStream: OutputStream,
-        keymapList: List<KeyMap>? = null,
+        keymapList: List<KeyMapEntity>? = null,
         fingerprintSwipeDown: FingerprintMap? = null,
         fingerprintSwipeUp: FingerprintMap? = null,
         fingerprintSwipeLeft: FingerprintMap? = null,
@@ -217,8 +217,8 @@ class BackupManager(
 
             keymapList?.forEach { keymap ->
                 keymap.trigger.keys.forEach { key ->
-                    if (key.deviceId != Trigger.Key.DEVICE_ID_ANY_DEVICE
-                        && key.deviceId != Trigger.Key.DEVICE_ID_THIS_DEVICE) {
+                    if (key.deviceId != TriggerEntity.KeyEntity.DEVICE_ID_ANY_DEVICE
+                        && key.deviceId != TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE) {
                         deviceInfoIdsToBackup.add(key.deviceId)
                     }
                 }
@@ -249,11 +249,11 @@ class BackupManager(
         } catch (e: Exception) {
             if (throwExceptions) throw e
 
-            return@async GenericFailure(e)
+            return@async GenericError(e)
         }
     }
 
-    private suspend fun doAutomaticBackup(keymaps: List<KeyMap>,
+    private suspend fun doAutomaticBackup(keymaps: List<KeyMapEntity>,
                                           fingerprintMaps: Map<String, FingerprintMap>) {
 
         if (!shouldBackupAutomatically()) return
@@ -288,10 +288,10 @@ class BackupManager(
         val keymapDbVersion: Int? = null,
 
         @SerializedName(NAME_KEYMAP_LIST)
-        val keymapList: List<KeyMap>? = null,
+        val keymapList: List<KeyMapEntity>? = null,
 
         @SerializedName(NAME_DEVICE_INFO)
-        val deviceInfo: List<DeviceInfo>? = null,
+        val deviceInfo: List<DeviceInfoEntity>? = null,
 
         @SerializedName(NAME_FINGERPRINT_SWIPE_DOWN)
         val fingerprintSwipeDown: FingerprintMap?,

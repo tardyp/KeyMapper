@@ -5,7 +5,7 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.isFailure
+import io.github.sds100.keymapper.util.result.isError
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.*
 
@@ -21,7 +21,7 @@ abstract class SimpleMappingController(
 
     private val repeatJobs = mutableMapOf<String, List<RepeatJob>>()
     private val performActionJobs = mutableMapOf<String, Job>()
-    private val actionsBeingHeldDown = mutableListOf<Action>()
+    private val actionsBeingHeldDown = mutableListOf<ActionEntity>()
 
     val performAction = LiveEvent<PerformAction>()
     val vibrateEvent: LiveEvent<VibrateEvent> = LiveEvent()
@@ -29,8 +29,8 @@ abstract class SimpleMappingController(
 
     fun onDetected(
         mappingId: String,
-        actionList: List<Action>,
-        constraintList: List<Constraint>,
+        actionList: List<ActionEntity>,
+        constraintList: List<ConstraintEntity>,
         constraintMode: Int,
         isEnabled: Boolean,
         extras: List<Extra>,
@@ -49,7 +49,7 @@ abstract class SimpleMappingController(
             val repeatJobs = mutableListOf<RepeatJob>()
 
             actionList.forEach {
-                if (canActionBePerformed(it, useCase.hasRootPermission).isFailure) return@forEach
+                if (canActionBePerformed(it, useCase.hasRootPermission).isError) return@forEach
 
                 if (it.repeat) {
                     var alreadyRepeating = false
@@ -109,7 +109,7 @@ abstract class SimpleMappingController(
 
     @MainThread
     private fun performAction(
-        action: Action,
+        action: ActionEntity,
         keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
     ) {
         repeat(action.multiplier ?: 1) {
@@ -120,7 +120,7 @@ abstract class SimpleMappingController(
         }
     }
 
-    private fun repeatAction(action: Action) = coroutineScope.launch(start = CoroutineStart.LAZY) {
+    private fun repeatAction(action: ActionEntity) = coroutineScope.launch(start = CoroutineStart.LAZY) {
         val repeatRate = action.repeatRate?.toLong()
             ?: useCase.defaultRepeatRate.firstBlocking().toLong()
 

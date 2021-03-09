@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.data.model
 
 import android.graphics.drawable.Drawable
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.result.Error
 
 /**
  * Created by sds100 on 17/03/2020.
@@ -10,11 +10,11 @@ import io.github.sds100.keymapper.util.result.Failure
 data class ConstraintModel(
     val id: String,
     val description: String? = null,
-    val failure: Failure? = null,
+    val error: Error? = null,
     val errorMessage: String? = null,
     val icon: Drawable? = null,
     val iconTintOnSurface: Boolean = false
 ) {
     val hasError: Boolean
-        get() = failure != null
+        get() = error != null
 }

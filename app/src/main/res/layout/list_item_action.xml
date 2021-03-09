@@ -13,7 +13,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.data.model.ActionModel" />
+            type="io.github.sds100.keymapper.ui.actions.ActionListItemModel" />
 
         <variable
             name="actionCount"
@@ -84,7 +84,7 @@
                     android:layout_height="wrap_content"
                     android:text="@{model.extraInfo}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:visibility='@{model.hasFlags ? View.VISIBLE : View.GONE}'
+                    android:visibility='@{model.extraInfo == null ? View.GONE : View.VISIBLE}'
                     tools:text="Show Volume Dialog"
                     tools:visibility="visible" />
 
@@ -125,7 +125,7 @@
                 app:layout_constraintStart_toEndOf="@id/buttonDrag"
                 app:layout_constraintTop_toTopOf="@id/layoutDescription"
                 app:layout_constraintVertical_bias="0.0"
-                app:tintType="@{model.hasError ? TintType.ERROR : model.type == ActionType.SYSTEM_ACTION ? TintType.ON_SURFACE : TintType.NONE}"
+                app:tintType="@{model.tintType}"
                 tools:srcCompat="@mipmap/ic_launcher"
                 tools:visibility="visible" />
 

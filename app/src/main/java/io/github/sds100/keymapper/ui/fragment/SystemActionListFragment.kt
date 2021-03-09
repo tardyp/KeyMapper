@@ -6,7 +6,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Option
+import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.data.model.SystemActionListItemModel
@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.sectionHeader
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.callback.StringResourceProvider
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.util.result.handle
 import io.github.sds100.keymapper.util.result.onSuccess
@@ -47,7 +47,7 @@ class SystemActionListFragment
         InjectorUtils.provideSystemActionListViewModel(requireContext())
     }
 
-    override val modelState: IModelState<Map<Int, List<SystemActionListItemModel>>>
+    override val modelState: ModelState<Map<Int, List<SystemActionListItemModel>>>
         get() = viewModel
 
     override var searchStateKey: String? = SEARCH_STATE_KEY
@@ -95,6 +95,10 @@ class SystemActionListFragment
     }
 
     override fun onSearchQuery(query: String?) {
+        /*TODO instead of passing a string resource provider to the view model,
+            get the string res ids from the view models
+            then get the strings
+            then pass a map of the system action ids to their string name with the query*/
         viewModel.searchQuery.value = query
     }
 
@@ -115,7 +119,7 @@ class SystemActionListFragment
 
             systemActionDef.getOptions(requireContext()).onSuccess { options ->
                 val optionLabels = options.map { optionId ->
-                    Option.getOptionLabel(requireContext(), systemActionDef.id, optionId).handle(
+                    SystemActionOption.getOptionLabel(requireContext(), systemActionDef.id, optionId).handle(
                         onSuccess = { it },
                         onFailure = { it.getFullMessage(requireContext()) }
                     )
@@ -144,7 +148,7 @@ class SystemActionListFragment
                                 }
 
                                 okButton { _ ->
-                                    val data = Option.optionSetToString(
+                                    val data = SystemActionOption.optionSetToString(
                                         options.filterIndexed { index, _ -> checkedOptions[index] }.toSet())
 
                                     it.resume(data)

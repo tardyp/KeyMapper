@@ -6,10 +6,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.Constraint
-import io.github.sds100.keymapper.data.model.KeyMap
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.ConstraintEntity
+import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.util.ActionType
 import kotlinx.coroutines.coroutineScope
 
@@ -24,13 +24,13 @@ class SeedDatabaseWorker(
         try {
             val keymaps = sequence {
                 for (i in 1..100) {
-                    yield(KeyMap(
+                    yield(KeyMapEntity(
                         id = 0,
                         trigger = createRandomTrigger(),
                         actionList = createRandomActionList(),
                         constraintList = listOf(
-                            Constraint.appConstraint(Constraint.APP_FOREGROUND, Constants.PACKAGE_NAME),
-                            Constraint.appConstraint(Constraint.APP_NOT_FOREGROUND, "io.github.sds100.keymapper.ci")
+                            ConstraintEntity.appConstraint(ConstraintEntity.APP_FOREGROUND, Constants.PACKAGE_NAME),
+                            ConstraintEntity.appConstraint(ConstraintEntity.APP_NOT_FOREGROUND, "io.github.sds100.keymapper.ci")
                         ),
                         flags = 0
                     ))
@@ -45,35 +45,35 @@ class SeedDatabaseWorker(
         }
     }
 
-    private fun createRandomTrigger(): Trigger {
+    private fun createRandomTrigger(): TriggerEntity {
         val keys = sequence {
-            yield(Trigger.Key(
+            yield(TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_CTRL_LEFT,
-                Trigger.Key.DEVICE_ID_THIS_DEVICE,
-                Trigger.SHORT_PRESS
+                TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE,
+                TriggerEntity.SHORT_PRESS
             ))
-            yield(Trigger.Key(
+            yield(TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_ALT_LEFT,
-                Trigger.Key.DEVICE_ID_ANY_DEVICE,
-                Trigger.LONG_PRESS
+                TriggerEntity.KeyEntity.DEVICE_ID_ANY_DEVICE,
+                TriggerEntity.LONG_PRESS
             ))
-            yield(Trigger.Key(
+            yield(TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_DEL,
-                Trigger.Key.DEVICE_ID_THIS_DEVICE,
-                Trigger.SHORT_PRESS
+                TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE,
+                TriggerEntity.SHORT_PRESS
             ))
         }.toList()
 
-        return Trigger(keys, mode = Trigger.SEQUENCE, flags = Trigger.TRIGGER_FLAG_VIBRATE)
+        return TriggerEntity(keys, mode = TriggerEntity.SEQUENCE, flags = TriggerEntity.TRIGGER_FLAG_VIBRATE)
     }
 
-    private fun createRandomActionList(): List<Action> {
+    private fun createRandomActionList(): List<ActionEntity> {
         return sequence {
-            yield(Action(
+            yield(ActionEntity(
                 type = ActionType.APP,
                 data = Constants.PACKAGE_NAME
             ))
-            yield(Action(
+            yield(ActionEntity(
                 type = ActionType.APP,
                 data = "this.app.doesnt.exist"
             ))

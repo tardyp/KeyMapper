@@ -12,8 +12,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import splitties.bitflags.hasFlag
 import timber.log.Timber
 
@@ -93,7 +93,7 @@ object Migration_1_2 {
                         val newTriggerKeys = trigger["keys"].asJsonArray.map {
                             val clickType = if (isLongPress) 1 else 0 //long press else short press
 
-                            createTriggerKey2(it.asInt, Trigger.Key.DEVICE_ID_ANY_DEVICE, clickType)
+                            createTriggerKey2(it.asInt, TriggerEntity.KeyEntity.DEVICE_ID_ANY_DEVICE, clickType)
                         }
 
                         val newTriggerKeysJsonArray = JsonArray().apply {
@@ -119,7 +119,7 @@ object Migration_1_2 {
 
                     if (actionTypeNew != null) {
                         val actionFlags = if (flagsOld.hasFlag(FLAG_SHOW_VOLUME_UI_1)) {
-                            Action.ACTION_FLAG_SHOW_VOLUME_UI
+                            ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI
                         } else {
                             0
                         }

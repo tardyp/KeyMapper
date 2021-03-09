@@ -8,9 +8,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.KeyMap
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.GlobalKeymapUseCase
 import io.github.sds100.keymapper.domain.usecases.DetectKeymapsUseCase
@@ -264,17 +264,17 @@ class AccessibilityServiceController(
         }
     }
 
-    fun updateKeymapListCache(keymapList: List<KeyMap>) {
+    fun updateKeymapListCache(keymapList: List<KeyMapEntity>) {
         keymapDetectionDelegate.keymapListCache = keymapList
 
         screenOffTriggersEnabled = keymapList.any { keymap ->
-            keymap.trigger.flags.hasFlag(Trigger.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
+            keymap.trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
         }
 
         triggerKeymapByIntentController.onKeymapListUpdate(keymapList)
     }
 
-    fun testAction(action: Action) {
+    fun testAction(action: ActionEntity) {
         _eventStream.value = PerformAction(action)
     }
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
 import io.github.sds100.keymapper.data.model.SliderListItemModel
-import io.github.sds100.keymapper.data.model.Trigger
+import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.model.options.BoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
@@ -38,7 +38,7 @@ class TriggerKeyOptionsViewModel : BaseOptionsDialogViewModel<TriggerKeyOptions>
 
     val shortPress = MediatorLiveData<Boolean>().apply {
         addSource(options) {
-            val newValue = it.clickType.value == Trigger.SHORT_PRESS
+            val newValue = it.clickType.value == TriggerEntity.SHORT_PRESS
 
             if (value != newValue) {
                 value = newValue
@@ -48,7 +48,7 @@ class TriggerKeyOptionsViewModel : BaseOptionsDialogViewModel<TriggerKeyOptions>
 
     val longPress = MediatorLiveData<Boolean>().apply {
         addSource(options) {
-            val newValue = it.clickType.value == Trigger.LONG_PRESS
+            val newValue = it.clickType.value == TriggerEntity.LONG_PRESS
 
             if (value != newValue) {
                 value = newValue
@@ -58,7 +58,7 @@ class TriggerKeyOptionsViewModel : BaseOptionsDialogViewModel<TriggerKeyOptions>
 
     val doublePress = MediatorLiveData<Boolean>().apply {
         addSource(options) {
-            val newValue = it.clickType.value == Trigger.DOUBLE_PRESS
+            val newValue = it.clickType.value == TriggerEntity.DOUBLE_PRESS
 
             if (value != newValue) {
                 value = newValue
@@ -69,19 +69,19 @@ class TriggerKeyOptionsViewModel : BaseOptionsDialogViewModel<TriggerKeyOptions>
     init {
         options.addSource(shortPress) {
             if (it) {
-                setValue(TriggerKeyOptions.ID_CLICK_TYPE, Trigger.SHORT_PRESS)
+                setValue(TriggerKeyOptions.ID_CLICK_TYPE, TriggerEntity.SHORT_PRESS)
             }
         }
 
         options.addSource(longPress) {
             if (it) {
-                setValue(TriggerKeyOptions.ID_CLICK_TYPE, Trigger.LONG_PRESS)
+                setValue(TriggerKeyOptions.ID_CLICK_TYPE, TriggerEntity.LONG_PRESS)
             }
         }
 
         options.addSource(doublePress) {
             if (it) {
-                setValue(TriggerKeyOptions.ID_CLICK_TYPE, Trigger.DOUBLE_PRESS)
+                setValue(TriggerKeyOptions.ID_CLICK_TYPE, TriggerEntity.DOUBLE_PRESS)
             }
         }
     }

@@ -1,14 +1,8 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
@@ -16,22 +10,20 @@ import com.airbnb.epoxy.EpoxyTouchHelper
 import com.google.android.material.card.MaterialCardView
 import io.github.sds100.keymapper.ActionBindingModel_
 import io.github.sds100.keymapper.NavAppDirections
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.action
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.ActionModel
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.ui.actions.ActionListItemModel
 import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
-import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 22/11/20.
  */
-abstract class ActionListFragment<O : BaseOptions<Action>>
-    : RecyclerViewFragment<List<ActionModel>, FragmentActionListBinding>() {
+abstract class ActionListFragment<O : BaseOptions<ActionEntity>>
+    : RecyclerViewFragment<List<ActionListItemModel>, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
@@ -39,55 +31,15 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
 
     abstract val actionListViewModel: ActionListViewModel<O>
 
-    override val modelState: IModelState<List<ActionModel>>
+    override val modelState: ModelState<List<ActionListItemModel>>
         get() = actionListViewModel
 
     private val actionListController = ActionListController()
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent ?: return
-
-            when (intent.action) {
-                Intent.ACTION_INPUT_METHOD_CHANGED -> {
-                    actionListViewModel.rebuildModels()
-                }
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        IntentFilter().apply {
-            addAction(Intent.ACTION_INPUT_METHOD_CHANGED)
-            requireContext().registerReceiver(broadcastReceiver, this)
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        actionListViewModel.saveState(outState)
-
-        super.onSaveInstanceState(outState)
-    }
 
     override fun onResume() {
         super.onResume()
 
         actionListViewModel.rebuildModels()
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        savedInstanceState ?: return
-
-        actionListViewModel.restoreState(savedInstanceState)
-    }
-
-    override fun onDestroy() {
-        requireContext().unregisterReceiver(broadcastReceiver)
-        super.onDestroy()
     }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
@@ -97,7 +49,7 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
 
     abstract fun openActionOptionsFragment(options: O)
 
-    override fun populateList(binding: FragmentActionListBinding, model: List<ActionModel>?) {
+    override fun populateList(binding: FragmentActionListBinding, model: List<ActionListItemModel>?) {
         binding.enableActionDragging(actionListController)
 
         actionListController.modelList = model ?: emptyList()
@@ -108,43 +60,8 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
 
         binding.epoxyRecyclerViewActions.adapter = actionListController.adapter
 
-        actionListViewModel.eventStream.observe(viewLifecycleOwner, { event ->
-            @Suppress("UNCHECKED_CAST")
-            when (event) {
-                is TestAction -> {
-                    if (AccessibilityUtils.isServiceEnabled(requireContext())) {
-
-                        requireContext().sendPackageBroadcast(
-                            MyAccessibilityService.ACTION_TEST_ACTION,
-                            bundleOf(MyAccessibilityService.EXTRA_ACTION to event.action)
-                        )
-
-                    } else {
-                        actionListViewModel.promptToEnableAccessibilityService()
-                    }
-                }
-
-                is EditActionOptions -> openActionOptionsFragment(event.options as O)
-
-                is BuildActionListModels -> {
-                    viewLifecycleScope.launchWhenStarted {
-                        val models = sequence {
-                            event.source.forEach {
-                                yield(
-                                    it.buildModel(
-                                        requireContext(),
-                                        event.deviceInfoList,
-                                        event.showDeviceDescriptors,
-                                        event.hasRootPermission
-                                    )
-                                )
-                            }
-                        }.toList()
-
-                        actionListViewModel.setModels(models)
-                    }
-                }
-            }
+        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
+            openActionOptionsFragment(it)
         })
 
         binding.setOnAddActionClick {
@@ -196,7 +113,7 @@ abstract class ActionListFragment<O : BaseOptions<Action>>
     }
 
     private inner class ActionListController : EpoxyController() {
-        var modelList: List<ActionModel> = listOf()
+        var modelList: List<ActionListItemModel> = listOf()
             set(value) {
                 field = value
                 requestModelBuild()

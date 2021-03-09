@@ -13,8 +13,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import io.github.sds100.keymapper.data.db.migration.JsonMigration
 import io.github.sds100.keymapper.data.db.migration.fingerprintmaps.Migration_0_1
-import io.github.sds100.keymapper.data.model.Action
-import io.github.sds100.keymapper.data.model.Constraint
+import io.github.sds100.keymapper.data.model.ActionEntity
+import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMap
 import io.github.sds100.keymapper.util.BackupRequest
@@ -49,9 +49,9 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
 
     private val gson = GsonBuilder()
         .registerTypeAdapter(FingerprintMap.DESERIALIZER)
-        .registerTypeAdapter(Action.DESERIALIZER)
+        .registerTypeAdapter(ActionEntity.DESERIALIZER)
         .registerTypeAdapter(Extra.DESERIALIZER)
-        .registerTypeAdapter(Constraint.DESERIALIZER).create()
+        .registerTypeAdapter(ConstraintEntity.DESERIALIZER).create()
 
     private val jsonParser = JsonParser()
 

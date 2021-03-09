@@ -15,9 +15,9 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.keymap
 import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.IModelState
+import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.Failure
+import io.github.sds100.keymapper.util.result.Error
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
@@ -34,7 +34,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         InjectorUtils.provideCreateActionShortcutViewModel(requireContext())
     }
 
-    override val modelState: IModelState<List<KeymapListItemModel>>
+    override val modelState: ModelState<List<KeymapListItemModel>>
         get() = viewModel
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
@@ -66,7 +66,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
             when (event) {
                 is FixFailure ->
                     binding.coordinatorLayout.showFixActionSnackBar(
-                        event.failure,
+                        event.error,
                         requireContext(),
                         recoverFailureDelegate,
                         findNavController()
@@ -111,8 +111,8 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
                     isSelectable(false)
 
                     onErrorClick(object : ErrorClickCallback {
-                        override fun onErrorClick(failure: Failure) {
-                            viewModel.fixError(failure)
+                        override fun onErrorClick(error: Error) {
+                            viewModel.fixError(error)
                         }
                     })
 

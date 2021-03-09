@@ -25,7 +25,7 @@ class FilteredListLiveData<T : ISearchable> : MediatorLiveData<DataState<List<T>
                         model.getSearchableString().toLowerCase(Locale.getDefault()).contains(query)
                     }
 
-                    filteredList.getState()
+                    filteredList.getDataState()
                 }
             }
 

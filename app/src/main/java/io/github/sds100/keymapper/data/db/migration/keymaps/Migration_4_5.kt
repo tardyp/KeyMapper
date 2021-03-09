@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.model.Action
+import io.github.sds100.keymapper.data.model.ActionEntity
 import splitties.bitflags.hasFlag
 import splitties.bitflags.withFlag
 
@@ -83,7 +83,7 @@ object Migration_4_5 {
                     val holdDownDelay = trigger["extras"].asJsonArray.getExtraData(EXTRA_HOLD_DOWN_DELAY)
 
                     actionList.forEach {
-                        val newFlags = it["flags"].asInt.withFlag(Action.ACTION_FLAG_REPEAT)
+                        val newFlags = it["flags"].asInt.withFlag(ActionEntity.ACTION_FLAG_REPEAT)
                         val newExtras = it["extras"].asJsonArray
 
                         if (holdDownDelay != null) {

@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.data.model.options.FingerprintMapOptions
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
-import io.github.sds100.keymapper.domain.usecases.ShowActionsUseCase
+import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.util.EnableAccessibilityServicePrompt
 import io.github.sds100.keymapper.util.Event
 import io.github.sds100.keymapper.util.FingerprintMapUtils.SWIPE_DOWN
@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 
 class ConfigFingerprintMapViewModel(
     private val fingerprintMapRepository: FingerprintMapRepository,
-    private val showActionsUseCase: ShowActionsUseCase
-) : ViewModel(), IConfigMappingViewModel {
+    private val showActionsUseCase: GetActionErrorUseCase
+) : ViewModel(), ConfigMappingViewModel {
 
     companion object {
         private const val MAP_STATE_KEY = "config_fingerprint_map"
@@ -40,7 +40,7 @@ class ConfigFingerprintMapViewModel(
 
         override val stateKey = "fingerprint_action_list_view_model"
 
-        override fun getActionOptions(action: Action): FingerprintActionOptions {
+        override fun getActionOptions(action: ActionEntity): FingerprintActionOptions {
             return FingerprintActionOptions(
                 action,
                 actionList.value!!.size
@@ -52,7 +52,7 @@ class ConfigFingerprintMapViewModel(
 
     val constraintListViewModel = ConstraintListViewModel(
         viewModelScope,
-        Constraint.COMMON_SUPPORTED_CONSTRAINTS
+        ConstraintEntity.COMMON_SUPPORTED_CONSTRAINTS
     )
 
     override val isEnabled = MutableLiveData(true)
@@ -134,7 +134,7 @@ class ConfigFingerprintMapViewModel(
 
     class Factory(
         private val fingerprintMapRepository: FingerprintMapRepository,
-        private val showActionsUseCase: ShowActionsUseCase
+        private val showActionsUseCase: GetActionErrorUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
