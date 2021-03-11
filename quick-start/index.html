@@ -294,11 +294,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#action-settings" class="md-nav__link">
-    Action settings
+  <a href="#customising-actions" class="md-nav__link">
+    Customising actions
   </a>
   
-    <nav class="md-nav" aria-label="Action settings">
+    <nav class="md-nav" aria-label="Customising actions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -592,11 +592,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#action-settings" class="md-nav__link">
-    Action settings
+  <a href="#customising-actions" class="md-nav__link">
+    Customising actions
   </a>
   
-    <nav class="md-nav" aria-label="Action settings">
+    <nav class="md-nav" aria-label="Customising actions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -671,7 +671,7 @@
                   <h1>Quick Start Guide</h1>
                 
                 <p>This page aims to give users an introduction to the Key Mapper interface and a demonstration on how to perform typical tasks with the app.
-For specific troubleshooting, <a href="../faq">consult the FAQ.</a></p>
+For specific troubleshooting, <a href="../faq/">consult the FAQ.</a></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Where screenshots are necessary, this guide uses two devices to demonstrate.</p>
@@ -807,51 +807,46 @@ This screen is referred to as the Key Mapper home screen.</p>
 <p><img alt="" src="../images/hg-trigger-settings.png" /> <img alt="" src="../images/hg-trigger-settings-light.png" /> </p>
 <p>You can choose from four different settings. Turning on "Do not override default action" will mean that Key Mapper will not replace the normal operation of your trigger, instead it will execute the key map as well as the default operation.</p>
 <p>One trigger can have three different click types. Choose from short press, long press and double press. <a href="#">Read more.</a></p>
-<h3 id="action-settings">Action settings<a class="headerlink" href="#action-settings" title="Permanent link">&para;</a></h3>
+<h3 id="customising-actions">Customising actions<a class="headerlink" href="#customising-actions" title="Permanent link">&para;</a></h3>
 <p>Next, tap the 3 stacked dots <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"/></svg></span> to the right of the action's name to bring up the following menu.</p>
 <p><img alt="" src="../images/hg-action-settings.png" /> <img alt="" src="../images/hg-action-settings-light.png" /></p>
-<p>Here you can customise a lot of the operation of your key map, including timing, multipliers and debug messages.</p>
+<p>Here you can customise a lot of the operation of your key map, including timing and multipliers.</p>
 <hr />
 <p>The following details refer to action timing settings.</p>
 <p>&nbsp;Delay before next action (ms)<br />
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <div class="admonition info">
 <p class="admonition-title">Key Mapper 2.2.0+</p>
 </div>
-<p>This option takes effect if you have multiple actions in your gesture map. The slider sets the amount of time between this action and the next.</p>
+<p>This option takes effect if you have multiple actions in your mapping. The slider sets the amount of time between this action and the next.</p>
 <hr />
 <p>&nbsp;Action count<br /> 
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <div class="admonition info">
 <p class="admonition-title">Key Mapper 2.1.0+</p>
 </div>
-<p>This option serves as a multiplier. If action count is equal to 1 when your gesture map is triggered then your action will be performed once. If it is equal to 5 then the action will be performed 5 times, etc.</p>
+<p>This option serves as a multiplier. If action count is equal to 1 when your mapping is triggered then your action will be performed once. If it is equal to 5 then the action will be performed 5 times, etc.</p>
 <hr />
 <h4 id="repeating-actions">Repeating actions<a class="headerlink" href="#repeating-actions" title="Permanent link">&para;</a></h4>
 <p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Repeat</p>
 <p>When this is turned on, Key Mapper will execute your actions repeatedly. This is particularly useful when emulating a keyboard key press, where in most applications holding down the key would result in a repeating output. The default settings in Key Mapper are designed to emulate that behaviour when 'Repeat' is turned on.</p>
 <hr />
 <p>&nbsp;Repeat every... (ms)<br /> 
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <p>This option sets the time period for your repeating action. If this is set to 200, your action will repeat every 200ms, or in terms of frequency, 5 times per second. Some people prefer to think about this setting as a repeat rate, commonly measured in 'clicks' per second or cps. To calculate the appropriate time period for this option from a desired frequency, use this equation:</p>
 <pre><code>Time period (ms) = 1000 / Frequency ('cps')
 </code></pre>
 <hr />
 <p>&nbsp;Delay until repeat... (ms)<br /> 
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <p>This option sets the amount of time between the first action and the second action (or the first repeat). This is part of the keyboard key behaviour simulation. If you want your repeating action to begin straight away, you can make this 0. </p>
-<hr />
-<p><sup><sub>&nbsp;Stop repeating when trigger is...</sup></sub><br />
-&nbsp;&nbsp;&nbsp;<span class="twemoji accent-light"><?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z" /></svg></span> <sup><sub>Released</sup></sub>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="twemoji accent-light"><?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z" /></svg></span> <sup><sub>Pressed again</sup></sub></p>
-<p>This option allows you to choose from 2 simple behaviours. If you choose 'Released', you will need to hold down the trigger key(s) in order to have the key map execute. If you let go of the key(s), the key map will stop.</p>
-<p>If you choose 'Pressed again', pressing your trigger key(s) once will be sufficient to start your repeating key map. To stop the key map, you will need to press the trigger key(s) a second time.</p>
 <hr />
 <h4 id="hold-down-actions">Hold down actions<a class="headerlink" href="#hold-down-actions" title="Permanent link">&para;</a></h4>
 <p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Hold down</p>
 <div class="admonition info">
 <p class="admonition-title">Key Mapper 2.1.0+</p>
 </div>
-<p>This setting provides the ability to simulate holding down a key. With this turned on (and repeat turned off), the default behaviour is that holding down your trigger will translate to holding down the action, for as long as you hold down the trigger.</p>
+<p>This setting provides the ability to simulate holding down a key or tapping a coordinate (Android 8.0+). With this turned on (and repeat turned off), the default behaviour is that holding down your trigger will translate to holding down the action, for as long as you hold down the trigger.</p>
 <hr />
 <p><sup><sub>&nbsp;Hold down until trigger is...</sup></sub><br />
 &nbsp;&nbsp;&nbsp;<span class="twemoji accent-light"><?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z" /></svg></span> <sup><sub>Released</sup></sub>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="twemoji accent-light"><?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z" /></svg></span> <sup><sub>Pressed again</sup></sub></p>
@@ -860,39 +855,16 @@ This screen is referred to as the Key Mapper home screen.</p>
 </div>
 <p>This setting allows you to choose from two behaviours. If 'Released' is selected, holding down your trigger key(s) will translate to holding down the action, for as long as you hold down the trigger key(s).</p>
 <p>If you choose 'Pressed again', pressing your trigger key(s) once will be sufficient to start holding down the action. To stop the key map, you will need to press the trigger key(s) a second time.</p>
-<hr />
 <h4 id="using-hold-down-and-repeat-together">Using 'Hold down' and 'Repeat' together<a class="headerlink" href="#using-hold-down-and-repeat-together" title="Permanent link">&para;</a></h4>
 <div class="admonition info">
 <p class="admonition-title">Key Mapper 2.2.0+</p>
 </div>
 <p>You can use turn on both of these settings to unlock an additional setting. A repeating hold down action behaves like a normal 'Repeat' action in that the action repeats itself with a given frequency. It also behaves like a 'Hold down' action in that each individual action will be held for a certain amount of time in each cycle.</p>
 <p>&nbsp;Hold down duration (ms)<br /> 
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
+<img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <p>This allows you to set how long the action is held down for before repeating.</p>
 <h2 id="special-options">Special options<a class="headerlink" href="#special-options" title="Permanent link">&para;</a></h2>
-<p>For extra key map customisation, tap the 'Constraints and more' tab at the top of the screen when editing or creating a key map.</p>
-<p><img alt="" src="../images/hg-keymap-4.png" /> <img alt="" src="images/hg-keymap-4-light.png" /></p>
-<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Trigger from other apps</p>
-<p>For information about "trigger from other apps" go to <a href="../user-guide/trigger/#trigger-from-other-apps-230">this page.</a></p>
-<hr />
-<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Show an on-screen message</p>
-<p>When this is turned on, the following notice will come up at the bottom of the screen when ever you trigger your mapping.</p>
-<p><img alt="" src="../images/ui-toast.png" /></p>
-<p>You can have your device vibrate instead of an on-screen message if you want. This option is below.</p>
-<hr />
-<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Vibrate</p>
-<p>&nbsp;Vibrate duration (ms)<br /> 
-<img alt="" src="../images/ui-slider-default-light-450px.png" /></p>
-<p>Tapping 'Vibrate' will cause your device to vibrate whenever you trigger your mapping. You can change how long your device vibrates with the slider.</p>
-<p>This behaves similarly to the on-screen message option above.</p>
-<hr />
-<p><span class="twemoji accent-light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 480H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48v352c0 26.51-21.49 48-48 48zm-204.686-98.059l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L184 302.745l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.25 16.379 6.25 22.628.001z"/></svg></span> &nbsp; Detect trigger when screen is off. ROOT only.</p>
-<p>These are the buttons which can be detected when the screen is off. Let the developer know about any buttons you would also like to be supported.</p>
-<ul>
-<li>Volume Up</li>
-<li>Volume Down</li>
-<li>Headset button</li>
-</ul>
+<p>You can see explanations of more options <a href="../user-guide/keymaps/#special-options">here</a>.</p>
 <h2 id="adding-constraints">Adding constraints<a class="headerlink" href="#adding-constraints" title="Permanent link">&para;</a></h2>
 <p>You can add special constraints to your key maps in order to customise when they are allowed to run.</p>
 <p>To add a constraint fron the 'Constraints and more' tab, tap 'Add constraint'.</p>
