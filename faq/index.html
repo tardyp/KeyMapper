@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#my-kkyboard-doesnt-appear-when-using-the-app" class="md-skip">
+        <a href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" class="md-skip">
           Skip to content
         </a>
       
@@ -260,8 +260,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#my-kkyboard-doesnt-appear-when-using-the-app" class="md-nav__link">
-    "My Kkyboard doesn't appear when using the app."
+  <a href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" class="md-nav__link">
+    "Can I remap joysticks/dpad/mouse buttons/mouse motion?"
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" class="md-nav__link">
+    "Key Mapper keeps randomly stopping/crashing/bugging/freezing"
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#my-keyboard-doesnt-appear-when-using-the-app" class="md-nav__link">
+    "My Keyboard doesn't appear when using the app."
   </a>
   
 </li>
@@ -337,13 +351,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" class="md-nav__link">
-    "Key Mapper keeps randomly stopping/crashing/bugging/freezing"
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#can-i-use-the-app-on-chromebook" class="md-nav__link">
     "Can I use the app on Chromebook?"
   </a>
@@ -353,13 +360,6 @@
         <li class="md-nav__item">
   <a href="#can-i-remap-on-screen-controls-to-buttons-with-key-mapper" class="md-nav__link">
     "Can I remap on-screen controls to buttons with Key Mapper?"
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" class="md-nav__link">
-    "Can I remap joysticks/dpad/mouse buttons/mouse motion?"
   </a>
   
 </li>
@@ -539,8 +539,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#my-kkyboard-doesnt-appear-when-using-the-app" class="md-nav__link">
-    "My Kkyboard doesn't appear when using the app."
+  <a href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" class="md-nav__link">
+    "Can I remap joysticks/dpad/mouse buttons/mouse motion?"
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" class="md-nav__link">
+    "Key Mapper keeps randomly stopping/crashing/bugging/freezing"
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#my-keyboard-doesnt-appear-when-using-the-app" class="md-nav__link">
+    "My Keyboard doesn't appear when using the app."
   </a>
   
 </li>
@@ -616,13 +630,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" class="md-nav__link">
-    "Key Mapper keeps randomly stopping/crashing/bugging/freezing"
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#can-i-use-the-app-on-chromebook" class="md-nav__link">
     "Can I use the app on Chromebook?"
   </a>
@@ -632,13 +639,6 @@
         <li class="md-nav__item">
   <a href="#can-i-remap-on-screen-controls-to-buttons-with-key-mapper" class="md-nav__link">
     "Can I remap on-screen controls to buttons with Key Mapper?"
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" class="md-nav__link">
-    "Can I remap joysticks/dpad/mouse buttons/mouse motion?"
   </a>
   
 </li>
@@ -664,7 +664,28 @@
                 
                 <p>This page serves to answer frequently asked questions about Key Mapper, and help solve any problems you may be facing.
 See the <a href="../quick-start/">Quick Start Guide</a> for more general help with using Key Mapper.</p>
-<h2 id="my-kkyboard-doesnt-appear-when-using-the-app">"My Kkyboard doesn't appear when using the app."<a class="headerlink" href="#my-kkyboard-doesnt-appear-when-using-the-app" title="Permanent link">&para;</a></h2>
+<h2 id="can-i-remap-joysticksdpadmouse-buttonsmouse-motion">"Can I remap joysticks/dpad/mouse buttons/mouse motion?"<a class="headerlink" href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" title="Permanent link">&para;</a></h2>
+<p>No. Here is why:</p>
+<p>Joysticks are complicated to remap because they are axes, so their inputs are a range depending on how much you press the stick. It would be a lot of work to integrate them into Key Mapper. The developer currently doesn't have a way to interpret the motion, and if they did, they might not add it into this app anyway because Key Mapper is for mapping keys, not motion.</p>
+<p>The D-pad is interpreted differently by Android to other keys. That makes it hard to remap. However, the developer has found a way that might be able to remap them. Therefore you can consider this a planned feature. It might take something like 6 months to see this in a build of Key Mapper.</p>
+<p>Mouse buttons are not possible to remap with an accessibility service. There will never be support for them in this app. If other apps can do it, they do not work the same way Key Mapper does. If you want to remap mouse buttons, do not use Key Mapper.</p>
+<p>Remapping the movement of the mouse is completely out of scope for this app. This is an app for remapping keys, not motion. If you want that kind of functionality, please don't look for it in Key Mapper or request this as a feature. There may be other apps that can help you (I don't know any of them though).</p>
+<h2 id="key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing">"Key Mapper keeps randomly stopping/crashing/bugging/freezing"<a class="headerlink" href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" title="Permanent link">&para;</a></h2>
+<p>Please follow the following steps:</p>
+<ul>
+<li>
+<p>Turn off battery and memory optimisations in your device settings.
+This is especially important for Huawei and Xiaomi devices, and devices with 2GB of RAM or less.
+You can read about how to do this on your particular device at <a href="http://dontkillmyapp.com/">dontkillmyapp.com</a></p>
+</li>
+<li>
+<p>Reboot your device.
+This is important for everyone to do if you are experiencing an issue with the app stopping. You must try rebooting your device. It works most of the time.</p>
+</li>
+</ul>
+<p>If you have tried BOTH steps and Key Mapper still stops working randomly, consider how you are using the app. If you have low-end hardware, and are playing a game while using repeating key maps, it's probably not a bug. It's probably just too much for your device.
+If you think you are using Key Mapper in a reasonable way and still experience random crashes, ask about it in <a href="http://keymapper.club">the discord server.</a></p>
+<h2 id="my-keyboard-doesnt-appear-when-using-the-app">"My Keyboard doesn't appear when using the app."<a class="headerlink" href="#my-keyboard-doesnt-appear-when-using-the-app" title="Permanent link">&para;</a></h2>
 <p>Key Mapper Basic Input Method (the keyboard built-in to the app) has no GUI/buttons. You can install the <a href="https://play.google.com/store/apps/details?id=io.github.sds100.keymapper.inputmethod.latin">Key Mapper GUI Keyboard</a> to get a proper keyboard that can also perform Key Mapper actions.</p>
 <h2 id="why-dont-my-volume-buttons-work-when-i-press-them">"Why don't my volume buttons work when I press them?"<a class="headerlink" href="#why-dont-my-volume-buttons-work-when-i-press-them" title="Permanent link">&para;</a></h2>
 <p>Give the app Do Not Disturb access in your device settings. At the top of the homescreen in the Key Mapper app there is a "Fix" button to do this.</p>
@@ -732,33 +753,12 @@ Follow this guide if you are remapping buttons on a game controller to different
 </ul>
 <h2 id="how-can-i-jump-bridge-with-key-mapper-how-can-i-use-key-mapper-for-minecraft-pvp">"How can I 'jump bridge' with Key Mapper? / How can I use Key Mapper for Minecraft PVP?"<a class="headerlink" href="#how-can-i-jump-bridge-with-key-mapper-how-can-i-use-key-mapper-for-minecraft-pvp" title="Permanent link">&para;</a></h2>
 <p>This is not an app designed for gaming. Please look elsewhere for help with this, such as YouTube tutorials or ask in <a href="http://keymapper.club">the discord server.</a> Also note that use of 'jump bridging' or very fast attacks on Minecraft servers where it is not allowed has absolutely nothing to do with the developer and it is not endorsed or encouraged. Again, this is not an app optimised for playing mobile games.</p>
-<h2 id="key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing">"Key Mapper keeps randomly stopping/crashing/bugging/freezing"<a class="headerlink" href="#key-mapper-keeps-randomly-stoppingcrashingbuggingfreezing" title="Permanent link">&para;</a></h2>
-<p>Please follow the following steps:</p>
-<ul>
-<li>
-<p>Turn off battery and memory optimisations in your device settings.
-This is especially important for Huawei and Xiaomi devices, and devices with 2GB of RAM or less.
-You can read about how to do this on your particular device at <a href="http://dontkillmyapp.com/">dontkillmyapp.com</a></p>
-</li>
-<li>
-<p>Reboot your device
-This is important for everyone to do if you are experiencing an issue with the app stopping. You must try rebooting your device. It works most of the time.</p>
-</li>
-</ul>
-<p>If you have tried BOTH steps and Key Mapper still stops working randomly, consider how you are using the app. If you have low-end hardware, and are playing a game while using repeating key maps, it's probably not a bug. It's probably just too much for your device.
-If you think you are using Key Mapper in a reasonable way and still experience random crashes, ask about it in <a href="http://keymapper.club">the discord server.</a></p>
 <h2 id="can-i-use-the-app-on-chromebook">"Can I use the app on Chromebook?"<a class="headerlink" href="#can-i-use-the-app-on-chromebook" title="Permanent link">&para;</a></h2>
 <p>Not all features work on Chromebook. The app is not supported on Chromebook.
 Key Mapper can't "tap the screen" for obvious reasons. If you want to play a game on Chromebook using Key Mapper with keyboard controls (especially <em>Among Us</em>) then you are unlikely to be able to do so.</p>
 <p>That being said, many features should work, such as remapping keyboard buttons.</p>
 <h2 id="can-i-remap-on-screen-controls-to-buttons-with-key-mapper">"Can I remap on-screen controls to buttons with Key Mapper?"<a class="headerlink" href="#can-i-remap-on-screen-controls-to-buttons-with-key-mapper" title="Permanent link">&para;</a></h2>
 <p>Technically yes but it would be a horrendous gaming experience. There is an action in Key Mapper to touch the screen but Key Mapper is only allowed to tap/swipe in one place at a time. Therefore, you wouldn't be able to tap forward on an on-screen joystick and shoot at the same time for example. This is how the Android API works and there is nothing I can do to change it.</p>
-<h2 id="can-i-remap-joysticksdpadmouse-buttonsmouse-motion">"Can I remap joysticks/dpad/mouse buttons/mouse motion?"<a class="headerlink" href="#can-i-remap-joysticksdpadmouse-buttonsmouse-motion" title="Permanent link">&para;</a></h2>
-<p>No. Here is why:</p>
-<p>Joysticks are complicated to remap because they are axes, so their inputs are a range depending on how much you press the stick. It would be a lot of work to integrate them into Key Mapper. The developer currently doesn't have a way to interpret the motion, and if they did, they might not add it into this app anyway because Key Mapper is for mapping keys, not motion.</p>
-<p>The D-pad is interpreted differently by Android to other keys. That makes it hard to remap. However, the developer has found a way that might be able to remap them. Therefore you can consider this a planned feature. It might take something like 6 months to see this in a build of Key Mapper.</p>
-<p>Mouse buttons are not possible to remap with an accessibility service. There will never be support for them in this app. If other apps can do it, they do not work the same way Key Mapper does. If you want to remap mouse buttons, do not use Key Mapper.</p>
-<p>Remapping the movement of the mouse is completely out of scope for this app. This is an app for remapping keys, not motion. If you want that kind of functionality, please don't look for it in Key Mapper or request this as a feature. There may be other apps that can help you (I don't know any of them though).</p>
 <p><a class="md-button md-button--primary" href="http://keymapper.club">Ask for help <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M297.216 243.2c0 15.616-11.52 28.416-26.112 28.416-14.336 0-26.112-12.8-26.112-28.416s11.52-28.416 26.112-28.416c14.592 0 26.112 12.8 26.112 28.416zm-119.552-28.416c-14.592 0-26.112 12.8-26.112 28.416s11.776 28.416 26.112 28.416c14.592 0 26.112-12.8 26.112-28.416.256-15.616-11.52-28.416-26.112-28.416zM448 52.736V512c-64.494-56.994-43.868-38.128-118.784-107.776l13.568 47.36H52.48C23.552 451.584 0 428.032 0 398.848V52.736C0 23.552 23.552 0 52.48 0h343.04C424.448 0 448 23.552 448 52.736zm-72.96 242.688c0-82.432-36.864-149.248-36.864-149.248-36.864-27.648-71.936-26.88-71.936-26.88l-3.584 4.096c43.52 13.312 63.744 32.512 63.744 32.512-60.811-33.329-132.244-33.335-191.232-7.424-9.472 4.352-15.104 7.424-15.104 7.424s21.248-20.224 67.328-33.536l-2.56-3.072s-35.072-.768-71.936 26.88c0 0-36.864 66.816-36.864 149.248 0 0 21.504 37.12 78.08 38.912 0 0 9.472-11.52 17.152-21.248-32.512-9.728-44.8-30.208-44.8-30.208 3.766 2.636 9.976 6.053 10.496 6.4 43.21 24.198 104.588 32.126 159.744 8.96 8.96-3.328 18.944-8.192 29.44-15.104 0 0-12.8 20.992-46.336 30.464 7.68 9.728 16.896 20.736 16.896 20.736 56.576-1.792 78.336-38.912 78.336-38.912z"/></svg></span></a></p>
                 
               
