@@ -13,8 +13,8 @@
         <meta name="author" content="sds100">
       
       
-      <link rel="shortcut icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.5">
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.0.6">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.77f3fd56.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2c0c5eaf.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.7fa14f5b.min.css">
@@ -73,11 +73,9 @@
       
     </div>
     
-      
-
-<header class="md-header" data-md-component="header">
+      <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Key Mapper Documentation" class="md-header__button md-logo" aria-label="Key Mapper Documentation">
+    <a href="../.." title="Key Mapper Documentation" class="md-header__button md-logo" aria-label="Key Mapper Documentation" data-md-component="logo">
       
   <img src="../../images/logo.png" alt="logo">
 
@@ -168,11 +166,9 @@
                     
 
 
-
-
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Key Mapper Documentation" class="md-nav__button md-logo" aria-label="Key Mapper Documentation">
+    <a href="../.." title="Key Mapper Documentation" class="md-nav__button md-logo" aria-label="Key Mapper Documentation" data-md-component="logo">
       
   <img src="../../images/logo.png" alt="logo">
 
@@ -595,6 +591,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../report-issues/" class="md-nav__link">
+        Report Issues
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../known-issues/" class="md-nav__link">
         Known Issues
       </a>
@@ -896,8 +907,8 @@
 <p>&nbsp;Repeat every... (ms)<br /> 
 <img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
 <p>This option sets the time period for your repeating action. If this is set to 200, your action will repeat every 200ms, or in terms of frequency, 5 times per second. Some people prefer to think about this setting as a repeat rate, commonly measured in 'clicks' per second or cps. To calculate the appropriate time period for this option from a desired frequency, use this equation:</p>
-<pre><code>Time period (ms) = 1000 / Frequency ('cps')
-</code></pre>
+<div class="highlight"><pre><span></span><code>Time period (ms) = 1000 / Frequency (&#39;cps&#39;)
+</code></pre></div>
 <hr />
 <p>&nbsp;Delay until repeat... (ms)<br /> 
 <img alt="" src="../../images/ui-slider-default-light-450px.png" /></p>
@@ -935,15 +946,15 @@
 <h4 id="intent">Intent<a class="headerlink" href="#intent" title="Permanent link">&para;</a></h4>
 <p>There are many apps that can automate broadcasting Intents such as Tasker and Automate.</p>
 <h5 id="intent-action">Intent action<a class="headerlink" href="#intent-action" title="Permanent link">&para;</a></h5>
-<pre><code>io.github.sds100.keymapper.TRIGGER_KEYMAP_BY_UID
-</code></pre>
+<div class="highlight"><pre><span></span><code>io.github.sds100.keymapper.TRIGGER_KEYMAP_BY_UID
+</code></pre></div>
 <h5 id="intent-string-extra">Intent string extra<a class="headerlink" href="#intent-string-extra" title="Permanent link">&para;</a></h5>
-<pre><code>io.github.sds100.keymapper.KEYMAP_UID
-</code></pre>
+<div class="highlight"><pre><span></span><code>io.github.sds100.keymapper.KEYMAP_UID
+</code></pre></div>
 <p>and the value is the UUID of the key map. You can copy the UUID in Key Mapper by turning on the "Trigger from other apps" option.</p>
 <h5 id="intent-package-optional-but-recommended">Intent package (optional but recommended)<a class="headerlink" href="#intent-package-optional-but-recommended" title="Permanent link">&para;</a></h5>
-<pre><code>io.github.sds100.keymapper
-</code></pre>
+<div class="highlight"><pre><span></span><code>io.github.sds100.keymapper
+</code></pre></div>
 <p>This will only send the Intent to Key Mapper and no other packages.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -1222,7 +1233,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fb4a9340.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cf3e710.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a1c7c35e.min.js"></script>
       
     
   </body>
