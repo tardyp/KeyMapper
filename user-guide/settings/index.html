@@ -349,6 +349,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#automatically-change-the-on-screen-keyboard-when-toggling-key-maps" class="md-nav__link">
+    Automatically change the on-screen keyboard when toggling key maps
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toggle-key-mapper-keyboard-notification" class="md-nav__link">
+    Toggle Key Mapper keyboard notification
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatically-show-keyboard-picker-up-to-android-90" class="md-nav__link">
     Automatically show keyboard picker (up to Android 9.0)
   </a>
@@ -482,6 +496,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#automatically-change-the-on-screen-keyboard-when-toggling-key-maps" class="md-nav__link">
+    Automatically change the on-screen keyboard when toggling key maps
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toggle-key-mapper-keyboard-notification" class="md-nav__link">
+    Toggle Key Mapper keyboard notification
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#automatically-show-keyboard-picker-up-to-android-90" class="md-nav__link">
     Automatically show keyboard picker (up to Android 9.0)
   </a>
@@ -524,18 +552,26 @@
                 <p>Open the Key Mapper settings by opening the menu <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg></span> at the bottom of the home screen and then
 tapping Settings.</p>
 <h2 id="automatically-change-the-on-screen-keyboard-when-a-device-connectsdisconnects">Automatically change the on-screen keyboard when a device connects/disconnects<a class="headerlink" href="#automatically-change-the-on-screen-keyboard-when-a-device-connectsdisconnects" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This requires WRITE_SECURE_SETTINGS permission.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>This requires WRITE_SECURE_SETTINGS permission on Android 10 and older. Follow <a href="../adb-permissions/#write_secure_settings">this guide</a> to grant Key Mapper this permission.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>This is restricted to Bluetooth devices in Key Mapper 2.2.0 and older. After updating to Key Mapper 2.3.0 you will need to set this up again because the data for the Bluetooth devices can't be migrated in a way that the new feature will work.</p>
 </div>
 <p>The last used Key Mapper keyboard will be automatically selected when a chosen device is connected. Your normal keyboard will be automatically selected when the device disconnects.</p>
+<h2 id="automatically-change-the-on-screen-keyboard-when-toggling-key-maps">Automatically change the on-screen keyboard when toggling key maps<a class="headerlink" href="#automatically-change-the-on-screen-keyboard-when-toggling-key-maps" title="Permanent link">&para;</a></h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>This requires WRITE_SECURE_SETTINGS permission on Android 10 and older. Follow <a href="../adb-permissions/#write_secure_settings">this guide</a> to grant Key Mapper this permission.</p>
+</div>
+<p>The last used Key Mapper keyboard will be automatically selected when you unpause your key maps. Your normal keyboard will be automatically selected when they are paused.</p>
+<h2 id="toggle-key-mapper-keyboard-notification">Toggle Key Mapper keyboard notification<a class="headerlink" href="#toggle-key-mapper-keyboard-notification" title="Permanent link">&para;</a></h2>
+<p>This notification will select the last used Key Mapper keyboard if you are using your normal keyboard and will select your normal keyboard if the Key Mapper keyboard is being used.</p>
 <h2 id="automatically-show-keyboard-picker-up-to-android-90">Automatically show keyboard picker (up to Android 9.0)<a class="headerlink" href="#automatically-show-keyboard-picker-up-to-android-90" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
 <p>This requires ROOT permission on Android 8.1 and Android 9.0 because Android blocked the ability for apps to show the input method picker when they are running in the background. Android removed the ability to show this even with ROOT on versions later than Android 9.0.</p>
 </div>
 <div class="admonition info">
