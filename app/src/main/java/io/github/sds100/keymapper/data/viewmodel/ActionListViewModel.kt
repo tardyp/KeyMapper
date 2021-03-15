@@ -3,19 +3,16 @@ package io.github.sds100.keymapper.data.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.ui.actions.ActionListItemModel
-import io.github.sds100.keymapper.domain.actions.ActionWithOptions
-import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.actions.TestActionUseCase
-import io.github.sds100.keymapper.domain.models.Action
+import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
+import io.github.sds100.keymapper.ui.actions.ActionListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.RecoverableError
 import io.github.sds100.keymapper.util.result.errorOrNull
 import io.github.sds100.keymapper.util.result.isError
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -24,20 +21,24 @@ import kotlinx.coroutines.launch
  * Created by sds100 on 22/11/20.
  */
 
-class ActionListViewModel<O>(
+class ActionListViewModel<A : Action>(
     private val coroutineScope: CoroutineScope,
-    private val configActions: ConfigActionsUseCase<O>,
+    private val configActions: ConfigActionsUseCase<A>,
     private val actionError: GetActionErrorUseCase,
     private val testAction: TestActionUseCase,
-    private val listItemModelMapper: ActionListItemMapper<O>,
+    private val listItemModelMapper: ActionListItemMapper<A>,
 ) : ModelState<List<ActionListItemModel>> {
 
     override val model = MutableLiveData<DataState<List<ActionListItemModel>>>(Loading())
 
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
-    private val _openEditOptions = LiveEvent<O>()
-    val openEditOptions: LiveData<O> = _openEditOptions
+    private val _openEditOptions = LiveEvent<String>()
+
+    /**
+     * value is the uid of the action
+     */
+    val openEditOptions: LiveData<String> = _openEditOptions
 
     private val _fixError = LiveEvent<RecoverableError>()
     val fixError: LiveData<RecoverableError> = _fixError
@@ -53,41 +54,41 @@ class ActionListViewModel<O>(
         actionError.invalidateErrors.onEach { rebuildModels() }.launchIn(coroutineScope)
     }
 
-    fun addAction(action: Action) = configActions.addAction(action)
+    fun addAction(action: ActionData) = configActions.addAction(action)
     fun moveAction(fromIndex: Int, toIndex: Int) = configActions.moveAction(fromIndex, toIndex)
     fun removeAction(uid: String) = configActions.removeAction(uid)
 
-    fun editOptions(uid: String) {
-        _openEditOptions.value = configActions.getOptions(uid)
-    }
+    fun onModelClick(uid: String) {
+        coroutineScope.launch {
+            configActions.actionList.first().ifIsData { data ->
+                val actionData = data.singleOrNull { it.uid == uid }?.data ?: return@launch
 
-    fun onModelClick(uid: String) = configActions.actionList.value.ifIsData { data ->
-        val action = data.singleOrNull { it.action.uid == uid }?.action ?: return
+                val error = actionError.getError(actionData)
 
-        val error = actionError.getError(action)
+                when {
+                    error.isError && error is RecoverableError -> _fixError.value = error
 
-        when {
-            error.isError && error is RecoverableError -> _fixError.value = error
-
-            else -> testAction(action)
+                    else -> testAction(actionData)
+                }
+            }
         }
-    }
-
-    fun setOptions(uid: String, options: O) {
-        configActions.setOptions(uid, options)
     }
 
     fun promptToEnableAccessibilityService() {
         _enableAccessibilityServicePrompt.value = Unit
     }
 
-    fun rebuildModels() = buildModels(configActions.actionList.value)
+    fun rebuildModels() {
+        coroutineScope.launch {
+            buildModels(configActions.actionList.first())
+        }
+    }
 
-    private fun buildModels(actionList: DataState<List<ActionWithOptions<O>>>) {
+    private fun buildModels(actionList: DataState<List<A>>) {
         coroutineScope.launch {
             val newModel = actionList.mapData { data ->
                 data.map {
-                    listItemModelMapper.map(it, actionError.getError(it.action).errorOrNull())
+                    listItemModelMapper.map(it, actionError.getError(it.data).errorOrNull())
                 }
             }
 

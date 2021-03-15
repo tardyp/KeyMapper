@@ -40,12 +40,17 @@ abstract class ConfigMappingFragment : Fragment() {
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
         recoverFailureDelegate = RecoverFailureDelegate(
             "ConfigMappingFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner) {
+            viewLifecycleOwner
+        ) {
 
             viewModel.actionListViewModel.rebuildModels()
         }
@@ -123,18 +128,17 @@ abstract class ConfigMappingFragment : Fragment() {
             }
         }
 
-        viewModel.eventStream.observe(viewLifecycleOwner, { event ->
-            when (event) {
-                is FixFailure -> binding.coordinatorLayout.showFixActionSnackBar(
-                    event.error,
-                    requireContext(),
-                    recoverFailureDelegate,
-                    findNavController()
-                )
+        viewModel.enableAccessibilityServicePrompt.observe(viewLifecycleOwner, {
+            binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
+        })
 
-                is EnableAccessibilityServicePrompt ->
-                    binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
-            }
+        viewModel.fixError.observe(viewLifecycleOwner, {
+            binding.coordinatorLayout.showFixActionSnackBar(
+                it,
+                requireContext(),
+                recoverFailureDelegate,
+                findNavController()
+            )
         })
     }
 
@@ -163,7 +167,8 @@ abstract class ConfigMappingFragment : Fragment() {
 
     private fun FragmentConfigMappingBinding.invalidateHelpMenuItemVisibility(
         fragmentInfoList: List<Pair<Int, FragmentInfo>>,
-        position: Int) {
+        position: Int
+    ) {
         val visible = fragmentInfoList[position].second.supportUrl != null
 
         appBar.menu.findItem(R.id.action_help).apply {

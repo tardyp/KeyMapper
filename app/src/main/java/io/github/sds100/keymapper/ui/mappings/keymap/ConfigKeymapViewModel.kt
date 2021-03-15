@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
 import android.os.Bundle
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.ConstraintEntity
@@ -12,18 +10,17 @@ import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCase
-import io.github.sds100.keymapper.domain.models.KeyMap
-import io.github.sds100.keymapper.domain.models.KeymapActionOptions
+import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
-import io.github.sds100.keymapper.util.ifIsData
+import io.github.sds100.keymapper.ui.utils.getJsonSerializable
+import io.github.sds100.keymapper.ui.utils.putJsonSerializable
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.RecoverableError
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -31,19 +28,20 @@ import kotlinx.coroutines.launch
  */
 
 class ConfigKeymapViewModel(
-    private val saveKeymapUseCase: SaveKeymapUseCase,
-    private val getKeymap: GetKeymapUseCase,
-    private val useCase: ConfigKeymapUseCase,
-    configActionsUseCase: ConfigActionsUseCase<KeymapActionOptions>,
-    configTriggerUseCase: ConfigKeymapTriggerUseCase,
+    private val save: SaveKeymapUseCase,
+    private val get: GetKeymapUseCase,
+    private val configUseCase: ConfigKeymapUseCase,
+    configActions: ConfigActionsUseCase<KeymapAction>,
+    configTrigger: ConfigKeymapTriggerUseCase,
     getActionError: GetActionErrorUseCase,
     testAction: TestActionUseCase,
     onboardingUseCase: OnboardingUseCase,
     recordTriggerUseCase: RecordTriggerUseCase,
     showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    actionListItemMapper: ActionListItemMapper<KeymapActionOptions>,
+    actionListItemMapper: ActionListItemMapper<KeymapAction>,
     triggerKeyListItemMapper: TriggerKeyListItemMapper,
-) : ViewModel(), ConfigMappingViewModel, BaseObservable() {
+) : ViewModel(), ConfigMappingViewModel {
+
     companion object {
         const val NEW_KEYMAP_ID = -1L
 
@@ -52,7 +50,7 @@ class ConfigKeymapViewModel(
 
     override val actionListViewModel = ActionListViewModel(
         viewModelScope,
-        configActionsUseCase,
+        configActions,
         getActionError,
         testAction,
         actionListItemMapper
@@ -61,12 +59,16 @@ class ConfigKeymapViewModel(
     val triggerViewModel = TriggerViewModel(
         viewModelScope,
         onboardingUseCase,
-        configTriggerUseCase,
+        configTrigger,
         triggerKeyListItemMapper,
         recordTriggerUseCase,
-        showDeviceInfoUseCase,
-        useCase
-    )
+        showDeviceInfoUseCase)
+
+    private val dataState = MutableLiveData<ConfigKeymapState?>()
+
+    //TODO hide UI elements if loading
+    private val _viewState = MutableLiveData<ViewState>(ViewLoading())
+    override val viewState: LiveData<ViewState> = _viewState
 
     private val supportedConstraints =
         ConstraintEntity.COMMON_SUPPORTED_CONSTRAINTS.toMutableList().apply {
@@ -76,13 +78,8 @@ class ConfigKeymapViewModel(
 
     val constraintListViewModel = ConstraintListViewModel(viewModelScope, supportedConstraints)
 
-    override val isEnabled = MutableLiveData(useCase.isEnabled.value)
-
-    var enabled: Boolean = true
-        @Bindable get() = useCase.isEnabled.value
-        set(value) {
-        notifyProper
-        }
+    override val isEnabled = dataState.map { it?.isEnabled ?: false }
+    override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
     private val _fixError = LiveEvent<RecoverableError>().apply {
         addSource(actionListViewModel.fixError) {
@@ -103,50 +100,70 @@ class ConfigKeymapViewModel(
     override val enableAccessibilityServicePrompt: LiveData<Unit> =
         _enableAccessibilityServicePrompt
 
-    override fun save() = useCase.save()
+    init {
+        configUseCase.state.onEach {
+            if (it is Data<ConfigKeymapState>) {
+                dataState.value = it.data
+                _viewState.value = ViewPopulated()
+            } else {
+                dataState.value = null
+                _viewState.value = ViewLoading()
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    override fun save() = configUseCase.getKeymap().ifIsData { save(it) }
 
     override fun saveState(outState: Bundle) {
-        useCase.getKeymap().ifIsData {
-            outState.putParcelable(STATE_KEY, it)
+        configUseCase.getKeymap().ifIsData {
+            outState.putJsonSerializable(STATE_KEY, it)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun restoreState(state: Bundle) {
-        state.getParcelable<KeyMap>(STATE_KEY)?.let {
-            useCase.setKeymap(it)
-        } ?: useCase.loadBlankKeymap()
+        state.getJsonSerializable<KeyMap>(STATE_KEY)?.let {
+            configUseCase.setKeymap(it)
+        } ?: configUseCase.loadBlankKeymap()
     }
 
     fun loadKeymap(id: Long) {
         viewModelScope.launch {
             when (id) {
-                NEW_KEYMAP_ID -> useCase.loadBlankKeymap()
-                else -> useCase.setKeymap(getKeymap(id))
+                NEW_KEYMAP_ID -> configUseCase.loadBlankKeymap()
+                else -> configUseCase.setKeymap(get(id))
             }
         }
     }
 
     class Factory(
+        private val saveKeymap: SaveKeymapUseCase,
+        private val getKeymap: GetKeymapUseCase,
         private val useCase: ConfigKeymapUseCase,
-        private val configActionsUseCase: ConfigActionsUseCase<KeymapActionOptions>,
+        private val configActionsUseCase: ConfigActionsUseCase<KeymapAction>,
         private val configTriggerUseCase: ConfigKeymapTriggerUseCase,
         private val getActionError: GetActionErrorUseCase,
         private val testAction: TestActionUseCase,
         private val onboardingUseCase: OnboardingUseCase,
-        private val actionListItemMapper: ActionListItemMapper<KeymapActionOptions>,
+        private val recordTriggerUseCase: RecordTriggerUseCase,
+        private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+        private val actionListItemMapper: ActionListItemMapper<KeymapAction>,
         private val triggerKeyListItemMapper: TriggerKeyListItemMapper,
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
             ConfigKeymapViewModel(
+                saveKeymap,
+                getKeymap,
                 useCase,
                 configActionsUseCase,
                 configTriggerUseCase,
                 getActionError,
                 testAction,
                 onboardingUseCase,
+                recordTriggerUseCase,
+                showDeviceInfoUseCase,
                 actionListItemMapper,
                 triggerKeyListItemMapper
             ) as T

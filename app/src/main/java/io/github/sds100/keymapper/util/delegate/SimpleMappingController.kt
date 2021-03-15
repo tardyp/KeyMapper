@@ -6,7 +6,6 @@ import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.isError
-import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.*
 
 /**
@@ -92,15 +91,16 @@ abstract class SimpleMappingController(
             this@SimpleMappingController.repeatJobs[mappingId] = repeatJobs
         }
 
-        if (vibrate) {
-            val duration = extras
-                .getData(FingerprintMap.EXTRA_VIBRATION_DURATION)
-                .valueOrNull()
-                ?.toLong()
-                ?: useCase.defaultVibrateDuration.firstBlocking().toLong()
-
-            vibrateEvent.value = VibrateEvent(duration)
-        }
+        //TODO use SimpleMapping interface
+//        if (vibrate) {
+//            val duration = extras
+//                .getData(FingerprintMapEntity.EXTRA_VIBRATION_DURATION)
+//                .valueOrNull()
+//                ?.toLong()
+//                ?: useCase.defaultVibrateDuration.firstBlocking().toLong()
+//
+//            vibrateEvent.value = VibrateEvent(duration)
+//        }
 
         if (showTriggeredToast) {
             showTriggeredToastEvent.value = ShowTriggeredKeymapToast
@@ -121,11 +121,11 @@ abstract class SimpleMappingController(
     }
 
     private fun repeatAction(action: ActionEntity) = coroutineScope.launch(start = CoroutineStart.LAZY) {
-        val repeatRate = action.repeatRate?.toLong()
-            ?: useCase.defaultRepeatRate.firstBlocking().toLong()
+        val repeatRate = action.repeatRate?.toLong() ?: 500L
+//            ?: useCase.defaultRepeatRate.firstBlocking().toLong() TODO
 
-        val holdDownDuration = action.holdDownDuration?.toLong()
-            ?: useCase.defaultHoldDownDuration.firstBlocking().toLong()
+        val holdDownDuration = action.holdDownDuration?.toLong()?: 400L
+//            ?: useCase.defaultHoldDownDuration.firstBlocking().toLong() TODO
 
         val holdDown = action.holdDown
 

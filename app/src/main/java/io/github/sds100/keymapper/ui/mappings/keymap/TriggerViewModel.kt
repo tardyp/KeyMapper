@@ -7,9 +7,9 @@ import androidx.lifecycle.map
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerState
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUidUseCase
-import io.github.sds100.keymapper.domain.models.TriggerKey
+import io.github.sds100.keymapper.domain.mappings.keymap.TriggerKey
 import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCase
 import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.trigger.TriggerMode
@@ -17,10 +17,7 @@ import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
-import io.github.sds100.keymapper.util.Data
-import io.github.sds100.keymapper.util.DataState
-import io.github.sds100.keymapper.util.Empty
-import io.github.sds100.keymapper.util.Loading
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -35,14 +32,12 @@ class TriggerViewModel(
     private val useCase: ConfigKeymapTriggerUseCase,
     private val listItemMapper: TriggerKeyListItemMapper,
     private val recordTrigger: RecordTriggerUseCase,
-    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    getKeymapUidUseCase: GetKeymapUidUseCase,
-) {
+    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase
+    ) {
 
     val optionsViewModel = TriggerOptionsViewModel(
         onboardingUseCase,
-        useCase,
-        getKeymapUidUseCase
+        useCase
     )
 
     private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
@@ -68,30 +63,40 @@ class TriggerViewModel(
         onboardingUseCase.shownSequenceTriggerExplanation = true
     }
 
-    val triggerInParallel = useCase.mode.map { it == TriggerMode.PARALLEL }
+    private val dataState = MutableLiveData<ConfigKeymapTriggerState?>()
+
+    //TODO hide UI elements if loading
+    private val _viewState = MutableLiveData<ViewState>(ViewLoading())
+    val viewState: LiveData<ViewState> = _viewState
+
+    val triggerInParallel = dataState.map { it?.mode == TriggerMode.PARALLEL }
     fun setParallelTriggerMode() = useCase.setMode(TriggerMode.PARALLEL)
 
-    val triggerInSequence = useCase.mode.map { it == TriggerMode.SEQUENCE }
+    val triggerInSequence = dataState.map { it?.mode == TriggerMode.SEQUENCE }
     fun setSequenceTriggerMode() = useCase.setMode(TriggerMode.SEQUENCE)
 
-    val triggerModeUndefined = useCase.mode.map { it == TriggerMode.UNDEFINED }
+    val triggerModeUndefined = dataState.map { it?.mode == TriggerMode.UNDEFINED }
     fun setUndefinedTriggerMode() = useCase.setMode(TriggerMode.UNDEFINED)
 
-    val isParallelTriggerClickTypeShortPress = useCase.keys.map {
-        if (!it.isNullOrEmpty()) {
-            it[0].clickType == ClickType.SHORT_PRESS
+    val isParallelTriggerClickTypeShortPress = dataState.map {
+        it ?: return@map false
+
+        if (!it.keys.isNullOrEmpty()) {
+            it.keys[0].clickType == ClickType.SHORT_PRESS
         } else {
             false
         }
     }
 
-    val isParallelTriggerClickTypeLongPress = useCase.keys.map {
-        if (!it.isNullOrEmpty()) {
-            it[0].clickType == ClickType.LONG_PRESS
+    val isParallelTriggerClickTypeLongPress = dataState.map {
+        it ?: return@map false
+
+        if (!it.keys.isNullOrEmpty()) {
+            it.keys[0].clickType == ClickType.LONG_PRESS
         } else {
             false
         }
-    }.stateIn(coroutineScope, SharingStarted.Eagerly, false)
+    }
 
     private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
     val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
@@ -120,27 +125,15 @@ class TriggerViewModel(
     private var successfullyRecordedTrigger = false
 
     init {
-        triggerInParallel.onEach {
-            /* when the user first chooses to make parallel a trigger,
-            show a dialog informing them that the order in which they
-            list the keys is the order in which they will need to be held down.
-            */
-            if (it
-                && useCase.keys.value.size > 1
-                && !onboardingUseCase.shownParallelTriggerOrderExplanation
-            ) {
-                _showParallelTriggerOrderExplanation.value = true
-            }
 
-            useCase.setMode(TriggerMode.PARALLEL)
-        }.launchIn(coroutineScope)
-
-        triggerInSequence.onEach {
-            if (it
-                && useCase.keys.value.size > 1
-                && !onboardingUseCase.shownSequenceTriggerExplanation
-            ) {
-                _showSequenceTriggerExplanation.value = true
+        useCase.state.onEach {
+            if (it is Data) {
+                dataState.value = it.data
+                onStateChange(it.data)
+                _viewState.value = ViewPopulated()
+            } else {
+                dataState.value = null
+                _viewState.postValue(ViewLoading())
             }
         }.launchIn(coroutineScope)
 
@@ -152,10 +145,6 @@ class TriggerViewModel(
 
             useCase.addTriggerKey(it.keyCode, it.device)
         }.launchIn(coroutineScope)
-
-        combine(useCase.mode, useCase.keys) { mode, keys ->
-            rebuildModels(mode, keys)
-        }
     }
 
     fun setParallelTriggerClickType(clickType: ClickType) =
@@ -196,7 +185,31 @@ class TriggerViewModel(
 
     fun stopRecording() = recordTrigger.stopRecording()
 
-    fun rebuildModels() = rebuildModels(useCase.mode.value, useCase.keys.value)
+    fun rebuildModels() = dataState.value?.let {
+        rebuildModels(it.mode, it.keys)
+    }
+
+    private fun onStateChange(state: ConfigKeymapTriggerState) {
+        /* when the user first chooses to make parallel a trigger,
+           show a dialog informing them that the order in which they
+           list the keys is the order in which they will need to be held down.
+           */
+        if (state.mode == TriggerMode.PARALLEL
+            && state.keys.size > 1
+            && !onboardingUseCase.shownParallelTriggerOrderExplanation
+        ) {
+            _showParallelTriggerOrderExplanation.value = true
+        }
+
+        if (state.mode == TriggerMode.SEQUENCE
+            && state.keys.size > 1
+            && !onboardingUseCase.shownSequenceTriggerExplanation
+        ) {
+            _showSequenceTriggerExplanation.value = true
+        }
+
+        rebuildModels(state.mode, state.keys)
+    }
 
     private fun rebuildModels(mode: TriggerMode, keys: List<TriggerKey>) {
         coroutineScope.launch {

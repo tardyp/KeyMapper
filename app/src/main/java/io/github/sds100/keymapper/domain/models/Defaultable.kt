@@ -8,7 +8,11 @@ package io.github.sds100.keymapper.domain.models
  * Represents a value for something that can have a custom value
  * or should use a default value that is set somewhere else.
  */
+@Serializable
 sealed class Defaultable<T> {
-    data class Custom<T>(val value: T) : Defaultable<T>()
+    @Serializable
+    data class Custom<T>(val data: T) : Defaultable<T>()
+
+    @Serializable
     class Default<T> : Defaultable<T>()
 }

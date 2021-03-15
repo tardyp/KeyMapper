@@ -6,6 +6,8 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 /**
  * Created by sds100 on 13/02/21.
  */
+
+//TODO move this and other repositories to relevant package in domain
 interface KeymapRepository {
     val keymapList: LiveData<List<KeyMapEntity>>
     fun duplicateKeymap(vararg id: Long)

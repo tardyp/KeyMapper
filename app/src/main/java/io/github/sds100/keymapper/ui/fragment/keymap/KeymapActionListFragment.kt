@@ -5,8 +5,9 @@ import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.ui.fragment.ActionListFragment
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 
@@ -14,7 +15,7 @@ import io.github.sds100.keymapper.util.InjectorUtils
  * Created by sds100 on 22/11/20.
  */
 
-class KeymapActionListFragment : ActionListFragment<KeymapActionOptions>() {
+class KeymapActionListFragment : ActionListFragment<KeymapActionOptions, KeymapAction>() {
 
     class Info : FragmentInfo(
         R.string.action_list_header,
@@ -28,7 +29,7 @@ class KeymapActionListFragment : ActionListFragment<KeymapActionOptions>() {
         InjectorUtils.provideConfigKeymapViewModel(requireContext())
     }
 
-    override val actionListViewModel: ActionListViewModel<KeymapActionOptions>
+    override val actionListViewModel: ActionListViewModel<KeymapAction>
         get() = configKeymapViewModel.actionListViewModel
 
     override fun openActionOptionsFragment(options: KeymapActionOptions) {

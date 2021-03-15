@@ -101,14 +101,7 @@ class KeyEventActionTypeFragment : Fragment() {
         })
 
         viewModel.chosenDevice.observe(viewLifecycleOwner, {
-            val text = when {
-                it == null -> str(R.string.from_no_device)
-
-                viewModel.showDeviceDescriptors ->
-                    "${it.name} ${it.descriptor.substring(0..4)}"
-
-                else -> it.name
-            }
+            val text: String = TODO()
 
             binding.dropdownDeviceId.setText(text, false)
         })
@@ -122,12 +115,6 @@ class KeyEventActionTypeFragment : Fragment() {
                     findNavController().navigate(direction)
                 }
 
-                is BuildDeviceInfoModels -> {
-                    viewLifecycleScope.launchWhenResumed {
-                        val modelList = InputDeviceUtils.createDeviceInfoModelsForAll()
-                        viewModel.setDeviceInfoModels(modelList)
-                    }
-                }
             }
         })
 
@@ -142,11 +129,12 @@ class KeyEventActionTypeFragment : Fragment() {
                     add(str(R.string.from_no_device))
 
                     models.forEach {
-                        if (viewModel.showDeviceDescriptors) {
-                            add("${it.name} ${it.descriptor.substring(0..4)}")
-                        } else {
-                            add(it.name)
-                        }
+                        //TODO fix
+//                        if (viewModel.showDeviceDescriptors) {
+//                            add("${it.name} ${it.descriptor.substring(0..4)}")
+//                        } else {
+//                            add(it.name)
+//                        }
                     }
 
                     binding.dropdownDeviceId.setAdapter(this)

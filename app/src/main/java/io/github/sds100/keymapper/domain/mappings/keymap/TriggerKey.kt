@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.models
+package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
@@ -9,6 +9,7 @@ import java.util.*
 /**
  * Created by sds100 on 21/02/2021.
  */
+@Serializable
 data class TriggerKey(
     val uid: String = UUID.randomUUID().toString(),
     val keyCode: Int,

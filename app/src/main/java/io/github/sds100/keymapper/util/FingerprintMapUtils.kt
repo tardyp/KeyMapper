@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import splitties.bitflags.hasFlag
 
 /**
@@ -18,13 +18,16 @@ object FingerprintMapUtils {
      */
     const val FINGERPRINT_GESTURES_MIN_VERSION = 40
 
+    //TODO all these ids move these to repository
     const val SWIPE_DOWN = "swipe_down"
     const val SWIPE_UP = "swipe_up"
     const val SWIPE_LEFT = "swipe_left"
     const val SWIPE_RIGHT = "swipe_right"
 
+    //TODO move to repository
     val GESTURES = arrayOf(SWIPE_DOWN, SWIPE_UP, SWIPE_LEFT, SWIPE_RIGHT)
 
+    //TODO move to somewhere more related to UI
     val HEADERS = mapOf(
         SWIPE_DOWN to R.string.header_fingerprint_gesture_down,
         SWIPE_UP to R.string.header_fingerprint_gesture_up,
@@ -32,6 +35,7 @@ object FingerprintMapUtils {
         SWIPE_RIGHT to R.string.header_fingerprint_gesture_right
     )
 
+    //REALLY NEED THIS HERE???
     @RequiresApi(Build.VERSION_CODES.O)
     val SDK_ID_TO_KEY_MAPPER_ID = mapOf(
         FingerprintGestureController.FINGERPRINT_GESTURE_SWIPE_DOWN to SWIPE_DOWN,
@@ -41,15 +45,15 @@ object FingerprintMapUtils {
     )
 }
 
-fun FingerprintMap.getFlagLabelList(ctx: Context): List<String> = sequence {
-    FingerprintMap.FLAG_LABEL_MAP.keys.forEach { flag ->
+fun FingerprintMapEntity.getFlagLabelList(ctx: Context): List<String> = sequence {
+    FingerprintMapEntity.FLAG_LABEL_MAP.keys.forEach { flag ->
         if (flags.hasFlag(flag)) {
-            yield(ctx.str(FingerprintMap.FLAG_LABEL_MAP.getValue(flag)))
+            yield(ctx.str(FingerprintMapEntity.FLAG_LABEL_MAP.getValue(flag)))
         }
     }
 }.toList()
 
-fun FingerprintMap.buildOptionsDescription(ctx: Context): String = buildString {
+fun FingerprintMapEntity.buildOptionsDescription(ctx: Context): String = buildString {
     getFlagLabelList(ctx).forEachIndexed { index, label ->
         if (index > 0) {
             append(" ${ctx.str(R.string.middot)} ")

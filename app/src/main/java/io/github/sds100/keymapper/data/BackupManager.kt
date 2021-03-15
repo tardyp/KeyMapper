@@ -183,14 +183,15 @@ class BackupManager(
 
             element ?: return@forEach
 
-            val version = element!!.get(FingerprintMap.NAME_VERSION).nullInt ?: 0
-            val incompatible = version > FingerprintMap.CURRENT_VERSION
+            val version = element!!.get(FingerprintMapEntity.NAME_VERSION).nullInt ?: 0
+            val incompatible = version > FingerprintMapEntity.CURRENT_VERSION
 
             if (incompatible) {
                 return BackupVersionTooNew
             }
 
-            fingerprintMapRepository.restore(gestureId, gson.toJson(element))
+            //TODO
+//            fingerprintMapRepository.restore(gestureId, gson.toJson(element))
         }
 
         return Success(Unit)
@@ -200,10 +201,10 @@ class BackupManager(
     private fun backupAsync(
         outputStream: OutputStream,
         keymapList: List<KeyMapEntity>? = null,
-        fingerprintSwipeDown: FingerprintMap? = null,
-        fingerprintSwipeUp: FingerprintMap? = null,
-        fingerprintSwipeLeft: FingerprintMap? = null,
-        fingerprintSwipeRight: FingerprintMap? = null
+        fingerprintSwipeDown: FingerprintMapEntity? = null,
+        fingerprintSwipeUp: FingerprintMapEntity? = null,
+        fingerprintSwipeLeft: FingerprintMapEntity? = null,
+        fingerprintSwipeRight: FingerprintMapEntity? = null
     ) = coroutineScope.async(dispatchers.io()) {
         try {
             val allDeviceInfoList = deviceInfoRepository.getAll()
@@ -254,7 +255,7 @@ class BackupManager(
     }
 
     private suspend fun doAutomaticBackup(keymaps: List<KeyMapEntity>,
-                                          fingerprintMaps: Map<String, FingerprintMap>) {
+                                          fingerprintMaps: Map<String, FingerprintMapEntity>) {
 
         if (!shouldBackupAutomatically()) return
 
@@ -294,15 +295,15 @@ class BackupManager(
         val deviceInfo: List<DeviceInfoEntity>? = null,
 
         @SerializedName(NAME_FINGERPRINT_SWIPE_DOWN)
-        val fingerprintSwipeDown: FingerprintMap?,
+        val fingerprintSwipeDown: FingerprintMapEntity?,
 
         @SerializedName(NAME_FINGERPRINT_SWIPE_UP)
-        val fingerprintSwipeUp: FingerprintMap?,
+        val fingerprintSwipeUp: FingerprintMapEntity?,
 
         @SerializedName(NAME_FINGERPRINT_SWIPE_LEFT)
-        val fingerprintSwipeLeft: FingerprintMap?,
+        val fingerprintSwipeLeft: FingerprintMapEntity?,
 
         @SerializedName(NAME_FINGERPRINT_SWIPE_RIGHT)
-        val fingerprintSwipeRight: FingerprintMap?
+        val fingerprintSwipeRight: FingerprintMapEntity?
     )
 }

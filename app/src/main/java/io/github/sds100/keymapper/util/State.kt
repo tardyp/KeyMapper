@@ -2,9 +2,7 @@
 
 package io.github.sds100.keymapper.util
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 
 /**
  * Created by sds100 on 06/11/20.

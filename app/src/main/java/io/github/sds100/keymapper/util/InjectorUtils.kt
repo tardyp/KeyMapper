@@ -4,12 +4,18 @@ import android.content.Context
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.data.viewmodel.*
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
-import io.github.sds100.keymapper.domain.devices.SaveDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerKeyListItemMapperImpl
@@ -33,10 +39,7 @@ object InjectorUtils {
     fun provideKeymapListViewModel(context: Context): KeymapListViewModel.Factory {
         return KeymapListViewModel.Factory(
             ServiceLocator.keymapRepository(context),
-            GetActionErrorUseCaseImpl(
-                ServiceLocator.preferenceRepository(context),
-                ServiceLocator.deviceInfoRepository(context)
-            )
+            UseCases.getActionError(context)
         )
     }
 
@@ -59,12 +62,7 @@ object InjectorUtils {
     ): KeyEventActionTypeViewModel.Factory {
         val deviceInfoRepository = ServiceLocator.deviceInfoRepository(context)
         return KeyEventActionTypeViewModel.Factory(
-            ShowDeviceInfoUseCaseImpl(
-                deviceInfoRepository,
-                ServiceLocator.preferenceRepository(context)
-            ),
-
-            SaveDeviceInfoUseCase(deviceInfoRepository)
+            UseCases.showDeviceInfo(context)
         )
     }
 
@@ -127,10 +125,7 @@ object InjectorUtils {
     fun provideFingerprintMapListViewModel(context: Context): FingerprintMapListViewModel.Factory {
         return FingerprintMapListViewModel.Factory(
             ServiceLocator.fingerprintMapRepository(context),
-            ShowDeviceInfoUseCaseImpl(
-                ServiceLocator.deviceInfoRepository(context),
-                ServiceLocator.preferenceRepository(context)
-            ),
+            UseCases.showDeviceInfo(context),
             ListFingerprintMapsUseCase(ServiceLocator.preferenceRepository(context))
         )
     }
@@ -144,39 +139,53 @@ object InjectorUtils {
     }
 
     fun provideConfigKeymapViewModel(
-        context: Context
+        ctx: Context
     ): ConfigKeymapViewModel.Factory {
-        val configKeymapUseCase = UseCases.configKeymap(context)
+        val configKeymapUseCase = ConfigKeymapUseCaseImpl()
 
         return ConfigKeymapViewModel.Factory(
+            SaveKeymapUseCaseImpl(ServiceLocator.keymapRepository(ctx)),
+            GetKeymapUseCaseImpl(
+                ServiceLocator.keymapRepository(ctx),
+                ServiceLocator.externalDeviceAdapter(ctx)
+            ),
             configKeymapUseCase,
             configKeymapUseCase.configActions,
             configKeymapUseCase.configTrigger,
-            UseCases.getActionError(context),
-            UseCases.testAction(context),
-            UseCases.onboarding(context),
+            UseCases.getActionError(ctx),
+            UseCases.testAction(ctx),
+            UseCases.onboarding(ctx),
+            RecordTriggerUseCaseImpl(),
+            UseCases.showDeviceInfo(ctx),
             KeymapActionListItemMapper(
-                UseCases.getActionError(context),
-                UseCases.showDeviceInfo(context),
-                ServiceLocator.appInfoAdapter(context),
-                ServiceLocator.resourceProvider(context)
+                UseCases.getActionError(ctx),
+                ServiceLocator.appInfoAdapter(ctx),
+                ServiceLocator.resourceProvider(ctx)
             ),
 
             TriggerKeyListItemMapperImpl(
-                ServiceLocator.resourceProvider(context),
-                UseCases.showDeviceInfo(context)
+                ServiceLocator.resourceProvider(ctx),
+                UseCases.showDeviceInfo(ctx)
             )
         )
     }
 
     fun provideConfigFingerprintMapViewModel(
-        context: Context
+        ctx: Context
     ): ConfigFingerprintMapViewModel.Factory {
+        val configUseCase = ConfigFingerprintMapUseCaseImpl()
+
         return ConfigFingerprintMapViewModel.Factory(
-            ServiceLocator.fingerprintMapRepository(context),
-            GetActionErrorUseCaseImpl(
-                ServiceLocator.preferenceRepository(context),
-                ServiceLocator.deviceInfoRepository(context)
+            SaveFingerprintMapUseCaseImpl(ServiceLocator.fingerprintMapRepository(ctx)),
+            GetFingerprintMapUseCaseImpl(ServiceLocator.fingerprintMapRepository(ctx)),
+            configUseCase,
+            configUseCase.configActions,
+            UseCases.getActionError(ctx),
+            UseCases.testAction(ctx),
+            FingerprintMapActionListItemMapper(
+                UseCases.getActionError(ctx),
+                ServiceLocator.appInfoAdapter(ctx),
+                ServiceLocator.resourceProvider(ctx)
             )
         )
     }
@@ -196,7 +205,7 @@ object InjectorUtils {
 
     fun provideApplicationViewModel(context: Context): ApplicationViewModel {
         val preferenceRepository = ServiceLocator.preferenceRepository(context)
-        val keyboardController = ServiceLocator.keyboardController(context)
+        val keyboardController = ServiceLocator.inputMethodAdapter(context)
         val bluetoothMonitor = ServiceLocator.bluetoothMonitor(context)
 
         return ApplicationViewModel(

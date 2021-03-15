@@ -5,9 +5,8 @@ import android.view.KeyEvent
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
-import io.github.sds100.keymapper.data.model.DeviceInfoEntity
-import io.github.sds100.keymapper.domain.devices.SaveDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.devices.DeviceInfo
+import io.github.sds100.keymapper.domain.devices.GetDeviceNameUseCase
 import io.github.sds100.keymapper.util.BuildDeviceInfoModels
 import io.github.sds100.keymapper.util.ChooseKeycode
 import io.github.sds100.keymapper.util.Event
@@ -22,9 +21,10 @@ import splitties.bitflags.withFlag
  * Created by sds100 on 30/03/2020.
  */
 
+
+//TODO move to CreateKeyEventActionUseCase
 class KeyEventActionTypeViewModel(
-    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    private val saveDeviceInfo: SaveDeviceInfoUseCase
+    private val getDeviceNameUseCase: GetDeviceNameUseCase
 ) : ViewModel() {
 
     val keyCode = MutableLiveData<String>(null)
@@ -42,9 +42,9 @@ class KeyEventActionTypeViewModel(
         }
     }
 
-    val chosenDevice = MutableLiveData<DeviceInfoEntity?>(null)
+    val chosenDevice = MutableLiveData<DeviceInfo?>(null)
 
-    val deviceInfoModels = MutableLiveData<List<DeviceInfoEntity>>()
+    val deviceInfoModels = MutableLiveData<List<DeviceInfo>>()
 
     val metaState = MutableLiveData(0)
 
@@ -76,9 +76,6 @@ class KeyEventActionTypeViewModel(
         }
     }
 
-    val showDeviceDescriptors
-        get() = showDeviceInfoUseCase.showDeviceDescriptors
-
     init {
         refreshDevices()
     }
@@ -102,8 +99,6 @@ class KeyEventActionTypeViewModel(
 
     fun chooseDevice(index: Int) {
         deviceInfoModels.value?.getOrNull(index)?.let {
-            saveDeviceInfo(it)
-
             chosenDevice.value = it
         }
     }
@@ -112,21 +107,13 @@ class KeyEventActionTypeViewModel(
         _eventStream.value = BuildDeviceInfoModels()
     }
 
-    fun setDeviceInfoModels(models: List<DeviceInfoEntity>) {
-        deviceInfoModels.value = models
-    }
-
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-        private val saveDeviceInfoUseCase: SaveDeviceInfoUseCase
+        private val getDeviceNameUseCase: GetDeviceNameUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return KeyEventActionTypeViewModel(
-                showDeviceInfoUseCase,
-                saveDeviceInfoUseCase
-            ) as T
+            return KeyEventActionTypeViewModel(getDeviceNameUseCase) as T
         }
     }
 }

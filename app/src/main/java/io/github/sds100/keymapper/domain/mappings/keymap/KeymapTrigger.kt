@@ -1,19 +1,22 @@
-package io.github.sds100.keymapper.domain.models
+package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
+import io.github.sds100.keymapper.domain.models.Defaultable
+import io.github.sds100.keymapper.domain.models.Option
 import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
-import kotlin.coroutines.coroutineContext
 
 /**
  * Created by sds100 on 03/03/2021.
  */
 
+@Serializable
 data class KeymapTrigger(
     val keys: List<TriggerKey> = emptyList(),
     val mode: TriggerMode = TriggerMode.UNDEFINED,
+
     private val vibrate: Boolean = false,
     private val longPressDoubleVibration: Boolean = false,
     private val screenOffTrigger: Boolean = false,

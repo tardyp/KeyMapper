@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.data.repository
 import io.github.sds100.keymapper.data.db.dao.DeviceInfoDao
 import io.github.sds100.keymapper.data.model.DeviceInfoEntity
 import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.util.result.DeviceNotFound
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
@@ -13,10 +12,12 @@ import kotlinx.coroutines.launch
 /**
  * Created by sds100 on 26/01/2020.
  */
+
+//TODO delete because device names should be saved with actions and triggers
 class RoomDeviceInfoCache(
     private val deviceInfoDao: DeviceInfoDao,
     private val coroutineScope: CoroutineScope
-) : DeviceInfoCache, io.github.sds100.keymapper.domain.devices.DeviceInfoCache {
+) : DeviceInfoCache {
 
     override suspend fun getAll(): List<DeviceInfoEntity> {
         //these devices might have been accidentally saved at some point

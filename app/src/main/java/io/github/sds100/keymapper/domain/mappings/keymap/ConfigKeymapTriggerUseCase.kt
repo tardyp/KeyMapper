@@ -1,44 +1,46 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.domain.models.Defaultable
-import io.github.sds100.keymapper.domain.models.KeymapTrigger
-import io.github.sds100.keymapper.domain.models.KeymapTriggerOptions
-import io.github.sds100.keymapper.domain.models.TriggerKey
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.domain.utils.moveElement
+import io.github.sds100.keymapper.util.DataState
+import io.github.sds100.keymapper.util.ifIsData
+import io.github.sds100.keymapper.util.mapData
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import java.util.*
 
 /**
  * Created by sds100 on 15/02/2021.
  */
-class ConfigKeymapTriggerUseCaseImpl() : ConfigKeymapTriggerUseCase {
+class ConfigKeymapTriggerUseCaseImpl(
+    private val keymapFlow: StateFlow<DataState<KeyMap>>,
+    val setKeymap: (keymap: KeyMap) -> Unit
+) : ConfigKeymapTriggerUseCase {
 
-    private val trigger = MutableStateFlow<DataState<KeymapTrigger>>(Loading())
-
-    override val keys = trigger.map { state -> state.mapData { it.keys } }
-    override val mode = trigger.map { state ->
-        when (state) {
-            is Data -> state.data.mode
-            else -> TriggerMode.UNDEFINED
+    override val state = keymapFlow.map { state ->
+        state.mapData {
+            ConfigKeymapTriggerState(
+                keymapUid = it.uid,
+                keys = it.trigger.keys,
+                mode = it.trigger.mode,
+                options = it.trigger.options
+            )
         }
     }
-
-    override val options = trigger.map { state -> state.mapData { it.options } }
 
     override fun setMode(newMode: TriggerMode) {
         when (newMode) {
             TriggerMode.PARALLEL -> {
-                trigger.value.ifIsData { data ->
-                    val oldKeys = data.keys
+                keymapFlow.value.ifIsData { keymap ->
+                    val trigger = keymap.trigger
+
+                    val oldKeys = trigger.keys
                     var newKeys = oldKeys.toMutableList()
 
-                    if (data.mode != TriggerMode.PARALLEL) {
+                    if (trigger.mode != TriggerMode.PARALLEL) {
 
                         if (newKeys.isNotEmpty()) {
                             // set all the keys to a short press if coming from a non-parallel trigger
@@ -53,28 +55,25 @@ class ConfigKeymapTriggerUseCaseImpl() : ConfigKeymapTriggerUseCase {
                         }
                     }
 
-                    trigger.value = Data(data.copy(keys = newKeys, mode = TriggerMode.PARALLEL))
+                    val newTrigger = trigger.copy(keys = newKeys, mode = newMode)
+                    setKeymap(keymap.copy(trigger = newTrigger))
                 }
             }
 
-            TriggerMode.SEQUENCE -> trigger.value.ifIsData {
-                trigger.value = Data(it.copy(mode = TriggerMode.SEQUENCE))
-            }
+            TriggerMode.SEQUENCE -> editTrigger { it.copy(mode = TriggerMode.SEQUENCE) }
 
-            TriggerMode.UNDEFINED -> trigger.value.ifIsData {
-                trigger.value = Data(it.copy(mode = TriggerMode.UNDEFINED))
-            }
+            TriggerMode.UNDEFINED -> editTrigger { it.copy(mode = TriggerMode.UNDEFINED) }
         }
     }
 
     override fun addTriggerKey(
         keyCode: Int,
         device: TriggerKeyDevice
-    ) = trigger.value.ifIsData { data ->
+    ) = editTrigger { trigger ->
         val clickType = ClickType.SHORT_PRESS
 
-        val containsKey = data.keys.any { keyToCompare ->
-            if (data.mode != TriggerMode.SEQUENCE) {
+        val containsKey = trigger.keys.any { keyToCompare ->
+            if (trigger.mode != TriggerMode.SEQUENCE) {
                 val sameKeyCode = keyCode == keyToCompare.keyCode
 
                 //if the new key is not external, check whether a trigger key already exists for this device
@@ -93,7 +92,7 @@ class ConfigKeymapTriggerUseCaseImpl() : ConfigKeymapTriggerUseCase {
             }
         }
 
-        val newKeys = data.keys.toMutableList().apply {
+        val newKeys = trigger.keys.toMutableList().apply {
 
             val triggerKey = TriggerKey(
                 keyCode = keyCode,
@@ -111,39 +110,31 @@ class ConfigKeymapTriggerUseCaseImpl() : ConfigKeymapTriggerUseCase {
             /* Automatically make it a parallel trigger when the user makes a trigger with more than one key
             because this is what most users are expecting when they make a trigger with multiple keys */
             newKeys.size == 2 && !containsKey -> TriggerMode.PARALLEL
-            else -> data.mode
+            else -> trigger.mode
         }
 
-        trigger.value = Data(data.copy(keys = newKeys, mode = newMode))
+        trigger.copy(keys = newKeys, mode = newMode)
     }
 
-    override fun removeTriggerKey(uid: String) = trigger.value.ifIsData { data ->
-        val newKeys = data.keys.toMutableList().apply {
+    override fun removeTriggerKey(uid: String) = editTrigger { trigger ->
+        val newKeys = trigger.keys.toMutableList().apply {
             removeAll { it.uid == uid }
         }
 
         val newMode = when {
             newKeys.size <= 1 -> TriggerMode.UNDEFINED
-            else -> data.mode
+            else -> trigger.mode
         }
 
-        trigger.value = Data(data.copy(keys = newKeys, mode = newMode))
+        trigger.copy(keys = newKeys, mode = newMode)
     }
 
-    override fun moveTriggerKey(fromIndex: Int, toIndex: Int) = trigger.value.ifIsData { data ->
-        data.keys.toMutableList().apply {
-            if (fromIndex < toIndex) {
-                for (i in fromIndex until toIndex) {
-                    Collections.swap(this, i, i + 1)
-                }
-            } else {
-                for (i in fromIndex downTo toIndex + 1) {
-                    Collections.swap(this, i, i - 1)
-                }
+    override fun moveTriggerKey(fromIndex: Int, toIndex: Int) = editTrigger { trigger ->
+        trigger.copy(
+            keys = trigger.keys.toMutableList().apply {
+                moveElement(fromIndex, toIndex)
             }
-
-            trigger.value = Data(data.copy(keys = this))
-        }
+        )
     }
 
     override fun setParallelTriggerClickType(clickType: ClickType) {
@@ -154,29 +145,23 @@ class ConfigKeymapTriggerUseCaseImpl() : ConfigKeymapTriggerUseCase {
 
     }
 
-    fun getTrigger(): DataState<KeymapTrigger> = trigger.value
+    override fun setVibrateEnabled(enabled: Boolean) = editTrigger { it.copy(vibrate = enabled) }
 
-    fun setTrigger(trigger: KeymapTrigger) {
-        this.trigger.value = Data(trigger)
-    }
-
-    override fun setVibrateEnabled(enabled: Boolean) = setOption { it.copy(vibrate = enabled) }
     override fun setVibrationDuration(duration: Defaultable<Int>) =
-        setOption { it.copy(vibrateDuration = duration) }
+        editTrigger { it.copy(vibrateDuration = duration) }
 
-    override fun setLongPressDelay(delay: Defaultable<Int>) {
-        TODO("Not yet implemented")
-    }
+    override fun setLongPressDelay(delay: Defaultable<Int>) =
+        editTrigger { it.copy(longPressDelay = delay) }
 
-    private fun setOption(block: (trigger: KeymapTrigger) -> KeymapTrigger) {
-        trigger.value = trigger.value.mapData { block(it) }
+    private fun editTrigger(block: (trigger: KeymapTrigger) -> KeymapTrigger) {
+        keymapFlow.value.ifIsData { keymap ->
+            setKeymap.invoke(keymap.copy(trigger = block(keymap.trigger)))
+        }
     }
 }
 
 interface ConfigKeymapTriggerUseCase {
-    val keys: Flow<DataState<List<TriggerKey>>>
-    val mode: Flow<TriggerMode>
-    val options: Flow<DataState<KeymapTriggerOptions>>
+    val state: Flow<DataState<ConfigKeymapTriggerState>>
 
     fun addTriggerKey(keyCode: Int, device: TriggerKeyDevice)
     fun removeTriggerKey(uid: String)
@@ -190,3 +175,10 @@ interface ConfigKeymapTriggerUseCase {
     fun setVibrationDuration(duration: Defaultable<Int>)
     fun setLongPressDelay(delay: Defaultable<Int>)
 }
+
+data class ConfigKeymapTriggerState(
+    val keymapUid: String,
+    val keys: List<TriggerKey>,
+    val mode: TriggerMode,
+    val options: KeymapTriggerOptions
+)

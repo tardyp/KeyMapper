@@ -2,11 +2,7 @@ package io.github.sds100.keymapper.ui.actions
 
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ActionModel
-import io.github.sds100.keymapper.domain.actions.ActionWithOptions
-import io.github.sds100.keymapper.domain.models.*
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.util.KeyEventUtils
@@ -18,17 +14,17 @@ import splitties.bitflags.hasFlag
  * Created by sds100 on 22/02/2021.
  */
 
-abstract class BaseActionListItemMapper<O>(
+abstract class BaseActionListItemMapper<A : Action>(
     private val getActionError: GetActionErrorUseCase,
     private val appInfoAdapter: AppInfoAdapter,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, ActionListItemMapper<O> {
+) : ResourceProvider by resourceProvider, ActionListItemMapper<A> {
 
-    override fun map(actionWithOptions: ActionWithOptions<O>, error: Error?): ActionListItemModel {
+    override fun map(action: A, error: Error?): ActionListItemModel {
         TODO("Not yet implemented")
     }
 
-    private fun getTitle(action: Action): Result<String> = when (action) {
+    private fun getTitle(action: ActionData): Result<String> = when (action) {
         is OpenAppAction ->
             appInfoAdapter.getAppName(action.packageName) then { appName ->
                 Success(getString(R.string.description_open_app, appName))
@@ -100,13 +96,13 @@ abstract class BaseActionListItemMapper<O>(
             }
         }
 
-        is CorruptAction -> action.error
+        is CorruptAction -> CorruptActionError
         is SystemAction -> TODO()
     }
 
-    abstract fun <O> getOptionStrings(options: O): List<String>
+    abstract fun getOptionStrings(action: A): List<String>
 }
 
-interface ActionListItemMapper<O> {
-    fun map(actionWithOptions: ActionWithOptions<O>, error: Error?): ActionListItemModel
+interface ActionListItemMapper<A : Action> {
+    fun map(action: A, error: Error?): ActionListItemModel
 }

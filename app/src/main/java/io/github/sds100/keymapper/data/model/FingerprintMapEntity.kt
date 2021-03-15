@@ -10,7 +10,7 @@ import kotlinx.android.parcel.Parcelize
  * Created by sds100 on 08/11/20.
  */
 @Parcelize
-data class FingerprintMap(
+data class FingerprintMapEntity(
     @SerializedName(NAME_VERSION)
     val version: Int = CURRENT_VERSION,
 
@@ -62,7 +62,7 @@ data class FingerprintMap(
 
             val isEnabled by it.json.byBool(NAME_ENABLED)
 
-            FingerprintMap(
+            FingerprintMapEntity(
                 version ?: 0, //versioning was added at version 1.
                 actionList,
                 constraints,

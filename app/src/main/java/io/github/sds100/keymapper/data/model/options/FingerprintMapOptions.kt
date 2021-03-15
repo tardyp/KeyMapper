@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.data.model.options
 
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.data.model.options.BoolOption.Companion.saveBoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption.Companion.saveIntOption
@@ -19,32 +19,32 @@ class FingerprintMapOptions(
     private val vibrateDuration: IntOption,
     private val showToast: BoolOption
 
-) : BaseOptions<FingerprintMap> {
+) : BaseOptions<FingerprintMapEntity> {
     companion object {
         const val ID_VIBRATE = "vibrate"
         const val ID_VIBRATION_DURATION = "vibration_duration"
         const val ID_SHOW_TOAST = "show_toast"
     }
 
-    constructor(gestureId: String, fingerprintMap: FingerprintMap) : this(
+    constructor(gestureId: String, fingerprintMap: FingerprintMapEntity) : this(
         id = gestureId,
 
         vibrate = BoolOption(
             id = ID_VIBRATE,
-            value = fingerprintMap.flags.hasFlag(FingerprintMap.FLAG_VIBRATE),
+            value = fingerprintMap.flags.hasFlag(FingerprintMapEntity.FLAG_VIBRATE),
             isAllowed = true
         ),
 
         vibrateDuration = IntOption(
             id = ID_VIBRATION_DURATION,
             value = fingerprintMap.extras
-                .getData(FingerprintMap.EXTRA_VIBRATION_DURATION).valueOrNull()?.toInt()
+                .getData(FingerprintMapEntity.EXTRA_VIBRATION_DURATION).valueOrNull()?.toInt()
                 ?: IntOption.DEFAULT,
-            isAllowed = fingerprintMap.flags.hasFlag(FingerprintMap.FLAG_VIBRATE)
+            isAllowed = fingerprintMap.flags.hasFlag(FingerprintMapEntity.FLAG_VIBRATE)
         ),
         showToast = BoolOption(
             id = ID_SHOW_TOAST,
-            value = fingerprintMap.flags.hasFlag(FingerprintMap.FLAG_SHOW_TOAST),
+            value = fingerprintMap.flags.hasFlag(FingerprintMapEntity.FLAG_SHOW_TOAST),
             isAllowed = true
         )
     )
@@ -78,13 +78,13 @@ class FingerprintMapOptions(
             vibrate,
             showToast)
 
-    override fun apply(old: FingerprintMap): FingerprintMap {
+    override fun apply(old: FingerprintMapEntity): FingerprintMapEntity {
         val newFlags = old.flags
-            .saveBoolOption(vibrate, FingerprintMap.FLAG_VIBRATE)
-            .saveBoolOption(showToast, FingerprintMap.FLAG_SHOW_TOAST)
+            .saveBoolOption(vibrate, FingerprintMapEntity.FLAG_VIBRATE)
+            .saveBoolOption(showToast, FingerprintMapEntity.FLAG_SHOW_TOAST)
 
         val newExtras = old.extras
-            .saveIntOption(vibrateDuration, FingerprintMap.EXTRA_VIBRATION_DURATION)
+            .saveIntOption(vibrateDuration, FingerprintMapEntity.EXTRA_VIBRATION_DURATION)
 
         return old.copy(flags = newFlags, extras = newExtras)
     }

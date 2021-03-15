@@ -53,6 +53,8 @@ class OpenUrlRes(@StringRes val url: Int) : Event()
 class CloseDialog : Event()
 class SelectScreenshot : Event()
 class ChooseKeycode : Event()
+
+//TODO delete
 class BuildDeviceInfoModels : Event()
 class RequestBackupSelectedKeymaps : Event()
 
@@ -119,7 +121,7 @@ class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
 //fingerprint gesture maps
 class BuildFingerprintMapModels(
-    val maps: Map<String, FingerprintMap>,
+    val maps: Map<String, FingerprintMapEntity>,
     val deviceInfoList: List<DeviceInfoEntity>,
     val hasRootPermission: Boolean,
     val showDeviceDescriptors: Boolean

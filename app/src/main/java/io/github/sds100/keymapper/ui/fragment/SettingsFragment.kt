@@ -20,6 +20,7 @@ import io.github.sds100.keymapper.data.viewmodel.SettingsViewModel
 import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
+import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
@@ -483,8 +484,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_long_press_delay)
             setSummary(R.string.summary_pref_long_press_delay)
-            min = int(R.integer.long_press_delay_min)
-            max = int(R.integer.long_press_delay_max)
+            min = PreferenceMinimums.LONG_PRESS_DELAY_MIN
+            max = 5000
             showSeekBarValue = true
 
             addPreference(this)
@@ -497,8 +498,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_double_press_delay)
             setSummary(R.string.summary_pref_double_press_delay)
-            min = int(R.integer.double_press_delay_min)
-            max = int(R.integer.double_press_delay_max)
+            min = PreferenceMinimums.DOUBLE_PRESS_DELAY_MIN
+            max = 5000
             showSeekBarValue = true
 
             addPreference(this)
@@ -511,13 +512,14 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_vibration_duration)
             setSummary(R.string.summary_pref_vibration_duration)
-            min = int(R.integer.vibrate_duration_min)
-            max = int(R.integer.vibrate_duration_max)
+            min = PreferenceMinimums.VIBRATION_DURATION_MIN
+            max = 1000
             showSeekBarValue = true
 
             addPreference(this)
         }
 
+        //TODO dont use R.integers
         //repeat delay
         SeekBarPreference(requireContext()).apply {
             key = Keys.defaultRepeatDelay.name
@@ -553,8 +555,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_sequence_trigger_timeout)
             setSummary(R.string.summary_pref_sequence_trigger_timeout)
-            min = int(R.integer.sequence_trigger_timeout_min)
-            max = int(R.integer.sequence_trigger_timeout_max)
+            min = PreferenceMinimums.SEQUENCE_TRIGGER_TIMEOUT_MIN
+            max = 5000
             showSeekBarValue = true
 
             addPreference(this)

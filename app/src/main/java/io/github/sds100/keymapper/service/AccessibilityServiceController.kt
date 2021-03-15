@@ -146,7 +146,7 @@ class AccessibilityServiceController(
     init {
         requestFingerprintGestureDetection()
 
-        if (onboarding.showFingerprintFeatureNotificationIfAvailable()) {
+        if (onboarding.showFingerprintFeatureNotificationIfAvailable) {
 
             if (isGestureDetectionAvailable) {
                 lifecycleScope.launchWhenStarted {

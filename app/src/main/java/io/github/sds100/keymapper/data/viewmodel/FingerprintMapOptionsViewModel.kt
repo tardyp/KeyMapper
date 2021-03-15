@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
-import io.github.sds100.keymapper.data.model.SliderListItemModel
-import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.data.model.options.BoolOption
 import io.github.sds100.keymapper.data.model.options.FingerprintMapOptions
 import io.github.sds100.keymapper.data.model.options.IntOption
-import io.github.sds100.keymapper.data.model.options.IntOption.Companion.nullIfDefault
 
 /**
  * Created by sds100 on 18/11/20.
@@ -23,19 +20,20 @@ class FingerprintMapOptionsViewModel : BaseOptionsViewModel<FingerprintMapOption
     override val stateKey = STATE_KEY
 
     override fun createSliderListItemModel(option: IntOption) = when (option.id) {
-        FingerprintMapOptions.ID_VIBRATION_DURATION -> {
-            SliderListItemModel(
-                id = option.id,
-                label = R.string.extra_label_vibration_duration,
-                sliderModel = SliderModel(
-                    value = option.value.nullIfDefault,
-                    isDefaultStepEnabled = true,
-                    min = R.integer.vibrate_duration_min,
-                    maxSlider = R.integer.vibrate_duration_max,
-                    stepSize = R.integer.vibrate_duration_step_size
-                )
-            )
-        }
+        //TODO
+//        FingerprintMapOptions.ID_VIBRATION_DURATION -> {
+//            SliderListItemModel(
+//                id = option.id,
+//                label = R.string.extra_label_vibration_duration,
+//                sliderModel = SliderModel(
+//                    value = option.value.nullIfDefault,
+//                    isDefaultStepEnabled = true,
+//                    min = R.integer.vibrate_duration_min,
+//                    maxSlider = R.integer.vibrate_duration_max,
+//                    stepSize = R.integer.vibrate_duration_step_size
+//                )
+//            )
+//        }
         else -> throw Exception(
             "Don't know how to create a SliderListItemModel for this option $option.id")
     }

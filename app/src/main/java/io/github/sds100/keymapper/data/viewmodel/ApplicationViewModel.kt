@@ -9,7 +9,6 @@ import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEven
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnToggleKeymapsUseCase
 import io.github.sds100.keymapper.domain.usecases.GetThemeUseCase
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
-import io.github.sds100.keymapper.util.collectIn
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -24,14 +23,14 @@ class ApplicationViewModel(
     val theme: LiveData<Int> = _theme
 
     init {
-        getTheme().collectIn(viewModelScope) {
+        getTheme().onEach {
             _theme.value = when (it) {
                 ThemeUtils.DARK -> AppCompatDelegate.MODE_NIGHT_YES
                 ThemeUtils.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
                 ThemeUtils.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
-        }
+        }.launchIn(viewModelScope)
 
         controlKeyboardOnToggleKeymapsUseCase.start(viewModelScope)
         controlKeyboardOnBluetoothEvent.start(viewModelScope)

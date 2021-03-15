@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.domain.adapter
 
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -12,5 +11,5 @@ interface InputMethodAdapter {
     fun chooseCompatibleInputMethod()
     fun showImePickerOutsideApp()
 
-    val chosenInputMethod: StateFlow<String>
+    val chosenInputMethodPackageName: StateFlow<String>
 }

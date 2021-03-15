@@ -12,6 +12,7 @@ import io.github.sds100.keymapper.util.KeyboardUtils
 import io.github.sds100.keymapper.util.PermissionUtils
 import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.result.*
+import kotlinx.coroutines.flow.StateFlow
 import splitties.toast.toast
 
 /**
@@ -23,6 +24,13 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
     }
 
     private val ctx = context.applicationContext
+
+    override val chosenInputMethodPackageName: StateFlow<String>
+        get() = TODO("Not yet implemented")
+
+    override fun enableCompatibleInputMethods() {
+        TODO("Not yet implemented")
+    }
 
     override fun chooseLastUsedIncompatibleInputMethod() {
         getLastUsedIncompatibleImeId(ctx).onSuccess {

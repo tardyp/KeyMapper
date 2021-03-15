@@ -6,10 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.CheckBoxListItemModel
 import io.github.sds100.keymapper.data.model.SliderListItemModel
-import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.data.model.options.BoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption
-import io.github.sds100.keymapper.data.model.options.IntOption.Companion.nullIfDefault
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 
 /**
@@ -88,77 +86,78 @@ class KeymapActionOptionsViewModel : BaseOptionsDialogViewModel<KeymapActionOpti
 
     override fun createSliderListItemModel(option: IntOption): SliderListItemModel =
         when (option.id) {
-
-            KeymapActionOptions.ID_MULTIPLIER -> {
-                SliderListItemModel(
-                    id = option.id,
-                    label = R.string.extra_label_action_multiplier,
-
-                    sliderModel = SliderModel(
-                        value = option.value.nullIfDefault,
-                        isDefaultStepEnabled = true,
-                        min = R.integer.action_multiplier_min,
-                        maxSlider = R.integer.action_multiplier_max,
-                        stepSize = R.integer.action_multiplier_step_size
-                    )
-                )
-            }
-
-            KeymapActionOptions.ID_REPEAT_RATE -> {
-                SliderListItemModel(
-                    id = option.id,
-                    label = R.string.extra_label_repeat_rate,
-                    sliderModel = SliderModel(
-                        value = option.value.nullIfDefault,
-                        isDefaultStepEnabled = true,
-                        min = R.integer.repeat_rate_min,
-                        maxSlider = R.integer.repeat_rate_max,
-                        stepSize = R.integer.repeat_rate_step_size
-                    )
-                )
-            }
-
-            KeymapActionOptions.ID_REPEAT_DELAY -> {
-                SliderListItemModel(
-                    id = option.id,
-                    label = R.string.extra_label_repeat_delay,
-                    sliderModel = SliderModel(
-                        value = option.value.nullIfDefault,
-                        isDefaultStepEnabled = true,
-                        min = R.integer.repeat_delay_min,
-                        maxSlider = R.integer.repeat_delay_max,
-                        stepSize = R.integer.repeat_delay_step_size
-                    )
-                )
-            }
-
-            KeymapActionOptions.ID_DELAY_BEFORE_NEXT_ACTION -> {
-                SliderListItemModel(
-                    id = option.id,
-                    label = R.string.extra_label_delay_before_next_action,
-                    sliderModel = SliderModel(
-                        value = option.value.nullIfDefault,
-                        isDefaultStepEnabled = true,
-                        min = R.integer.delay_before_next_action_min,
-                        maxSlider = R.integer.delay_before_next_action_max,
-                        stepSize = R.integer.delay_before_next_action_step_size
-                    )
-                )
-            }
-
-            KeymapActionOptions.ID_HOLD_DOWN_DURATION -> {
-                SliderListItemModel(
-                    id = option.id,
-                    label = R.string.extra_label_hold_down_duration,
-                    sliderModel = SliderModel(
-                        value = option.value.nullIfDefault,
-                        isDefaultStepEnabled = true,
-                        min = R.integer.hold_down_duration_min,
-                        maxSlider = R.integer.hold_down_duration_max,
-                        stepSize = R.integer.hold_down_duration_step_size
-                    )
-                )
-            }
+            //TODO
+//
+//            KeymapActionOptions.ID_MULTIPLIER -> {
+//                SliderListItemModel(
+//                    id = option.id,
+//                    label = R.string.extra_label_action_multiplier,
+//
+//                    sliderModel = SliderModel(
+//                        value = option.value.nullIfDefault,
+//                        isDefaultStepEnabled = true,
+//                        min = R.integer.action_multiplier_min,
+//                        maxSlider = R.integer.action_multiplier_max,
+//                        stepSize = R.integer.action_multiplier_step_size
+//                    )
+//                )
+//            }
+//
+//            KeymapActionOptions.ID_REPEAT_RATE -> {
+//                SliderListItemModel(
+//                    id = option.id,
+//                    label = R.string.extra_label_repeat_rate,
+//                    sliderModel = SliderModel(
+//                        value = option.value.nullIfDefault,
+//                        isDefaultStepEnabled = true,
+//                        min = R.integer.repeat_rate_min,
+//                        maxSlider = R.integer.repeat_rate_max,
+//                        stepSize = R.integer.repeat_rate_step_size
+//                    )
+//                )
+//            }
+//
+//            KeymapActionOptions.ID_REPEAT_DELAY -> {
+//                SliderListItemModel(
+//                    id = option.id,
+//                    label = R.string.extra_label_repeat_delay,
+//                    sliderModel = SliderModel(
+//                        value = option.value.nullIfDefault,
+//                        isDefaultStepEnabled = true,
+//                        min = R.integer.repeat_delay_min,
+//                        maxSlider = R.integer.repeat_delay_max,
+//                        stepSize = R.integer.repeat_delay_step_size
+//                    )
+//                )
+//            }
+//
+//            KeymapActionOptions.ID_DELAY_BEFORE_NEXT_ACTION -> {
+//                SliderListItemModel(
+//                    id = option.id,
+//                    label = R.string.extra_label_delay_before_next_action,
+//                    sliderModel = SliderModel(
+//                        value = option.value.nullIfDefault,
+//                        isDefaultStepEnabled = true,
+//                        min = R.integer.delay_before_next_action_min,
+//                        maxSlider = R.integer.delay_before_next_action_max,
+//                        stepSize = R.integer.delay_before_next_action_step_size
+//                    )
+//                )
+//            }
+//
+//            KeymapActionOptions.ID_HOLD_DOWN_DURATION -> {
+//                SliderListItemModel(
+//                    id = option.id,
+//                    label = R.string.extra_label_hold_down_duration,
+//                    sliderModel = SliderModel(
+//                        value = option.value.nullIfDefault,
+//                        isDefaultStepEnabled = true,
+//                        min = R.integer.hold_down_duration_min,
+//                        maxSlider = R.integer.hold_down_duration_max,
+//                        stepSize = R.integer.hold_down_duration_step_size
+//                    )
+//                )
+//            }
             else -> throw Exception("Don't know how to create a SliderListItemModel for this option $option.id")
         }
 

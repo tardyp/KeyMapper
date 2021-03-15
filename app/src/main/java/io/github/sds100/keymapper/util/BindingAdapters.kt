@@ -151,11 +151,6 @@ fun setLongClickListener(view: View, onLongClickListener: View.OnLongClickListen
     view.setOnLongClickListener(onLongClickListener)
 }
 
-@BindingAdapter("app:onCheckedChange")
-fun CompoundButton.onCheckedChange(onCheckedChangeListener: CompoundButton.OnCheckedChangeListener) {
-    this.setOnCheckedChangeListener(onCheckedChangeListener)
-}
-
 @BindingAdapter("app:actions", "app:errorClickCallback", requireAll = true)
 fun ChipGroup.bindActions(actions: List<ActionChipModel>, callback: ErrorClickCallback) {
 
@@ -199,6 +194,7 @@ fun ChipGroup.bindActionsAndConstraints(
 
     bindActions(actions, callback)
 
+    //TODO this logic should be moved to the view model. create a Transparent sub class in ChipModel sealed class
     if (actions.isNotEmpty() && constraints.isNotEmpty()) {
         Chip(context).apply {
             text = str(R.string.chip_while)

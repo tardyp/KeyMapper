@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.util.delegate
 
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.FingerprintMapUtils
 import io.github.sds100.keymapper.util.IActionError
@@ -23,7 +23,7 @@ class FingerprintGestureMapController(
     iActionError
 ) {
 
-    var fingerprintMaps: Map<String, FingerprintMap> = emptyMap()
+    var fingerprintMaps: Map<String, FingerprintMapEntity> = emptyMap()
         set(value) {
             reset()
 
@@ -41,8 +41,8 @@ class FingerprintGestureMapController(
                 constraintMode,
                 isEnabled,
                 extras,
-                flags.hasFlag(FingerprintMap.FLAG_VIBRATE),
-                flags.hasFlag(FingerprintMap.FLAG_SHOW_TOAST)
+                flags.hasFlag(FingerprintMapEntity.FLAG_VIBRATE),
+                flags.hasFlag(FingerprintMapEntity.FLAG_SHOW_TOAST)
             )
         }
     }

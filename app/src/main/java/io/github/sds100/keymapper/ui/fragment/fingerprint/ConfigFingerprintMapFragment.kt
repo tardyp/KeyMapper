@@ -5,11 +5,12 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
-import io.github.sds100.keymapper.data.viewmodel.ConfigFingerprintMapViewModel
+import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.ui.fragment.*
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
+import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.int
@@ -31,11 +32,12 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
 
         //only load the fingerprint map if opening this fragment for the first time
         if (savedInstanceState == null) {
-            viewModel.loadFingerprintMap(args.gestureId)
+            //TODO
+//            viewModel.loadFingerprintMap(args.gestureId)
         }
 
         setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
-            result.getParcelable<ActionEntity>(ChooseActionFragment.EXTRA_ACTION)?.let {
+            result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
                 viewModel.actionListViewModel.addAction(it)
             }
         }
@@ -49,7 +51,8 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
         setFragmentResultListener(FingerprintActionOptionsFragment.REQUEST_KEY) { _, result ->
             result.getParcelable<FingerprintActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
                 ?.let {
-                    viewModel.actionListViewModel.setOptions(it)
+                    //TODO
+//                    viewModel.actionListViewModel.setOptions(it)
                 }
         }
     }

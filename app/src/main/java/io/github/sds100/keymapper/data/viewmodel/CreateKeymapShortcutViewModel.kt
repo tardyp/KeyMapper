@@ -29,14 +29,15 @@ class CreateKeymapShortcutViewModel(
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(keymapRepository.keymapList) {
             viewModelScope.launch {
-                postValue(
-                    BuildKeymapListModels(
-                        it,
-                        showActionsUseCase.getDeviceInfo(),
-                        showActionsUseCase.hasRootPermission,
-                        showActionsUseCase.showDeviceDescriptors
-                    )
-                )
+                //TODO
+//                postValue(
+//                    BuildKeymapListModels(
+//                        it,
+//                        showActionsUseCase.getDeviceInfo(),
+//                        showActionsUseCase.hasRootPermission,
+//                        showActionsUseCase.showDeviceDescriptors
+//                    )
+//                )
             }
         }
     }
@@ -55,14 +56,15 @@ class CreateKeymapShortcutViewModel(
 
             _model.value = Loading()
 
-            _eventStream.postValue(
-                BuildKeymapListModels(
-                    keymapRepository.keymapList.value ?: emptyList(),
-                    showActionsUseCase.getDeviceInfo(),
-                    showActionsUseCase.hasRootPermission,
-                    showActionsUseCase.showDeviceDescriptors
-                )
-            )
+//            _eventStream.postValue(
+                //TODO
+//                BuildKeymapListModels(
+//                    keymapRepository.keymapList.value ?: emptyList(),
+//                    showActionsUseCase.getDeviceInfo(),
+//                    showActionsUseCase.hasRootPermission,
+//                    showActionsUseCase.showDeviceDescriptors
+//                )
+//            )
         }
     }
 
@@ -85,12 +87,13 @@ class CreateKeymapShortcutViewModel(
                 viewModelScope.launch {
                     keymapRepository.updateKeymap(newKeymap)
 
-                    _eventStream.value = CreateKeymapShortcutEvent(
-                        uid,
-                        newKeymap.actionList,
-                        showActionsUseCase.getDeviceInfo(),
-                        showActionsUseCase.showDeviceDescriptors
-                    )
+                    //TODO
+//                    _eventStream.value = CreateKeymapShortcutEvent(
+//                        uid,
+//                        newKeymap.actionList,
+//                        showActionsUseCase.getDeviceInfo(),
+//                        showActionsUseCase.showDeviceDescriptors
+//                    )
                 }
             }
     }

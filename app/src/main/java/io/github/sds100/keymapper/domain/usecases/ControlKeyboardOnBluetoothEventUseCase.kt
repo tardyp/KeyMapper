@@ -5,8 +5,9 @@ import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
-import io.github.sds100.keymapper.util.collectIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -26,7 +27,7 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
     private val showImePickerOnBtConnect by PrefDelegate(Keys.showImePickerOnBtConnect, false)
 
     override fun start(coroutineScope: CoroutineScope) {
-        bluetoothMonitor.onDeviceConnect.collectIn(coroutineScope) { address ->
+        bluetoothMonitor.onDeviceConnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
                 inputMethodAdapter.chooseCompatibleInputMethod()
             }
@@ -34,9 +35,9 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
                 inputMethodAdapter.showImePickerOutsideApp()
             }
-        }
+        }.launchIn(coroutineScope)
 
-        bluetoothMonitor.onDeviceDisconnect.collectIn(coroutineScope) { address ->
+        bluetoothMonitor.onDeviceDisconnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
                 inputMethodAdapter.chooseLastUsedIncompatibleInputMethod()
             }
@@ -44,7 +45,7 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
                 inputMethodAdapter.showImePickerOutsideApp()
             }
-        }
+        }.launchIn(coroutineScope)
     }
 }
 

@@ -1,17 +1,14 @@
 package io.github.sds100.keymapper.ui.fragment.fingerprint
 
 import android.content.Context
-import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.FingerprintMapOptions
 import io.github.sds100.keymapper.data.model.options.OptionsListModel
 import io.github.sds100.keymapper.data.viewmodel.BaseOptionsViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.ui.adapter.OptionsController
 import io.github.sds100.keymapper.ui.fragment.DefaultRecyclerViewFragment
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
@@ -25,11 +22,7 @@ class FingerprintMapOptionsFragment : DefaultRecyclerViewFragment<OptionsListMod
         { FingerprintMapOptionsFragment() }
     )
 
-    val optionsViewModel: BaseOptionsViewModel<FingerprintMapOptions> by lazy {
-        navGraphViewModels<ConfigFingerprintMapViewModel>(R.id.nav_config_fingerprint_map) {
-            InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
-        }.value.optionsViewModel
-    }
+    val optionsViewModel: BaseOptionsViewModel<FingerprintMapOptions> = TODO()
 
     override val modelState: ModelState<OptionsListModel>
         get() = optionsViewModel

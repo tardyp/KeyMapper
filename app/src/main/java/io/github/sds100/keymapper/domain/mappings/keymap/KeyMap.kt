@@ -1,28 +1,32 @@
-package io.github.sds100.keymapper.domain.models
+package io.github.sds100.keymapper.domain.mappings.keymap
 
-import android.os.Parcelable
 import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.domain.actions.ActionWithOptions
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
-import kotlinx.android.parcel.Parcelize
+import io.github.sds100.keymapper.domain.models.Constraint
+import io.github.sds100.keymapper.domain.models.ConstraintMode
 import java.util.*
 
 /**
  * Created by sds100 on 03/03/2021.
  */
 
-@Parcelize
+@Serializable
 data class KeyMap(
     val dbId: Long = NEW_ID,
     val uid: String = UUID.randomUUID().toString(),
     val trigger: KeymapTrigger = KeymapTrigger(),
-    val actionList: List<ActionWithOptions<KeymapActionOptions>> = emptyList(),
+    val actionDataList: List<KeymapActionData> = emptyList(),
     val constraintList: List<Constraint> = emptyList(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true
-) : Parcelable {
+) {
+
     companion object {
         const val NEW_ID = -1L
+    }
+
+    val actionList: List<KeymapAction> = actionDataList.map {
+        TODO()
     }
 }
 
@@ -37,6 +41,6 @@ object KeyMapEntityMapper {
     }
 
     fun toEntity(model: KeyMap): KeyMapEntity {
-
+        TODO()
     }
 }

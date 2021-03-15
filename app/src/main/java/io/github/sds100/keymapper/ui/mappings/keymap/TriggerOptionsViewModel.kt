@@ -1,32 +1,31 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.models.KeymapTriggerOptions
+import io.github.sds100.keymapper.domain.mappings.keymap.KeymapTriggerOptions
 import io.github.sds100.keymapper.domain.models.Defaultable
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUidUseCase
+import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.ui.models.CheckBoxListItem
 import io.github.sds100.keymapper.ui.models.ListItem
 import io.github.sds100.keymapper.ui.models.SliderListItem
 import io.github.sds100.keymapper.ui.models.TriggerFromOtherAppsListItem
-import io.github.sds100.keymapper.util.DataState
-import io.github.sds100.keymapper.util.Loading
-import io.github.sds100.keymapper.util.UserResponse
-import io.github.sds100.keymapper.util.mapData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.delegate.ModelState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Created by sds100 on 29/11/20.
  */
 class TriggerOptionsViewModel(
     private val onboardingUseCase: OnboardingUseCase,
-    private val useCase: ConfigKeymapTriggerUseCase,
-    getKeymapUid: GetKeymapUidUseCase
-) : ViewModel() {
+    private val useCase: ConfigKeymapTriggerUseCase
+) : ViewModel(), ModelState<List<ListItem>> {
 
     private companion object {
         const val ID_LONG_PRESS_DELAY = "long_press_delay"
@@ -42,13 +41,23 @@ class TriggerOptionsViewModel(
         const val KEY_SCREEN_OFF_TRIGGERS = "screen_off_triggers"
     }
 
-    val listItemModels = MutableStateFlow<DataState<List<ListItem>>>(Loading())
+    override val model = MutableLiveData<DataState<List<ListItem>>>(Loading())
+    override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
     init {
-        combine(useCase.options, getKeymapUid.uid) { optionsState, keymapUid ->
-            listItemModels.value =
-                optionsState.mapData { options -> buildModels(options, keymapUid) }
-        }
+        useCase.state.onEach { state ->
+            if (state is Data) {
+                model.value = buildModels(state.data.options, state.data.keymapUid).let {
+                    if (it.isEmpty()) {
+                        Empty()
+                    } else {
+                        Data(it)
+                    }
+                }
+            } else {
+                model.value = Loading()
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun buildModels(options: KeymapTriggerOptions, keymapUid: String) =
@@ -102,7 +111,7 @@ class TriggerOptionsViewModel(
                         SliderModel(
                             value = options.vibrateDuration.value,
                             isDefaultStepEnabled = true,
-                            min = 5,
+                            min = PreferenceMinimums.VIBRATION_DURATION_MIN,
                             max = 1000,
                             stepSize = 5,
                         )
@@ -118,7 +127,7 @@ class TriggerOptionsViewModel(
                         SliderModel(
                             value = options.longPressDelay.value,
                             isDefaultStepEnabled = true,
-                            min = 5,
+                            min = PreferenceMinimums.LONG_PRESS_DELAY_MIN,
                             max = 5000,
                             stepSize = 5,
                         )
@@ -144,7 +153,7 @@ class TriggerOptionsViewModel(
                         SliderModel(
                             value = options.doublePressDelay.value,
                             isDefaultStepEnabled = true,
-                            min = 5,
+                            min = PreferenceMinimums.DOUBLE_PRESS_DELAY_MIN,
                             max = 5000,
                             stepSize = 5,
                         )
@@ -160,7 +169,7 @@ class TriggerOptionsViewModel(
                         SliderModel(
                             value = options.sequenceTriggerTimeout.value,
                             isDefaultStepEnabled = true,
-                            min = 5,
+                            min = PreferenceMinimums.SEQUENCE_TRIGGER_TIMEOUT_MIN,
                             max = 5000,
                             stepSize = 5,
                         )

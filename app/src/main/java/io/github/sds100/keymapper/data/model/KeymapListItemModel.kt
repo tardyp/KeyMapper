@@ -3,6 +3,8 @@ package io.github.sds100.keymapper.data.model
 /**
  * Created by sds100 on 28/03/2020.
  */
+
+//TODO a single list should be used for the chips
 data class KeymapListItemModel(
     val id: Long,
     val actionList: List<ActionChipModel>,

@@ -81,25 +81,27 @@ fun TriggerEntity.KeyEntity.buildModel(
     deviceInfoList: List<DeviceInfoEntity>,
     showDeviceDescriptors: Boolean
 ): TriggerKeyListItemModel {
+//
+//    val extraInfo = buildString {
+//        append(getDeviceName(ctx, deviceInfoList, showDeviceDescriptors))
+//
+//        val flagLabels = getFlagLabelList(ctx)
+//
+//        flagLabels.forEach { label ->
+//            append(" ${ctx.str(R.string.middot)} ")
+//            append(label)
+//        }
+//    }
+//
+//    return TriggerKeyListItemModel(
+//        id = uid,
+//        keyCode = keyCode,
+//        name = KeyEventUtils.keycodeToString(keyCode),
+//        clickType = clickType,
+//        extraInfo = extraInfo
+//    )
 
-    val extraInfo = buildString {
-        append(getDeviceName(ctx, deviceInfoList, showDeviceDescriptors))
-
-        val flagLabels = getFlagLabelList(ctx)
-
-        flagLabels.forEach { label ->
-            append(" ${ctx.str(R.string.middot)} ")
-            append(label)
-        }
-    }
-
-    return TriggerKeyListItemModel(
-        id = uid,
-        keyCode = keyCode,
-        name = KeyEventUtils.keycodeToString(keyCode),
-        clickType = clickType,
-        extraInfo = extraInfo
-    )
+    TODO()
 }
 
 fun TriggerEntity.KeyEntity.getDeviceName(

@@ -1,8 +1,9 @@
-package io.github.sds100.keymapper.domain.models
+package io.github.sds100.keymapper.domain.mappings.keymap
 
-import io.github.sds100.keymapper.domain.mappings.keymap.StopHoldDown
-import io.github.sds100.keymapper.domain.mappings.keymap.StopRepeating
+import io.github.sds100.keymapper.domain.models.Defaultable
+import io.github.sds100.keymapper.domain.models.Option
 
+@Serializable
 data class KeymapActionOptions(
     val repeat: Option<Boolean>,
     val holdDown: Option<Boolean>,

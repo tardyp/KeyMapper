@@ -6,9 +6,7 @@ import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.FlowPrefDelegate
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
 import io.github.sds100.keymapper.util.FingerprintMapUtils
-import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 14/02/21.
@@ -42,10 +40,6 @@ class OnboardingUseCaseImpl(
         Keys.shownSequenceTriggerExplanation,
         false
     )
-    override var shownMultipleOfSameKeyInSequenceTriggerExplanation by PrefDelegate(
-        Keys.shownMultipleOfSameKeyInSequenceTriggerExplanation,
-        false
-    )
 
     override val showFingerprintFeatureNotificationIfAvailable: Boolean
         get() {
@@ -69,7 +63,7 @@ class OnboardingUseCaseImpl(
         set(Keys.lastInstalledVersionCodeHomeScreen, Constants.VERSION_CODE)
     }
 
-    override var shownQuickStartGuideHint by PrefDelegate(Keys.shownQuickStartGuideHint, false)
+    override val shownQuickStartGuideHint by FlowPrefDelegate(Keys.shownQuickStartGuideHint, false)
     override fun shownQuickStartGuideHint() {
         preferenceRepository.set(Keys.shownQuickStartGuideHint, true)
     }
@@ -85,7 +79,6 @@ interface OnboardingUseCase {
     var shownScreenOffTriggersExplanation: Boolean
     var shownParallelTriggerOrderExplanation: Boolean
     var shownSequenceTriggerExplanation: Boolean
-    var shownMultipleOfSameKeyInSequenceTriggerExplanation: Boolean
 
     val showFingerprintFeatureNotificationIfAvailable: Boolean
     fun showedFingerprintFeatureNotificationIfAvailable()
@@ -93,6 +86,6 @@ interface OnboardingUseCase {
     val showOnboardingAfterUpdateHomeScreen: Flow<Boolean>
     fun showedOnboardingAfterUpdateHomeScreen()
 
-    var shownQuickStartGuideHint: Boolean
+    val shownQuickStartGuideHint: Flow<Boolean>
     fun shownQuickStartGuideHint()
 }

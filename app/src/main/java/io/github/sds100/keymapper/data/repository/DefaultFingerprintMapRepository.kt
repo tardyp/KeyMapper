@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
-import androidx.datastore.preferences.core.remove
 import androidx.lifecycle.MutableLiveData
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.nullInt
@@ -16,7 +15,8 @@ import io.github.sds100.keymapper.data.db.migration.fingerprintmaps.Migration_0_
 import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.FingerprintMapEntity
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.FingerprintMapUtils
 import io.github.sds100.keymapper.util.MigrationUtils
@@ -27,8 +27,9 @@ import kotlinx.coroutines.launch
 /**
  * Created by sds100 on 17/11/20.
  */
-class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferences>,
-                                      private val coroutineScope: CoroutineScope
+class DefaultFingerprintMapRepository(
+    private val dataStore: DataStore<Preferences>,
+    private val coroutineScope: CoroutineScope
 ) : FingerprintMapRepository {
 
     companion object {
@@ -45,31 +46,31 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
     }
 
     override val requestAutomaticBackup =
-        MutableLiveData<BackupRequest<Map<String, FingerprintMap>>>()
+        MutableLiveData<BackupRequest<Map<String, FingerprintMapEntity>>>()
 
     private val gson = GsonBuilder()
-        .registerTypeAdapter(FingerprintMap.DESERIALIZER)
+        .registerTypeAdapter(FingerprintMapEntity.DESERIALIZER)
         .registerTypeAdapter(ActionEntity.DESERIALIZER)
         .registerTypeAdapter(Extra.DESERIALIZER)
         .registerTypeAdapter(ConstraintEntity.DESERIALIZER).create()
 
     private val jsonParser = JsonParser()
 
-    override val swipeDown: Flow<FingerprintMap> = dataStore.data.map { prefs ->
+    override val swipeDown: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
         prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN)
-    }.dropWhile { it.version < FingerprintMap.CURRENT_VERSION }
+    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
 
-    override val swipeUp: Flow<FingerprintMap> = dataStore.data.map { prefs ->
+    override val swipeUp: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
         prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP)
-    }.dropWhile { it.version < FingerprintMap.CURRENT_VERSION }
+    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
 
-    override val swipeLeft: Flow<FingerprintMap> = dataStore.data.map { prefs ->
+    override val swipeLeft: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
         prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT)
-    }.dropWhile { it.version < FingerprintMap.CURRENT_VERSION }
+    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
 
-    override val swipeRight: Flow<FingerprintMap> = dataStore.data.map { prefs ->
+    override val swipeRight: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
         prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT)
-    }.dropWhile { it.version < FingerprintMap.CURRENT_VERSION }
+    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
 
     override val fingerprintGestureMaps = combine(
         swipeDown,
@@ -97,34 +98,45 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
         }
     }
 
+    override suspend fun get(id: FingerprintMapId) = when (id) {
+        FingerprintMapId.SWIPE_DOWN -> swipeDown.first()
+        FingerprintMapId.SWIPE_UP -> swipeUp.first()
+        FingerprintMapId.SWIPE_LEFT -> swipeLeft.first()
+        FingerprintMapId.SWIPE_RIGHT -> swipeRight.first()
+    }
+
     override fun restore(
-        gestureId: String,
+        id: FingerprintMapId,
         fingerprintMapJson: String
     ) {
         coroutineScope.launch {
             val rootElement = jsonParser.parse(fingerprintMapJson)
-            val initialVersion = rootElement.asJsonObject.get(FingerprintMap.NAME_VERSION).nullInt
-                ?: 0
+            val initialVersion =
+                rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt
+                    ?: 0
 
             val migratedJson = MigrationUtils.migrate(
                 gson,
                 MIGRATIONS,
                 initialVersion,
                 fingerprintMapJson,
-                FingerprintMap.CURRENT_VERSION
+                FingerprintMapEntity.CURRENT_VERSION
             )
 
-            setGesture(gestureId, migratedJson)
+
+            //TODO
+//            setGesture(id, migratedJson)
         }
     }
 
     override fun updateGesture(
-        gestureId: String,
-        block: (old: FingerprintMap) -> FingerprintMap
+        id: FingerprintMapId,
+        block: (old: FingerprintMapEntity) -> FingerprintMapEntity
     ) {
+        TODO()
         coroutineScope.launch {
             dataStore.edit { prefs ->
-                val key = PREF_KEYS_MAP[gestureId]!!
+                val key = PREF_KEYS_MAP[id]!!
                 val new = block.invoke(prefs.getGesture(key))
 
                 prefs[key] = gson.toJson(new)
@@ -144,8 +156,10 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
         }
     }
 
-    private suspend fun setGesture(gestureId: String,
-                                   fingerprintMapJson: String) {
+    private suspend fun setGesture(
+        gestureId: String,
+        fingerprintMapJson: String
+    ) {
         dataStore.edit { prefs ->
             val key = PREF_KEYS_MAP[gestureId]!!
             prefs[key] = fingerprintMapJson
@@ -156,30 +170,31 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
 
     private suspend fun requestBackup() {
         val maps = PREF_KEYS_MAP.mapValues { (_, preferenceKey) ->
-            dataStore.data.firstOrNull()?.getGesture(preferenceKey) ?: FingerprintMap()
+            dataStore.data.firstOrNull()?.getGesture(preferenceKey) ?: FingerprintMapEntity()
         }
 
         //don't back up if they haven't been migrated
-        if (maps.any { it.value.version < FingerprintMap.CURRENT_VERSION }) return
+        if (maps.any { it.value.version < FingerprintMapEntity.CURRENT_VERSION }) return
 
         requestAutomaticBackup.value = BackupRequest(maps)
     }
 
-    private suspend fun Preferences.getGesture(key: Preferences.Key<String>): FingerprintMap {
-        val json = this[key] ?: return FingerprintMap()
+    private suspend fun Preferences.getGesture(key: Preferences.Key<String>): FingerprintMapEntity {
+        val json = this[key] ?: return FingerprintMapEntity()
 
         val rootElement = jsonParser.parse(json)
-        val initialVersion = rootElement.asJsonObject.get(FingerprintMap.NAME_VERSION).nullInt ?: 0
+        val initialVersion =
+            rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt ?: 0
 
         val migratedJson = MigrationUtils.migrate(
             gson,
             MIGRATIONS,
             initialVersion,
             json,
-            FingerprintMap.CURRENT_VERSION
+            FingerprintMapEntity.CURRENT_VERSION
         )
 
-        if (initialVersion < FingerprintMap.CURRENT_VERSION) {
+        if (initialVersion < FingerprintMapEntity.CURRENT_VERSION) {
             setGesture(key.name, migratedJson)
         }
 
@@ -196,7 +211,8 @@ class DefaultFingerprintMapRepository(private val dataStore: DataStore<Preferenc
             FINGERPRINT_GESTURE_SWIPE_DOWN,
             FINGERPRINT_GESTURE_SWIPE_LEFT,
             FINGERPRINT_GESTURE_SWIPE_UP,
-            FINGERPRINT_GESTURE_SWIPE_RIGHT)
+            FINGERPRINT_GESTURE_SWIPE_RIGHT
+        )
 
         val FINGERPRINT_GESTURES_AVAILABLE =
             preferencesKey<Boolean>("fingerprint_gestures_available")

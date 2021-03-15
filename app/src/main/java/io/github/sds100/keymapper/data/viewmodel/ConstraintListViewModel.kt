@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
  * Created by sds100 on 29/11/20.
  */
 
+//TODO refactor
 class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
                               val supportedConstraintList: List<String>) :
     ModelState<List<ConstraintModel>> {

@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.ui.mappings.keymap
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.models.TriggerKey
+import io.github.sds100.keymapper.domain.mappings.keymap.TriggerKey
 import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType

@@ -9,6 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
+import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.util.int
 import io.github.sds100.keymapper.util.str
 
@@ -55,11 +56,13 @@ class SliderWithLabel(context: Context,
 
     fun applyModel(model: SliderModel) {
         val min = context.int(model.min)
-        val max = context.int(model.maxSlider)
+        val max = context.int(model.max)
         var stepSize = context.int(model.stepSize)
 
-        if ((model.value ?: 0) % stepSize != 0 || model.value?.let { it > max } == true) {
-            stepSize = 1
+        if (model.value is Defaultable.Custom) {
+            if (model.value.data % stepSize != 0 || model.value.data > max) {
+                stepSize = 1
+            }
         }
 
         val defaultStepValue = calculateDefaultStepValue(min.toFloat(), stepSize.toFloat())
@@ -75,23 +78,23 @@ class SliderWithLabel(context: Context,
         slider.stepSize = stepSize.toFloat()
         isDefaultStepEnabled = model.isDefaultStepEnabled
 
-        if (model.value != null) {
+        if (model.value is Defaultable.Custom) {
             when {
-                model.value > max -> {
+                model.value.data > max -> {
                     //set the max slider value to a multiple of the step size greater than the value
                     val remainder = if (stepSize == 0) {
                         0
                     } else {
-                        model.value % stepSize
+                        model.value.data % stepSize
                     }
 
-                    slider.valueTo = ((model.value + stepSize) - remainder).toFloat()
-                    slider.value = model.value.toFloat()
+                    slider.valueTo = ((model.value.data + stepSize) - remainder).toFloat()
+                    slider.value = model.value.data.toFloat()
                 }
 
-                model.value < min -> slider.value = min.toFloat()
+                model.value.data < min -> slider.value = min.toFloat()
 
-                else -> slider.value = model.value.toFloat()
+                else -> slider.value = model.value.data.toFloat()
             }
         } else {
             slider.value = defaultStepValue

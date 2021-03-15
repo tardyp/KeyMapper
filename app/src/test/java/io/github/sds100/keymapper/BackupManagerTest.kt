@@ -10,7 +10,7 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.BackupManager
 import io.github.sds100.keymapper.data.IBackupManager
 import io.github.sds100.keymapper.data.db.AppDatabase
-import io.github.sds100.keymapper.data.model.FingerprintMap
+import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
@@ -133,13 +133,13 @@ class BackupManagerTest {
     fun `backup all fingerprint maps, don't save keymap db version and show success message`() =
         coroutineScope.runBlockingTest {
             Mockito.`when`(mockFingerprintMapRepository.swipeDown)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeUp)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeLeft)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeRight)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
 
             val outputStream = PipedOutputStream()
             val inputStream =
@@ -271,13 +271,13 @@ class BackupManagerTest {
     fun `backup all fingerprint maps, return list of default fingerprint maps`() =
         coroutineScope.runBlockingTest {
             Mockito.`when`(mockFingerprintMapRepository.swipeDown)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeUp)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeLeft)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeRight)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
 
             val outputStream = PipedOutputStream()
             val inputStream =
@@ -292,7 +292,7 @@ class BackupManagerTest {
                 MatcherAssert.assertThat(
                     "doesn't contain $jsonKey fingerprint map",
                     gson.toJson(rootElement[jsonKey]),
-                    Is.`is`(gson.toJson(FingerprintMap()))
+                    Is.`is`(gson.toJson(FingerprintMapEntity()))
                 )
             }
 
@@ -344,13 +344,13 @@ class BackupManagerTest {
             val keymapList = listOf(KeyMapEntity(0), KeyMapEntity(1))
             Mockito.`when`(mockKeymapRepository.getKeymaps()).then { keymapList }
             Mockito.`when`(mockFingerprintMapRepository.swipeDown)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeUp)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeLeft)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
             Mockito.`when`(mockFingerprintMapRepository.swipeRight)
-                .then { flow { emit(FingerprintMap()) } }
+                .then { flow { emit(FingerprintMapEntity()) } }
 
             val outputStream = PipedOutputStream()
             val inputStream =
@@ -375,7 +375,7 @@ class BackupManagerTest {
                 MatcherAssert.assertThat(
                     "doesn't contain $jsonKey fingerprint map",
                     gson.toJson(rootElement[jsonKey]),
-                    Is.`is`(gson.toJson(FingerprintMap()))
+                    Is.`is`(gson.toJson(FingerprintMapEntity()))
                 )
             }
 

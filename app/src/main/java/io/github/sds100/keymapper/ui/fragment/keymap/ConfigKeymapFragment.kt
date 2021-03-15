@@ -38,7 +38,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
         setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
             result.getParcelable<ActionEntity>(ChooseActionFragment.EXTRA_ACTION)?.let {
-                viewModel.actionListViewModel.addAction(it)
+                //TODO
             }
         }
 
@@ -51,7 +51,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         setFragmentResultListener(KeymapActionOptionsFragment.REQUEST_KEY) { _, result ->
             result.getParcelable<KeymapActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
                 ?.let {
-                    viewModel.actionListViewModel.setOptions(it)
+                    //TODO
                 }
         }
 

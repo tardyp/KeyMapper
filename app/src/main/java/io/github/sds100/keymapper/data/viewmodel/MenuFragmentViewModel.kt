@@ -6,10 +6,8 @@ import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.MenuKeymapUseCase
 import io.github.sds100.keymapper.domain.usecases.ControlKeymapsPausedState
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Created by sds100 on 17/11/20.
@@ -17,31 +15,30 @@ import kotlinx.coroutines.launch
 class MenuFragmentViewModel(
     private val keymapUseCase: MenuKeymapUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,
-    private val manageKeymapsUseCase: ControlKeymapsPausedState
+    private val controlKeymapsPausedState: ControlKeymapsPausedState
 ) : ViewModel() {
 
-    private val _keymapsPaused = MutableStateFlow(false)
-    val keymapsPaused: StateFlow<Boolean> = _keymapsPaused
+    private val _keymapsPaused = MutableLiveData(false)
+    val keymapsPaused: LiveData<Boolean> = _keymapsPaused
     val accessibilityServiceEnabled = MutableLiveData(false)
 
     private val _eventStream = LiveEvent<Event>()
     val eventStream: LiveData<Event> = _eventStream
 
     init {
-        viewModelScope.launch {
-            manageKeymapsUseCase.keymapsPaused.collect {
-                _keymapsPaused.value = it
-            }
-        }
+        controlKeymapsPausedState.keymapsPaused.onEach {
+            _keymapsPaused.value = it
+        }.launchIn(viewModelScope)
     }
 
     fun enableAll() {
         keymapUseCase.enableAll()
 
         FingerprintMapUtils.GESTURES.forEach { gestureId ->
-            fingerprintMapRepository.updateGesture(gestureId) {
-                it.copy(isEnabled = true)
-            }
+            //TODO
+//            fingerprintMapRepository.updateGesture(gestureId) {
+//                it.copy(isEnabled = true)
+//            }
         }
     }
 
@@ -49,9 +46,10 @@ class MenuFragmentViewModel(
         keymapUseCase.disableAll()
 
         FingerprintMapUtils.GESTURES.forEach { gestureId ->
-            fingerprintMapRepository.updateGesture(gestureId) {
-                it.copy(isEnabled = false)
-            }
+            //TODO
+//            fingerprintMapRepository.updateGesture(gestureId) {
+//                it.copy(isEnabled = false)
+//            }
         }
     }
 
@@ -61,8 +59,8 @@ class MenuFragmentViewModel(
     fun sendFeedback() = run { _eventStream.value = SendFeedback() }
     fun backupAll() = run { _eventStream.value = RequestBackupAll() }
     fun restore() = run { _eventStream.value = RequestRestore() }
-    fun resumeKeymaps() = run { manageKeymapsUseCase.resumeKeymaps() }
-    fun pauseKeymaps() = run { manageKeymapsUseCase.pauseKeymaps() }
+    fun resumeKeymaps() = run { controlKeymapsPausedState.resumeKeymaps() }
+    fun pauseKeymaps() = run { controlKeymapsPausedState.pauseKeymaps() }
     fun enableAccessibilityService() = run { _eventStream.value = EnableAccessibilityService() }
 
     @Suppress("UNCHECKED_CAST")

@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.repository.KeymapRepository
-import io.github.sds100.keymapper.domain.models.KeyMap
-import io.github.sds100.keymapper.domain.models.KeyMapEntityMapper
 
 /**
  * Created by sds100 on 08/03/2021.

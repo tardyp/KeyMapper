@@ -4,8 +4,8 @@ import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
-import io.github.sds100.keymapper.domain.usecases.ListFingerprintMapsUseCase
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.usecases.ListFingerprintMapsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.Error
@@ -42,14 +42,15 @@ class FingerprintMapListViewModel(
         addSource(fingerprintGestureMaps.asLiveData()) {
             //this is important to prevent events being sent in the wrong order
             viewModelScope.launch {
-                postValue(
-                    BuildFingerprintMapModels(
-                        it,
-                        showDeviceInfoUseCase.getAll(),
-                        listUseCase.hasRootPermission,
-                        showDeviceInfoUseCase.showDeviceDescriptors
-                    )
-                )
+                //TODO
+//                postValue(
+//                    BuildFingerprintMapModels(
+//                        it,
+//                        showDeviceInfoUseCase.getAll(),
+//                        listUseCase.hasRootPermission,
+//                        showDeviceInfoUseCase.showDeviceDescriptors
+//                    )
+//                )
             }
         }
     }
@@ -72,23 +73,23 @@ class FingerprintMapListViewModel(
         _model.value = Data(models)
     }
 
-    fun setEnabled(id: String, isEnabled: Boolean) = repository.updateGesture(id) {
-        it.copy(isEnabled = isEnabled)
-    }
+    //TODO
+    fun setEnabled(id: String, isEnabled: Boolean): Nothing = TODO()
 
     fun rebuildModels() {
         _model.value = Loading()
 
         viewModelScope.launch {
             fingerprintGestureMaps.firstOrNull()?.let {
-                _eventStream.postValue(
-                    BuildFingerprintMapModels(
-                        it,
-                        showDeviceInfoUseCase.getAll(),
-                        listUseCase.hasRootPermission,
-                        showDeviceInfoUseCase.showDeviceDescriptors
-                    )
-                )
+                //TODO
+//                _eventStream.postValue(
+//                    BuildFingerprintMapModels(
+//                        it,
+//                        showDeviceInfoUseCase.getAll(),
+//                        listUseCase.hasRootPermission,
+//                        showDeviceInfoUseCase.showDeviceDescriptors
+//                    )
+//                )
             }
         }
     }

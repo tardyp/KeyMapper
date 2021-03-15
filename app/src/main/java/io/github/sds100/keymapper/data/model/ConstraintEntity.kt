@@ -86,6 +86,7 @@ data class ConstraintEntity(@ConstraintType
         /**
          * Constraints supported by all types of mappings.
          */
+        //TODO move to sealed Constraint model in domain
         val COMMON_SUPPORTED_CONSTRAINTS = listOf(
             APP_FOREGROUND,
             APP_NOT_FOREGROUND,

@@ -10,26 +10,28 @@ import com.airbnb.epoxy.EpoxyTouchHelper
 import com.google.android.material.card.MaterialCardView
 import io.github.sds100.keymapper.ActionBindingModel_
 import io.github.sds100.keymapper.NavAppDirections
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.action
 import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.ui.actions.ActionListItemModel
 import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.domain.actions.Action
+import io.github.sds100.keymapper.ui.actions.ActionListItemModel
 import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.ifIsData
 
 /**
  * Created by sds100 on 22/11/20.
  */
-abstract class ActionListFragment<O : BaseOptions<ActionEntity>>
+abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
     : RecyclerViewFragment<List<ActionListItemModel>, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
     }
 
-    abstract val actionListViewModel: ActionListViewModel<O>
+    abstract val actionListViewModel: ActionListViewModel<A>
 
     override val modelState: ModelState<List<ActionListItemModel>>
         get() = actionListViewModel
@@ -49,7 +51,10 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>>
 
     abstract fun openActionOptionsFragment(options: O)
 
-    override fun populateList(binding: FragmentActionListBinding, model: List<ActionListItemModel>?) {
+    override fun populateList(
+        binding: FragmentActionListBinding,
+        model: List<ActionListItemModel>?
+    ) {
         binding.enableActionDragging(actionListController)
 
         actionListController.modelList = model ?: emptyList()
@@ -61,7 +66,8 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>>
         binding.epoxyRecyclerViewActions.adapter = actionListController.adapter
 
         actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
-            openActionOptionsFragment(it)
+            //TODO
+//            openActionOptionsFragment(it)
         })
 
         binding.setOnAddActionClick {
@@ -131,7 +137,8 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>>
                     }
 
                     onMoreClick { _ ->
-                        actionListViewModel.editOptions(model.id)
+                        //TODO
+//                        actionListViewModel.editOptions(model.id)
                     }
 
                     onClick { _ ->

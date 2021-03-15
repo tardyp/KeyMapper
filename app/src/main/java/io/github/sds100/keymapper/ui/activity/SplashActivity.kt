@@ -5,14 +5,14 @@ import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 
 /**
  * Created by sds100 on 20/01/21.
  */
 class SplashActivity : FragmentActivity() {
 
-    private val useCase = OnboardingUseCase(ServiceLocator.preferenceRepository(this))
+    private val useCase = OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(this))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -26,14 +26,14 @@ class KeymapListViewModel internal constructor(
     private val _eventStream = LiveEvent<Event>().apply {
         addSource(keymapRepository.keymapList) {
             viewModelScope.launch {
-                postValue(
-                    BuildKeymapListModels(
-                        it,
-                        showActionsUseCase.getDeviceInfo(),
-                        showActionsUseCase.hasRootPermission,
-                        showActionsUseCase.showDeviceDescriptors
-                    )
-                )
+//                postValue(
+//                    BuildKeymapListModels(
+//                        it,
+//                        showActionsUseCase.getDeviceInfo(),
+//                        showActionsUseCase.hasRootPermission,
+//                        showActionsUseCase.showDeviceDescriptors
+//                    )
+//                )
             }
         }
     }
@@ -60,14 +60,14 @@ class KeymapListViewModel internal constructor(
         _model.value = Loading()
 
         viewModelScope.launch {
-            _eventStream.postValue(
-                BuildKeymapListModels(
-                    keymapRepository.keymapList.value ?: emptyList(),
-                    showActionsUseCase.getDeviceInfo(),
-                    showActionsUseCase.hasRootPermission,
-                    showActionsUseCase.showDeviceDescriptors
-                )
-            )
+//            _eventStream.postValue(
+//                BuildKeymapListModels(
+//                    keymapRepository.keymapList.value ?: emptyList(),
+//                    showActionsUseCase.getDeviceInfo(),
+//                    showActionsUseCase.hasRootPermission,
+//                    showActionsUseCase.showDeviceDescriptors
+//                )
+//            )
         }
     }
 
