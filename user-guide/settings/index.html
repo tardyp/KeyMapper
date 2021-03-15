@@ -554,7 +554,7 @@ tapping Settings.</p>
 <h2 id="automatically-change-the-on-screen-keyboard-when-a-device-connectsdisconnects">Automatically change the on-screen keyboard when a device connects/disconnects<a class="headerlink" href="#automatically-change-the-on-screen-keyboard-when-a-device-connectsdisconnects" title="Permanent link">&para;</a></h2>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>This requires WRITE_SECURE_SETTINGS permission on Android 10 and older. Follow <a href="../adb-permissions/#write_secure_settings">this guide</a> to grant Key Mapper this permission.</p>
+<p>You must <a href="../adb-permissions/#write_secure_settings">grant Key Mapper WRITE_SECURE_SETTINGS permission</a> for this to notification to be shown. Alternatively on Android 11+ you can just turn on the accessibility service.</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -564,10 +564,14 @@ tapping Settings.</p>
 <h2 id="automatically-change-the-on-screen-keyboard-when-toggling-key-maps">Automatically change the on-screen keyboard when toggling key maps<a class="headerlink" href="#automatically-change-the-on-screen-keyboard-when-toggling-key-maps" title="Permanent link">&para;</a></h2>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>This requires WRITE_SECURE_SETTINGS permission on Android 10 and older. Follow <a href="../adb-permissions/#write_secure_settings">this guide</a> to grant Key Mapper this permission.</p>
+<p>You must <a href="../adb-permissions/#write_secure_settings">grant Key Mapper WRITE_SECURE_SETTINGS permission</a> for this to notification to be shown. Alternatively on Android 11+ you can just turn on the accessibility service.</p>
 </div>
 <p>The last used Key Mapper keyboard will be automatically selected when you unpause your key maps. Your normal keyboard will be automatically selected when they are paused.</p>
 <h2 id="toggle-key-mapper-keyboard-notification">Toggle Key Mapper keyboard notification<a class="headerlink" href="#toggle-key-mapper-keyboard-notification" title="Permanent link">&para;</a></h2>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>You must <a href="../adb-permissions/#write_secure_settings">grant Key Mapper WRITE_SECURE_SETTINGS permission</a> for this to notification to be shown. Alternatively on Android 11+ you can just turn on the accessibility service.</p>
+</div>
 <p>This notification will select the last used Key Mapper keyboard if you are using your normal keyboard and will select your normal keyboard if the Key Mapper keyboard is being used.</p>
 <h2 id="automatically-show-keyboard-picker-up-to-android-90">Automatically show keyboard picker (up to Android 9.0)<a class="headerlink" href="#automatically-show-keyboard-picker-up-to-android-90" title="Permanent link">&para;</a></h2>
 <div class="admonition attention">
