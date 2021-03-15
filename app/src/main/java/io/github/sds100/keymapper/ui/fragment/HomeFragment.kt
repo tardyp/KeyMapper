@@ -407,12 +407,12 @@ class HomeFragment : Fragment() {
                 }
             })
 
-            homeViewModel.showQuickStartGuide.observe(viewLifecycleOwner, { show ->
+            homeViewModel.showQuickStartGuideTapTarget.observe(viewLifecycleOwner, { show ->
                 if (!show) return@observe
 
                 viewLifecycleScope.launchWhenResumed {
                     QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
-
+                        homeViewModel.approvedQuickStartGuideTapTarget()
                     }
                 }
             })

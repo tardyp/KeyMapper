@@ -16,8 +16,8 @@ class HomeViewModel(private val onboarding: OnboardingUseCase) : ViewModel() {
     private val _showWhatsNew = MutableLiveData(false)
     val showWhatsNew: LiveData<Boolean> = _showWhatsNew
 
-    private val _showQuickStartGuideHint = MutableLiveData(false)
-    val showQuickStartGuide: LiveData<Boolean> = _showQuickStartGuideHint
+    private val _showQuickStartGuideTapTarget = MutableLiveData(false)
+    val showQuickStartGuideTapTarget: LiveData<Boolean> = _showQuickStartGuideTapTarget
 
     init {
         onboarding.showGuiKeyboardAdFlow.onEach {
@@ -25,7 +25,7 @@ class HomeViewModel(private val onboarding: OnboardingUseCase) : ViewModel() {
         }.launchIn(viewModelScope)
 
         onboarding.shownQuickStartGuideHint.onEach { shown ->
-            _showQuickStartGuideHint.value = !shown
+            _showQuickStartGuideTapTarget.value = !shown
         }.launchIn(viewModelScope)
 
         onboarding.showOnboardingAfterUpdateHomeScreen.onEach { show ->
@@ -36,6 +36,8 @@ class HomeViewModel(private val onboarding: OnboardingUseCase) : ViewModel() {
     fun shownGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
     fun shownWhatsNew() = onboarding.showedOnboardingAfterUpdateHomeScreen()
+
+    fun approvedQuickStartGuideTapTarget() = onboarding.shownQuickStartGuideHint()
 
     @Suppress("UNCHECKED_CAST")
     class Factory(

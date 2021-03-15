@@ -21,7 +21,7 @@ sealed class TapTarget(
      * Only works on app bar items if called during or after
      * the resumed state in the view lifecycle.
      */
-    suspend fun show(
+    fun show(
         fragment: Fragment,
         @IdRes viewId: Int,
         promptFocal: PromptFocal = CirclePromptFocal(),

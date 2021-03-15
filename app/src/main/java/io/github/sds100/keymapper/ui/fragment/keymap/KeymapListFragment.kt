@@ -82,6 +82,7 @@ class KeymapListFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>
     override fun onResume() {
         super.onResume()
 
+        viewModel.rebuildModels()
         //TODO rebuild models
     }
 
