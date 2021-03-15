@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.domain.actions
 
 import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.domain.utils.*
+import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class ActionData

@@ -11,5 +11,5 @@ interface InputMethodAdapter {
     fun chooseCompatibleInputMethod()
     fun showImePickerOutsideApp()
 
-    val chosenInputMethodPackageName: StateFlow<String>
+    val chosenImePackageName: StateFlow<String?>
 }

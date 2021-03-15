@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.models.Constraint
 import io.github.sds100.keymapper.domain.models.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
+import kotlinx.serialization.Serializable
 
 /**
  * Created by sds100 on 03/03/2021.

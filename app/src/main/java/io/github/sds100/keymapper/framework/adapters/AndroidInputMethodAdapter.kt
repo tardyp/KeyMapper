@@ -1,6 +1,9 @@
 package io.github.sds100.keymapper.framework.adapters
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
@@ -12,7 +15,7 @@ import io.github.sds100.keymapper.util.KeyboardUtils
 import io.github.sds100.keymapper.util.PermissionUtils
 import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.result.*
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import splitties.toast.toast
 
 /**
@@ -23,10 +26,38 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
         private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
     }
 
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent ?: return
+            context ?: return
+
+            when (intent.action) {
+                Intent.ACTION_INPUT_METHOD_CHANGED -> {
+                    chosenImePackageName.value =
+                        KeyboardUtils.getChosenInputMethodPackageName(ctx).valueOrNull()
+                }
+            }
+        }
+    }
+
+
     private val ctx = context.applicationContext
 
-    override val chosenInputMethodPackageName: StateFlow<String>
-        get() = TODO("Not yet implemented")
+    override val chosenImePackageName = MutableStateFlow(
+        getChosenInputMethodPackageName(ctx).valueOrNull()
+    )
+
+    private val inputMethodManager: InputMethodManager
+        get() = ctx.getSystemService()!!
+
+
+    init {
+        IntentFilter().apply {
+            addAction(Intent.ACTION_INPUT_METHOD_CHANGED)
+
+            ctx.registerReceiver(broadcastReceiver, this)
+        }
+    }
 
     override fun enableCompatibleInputMethods() {
         TODO("Not yet implemented")
@@ -106,5 +137,25 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
         }
 
         return NoIncompatibleKeyboardsInstalled()
+    }
+
+    private fun getChosenInputMethodPackageName(ctx: Context): Result<String> {
+        val chosenImeId = getChosenImeId(ctx)
+
+        return getImePackageName(chosenImeId)
+    }
+
+    private fun getChosenImeId(ctx: Context): String {
+        return Settings.Secure.getString(ctx.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+    }
+
+    private fun getImePackageName(imeId: String): Result<String> {
+        val packageName = inputMethodManager.inputMethodList.find { it.id == imeId }?.packageName
+
+        return if (packageName == null) {
+            ImeNotFound(imeId)
+        } else {
+            Success(packageName)
+        }
     }
 }

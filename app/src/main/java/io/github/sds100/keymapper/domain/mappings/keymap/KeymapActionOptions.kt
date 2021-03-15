@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class KeymapActionOptions(

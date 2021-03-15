@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.models.Constraint
 import io.github.sds100.keymapper.domain.models.ConstraintMode
+import kotlinx.serialization.Serializable
 import java.util.*
 
 /**

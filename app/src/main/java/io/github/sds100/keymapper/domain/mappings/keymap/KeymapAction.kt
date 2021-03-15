@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.models.Defaultable
+import kotlinx.serialization.Serializable
 import java.util.*
 
 /**

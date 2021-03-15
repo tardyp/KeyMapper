@@ -16,7 +16,7 @@ class GetActionErrorUseCaseImpl(
     inputMethodAdapter: InputMethodAdapter
 ) : GetActionErrorUseCase {
 
-    override val invalidateErrors = combine(inputMethodAdapter.chosenInputMethodPackageName) {}
+    override val invalidateErrors = combine(inputMethodAdapter.chosenImePackageName) {}
 
     override fun getError(action: ActionData): Result<Unit> {
         TODO("Not yet implemented")

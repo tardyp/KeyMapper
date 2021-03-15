@@ -6,7 +6,9 @@ import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.FlowPrefDelegate
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
 import io.github.sds100.keymapper.util.FingerprintMapUtils
+import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 14/02/21.

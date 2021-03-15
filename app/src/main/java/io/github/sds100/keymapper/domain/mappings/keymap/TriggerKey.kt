@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.utils.ClickType
+import kotlinx.serialization.Serializable
 import java.util.*
 
 /**

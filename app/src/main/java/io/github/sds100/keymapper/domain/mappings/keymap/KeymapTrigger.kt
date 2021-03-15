@@ -7,6 +7,7 @@ import io.github.sds100.keymapper.domain.models.Option
 import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
+import kotlinx.serialization.Serializable
 
 /**
  * Created by sds100 on 03/03/2021.

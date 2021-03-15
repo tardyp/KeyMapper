@@ -9,6 +9,8 @@ import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEven
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnToggleKeymapsUseCase
 import io.github.sds100.keymapper.domain.usecases.GetThemeUseCase
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Created by sds100 on 14/02/2021.
