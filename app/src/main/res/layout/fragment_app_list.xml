@@ -77,7 +77,7 @@
             android:text="@string/show_hidden_apps"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="?attr/colorOnSurface"
-            android:visibility="@{viewModel.haveHiddenApps == true ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.showHiddenAppsButton == true ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

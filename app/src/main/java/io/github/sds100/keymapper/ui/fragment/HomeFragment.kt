@@ -163,7 +163,7 @@ class HomeFragment : Fragment() {
         }
 
         FragmentHomeBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = this@HomeFragment
+            lifecycleOwner = viewLifecycleOwner
             _binding = this
             return this.root
         }

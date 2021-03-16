@@ -29,7 +29,10 @@ import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
 object InjectorUtils {
 
     fun provideAppListViewModel(context: Context): AppListViewModel.Factory {
-        return AppListViewModel.Factory(ServiceLocator.packageRepository(context))
+        return AppListViewModel.Factory(
+            ServiceLocator.appInfoAdapter(context),
+            ServiceLocator.packageManagerAdapter(context)
+        )
     }
 
     fun provideAppShortcutListViewModel(context: Context): AppShortcutListViewModel.Factory {

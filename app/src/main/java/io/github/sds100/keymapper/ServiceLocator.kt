@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.data.repository.*
 import io.github.sds100.keymapper.domain.adapter.BluetoothMonitor
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
 import io.github.sds100.keymapper.framework.adapters.AndroidExternalDeviceAdapter
@@ -228,6 +229,10 @@ object ServiceLocator {
 
     fun appInfoAdapter(context: Context): AppInfoAdapter {
         return (context.applicationContext as MyApplication).appInfoAdapter
+    }
+
+    fun packageManagerAdapter(context: Context): PackageManagerAdapter {
+        return (context.applicationContext as MyApplication).packageManagerAdapter
     }
 
     @VisibleForTesting

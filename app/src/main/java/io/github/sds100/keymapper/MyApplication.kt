@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.framework.adapters.AndroidAppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.AndroidBluetoothMonitor
+import io.github.sds100.keymapper.framework.adapters.AndroidPackageManagerAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProviderImpl
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FileAccessDenied
@@ -39,6 +40,12 @@ class MyApplication : MultiDexApplication(),
     internal val resourceProvider by lazy { ResourceProviderImpl(this) }
 
     internal val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }
+    internal val packageManagerAdapter by lazy {
+        AndroidPackageManagerAdapter(
+            this,
+            appCoroutineScope
+        )
+    }
 
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 

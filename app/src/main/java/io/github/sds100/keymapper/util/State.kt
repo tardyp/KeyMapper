@@ -25,6 +25,13 @@ fun <T, O> DataState<T>.mapData(block: (data: T) -> O): DataState<O> = when (thi
     is Data -> Data(block.invoke(this.data))
 }
 
+suspend fun <T, O> DataState<T>.mapDataSuspend(block: suspend (data: T) -> O): DataState<O> =
+    when (this) {
+        is Loading -> Loading()
+        is Empty -> Empty()
+        is Data -> Data(block.invoke(this.data))
+    }
+
 inline fun <T> DataState<T>.ifIsData(block: (data: T) -> Unit) {
     if (this is Data) {
         block.invoke(this.data)

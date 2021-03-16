@@ -15,6 +15,16 @@ data class Success<T>(val value: T) : Result<T>()
 abstract class Error : Result<Nothing>()
 abstract class RecoverableError : Error()
 
+fun <T1, T2> combineOnSuccess(
+    result1: Result<T1>,
+    result2: Result<T2>,
+    onSuccess: (value1: T1, value2: T2) -> Unit
+) {
+    if (result1 is Success && result2 is Success) {
+        onSuccess.invoke(result1.value, result2.value)
+    }
+}
+
 inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {
     if (this is Success) {
         f(this.value)

@@ -2,18 +2,21 @@ package io.github.sds100.keymapper.framework.adapters
 
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /**
  * Created by sds100 on 03/03/2021.
  */
 
-class AndroidAppInfoAdapter(packageManager: PackageManager) : AppInfoAdapter {
-    override fun getAppName(packageName: String): Result<String> {
-        TODO("Not yet implemented")
+class AndroidAppInfoAdapter(
+    private val packageManager: PackageManager
+) : AppInfoAdapter {
+    override fun getAppName(packageName: String): Flow<String> = flow {
+        emit(packageManager.getApplicationInfo(packageName, 0).loadLabel(packageManager).toString())
     }
 
-    override fun getAppIcon(packageName: String): Result<Drawable> {
-        TODO("Not yet implemented")
+    override fun getAppIcon(packageName: String): Flow<Drawable> = flow {
+        emit(packageManager.getApplicationInfo(packageName, 0).loadIcon(packageManager))
     }
 }

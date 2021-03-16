@@ -9,12 +9,10 @@ import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.util.IntentTarget
-import io.github.sds100.keymapper.util.KeyEventUtils
-import io.github.sds100.keymapper.util.SystemActionUtils
-import io.github.sds100.keymapper.util.TintType
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
-import splitties.bitflags.hasFlag
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 22/02/2021.
@@ -83,9 +81,9 @@ abstract class BaseActionListItemMapper<A : Action>(
 
     private fun getTitle(action: ActionData): Result<String> = when (action) {
         is OpenAppAction ->
-            appInfoAdapter.getAppName(action.packageName) then { appName ->
+            appInfoAdapter.getAppName(action.packageName).map { appName ->
                 Success(getString(R.string.description_open_app, appName))
-            }
+            }.firstBlocking()
 
         is OpenAppShortcutAction -> Success(action.shortcutTitle)
 
@@ -216,7 +214,7 @@ abstract class BaseActionListItemMapper<A : Action>(
         }
 
         is ControlMediaForAppSystemAction ->
-            appInfoAdapter.getAppName(action.packageName).then { appName ->
+            appInfoAdapter.getAppName(action.packageName).map { appName ->
                 val resId = when (action.id) {
                     SystemActionId.PLAY_MEDIA_PACKAGE -> R.string.action_play_media_package_formatted
                     SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_play_pause_media_package_formatted
@@ -232,7 +230,7 @@ abstract class BaseActionListItemMapper<A : Action>(
 
                 getString(resId, appName).success()
 
-            }.otherwise {
+            }.catch {
                 val resId = when (action.id) {
                     SystemActionId.PLAY_MEDIA_PACKAGE -> R.string.action_play_media_package
                     SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_play_pause_media_package
@@ -246,7 +244,7 @@ abstract class BaseActionListItemMapper<A : Action>(
                 }
 
                 getString(resId).success()
-            }
+            }.firstBlocking()
 
         is CycleRotationsSystemAction -> {
             val orientationStrings = action.orientations.map {
@@ -320,13 +318,13 @@ abstract class BaseActionListItemMapper<A : Action>(
             tintType = TintType.NONE
         ).success()
 
-        is OpenAppAction -> appInfoAdapter.getAppIcon(action.packageName).then {
+        is OpenAppAction -> appInfoAdapter.getAppIcon(action.packageName).map {
             ActionIconInfo(it, TintType.NONE).success()
-        }
+        }.firstBlocking()
 
-        is OpenAppShortcutAction -> appInfoAdapter.getAppIcon(action.packageName).then {
+        is OpenAppShortcutAction -> appInfoAdapter.getAppIcon(action.packageName).map {
             ActionIconInfo(it, TintType.NONE).success()
-        }
+        }.firstBlocking()
 
         is SystemAction -> ActionIconInfo(
             getDrawable(SystemActionUtils.ICON_MAP[action.id]!!),
