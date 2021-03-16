@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
-import io.github.sds100.keymapper.ui.actions.ActionListItemModel
+import io.github.sds100.keymapper.ui.actions.ActionListItemState
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.RecoverableError
@@ -27,9 +27,9 @@ class ActionListViewModel<A : Action>(
     private val actionError: GetActionErrorUseCase,
     private val testAction: TestActionUseCase,
     private val listItemModelMapper: ActionListItemMapper<A>,
-) : ModelState<List<ActionListItemModel>> {
+) : ModelState<List<ActionListItemState>> {
 
-    override val model = MutableLiveData<DataState<List<ActionListItemModel>>>(Loading())
+    override val model = MutableLiveData<DataState<List<ActionListItemState>>>(Loading())
 
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
@@ -78,7 +78,7 @@ class ActionListViewModel<A : Action>(
         _enableAccessibilityServicePrompt.value = Unit
     }
 
-    fun rebuildModels() {
+    override fun rebuildModels() {
         coroutineScope.launch {
             buildModels(configActions.actionList.first())
         }
@@ -88,7 +88,11 @@ class ActionListViewModel<A : Action>(
         coroutineScope.launch {
             val newModel = actionList.mapData { data ->
                 data.map {
-                    listItemModelMapper.map(it, actionError.getError(it.data).errorOrNull())
+                    listItemModelMapper.map(
+                        it,
+                        actionError.getError(it.data).errorOrNull(),
+                        data.size
+                    )
                 }
             }
 

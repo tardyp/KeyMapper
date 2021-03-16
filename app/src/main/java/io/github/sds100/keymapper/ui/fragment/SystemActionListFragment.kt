@@ -6,10 +6,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.data.model.SystemActionListItemModel
+import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.viewmodel.SystemActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.sectionHeader
@@ -121,7 +121,7 @@ class SystemActionListFragment
                 val optionLabels = options.map { optionId ->
                     SystemActionOption.getOptionLabel(requireContext(), systemActionDef.id, optionId).handle(
                         onSuccess = { it },
-                        onFailure = { it.getFullMessage(requireContext()) }
+                        onError = { it.getFullMessage(requireContext()) }
                     )
                 }
 

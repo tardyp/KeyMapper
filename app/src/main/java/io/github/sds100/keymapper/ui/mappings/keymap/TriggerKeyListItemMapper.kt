@@ -64,7 +64,7 @@ class TriggerKeyListItemMapperImpl(
                 showDeviceInfoUseCase.getDeviceName(device.descriptor)
                     .handle(
                         onSuccess = { it },
-                        onFailure = { it.getFullMessage(resourceProvider) }
+                        onError = { it.getFullMessage(resourceProvider) }
                     )
             }
         }

@@ -101,6 +101,13 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
         }
     }
 
+    override fun getLabel(imeId: String): Result<String> {
+        val label = inputMethodManager.enabledInputMethodList.find { it.id == imeId }
+            ?.loadLabel(ctx.packageManager)?.toString() ?: return InputMethodNotFound(imeId)
+
+        return Success(label)
+    }
+
     private fun getSubtypeHistoryString(ctx: Context): String {
         return Settings.Secure.getString(
             ctx.contentResolver,

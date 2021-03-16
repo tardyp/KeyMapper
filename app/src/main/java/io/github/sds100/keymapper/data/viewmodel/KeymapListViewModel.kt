@@ -49,7 +49,7 @@ class KeymapListViewModel internal constructor(
     fun enableAll() = keymapRepository.enableAll()
     fun disableAll() = keymapRepository.disableAll()
 
-    fun rebuildModels() {
+    override fun rebuildModels() {
         if (keymapRepository.keymapList.value == null) return
 
         if (keymapRepository.keymapList.value?.isEmpty() == true) {

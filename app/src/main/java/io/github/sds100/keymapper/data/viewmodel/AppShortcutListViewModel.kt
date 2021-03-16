@@ -50,6 +50,10 @@ class AppShortcutListViewModel internal constructor(
     override val model = _model
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     class Factory(
         private val repository: AppRepository
     ) : ViewModelProvider.Factory {

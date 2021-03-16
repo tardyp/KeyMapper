@@ -9,7 +9,7 @@ data class KeymapActionOptions(
     val repeat: Option<Boolean>,
     val holdDown: Option<Boolean>,
     val stopRepeating: Option<StopRepeating>,
-    val stopHoldDown: Option<StopHoldDown>,
+    val stopHoldDown: Option<Defaultable<StopHoldDown>>,
     val repeatRate: Option<Defaultable<Int>>,
     val repeatDelay: Option<Defaultable<Int>>,
     val holdDownDuration: Option<Defaultable<Int>>,

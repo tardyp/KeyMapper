@@ -171,7 +171,7 @@ object KeyboardUtils {
 
     fun isImeEnabled(imeId: String): Boolean = getInputMethodIds().handle(
         onSuccess = { it.contains(imeId) },
-        onFailure = { false }
+        onError = { false }
     )
 
     fun isCompatibleImeEnabled(): Boolean {

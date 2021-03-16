@@ -101,8 +101,8 @@
     <string name="description_keyevent_from_device">Input %s%s from %s</string>
     <string name="description_keyevent_from_device_through_shell">Input %s%s from %s through shell</string>
     <string name="description_url">Open %s</string>
-    <string name="description_tap_coordinate_default">Tap coordinates %s, %s</string>
-    <string name="description_tap_coordinate_with_description">Tap coordinates %s, %s (%s)</string>
+    <string name="description_tap_coordinate_default">Tap coordinates %d, %d</string>
+    <string name="description_tap_coordinate_with_description">Tap coordinates %d, %d (%s)</string>
     <string name="description_phone_call">Call %s</string>
     <!--  Action descriptions  -->
 

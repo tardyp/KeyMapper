@@ -16,21 +16,24 @@ data class KeymapAction(
     override val uid: String = UUID.randomUUID().toString(),
     override val data: ActionData,
     val options: KeymapActionOptions
-) : Action
+) : Action {
+    override val multiplier = options.multiplier
+    override val delayBeforeNextAction = options.delayBeforeNextAction
+}
 
 @Serializable
 data class KeymapActionData(
     val uid: String = UUID.randomUUID().toString(),
     val data: ActionData,
-    private val repeat: Boolean = false,
-    private val holdDown: Boolean = false,
-    private val stopRepeating: StopRepeating = StopRepeating.TRIGGER_RELEASED,
-    private val stopHoldDown: StopHoldDown = StopHoldDown.TRIGGER_RELEASED,
-    private val repeatRate: Defaultable<Int> = Defaultable.Default(),
-    private val repeatDelay: Defaultable<Int> = Defaultable.Default(),
-    private val holdDownDuration: Defaultable<Int> = Defaultable.Default(),
-    private val delayBeforeNextAction: Defaultable<Int> = Defaultable.Default(),
-    private val multiplier: Defaultable<Int> = Defaultable.Default()
+    val repeat: Boolean = false,
+    val holdDown: Boolean = false,
+    val stopRepeating: StopRepeating = StopRepeating.TRIGGER_RELEASED,
+    val stopHoldDown: Defaultable<StopHoldDown> = Defaultable.Default(),
+    val repeatRate: Defaultable<Int> = Defaultable.Default(),
+    val repeatDelay: Defaultable<Int> = Defaultable.Default(),
+    val holdDownDuration: Defaultable<Int> = Defaultable.Default(),
+    val delayBeforeNextAction: Defaultable<Int> = Defaultable.Default(),
+    val multiplier: Defaultable<Int> = Defaultable.Default()
 )
 
 object KeymapActionEntityMapper {

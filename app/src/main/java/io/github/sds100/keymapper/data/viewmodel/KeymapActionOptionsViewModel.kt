@@ -186,6 +186,10 @@ class KeymapActionOptionsViewModel : BaseOptionsDialogViewModel<KeymapActionOpti
             else -> throw Exception("Don't know how to create a SliderListItemModel for this option $option.id")
         }
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     @Suppress("UNCHECKED_CAST")
     class Factory : ViewModelProvider.NewInstanceFactory() {
 

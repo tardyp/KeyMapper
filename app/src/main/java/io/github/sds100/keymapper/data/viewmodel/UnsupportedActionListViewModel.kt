@@ -32,7 +32,8 @@ class UnsupportedActionListViewModel(
                 UnsupportedSystemActionListItemModel(systemAction.id,
                     systemAction.descriptionRes,
                     systemAction.iconRes,
-                    failure)
+                    failure
+                )
             }.getDataState()
         }
 
@@ -42,8 +43,13 @@ class UnsupportedActionListViewModel(
     override val model = _model
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val systemActionRepository: SystemActionRepository
+    class Factory(
+        private val systemActionRepository: SystemActionRepository
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {

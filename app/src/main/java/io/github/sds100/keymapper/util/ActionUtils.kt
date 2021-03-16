@@ -182,7 +182,7 @@ fun ActionEntity.getTitle(
                     )
                 },
 
-                onFailure = {
+                onError = {
                     val strRes = if (useShell) {
                         R.string.description_keyevent_through_shell
                     } else {

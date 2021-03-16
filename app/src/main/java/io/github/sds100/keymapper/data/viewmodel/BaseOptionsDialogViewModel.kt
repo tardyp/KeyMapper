@@ -28,5 +28,9 @@ abstract class BaseOptionsDialogViewModel<O : BaseOptions<*>> : BaseOptionsViewM
         _eventStream.value = OpenUrlRes(helpUrl)
     }
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     abstract val helpUrl: Int
 }

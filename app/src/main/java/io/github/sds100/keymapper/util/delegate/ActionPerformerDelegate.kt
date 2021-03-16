@@ -217,7 +217,7 @@ class ActionPerformerDelegate(
                         .getData(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR)
                         .handle(
                             onSuccess = { InputDeviceUtils.getDeviceIdFromDescriptor(it) },
-                            onFailure = { 0 }
+                            onError = { 0 }
                         )
 
                     chosenImePackageName?.let {

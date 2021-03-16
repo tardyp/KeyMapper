@@ -159,6 +159,12 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        modelState.rebuildModels()
+    }
+
     override fun onDestroyView() {
         _binding = null
 

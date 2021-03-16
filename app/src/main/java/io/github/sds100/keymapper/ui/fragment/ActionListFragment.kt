@@ -17,7 +17,7 @@ import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
-import io.github.sds100.keymapper.ui.actions.ActionListItemModel
+import io.github.sds100.keymapper.ui.actions.ActionListItemState
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.ifIsData
 
@@ -25,7 +25,7 @@ import io.github.sds100.keymapper.util.ifIsData
  * Created by sds100 on 22/11/20.
  */
 abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
-    : RecyclerViewFragment<List<ActionListItemModel>, FragmentActionListBinding>() {
+    : RecyclerViewFragment<List<ActionListItemState>, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
@@ -33,16 +33,10 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     abstract val actionListViewModel: ActionListViewModel<A>
 
-    override val modelState: ModelState<List<ActionListItemModel>>
+    override val modelState: ModelState<List<ActionListItemState>>
         get() = actionListViewModel
 
     private val actionListController = ActionListController()
-
-    override fun onResume() {
-        super.onResume()
-
-        actionListViewModel.rebuildModels()
-    }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentActionListBinding.inflate(inflater, container, false).apply {
@@ -53,11 +47,11 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     override fun populateList(
         binding: FragmentActionListBinding,
-        model: List<ActionListItemModel>?
+        model: List<ActionListItemState>?
     ) {
         binding.enableActionDragging(actionListController)
 
-        actionListController.modelList = model ?: emptyList()
+        actionListController.state = model ?: emptyList()
     }
 
     override fun subscribeUi(binding: FragmentActionListBinding) {
@@ -119,21 +113,20 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
     }
 
     private inner class ActionListController : EpoxyController() {
-        var modelList: List<ActionListItemModel> = listOf()
+        var state: List<ActionListItemState> = listOf()
             set(value) {
                 field = value
                 requestModelBuild()
             }
 
         override fun buildModels() {
-            modelList.forEach { model ->
+            state.forEach {
                 action {
-                    id(model.id)
-                    model(model)
-                    actionCount(modelList.size)
+                    id(it.id)
+                    state(it)
 
                     onRemoveClick { _ ->
-                        actionListViewModel.removeAction(model.id)
+                        actionListViewModel.removeAction(it.id)
                     }
 
                     onMoreClick { _ ->
@@ -142,7 +135,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
                     }
 
                     onClick { _ ->
-                        actionListViewModel.onModelClick(model.id)
+                        actionListViewModel.onModelClick(it.id)
                     }
                 }
             }

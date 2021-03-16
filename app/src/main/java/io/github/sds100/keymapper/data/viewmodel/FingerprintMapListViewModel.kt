@@ -76,12 +76,12 @@ class FingerprintMapListViewModel(
     //TODO
     fun setEnabled(id: String, isEnabled: Boolean): Nothing = TODO()
 
-    fun rebuildModels() {
-        _model.value = Loading()
+   override fun rebuildModels() {
+       _model.value = Loading()
 
-        viewModelScope.launch {
-            fingerprintGestureMaps.firstOrNull()?.let {
-                //TODO
+       viewModelScope.launch {
+           fingerprintGestureMaps.firstOrNull()?.let {
+               //TODO
 //                _eventStream.postValue(
 //                    BuildFingerprintMapModels(
 //                        it,

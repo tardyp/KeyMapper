@@ -85,6 +85,10 @@ class AppListViewModel internal constructor(
     override val model = _model
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     private fun List<ApplicationInfo>.createModels(): List<AppListItemModel> =
         map {
             val name = repository.getAppName(it)

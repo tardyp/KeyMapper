@@ -16,15 +16,22 @@ data class FingerprintMapAction(
     override val uid: String = UUID.randomUUID().toString(),
     override val data: ActionData,
     val options: FingerprintMapActionOptions
-) : Action
+) : Action {
+    override val multiplier = options.multiplier
+    override val delayBeforeNextAction = options.delayBeforeNextAction
+}
 
 @Serializable
 data class FingerprintMapActionData(
-    override val uid: String = UUID.randomUUID().toString(),
-    override val data: ActionData,
+    val uid: String = UUID.randomUUID().toString(),
+    val data: ActionData,
     val delayBeforeNextAction: Defaultable<Int> = Defaultable.Default(),
-    val multiplier: Defaultable<Int> = Defaultable.Default()
-) : Action
+    val multiplier: Defaultable<Int> = Defaultable.Default(),
+    val repeatUntilSwipedAgain: Boolean = false,
+    val repeatRate: Defaultable<Int> = Defaultable.Default(),
+    val holdDownUntilSwipedAgain: Boolean = false,
+    val holdDownDuration: Defaultable<Int> = Defaultable.Default()
+)
 
 object FingerprintMapActionEntityMapper {
     fun fromEntity(entity: ActionEntity): FingerprintMapActionData {

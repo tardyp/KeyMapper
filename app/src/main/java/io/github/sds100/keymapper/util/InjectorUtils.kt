@@ -160,6 +160,7 @@ object InjectorUtils {
             KeymapActionListItemMapper(
                 UseCases.getActionError(ctx),
                 ServiceLocator.appInfoAdapter(ctx),
+                ServiceLocator.inputMethodAdapter(ctx),
                 ServiceLocator.resourceProvider(ctx)
             ),
 
@@ -185,6 +186,7 @@ object InjectorUtils {
             FingerprintMapActionListItemMapper(
                 UseCases.getActionError(ctx),
                 ServiceLocator.appInfoAdapter(ctx),
+                ServiceLocator.inputMethodAdapter(ctx),
                 ServiceLocator.resourceProvider(ctx)
             )
         )

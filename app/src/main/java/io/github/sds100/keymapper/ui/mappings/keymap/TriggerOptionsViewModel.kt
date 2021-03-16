@@ -196,4 +196,8 @@ class TriggerOptionsViewModel(
                 onboardingUseCase.shownScreenOffTriggersExplanation = true
         }
     }
+
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
 }

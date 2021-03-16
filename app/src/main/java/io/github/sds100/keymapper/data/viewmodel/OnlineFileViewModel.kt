@@ -31,7 +31,7 @@ class OnlineFileViewModel(
                 onSuccess = {
                     it
                 },
-                onFailure = {
+                onError = {
                     if (it is SSLHandshakeError) {
                         if (alternateUrl != null) {
                             _eventStream.value = OpenUrl(alternateUrl)

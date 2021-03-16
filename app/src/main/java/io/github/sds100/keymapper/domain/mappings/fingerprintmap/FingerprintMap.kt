@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.models.Constraint
 import io.github.sds100.keymapper.domain.models.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
+import io.github.sds100.keymapper.ui.actions.ActionUtils
 import kotlinx.serialization.Serializable
 
 /**
@@ -28,12 +29,31 @@ data class FingerprintMap(
             multiplier = Option(
                 value = it.multiplier,
                 true
+            ),
+
+            repeatUntilSwipedAgain = Option(
+                value = it.repeatUntilSwipedAgain,
+                isAllowed = true
+            ),
+
+            repeatRate = Option(
+                value = it.repeatRate,
+                isAllowed = it.repeatUntilSwipedAgain
+            ),
+
+            holdDownUntilSwipedAgain = Option(
+                value = it.holdDownUntilSwipedAgain,
+                isAllowed = ActionUtils.canBeHeldDown(it.data)
+            ),
+
+            holdDownDuration = Option(
+                value = it.holdDownDuration,
+                isAllowed = it.holdDownUntilSwipedAgain
             )
         )
 
         FingerprintMapAction(it.uid, it.data, options)
     }
-
 }
 
 object FingerprintMapEntityMapper {

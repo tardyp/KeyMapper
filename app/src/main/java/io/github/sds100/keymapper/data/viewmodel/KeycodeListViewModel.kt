@@ -53,6 +53,10 @@ class KeycodeListViewModel : ViewModel(), ModelState<Map<Int, String>> {
 
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     @Suppress("UNCHECKED_CAST")
     class Factory : ViewModelProvider.NewInstanceFactory() {
 

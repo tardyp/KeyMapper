@@ -12,4 +12,5 @@ import io.github.sds100.keymapper.util.ViewState
 interface ModelState<T> {
     val model: LiveData<DataState<T>>
     val viewState: MutableLiveData<ViewState>
+    fun rebuildModels()
 }

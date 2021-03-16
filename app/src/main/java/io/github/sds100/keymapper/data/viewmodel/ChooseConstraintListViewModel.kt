@@ -169,9 +169,13 @@ class ChooseConstraintListViewModel(
         }
     }
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val supportedConstraints: List<String>) : ViewModelProvider.NewInstanceFactory() {
+    class Factory(private val supportedConstraints: List<String>) :
+        ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return ChooseConstraintListViewModel(supportedConstraints) as T

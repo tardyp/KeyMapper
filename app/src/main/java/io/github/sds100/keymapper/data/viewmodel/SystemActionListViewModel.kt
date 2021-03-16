@@ -109,8 +109,13 @@ class SystemActionListViewModel(
         unregisterStringResourceProvider()
     }
 
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
+
     @Suppress("UNCHECKED_CAST")
-    class Factory(private val systemActionRepository: SystemActionRepository) : ViewModelProvider.NewInstanceFactory() {
+    class Factory(private val systemActionRepository: SystemActionRepository) :
+        ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return SystemActionListViewModel(systemActionRepository) as T

@@ -60,4 +60,8 @@ class BluetoothDeviceListFragment
             model.value = Data(pairedDevices)
         }
     }
+
+    override fun rebuildModels() {
+        TODO("Not yet implemented")
+    }
 }

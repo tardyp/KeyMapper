@@ -71,10 +71,10 @@ val <T> Result<T>.isError: Boolean
 val <T> Result<T>.isSuccess: Boolean
     get() = this is Success
 
-fun <T, U> Result<T>.handle(onSuccess: (value: T) -> U, onFailure: (error: Error) -> U): U {
+fun <T, U> Result<T>.handle(onSuccess: (value: T) -> U, onError: (error: Error) -> U): U {
     return when (this) {
         is Success -> onSuccess(value)
-        is Error -> onFailure(this)
+        is Error -> onError(this)
     }
 }
 

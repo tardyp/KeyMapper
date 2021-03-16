@@ -44,17 +44,17 @@ class CreateKeymapShortcutViewModel(
 
     val eventStream: LiveData<Event> = _eventStream
 
-    fun rebuildModels() {
-        viewModelScope.launch {
+  override fun rebuildModels() {
+      viewModelScope.launch {
 
-            if (keymapRepository.keymapList.value == null) return@launch
+          if (keymapRepository.keymapList.value == null) return@launch
 
-            if (keymapRepository.keymapList.value?.isEmpty() == true) {
-                _model.value = Empty()
-                return@launch
-            }
+          if (keymapRepository.keymapList.value?.isEmpty() == true) {
+              _model.value = Empty()
+              return@launch
+          }
 
-            _model.value = Loading()
+          _model.value = Loading()
 
 //            _eventStream.postValue(
                 //TODO

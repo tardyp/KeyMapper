@@ -8,9 +8,10 @@ import android.os.Build
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
+import io.github.sds100.keymapper.data.model.SystemActionOption
+import io.github.sds100.keymapper.domain.actions.SystemActionId
 import io.github.sds100.keymapper.util.SystemAction.CATEGORY_AIRPLANE_MODE
 import io.github.sds100.keymapper.util.SystemAction.CATEGORY_BLUETOOTH
 import io.github.sds100.keymapper.util.SystemAction.CATEGORY_BRIGHTNESS
@@ -103,7 +104,6 @@ import io.github.sds100.keymapper.util.SystemAction.TOGGLE_QUICK_SETTINGS_DRAWER
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_SPLIT_SCREEN
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI
 import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.SystemAction.VOLUME_DOWN
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_MUTE
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_TOGGLE_MUTE
 import io.github.sds100.keymapper.util.SystemAction.VOLUME_UNMUTE
@@ -136,14 +136,15 @@ object SystemActionUtils {
         CATEGORY_OTHER to R.string.system_action_cat_other
     )
 
+    //TODO
     val TITLE_MAP = mapOf(
-        GO_BACK to R.string.action_go_back,
-
-        VOLUME_DOWN to R.string.action_volume_down
+        SystemActionId.GO_BACK to R.string.action_go_back,
+        SystemActionId.VOLUME_DOWN to R.string.action_volume_down
     )
 
-    val TITLE_WITH_OPTIONS_RES_MAP = mapOf<String, Int>(
-
+    val ICON_MAP = mapOf(
+        SystemActionId.GO_BACK to R.drawable.ic_baseline_arrow_back_24,
+        SystemActionId.GO_HOME to R.drawable.ic_outline_home_24
     )
 
     /**

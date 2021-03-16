@@ -97,7 +97,7 @@ class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
         }
     }
 
-    fun rebuildModels() {
-        _eventStream.value = BuildConstraintListModels(constraintList.value!!)
-    }
+   override fun rebuildModels() {
+       _eventStream.value = BuildConstraintListModels(constraintList.value!!)
+   }
 }
