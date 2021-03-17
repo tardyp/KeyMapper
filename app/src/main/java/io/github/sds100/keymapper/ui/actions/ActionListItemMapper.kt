@@ -324,7 +324,7 @@ abstract class BaseActionListItemMapper<A : Action>(
             ActionIconInfo(it, TintType.NONE).success()
         }.firstBlocking()
 
-        is SystemAction -> ActionIconInfo(
+        is SystemActionData -> ActionIconInfo(
             SystemActionUtils.getIcon(action)?.let { getDrawable(it) },
             TintType.ON_SURFACE
         ).success()

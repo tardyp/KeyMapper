@@ -4,28 +4,31 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.github.sds100.keymapper.util.drawable
+import io.github.sds100.keymapper.util.str
 
 /**
  * Created by sds100 on 21/02/2021.
  */
 
-class ResourceProviderImpl(context: Context): ResourceProvider{
+class ResourceProviderImpl(context: Context): ResourceProvider {
+    private val ctx = context.applicationContext
+
     override fun getString(resId: Int, args: Array<Any>): String {
-        TODO("Not yet implemented")
+        return ctx.str(resId, args)
     }
 
     override fun getString(resId: Int, arg: Any): String {
-        TODO("Not yet implemented")
+        return ctx.str(resId, arg)
     }
 
     override fun getString(resId: Int): String {
-        TODO("Not yet implemented")
+        return ctx.str(resId)
     }
 
     override fun getDrawable(resId: Int): Drawable {
-        TODO("Not yet implemented")
+        return ctx.drawable(resId)
     }
-
 }
 
 interface ResourceProvider {

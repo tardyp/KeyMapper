@@ -20,7 +20,6 @@ import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.actions.KeyEventAction
 import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
@@ -102,7 +101,7 @@ class ChooseActionFragment : Fragment() {
         }
 
         createActionOnResult(SystemActionListFragment.REQUEST_KEY) {
-            it.getJsonSerializable<SystemAction>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
+            it.getJsonSerializable<SystemActionData>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
         }
 
         createActionOnResult(KeycodeListFragment.REQUEST_KEY) {

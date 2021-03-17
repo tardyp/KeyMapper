@@ -76,13 +76,13 @@ class GetActionErrorUseCaseImpl(
                     return RecoverableError.PermissionDenied(Manifest.permission.CALL_PHONE)
                 }
 
-            is SystemAction -> action.getError()
+            is SystemActionData -> action.getError()
         }
 
         return null
     }
 
-    private fun SystemAction.getError(): Error? {
+    private fun SystemActionData.getError(): Error? {
         isSystemActionSupported.invoke(this)?.let {
             return it
         }

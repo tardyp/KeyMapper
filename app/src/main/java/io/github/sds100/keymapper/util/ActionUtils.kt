@@ -328,9 +328,9 @@ fun ActionEntity.getIcon(ctx: Context): Result<Drawable?> = when (type) {
         //convert the string representation of the enum entry into an enum object
         val systemActionId = data
 
-        SystemActionUtils.getSystemActionDef(systemActionId).then {
+        SystemActionUtils.getSystemActionDef(systemActionId).then { def ->
             Success(null)
-            Success(ctx.drawable(it.iconRes))
+            Success(def.iconRes?.let { ctx.drawable(it) })
         }
     }
 

@@ -3,6 +3,8 @@ package io.github.sds100.keymapper.util
 /**
  * Created by sds100 on 04/08/2018.
  */
+
+//todo delete
 object SystemAction {
     //wifi
     const val TOGGLE_WIFI = "toggle_wifi"

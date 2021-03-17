@@ -220,22 +220,22 @@ object KeyboardUtils {
         imePackageName: String,
         keyCode: Int,
         metaState: Int = 0,
-        keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP,
+        keyEventAction: InputEventType = InputEventType.DOWN_UP,
         deviceId: Int,
         scanCode: Int = 0
     ) {
         val intentAction = when (keyEventAction) {
-            KeyEventAction.DOWN -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN
-            KeyEventAction.DOWN_UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP
-            KeyEventAction.UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP
+            InputEventType.DOWN -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN
+            InputEventType.DOWN_UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP
+            InputEventType.UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP
         }
 
         Intent(intentAction).apply {
             setPackage(imePackageName)
 
             val action = when (keyEventAction) {
-                KeyEventAction.DOWN, KeyEventAction.DOWN_UP -> KeyEvent.ACTION_DOWN
-                KeyEventAction.UP -> KeyEvent.ACTION_UP
+                InputEventType.DOWN, InputEventType.DOWN_UP -> KeyEvent.ACTION_DOWN
+                InputEventType.UP -> KeyEvent.ACTION_UP
             }
 
             val eventTime = SystemClock.uptimeMillis()

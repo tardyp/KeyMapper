@@ -175,7 +175,7 @@ class SystemActionListFragment
         simple {
             id(systemAction.id)
             primaryText(str(systemAction.descriptionRes))
-            icon(drawable(systemAction.iconRes))
+            icon(systemAction.iconRes?.let { drawable(it) })
             tintType(TintType.ON_SURFACE)
 
             isSecondaryTextAnError(systemAction.requiresRoot)

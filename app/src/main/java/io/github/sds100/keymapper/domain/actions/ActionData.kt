@@ -35,38 +35,38 @@ interface AppAction{
     val packageName: String
 }
 
-sealed class SystemAction : ActionData() {
+sealed class SystemActionData : ActionData() {
     abstract val id: SystemActionId
 }
 
 @Serializable
 data class SimpleSystemAction(
     override val id: SystemActionId,
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class VolumeSystemAction(
     val showVolumeUi: Boolean,
     override val id: SystemActionId
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class ChangeVolumeStreamSystemAction(
     override val id: SystemActionId,
     val showVolumeUi: Boolean,
     val streamType: StreamType
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class FlashlightSystemAction(
     override val id: SystemActionId,
     val lens: CameraLens
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class ChangeRingerModeSystemAction(
     val ringerMode: RingerMode
-) : SystemAction() {
+) : SystemActionData() {
     override val id: SystemActionId = SystemActionId.CHANGE_RINGER_MODE
 }
 
@@ -74,7 +74,7 @@ data class ChangeRingerModeSystemAction(
 data class SwitchKeyboardSystemAction(
     val imeId: String,
     val savedImeName: String
-) : SystemAction() {
+) : SystemActionData() {
     override val id = SystemActionId.SWITCH_KEYBOARD
 }
 
@@ -82,12 +82,12 @@ data class SwitchKeyboardSystemAction(
 class ChangeDndModeSystemAction(
     override val id: SystemActionId,
     val dndMode: DndMode
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class CycleRotationsSystemAction(
     val orientations: List<Orientation>
-) : SystemAction() {
+) : SystemActionData() {
     override val id = SystemActionId.CYCLE_ROTATIONS
 }
 
@@ -95,7 +95,7 @@ data class CycleRotationsSystemAction(
 data class ControlMediaForAppSystemAction(
     override val id: SystemActionId,
     val packageName: String
-) : SystemAction()
+) : SystemActionData()
 
 @Serializable
 data class IntentAction(

@@ -141,7 +141,7 @@ object SystemActionUtils {
     )
 
     @StringRes
-    fun getTitle(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int =
+    fun getTitle(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int =
         when (action.id) {
             SystemActionId.TOGGLE_WIFI -> R.string.action_toggle_wifi
             SystemActionId.ENABLE_WIFI -> R.string.action_enable_wifi
@@ -241,7 +241,7 @@ object SystemActionUtils {
         }
 
     @DrawableRes
-    fun getIcon(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int? =
+    fun getIcon(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int? =
         when (action.id) {
             SystemActionId.TOGGLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.ENABLE_WIFI -> R.drawable.ic_outline_wifi_24
@@ -340,7 +340,7 @@ object SystemActionUtils {
             SystemActionId.SHOW_POWER_MENU -> R.drawable.ic_outline_power_settings_new_24
         }
 
-    fun getMinApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
+    fun getMinApi(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int {
         return when (action.id) {
             SystemActionId.TOGGLE_SPLIT_SCREEN -> Build.VERSION_CODES.N
             SystemActionId.GO_LAST_APP -> Build.VERSION_CODES.N
@@ -393,7 +393,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getMaxApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
+    fun getMaxApi(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int {
         return when (action.id) {
             SystemActionId.SHOW_KEYBOARD_PICKER -> Build.VERSION_CODES.P
 
@@ -401,7 +401,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getRequiredSystemFeatures(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
+    fun getRequiredSystemFeatures(action: io.github.sds100.keymapper.domain.actions.SystemActionData): List<String> {
         return when (action.id) {
             SystemActionId.SECURE_LOCK_DEVICE
             -> listOf(PackageManager.FEATURE_DEVICE_ADMIN)
@@ -420,7 +420,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getRequiredPermissions(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
+    fun getRequiredPermissions(action: io.github.sds100.keymapper.domain.actions.SystemActionData): List<String> {
         when (action.id) {
             SystemActionId.TOGGLE_WIFI,
             SystemActionId.ENABLE_WIFI,

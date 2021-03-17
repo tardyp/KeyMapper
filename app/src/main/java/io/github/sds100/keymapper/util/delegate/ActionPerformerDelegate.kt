@@ -174,13 +174,13 @@ class ActionPerformerDelegate(
                             ) {
 
                                 when (keyEventAction) {
-                                    KeyEventAction.DOWN -> GestureDescription.StrokeDescription(
+                                    InputEventType.DOWN -> GestureDescription.StrokeDescription(
                                         path,
                                         0,
                                         duration,
                                         true
                                     )
-                                    KeyEventAction.UP -> GestureDescription.StrokeDescription(
+                                    InputEventType.UP -> GestureDescription.StrokeDescription(
                                         path,
                                         59999,
                                         duration,

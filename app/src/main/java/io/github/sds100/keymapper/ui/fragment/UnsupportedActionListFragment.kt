@@ -43,13 +43,13 @@ class UnsupportedActionListFragment
                 }
             }
 
-            model?.forEach {
+            model?.forEach { model ->
                 simple {
-                    id(it.id)
-                    icon(drawable(it.icon))
+                    id(model.id)
+                    icon(model.icon?.let { drawable(it) })
                     tintType(TintType.ON_SURFACE)
-                    primaryText(str(it.description))
-                    secondaryText(it.reason.getFullMessage(requireContext()))
+                    primaryText(str(model.description))
+                    secondaryText(model.reason.getFullMessage(requireContext()))
                 }
             }
         }

@@ -35,14 +35,14 @@ object ShowTriggeredKeymapToast : Event()
 data class PerformAction(
     val action: ActionEntity,
     val additionalMetaState: Int = 0,
-    val keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
+    val keyEventAction: InputEventType = InputEventType.DOWN_UP
 ) : Event()
 
 data class ImitateButtonPress(
     val keyCode: Int,
     val metaState: Int = 0,
     val deviceId: Int = 0,
-    val keyEventAction: KeyEventAction,
+    val keyEventAction: InputEventType,
     val scanCode: Int = 0
 ) : Event()
 

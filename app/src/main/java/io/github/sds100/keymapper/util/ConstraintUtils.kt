@@ -133,19 +133,19 @@ private fun ConstraintEntity.getIcon(ctx: Context): Result<Drawable> {
             }
 
         ConstraintEntity.BT_DEVICE_CONNECTED ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_outline_bluetooth_connected_24)!!)
+            Success(ctx.drawable(R.drawable.ic_outline_bluetooth_connected_24))
         ConstraintEntity.BT_DEVICE_DISCONNECTED ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_outline_bluetooth_disabled_24)!!)
+            Success(ctx.drawable(R.drawable.ic_outline_bluetooth_disabled_24))
 
         ConstraintEntity.SCREEN_ON ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_outline_stay_current_portrait_24)!!)
+            Success(ctx.drawable(R.drawable.ic_outline_stay_current_portrait_24))
         ConstraintEntity.SCREEN_OFF ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_baseline_mobile_off_24)!!)
+            Success(ctx.drawable(R.drawable.ic_baseline_mobile_off_24))
 
         ConstraintEntity.ORIENTATION_PORTRAIT, ConstraintEntity.ORIENTATION_0, ConstraintEntity.ORIENTATION_180 ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_outline_stay_current_portrait_24)!!)
+            Success(ctx.drawable(R.drawable.ic_outline_stay_current_portrait_24))
         ConstraintEntity.ORIENTATION_LANDSCAPE, ConstraintEntity.ORIENTATION_90, ConstraintEntity.ORIENTATION_270 ->
-            Success(ctx.safeVectorDrawable(R.drawable.ic_outline_stay_current_landscape_24)!!)
+            Success(ctx.drawable(R.drawable.ic_outline_stay_current_landscape_24))
 
         else -> Error.ConstraintNotFound
     }

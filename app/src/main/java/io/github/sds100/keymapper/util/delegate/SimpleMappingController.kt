@@ -72,9 +72,9 @@ abstract class SimpleMappingController(
                         actionsBeingHeldDown.any { action -> action.uid == it.uid }
 
                     val keyEventAction = when {
-                        it.holdDown && !alreadyBeingHeldDown -> KeyEventAction.DOWN
-                        alreadyBeingHeldDown -> KeyEventAction.UP
-                        else -> KeyEventAction.DOWN_UP
+                        it.holdDown && !alreadyBeingHeldDown -> InputEventType.DOWN
+                        alreadyBeingHeldDown -> InputEventType.UP
+                        else -> InputEventType.DOWN_UP
                     }
 
                     when {
@@ -110,7 +110,7 @@ abstract class SimpleMappingController(
     @MainThread
     private fun performAction(
         action: ActionEntity,
-        keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
+        keyEventAction: InputEventType = InputEventType.DOWN_UP
     ) {
         repeat(action.multiplier ?: 1) {
             performAction.value = PerformAction(
@@ -131,15 +131,15 @@ abstract class SimpleMappingController(
 
         while (true) {
             val keyEventAction = when {
-                holdDown -> KeyEventAction.DOWN
-                else -> KeyEventAction.DOWN_UP
+                holdDown -> InputEventType.DOWN
+                else -> InputEventType.DOWN_UP
             }
 
             performAction(action, keyEventAction)
 
             if (holdDown) {
                 delay(holdDownDuration)
-                performAction(action, KeyEventAction.UP)
+                performAction(action, InputEventType.UP)
             }
 
             delay(repeatRate)
@@ -160,7 +160,7 @@ abstract class SimpleMappingController(
         performActionJobs.clear()
 
         actionsBeingHeldDown.forEach {
-            performAction(it, KeyEventAction.UP)
+            performAction(it, InputEventType.UP)
         }
 
         actionsBeingHeldDown.clear()

@@ -70,9 +70,9 @@ fun StatusLayout.setStatusLayoutState(
     }
 
     val drawable = when (state) {
-        StatusLayout.State.POSITIVE -> context.safeVectorDrawable(R.drawable.ic_outline_check_circle_outline_24)
-        StatusLayout.State.WARN -> context.safeVectorDrawable(R.drawable.ic_baseline_error_outline_24)
-        StatusLayout.State.ERROR -> context.safeVectorDrawable(R.drawable.ic_baseline_error_outline_24)
+        StatusLayout.State.POSITIVE -> context.drawable(R.drawable.ic_outline_check_circle_outline_24)
+        StatusLayout.State.WARN -> context.drawable(R.drawable.ic_baseline_error_outline_24)
+        StatusLayout.State.ERROR -> context.drawable(R.drawable.ic_baseline_error_outline_24)
     }
 
     val tint = when (state) {

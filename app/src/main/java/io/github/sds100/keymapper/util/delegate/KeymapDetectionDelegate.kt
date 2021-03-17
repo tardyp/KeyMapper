@@ -792,8 +792,9 @@ class KeymapDetectionDelegate(
                 event.keyCode,
                 metaStateFromKeyEvent.withFlag(metaStateFromActions),
                 deviceId,
-                KeyEventAction.DOWN,
-                scanCode)
+                InputEventType.DOWN,
+                scanCode
+            )
 
             coroutineScope.launch {
                 repeatImitatingKey(event.keyCode, deviceId, scanCode)
@@ -842,7 +843,7 @@ class KeymapDetectionDelegate(
 
                                     performAction(
                                         action,
-                                        keyEventAction = KeyEventAction.UP,
+                                        keyEventAction = InputEventType.UP,
                                         multiplier = actionMultiplier(actionKey)
                                     )
 
@@ -857,8 +858,9 @@ class KeymapDetectionDelegate(
 
                                     performAction(
                                         action,
-                                        keyEventAction = KeyEventAction.UP,
-                                        multiplier = actionMultiplier(actionKey))
+                                        keyEventAction = InputEventType.UP,
+                                        multiplier = actionMultiplier(actionKey)
+                                    )
 
                                     shouldPerformActionNormally = false
                                 }
@@ -871,9 +873,9 @@ class KeymapDetectionDelegate(
 
                                 val keyEventAction =
                                     if (action.flags.hasFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)) {
-                                        KeyEventAction.DOWN
+                                        InputEventType.DOWN
                                     } else {
-                                        KeyEventAction.DOWN_UP
+                                        InputEventType.DOWN_UP
                                     }
 
                                 performAction(
@@ -894,7 +896,7 @@ class KeymapDetectionDelegate(
                                     performAction(
                                         action,
                                         1,
-                                        KeyEventAction.UP
+                                        InputEventType.UP
                                     )
                                 }
                             }
@@ -1199,7 +1201,7 @@ class KeymapDetectionDelegate(
                             performAction(
                                 action,
                                 actionMultiplier(actionKey),
-                                KeyEventAction.UP
+                                InputEventType.UP
                             )
                         }
                     }
@@ -1304,7 +1306,11 @@ class KeymapDetectionDelegate(
                     }
 
                     this@KeymapDetectionDelegate.imitateButtonPress.value =
-                        ImitateButtonPress(keyCode, keyEventAction = KeyEventAction.DOWN_UP, scanCode = scanCode)
+                        ImitateButtonPress(
+                            keyCode,
+                            keyEventAction = InputEventType.DOWN_UP,
+                            scanCode = scanCode
+                        )
                 }
             }
         }
@@ -1316,9 +1322,9 @@ class KeymapDetectionDelegate(
             && !mappedToDoublePress) {
 
             val keyEventAction = if (imitateUpKeyEvent) {
-                KeyEventAction.UP
+                InputEventType.UP
             } else {
-                KeyEventAction.DOWN_UP
+                InputEventType.DOWN_UP
             }
 
             this.imitateButtonPress.value = ImitateButtonPress(
@@ -1355,7 +1361,7 @@ class KeymapDetectionDelegate(
             performAction(
                 action,
                 multiplier = 1,
-                keyEventAction = KeyEventAction.UP
+                keyEventAction = InputEventType.UP
             )
         }
 
@@ -1476,8 +1482,9 @@ class KeymapDetectionDelegate(
                 keyCode,
                 metaStateFromKeyEvent.withFlag(metaStateFromActions),
                 deviceId,
-                KeyEventAction.DOWN,
-                scanCode)) //use down action because this is what Android does
+                InputEventType.DOWN,
+                scanCode
+            )) //use down action because this is what Android does
 
             delay(50)
         }
@@ -1500,9 +1507,9 @@ class KeymapDetectionDelegate(
                     if (action.holdDown && action.repeat) {
                         val holdDownDuration = holdDownDuration(actionKey)
 
-                        performAction(action, actionMultiplier(actionKey), KeyEventAction.DOWN)
+                        performAction(action, actionMultiplier(actionKey), InputEventType.DOWN)
                         delay(holdDownDuration)
-                        performAction(action, actionMultiplier(actionKey), KeyEventAction.UP)
+                        performAction(action, actionMultiplier(actionKey), InputEventType.UP)
                     } else {
                         performAction(action, actionMultiplier(actionKey))
                     }
@@ -1541,8 +1548,9 @@ class KeymapDetectionDelegate(
 
                         performAction(
                             action,
-                            keyEventAction = KeyEventAction.UP,
-                            multiplier = actionMultiplier(actionKey))
+                            keyEventAction = InputEventType.UP,
+                            multiplier = actionMultiplier(actionKey)
+                        )
 
                         performActionNormally = false
                     } else {
@@ -1558,9 +1566,9 @@ class KeymapDetectionDelegate(
 
                     val keyEventAction =
                         if (action.flags.hasFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)) {
-                            KeyEventAction.DOWN
+                            InputEventType.DOWN
                         } else {
-                            KeyEventAction.DOWN_UP
+                            InputEventType.DOWN_UP
                         }
 
                     performAction(action, actionMultiplier(actionKey), keyEventAction)
@@ -1654,7 +1662,7 @@ class KeymapDetectionDelegate(
     private fun performAction(
         action: ActionEntity,
         multiplier: Int,
-        keyEventAction: KeyEventAction = KeyEventAction.DOWN_UP
+        keyEventAction: InputEventType = InputEventType.DOWN_UP
     ) {
         val additionalMetaState = metaStateFromKeyEvent.withFlag(metaStateFromActions)
 

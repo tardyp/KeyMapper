@@ -204,20 +204,20 @@ class KeymapDetectionDelegateTest {
         )
 
         val expectedEvents = listOf(
-            PerformAction(action, metaState, KeyEventAction.DOWN),
+            PerformAction(action, metaState, InputEventType.DOWN),
             ImitateButtonPress(
                 KeyEvent.KEYCODE_E,
                 metaState,
                 FAKE_KEYBOARD_DEVICE_ID,
-                KeyEventAction.DOWN,
+                InputEventType.DOWN,
                 scanCode = 33
             ),
-            PerformAction(action, 0, KeyEventAction.UP),
+            PerformAction(action, 0, InputEventType.UP),
             ImitateButtonPress(
                 KeyEvent.KEYCODE_E,
                 metaState = 0,
                 FAKE_KEYBOARD_DEVICE_ID,
-                KeyEventAction.UP,
+                InputEventType.UP,
                 scanCode = 33
             )
         )
@@ -261,22 +261,22 @@ class KeymapDetectionDelegateTest {
         advanceUntilIdle()
 
         val expectedEvents2 = listOf(
-            PerformAction(action, metaState, KeyEventAction.DOWN),
+            PerformAction(action, metaState, InputEventType.DOWN),
             ImitateButtonPress(
                 KeyEvent.KEYCODE_E,
                 metaState,
                 FAKE_KEYBOARD_DEVICE_ID,
-                KeyEventAction.DOWN,
+                InputEventType.DOWN,
                 scanCode = 33
             ),
             ImitateButtonPress(
                 KeyEvent.KEYCODE_E,
                 metaState,
                 FAKE_KEYBOARD_DEVICE_ID,
-                KeyEventAction.UP,
+                InputEventType.UP,
                 scanCode = 33
             ),
-            PerformAction(action, additionalMetaState = 0, KeyEventAction.UP),
+            PerformAction(action, additionalMetaState = 0, InputEventType.UP),
         )
 
         assertThat(eventStream.history, `is`(expectedEvents2))
@@ -434,7 +434,7 @@ class KeymapDetectionDelegateTest {
             //THEN
             assertThat(delegate.performAction.value?.action, `is`(action))
 
-            assertThat(delegate.performAction.value?.keyEventAction, `is`(KeyEventAction.DOWN))
+            assertThat(delegate.performAction.value?.keyEventAction, `is`(InputEventType.DOWN))
 
             //WHEN
             mockTriggerKeyInput(trigger.keys[0])
@@ -442,7 +442,7 @@ class KeymapDetectionDelegateTest {
 
             assertThat(delegate.performAction.value?.action, `is`(action))
 
-            assertThat(delegate.performAction.value?.keyEventAction, `is`(KeyEventAction.UP))
+            assertThat(delegate.performAction.value?.keyEventAction, `is`(InputEventType.UP))
         }
 
     /**

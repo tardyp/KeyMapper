@@ -17,15 +17,6 @@ import splitties.mainthread.isMainThread
  * Created by sds100 on 17/05/2020.
  */
 
-/**
- * Get a resource drawable. Can be safely used to get vector drawables on pre-lollipop.
- */
-fun Context.safeVectorDrawable(@DrawableRes resId: Int?): Drawable? {
-    if (resId == null) return null
-
-    return AppCompatResources.getDrawable(this, resId)
-}
-
 // Using varargs doesn't work since prints [LJava.lang.object@32f...etc
 fun Context.str(@StringRes resId: Int, formatArg: Any? = null): String = getString(resId, formatArg)
 fun Context.str(@StringRes resId: Int, formatArgArray: Array<Any?>): String = getString(resId, *formatArgArray)
@@ -105,20 +96,22 @@ fun Context.str(attributeSet: AttributeSet, @StyleableRes styleableId: IntArray,
     return attrValue
 }
 
-fun View.str(attributeSet: AttributeSet, @StyleableRes styleableId: IntArray, @StyleableRes attrId: Int) =
+fun View.str(
+    attributeSet: AttributeSet,
+    @StyleableRes styleableId: IntArray,
+    @StyleableRes attrId: Int
+) =
     context.str(attributeSet, styleableId, attrId)
 
 /**
  * Get a resource drawable. Can be safely used to get vector drawables on pre-lollipop.
  */
-fun Context.drawable(@DrawableRes resId: Int?): Drawable? {
-    if (resId == null) return null
-
-    return AppCompatResources.getDrawable(this, resId)
+fun Context.drawable(@DrawableRes resId: Int): Drawable {
+    return AppCompatResources.getDrawable(this, resId)!!
 }
 
-fun View.drawable(@DrawableRes resId: Int?): Drawable? = context.drawable(resId)
-fun Fragment.drawable(@DrawableRes resId: Int?): Drawable? = requireContext().drawable(resId)
+fun View.drawable(@DrawableRes resId: Int): Drawable = context.drawable(resId)
+fun Fragment.drawable(@DrawableRes resId: Int): Drawable = requireContext().drawable(resId)
 
 fun Context.color(@ColorRes resId: Int): Int = ContextCompat.getColor(this, resId)
 fun View.color(@ColorRes resId: Int): Int = context.color(resId)
