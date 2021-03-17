@@ -60,12 +60,11 @@ class ActionListViewModel<A : Action>(
             configActions.actionList.first().ifIsData { data ->
                 val actionData = data.singleOrNull { it.uid == uid }?.data ?: return@launch
 
-                val error = actionError.getError(actionData)
-
-                when {
-                    error != null && error is RecoverableError -> _fixError.value = error
-
-                    else -> testAction(actionData)
+                actionError.getError(actionData)?.let { error ->
+                    when (error) {
+                        is RecoverableError -> _fixError.value = error
+                        else -> testAction(actionData)
+                    }
                 }
             }
         }

@@ -26,12 +26,16 @@ class KeymapActionListItemMapper(
 
     override fun getOptionLabels(action: KeymapAction) = sequence {
 
-        if (action.options.repeat.isAllowed) {
-            yield(getString(R.string.flag_repeat_actions))
+        action.options.repeat.apply {
+            if (isAllowed && value) {
+                yield(getString(R.string.flag_repeat_actions))
+            }
         }
 
-        if (action.options.holdDown.isAllowed) {
-            yield(getString(R.string.flag_hold_down))
+        action.options.holdDown.apply {
+            if (isAllowed && value) {
+                yield(getString(R.string.flag_hold_down))
+            }
         }
 
     }.toList()

@@ -32,12 +32,17 @@ class FingerprintMapActionListItemMapper(
             }
         }
 
-        if (action.options.repeatUntilSwipedAgain.isAllowed) {
-            yield(getString(R.string.flag_repeat_until_swiped_again))
+        action.options.repeatUntilSwipedAgain.apply {
+            if (isAllowed && value) {
+                yield(getString(R.string.flag_repeat_until_swiped_again))
+            }
         }
 
-        if (action.options.holdDownUntilSwipedAgain.isAllowed) {
-            yield(getString(R.string.flag_hold_down_until_swiped_again))
+        action.options.holdDownUntilSwipedAgain.apply {
+            if (isAllowed && value) {
+                yield(getString(R.string.flag_hold_down_until_swiped_again))
+            }
         }
+
     }.toList()
 }

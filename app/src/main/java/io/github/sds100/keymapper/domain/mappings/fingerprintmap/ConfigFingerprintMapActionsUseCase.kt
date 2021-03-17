@@ -3,9 +3,7 @@ package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.utils.moveElement
-import io.github.sds100.keymapper.util.DataState
-import io.github.sds100.keymapper.util.ifIsData
-import io.github.sds100.keymapper.util.mapData
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
@@ -18,7 +16,13 @@ class ConfigFingerprintMapActionsUseCaseImpl(
     val setFingerprintMap: (keymap: FingerprintMap) -> Unit
 ) : ConfigFingerprintMapActionsUseCase {
 
-    override val actionList = fingerprintMapFlow.map { state -> state.mapData { it.actionList } }
+    override val actionList = fingerprintMapFlow.map { state ->
+        if (state is Data) {
+            state.data.actionList.getDataState()
+        } else {
+            Loading()
+        }
+    }
 
     override fun addAction(action: ActionData) =
         fingerprintMapFlow.value.ifIsData { fingerprintMap ->
