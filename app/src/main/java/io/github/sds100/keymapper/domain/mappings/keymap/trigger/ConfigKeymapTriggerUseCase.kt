@@ -1,8 +1,7 @@
-package io.github.sds100.keymapper.domain.mappings.keymap
+package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.models.Defaultable
-import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.moveElement
 import io.github.sds100.keymapper.util.DataState

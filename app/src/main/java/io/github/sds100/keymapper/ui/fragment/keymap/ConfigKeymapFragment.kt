@@ -5,7 +5,6 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
@@ -34,12 +33,6 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         //only load the keymap if opening this fragment for the first time
         if (savedInstanceState == null) {
             viewModel.loadKeymap(args.keymapId)
-        }
-
-        setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
-            result.getParcelable<ActionEntity>(ChooseActionFragment.EXTRA_ACTION)?.let {
-                //TODO
-            }
         }
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->

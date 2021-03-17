@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.ActivityHomeBinding
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.FileAccessDenied
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.android.synthetic.main.activity_home.*
 import splitties.alertdialog.appcompat.alertDialog
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
                 is AutomaticBackupResult ->
                     it.result.onFailure { failure ->
-                        if (failure is FileAccessDenied) showFileAccessDeniedSnackBar()
+                        if (failure is Error.FileAccessDenied) showFileAccessDeniedSnackBar()
                     }
             }
         })

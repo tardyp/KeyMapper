@@ -131,14 +131,14 @@ class BackupManager(
                 _eventStream.value = RestoreResult(result)
 
             } catch (e: MalformedJsonException) {
-                _eventStream.value = RestoreResult(CorruptJsonFile)
+                _eventStream.value = RestoreResult(Error.CorruptJsonFile)
 
             } catch (e: JsonSyntaxException) {
-                _eventStream.value = RestoreResult(CorruptJsonFile)
+                _eventStream.value = RestoreResult(Error.CorruptJsonFile)
 
             } catch (e: Exception) {
 
-                _eventStream.value = RestoreResult(GenericError(e))
+                _eventStream.value = RestoreResult(Error.GenericError(e))
 
                 if (throwExceptions) {
                     e.printStackTrace()
@@ -153,7 +153,7 @@ class BackupManager(
         val parser = JsonParser()
         val gson = Gson()
 
-        if (json.isBlank()) return EmptyJson
+        if (json.isBlank()) return Error.EmptyJson
 
         val rootElement = parser.parse(json).asJsonObject
 
@@ -166,7 +166,7 @@ class BackupManager(
 
         //started storing database version at db version 10
         if (keymapDbVersion > AppDatabase.DATABASE_VERSION) {
-            return BackupVersionTooNew
+            return Error.BackupVersionTooNew
         }
 
         keymapListJsonArray
@@ -187,7 +187,7 @@ class BackupManager(
             val incompatible = version > FingerprintMapEntity.CURRENT_VERSION
 
             if (incompatible) {
-                return BackupVersionTooNew
+                return Error.BackupVersionTooNew
             }
 
             //TODO
@@ -250,7 +250,7 @@ class BackupManager(
         } catch (e: Exception) {
             if (throwExceptions) throw e
 
-            return@async GenericError(e)
+            return@async Error.GenericError(e)
         }
     }
 

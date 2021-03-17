@@ -7,10 +7,10 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.usecase.ConfigKeymapUseCase
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
+import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.util.KeyEventUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -30,6 +30,7 @@ class KeyEventActionTypeFragment : Fragment() {
         const val EXTRA_META_STATE = "extra_meta_state"
         const val EXTRA_USE_SHELL = "extra_use_shell"
         const val EXTRA_DEVICE_DESCRIPTOR = "extra_device_descriptor"
+        const val EXTRA_DEVICE_NAME = "extra_device_name"
     }
 
     private val viewModel: KeyEventActionTypeViewModel by activityViewModels {
@@ -71,6 +72,7 @@ class KeyEventActionTypeFragment : Fragment() {
                 ).apply {
                     viewModel.chosenDevice.value?.let {
                         putString(EXTRA_DEVICE_DESCRIPTOR, it.descriptor)
+                        putString(EXTRA_DEVICE_NAME, it.name)
                     }
                 }
             )

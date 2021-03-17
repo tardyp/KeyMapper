@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.TintType
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.drawable
-import io.github.sds100.keymapper.util.result.SdkVersionTooLow
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.util.str
 
@@ -37,7 +37,8 @@ class UnsupportedActionListFragment
                 simple {
                     id(0)
                     primaryText(str(R.string.action_type_tap_coordinate))
-                    secondaryText(SdkVersionTooLow(Build.VERSION_CODES.N)
+                    secondaryText(
+                        Error.SdkVersionTooLow(Build.VERSION_CODES.N)
                         .getFullMessage(requireContext()))
                 }
             }

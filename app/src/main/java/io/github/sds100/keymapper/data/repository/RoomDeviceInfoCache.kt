@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.data.repository
 import io.github.sds100.keymapper.data.db.dao.DeviceInfoDao
 import io.github.sds100.keymapper.data.model.DeviceInfoEntity
 import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.util.result.DeviceNotFound
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,7 @@ class RoomDeviceInfoCache(
     override suspend fun getDeviceName(descriptor: String): Result<String> {
         return with(deviceInfoDao.getByDescriptor(descriptor)) {
             if (this == null) {
-                DeviceNotFound()
+                Error.DeviceNotFound(descriptor)
             } else {
                 Success(this.name)
             }

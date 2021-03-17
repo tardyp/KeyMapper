@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.repository.FileRepository
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.SSLHandshakeError
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.handle
 
 /**
@@ -32,7 +32,7 @@ class OnlineFileViewModel(
                     it
                 },
                 onError = {
-                    if (it is SSLHandshakeError) {
+                    if (it is Error.SSLHandshakeError) {
                         if (alternateUrl != null) {
                             _eventStream.value = OpenUrl(alternateUrl)
                         }

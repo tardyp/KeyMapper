@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.domain.constraints.ConfigConstraintUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCaseImpl
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,10 +1,9 @@
-package io.github.sds100.keymapper.domain.mappings.keymap
+package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
 import kotlinx.serialization.Serializable

@@ -57,4 +57,8 @@ class AndroidPackageManagerAdapter(
             false
         }
     }
+
+    override fun isVoiceAssistantInstalled(): Boolean {
+        TODO("Not yet implemented")
+    }
 }

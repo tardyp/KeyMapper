@@ -14,7 +14,11 @@ object UseCases {
     fun getActionError(ctx: Context) = GetActionErrorUseCaseImpl(
         ServiceLocator.preferenceRepository(ctx),
         ServiceLocator.deviceInfoRepository(ctx),
-        ServiceLocator.inputMethodAdapter(ctx)
+        ServiceLocator.packageManagerAdapter(ctx),
+        ServiceLocator.inputMethodAdapter(ctx),
+        ServiceLocator.permissionAdapter(ctx),
+        ServiceLocator.systemFeatureAdapter(ctx),
+        ServiceLocator.cameraAdapter(ctx)
     )
 
     fun testAction(ctx: Context) = TestActionUseCaseImpl()

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapTriggerOptions
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerOptions
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase

@@ -12,12 +12,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.KeyboardUtils
 import io.github.sds100.keymapper.util.PackageUtils
 import io.github.sds100.keymapper.util.PermissionUtils
-import io.github.sds100.keymapper.util.result.*
-import io.github.sds100.keymapper.util.str
+import io.github.sds100.keymapper.util.result.RecoverableError
 
 /**
  * Created by sds100 on 22/10/20.
@@ -54,7 +52,7 @@ class RecoverFailureDelegate(
 
     fun recover(ctx: Context, failure: RecoverableError, navController: NavController) {
         when (failure) {
-            is PermissionDenied -> {
+            is RecoverableError.PermissionDenied -> {
                 when (failure.permission) {
                     Manifest.permission.WRITE_SETTINGS ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -96,13 +94,9 @@ class RecoverFailureDelegate(
                 }
             }
 
-            is GoogleAppNotFound -> recover(ctx,
-                AppNotFound(ctx.str(R.string.google_app_package_name)),
-                navController)
+            is RecoverableError.AppNotFound -> PackageUtils.viewAppOnline(ctx, failure.packageName)
 
-            is AppNotFound -> PackageUtils.viewAppOnline(ctx, failure.packageName)
-
-            is AppDisabled -> {
+            is RecoverableError.AppDisabled -> {
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.parse("package:${failure.packageName}")
                     flags = Intent.FLAG_ACTIVITY_NO_HISTORY
@@ -111,8 +105,8 @@ class RecoverFailureDelegate(
                 }
             }
 
-            is NoCompatibleImeEnabled -> KeyboardUtils.enableCompatibleInputMethods(ctx)
-            is NoCompatibleImeChosen -> KeyboardUtils.chooseCompatibleInputMethod(ctx)
+            is RecoverableError.NoCompatibleImeEnabled -> KeyboardUtils.enableCompatibleInputMethods(ctx)
+            is RecoverableError.NoCompatibleImeChosen -> KeyboardUtils.chooseCompatibleInputMethod(ctx)
         }
     }
 }

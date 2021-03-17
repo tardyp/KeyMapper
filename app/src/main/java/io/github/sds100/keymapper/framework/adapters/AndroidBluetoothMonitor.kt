@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 /**
  * Created by sds100 on 14/02/2021.
  */
-internal class AndroidBluetoothMonitor(
+class AndroidBluetoothMonitor(
     private val coroutineScope: CoroutineScope
 ) : BluetoothMonitor {
 

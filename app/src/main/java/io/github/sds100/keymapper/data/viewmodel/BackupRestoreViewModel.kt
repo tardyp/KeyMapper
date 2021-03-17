@@ -7,7 +7,9 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.IBackupManager
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.onFailure
+import io.github.sds100.keymapper.util.result.onSuccess
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -75,10 +77,10 @@ class BackupRestoreViewModel internal constructor(
         if (event is ResultEvent<*>) {
             event.result.onFailure {
                 _eventStream.value = when (it) {
-                    is BackupVersionTooNew -> MessageEvent(R.string.error_backup_version_too_new)
-                    is EmptyJson -> MessageEvent(R.string.error_empty_json)
-                    is CorruptJsonFile -> MessageEvent(R.string.error_corrupt_json_file)
-                    is FileAccessDenied -> AutomaticBackupResult(it)
+                    is Error.BackupVersionTooNew -> MessageEvent(R.string.error_backup_version_too_new)
+                    is Error.EmptyJson -> MessageEvent(R.string.error_empty_json)
+                    is Error.CorruptJsonFile -> MessageEvent(R.string.error_corrupt_json_file)
+                    is Error.FileAccessDenied -> AutomaticBackupResult(it)
                     else -> ShowErrorMessage(it)
                 }
             }

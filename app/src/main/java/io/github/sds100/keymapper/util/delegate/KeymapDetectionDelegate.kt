@@ -12,8 +12,8 @@ import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.DOUBLE_PRES
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.LONG_PRESS
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.SHORT_PRESS
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.TRIGGER_FLAG_SHOW_TOAST
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapTrigger
-import io.github.sds100.keymapper.domain.trigger.TriggerMode
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*

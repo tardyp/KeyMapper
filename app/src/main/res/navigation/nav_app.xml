@@ -62,7 +62,7 @@
         app:popEnterAnim="@anim/slide_in_left"
         app:popExitAnim="@anim/slide_out_right">
         <argument
-            android:name="@string/nav_arg_choose_action_request_key"
+            android:name="choose_action_request_key"
             app:argType="string" />
     </action>
 

@@ -287,7 +287,7 @@ class MyAccessibilityService : AccessibilityService(),
             return if (isCompatibleImeChosen) {
                 Success(action)
             } else {
-                NoCompatibleImeChosen()
+                RecoverableError.NoCompatibleImeChosen
             }
         }
 

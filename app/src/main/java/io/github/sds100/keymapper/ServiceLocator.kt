@@ -10,14 +10,10 @@ import io.github.sds100.keymapper.data.db.DefaultDataStoreManager
 import io.github.sds100.keymapper.data.db.IDataStoreManager
 import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repository.*
-import io.github.sds100.keymapper.domain.adapter.BluetoothMonitor
-import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.domain.adapter.*
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
-import io.github.sds100.keymapper.framework.adapters.AndroidExternalDeviceAdapter
-import io.github.sds100.keymapper.framework.adapters.AndroidInputMethodAdapter
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import kotlinx.coroutines.runBlocking
@@ -191,24 +187,12 @@ object ServiceLocator {
         }
     }
 
-    @Volatile
-    private var inputMethodAdapter: InputMethodAdapter? = null
-
     fun inputMethodAdapter(context: Context): InputMethodAdapter {
-        synchronized(this) {
-            return inputMethodAdapter
-                ?: AndroidInputMethodAdapter(context).also { inputMethodAdapter = it }
-        }
+        return (context.applicationContext as MyApplication).inputMethodAdapter
     }
 
-    @Volatile
-    private var externalDeviceAdapter: ExternalDeviceAdapter? = null
-
     fun externalDeviceAdapter(context: Context): ExternalDeviceAdapter {
-        synchronized(this) {
-            return externalDeviceAdapter
-                ?: AndroidExternalDeviceAdapter(context).also { externalDeviceAdapter = it }
-        }
+        return (context.applicationContext as MyApplication).externalDeviceAdapter
     }
 
     fun bluetoothMonitor(context: Context): BluetoothMonitor {
@@ -233,6 +217,18 @@ object ServiceLocator {
 
     fun packageManagerAdapter(context: Context): PackageManagerAdapter {
         return (context.applicationContext as MyApplication).packageManagerAdapter
+    }
+
+    fun cameraAdapter(context: Context): CameraAdapter {
+        return (context.applicationContext as MyApplication).cameraAdapter
+    }
+
+    fun permissionAdapter(context: Context): PermissionAdapter {
+        return (context.applicationContext as MyApplication).permissionAdapter
+    }
+
+    fun systemFeatureAdapter(context: Context): SystemFeatureAdapter {
+        return (context.applicationContext as MyApplication).systemFeatureAdapter
     }
 
     @VisibleForTesting

@@ -9,12 +9,8 @@ import io.github.sds100.keymapper.ui.actions.ActionListItemState
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.RecoverableError
-import io.github.sds100.keymapper.util.result.errorOrNull
-import io.github.sds100.keymapper.util.result.isError
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 /**
@@ -33,12 +29,12 @@ class ActionListViewModel<A : Action>(
 
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
-    private val _openEditOptions = LiveEvent<String>()
+    private val _openEditOptions = MutableSharedFlow<String>()
 
     /**
      * value is the uid of the action
      */
-    val openEditOptions: LiveData<String> = _openEditOptions
+    val openEditOptions = _openEditOptions.asSharedFlow()
 
     private val _fixError = LiveEvent<RecoverableError>()
     val fixError: LiveData<RecoverableError> = _fixError
@@ -47,11 +43,12 @@ class ActionListViewModel<A : Action>(
     val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
 
     init {
-        configActions.actionList
-            .onEach { buildModels(it) }
-            .launchIn(coroutineScope)
-
-        actionError.invalidateErrors.onEach { rebuildModels() }.launchIn(coroutineScope)
+        combine(
+            configActions.actionList,
+            actionError.invalidateErrors
+        ) { models, _ ->
+            model.value = models.mapData { buildModels(it) }
+        }.launchIn(coroutineScope)
     }
 
     fun addAction(action: ActionData) = configActions.addAction(action)
@@ -66,7 +63,7 @@ class ActionListViewModel<A : Action>(
                 val error = actionError.getError(actionData)
 
                 when {
-                    error.isError && error is RecoverableError -> _fixError.value = error
+                    error != null && error is RecoverableError -> _fixError.value = error
 
                     else -> testAction(actionData)
                 }
@@ -80,23 +77,17 @@ class ActionListViewModel<A : Action>(
 
     override fun rebuildModels() {
         coroutineScope.launch {
-            buildModels(configActions.actionList.first())
+            model.value = configActions.actionList.first().mapData {
+                buildModels(it)
+            }
         }
     }
 
-    private fun buildModels(actionList: DataState<List<A>>) {
-        coroutineScope.launch {
-            val newModel = actionList.mapData { data ->
-                data.map {
-                    listItemModelMapper.map(
-                        it,
-                        actionError.getError(it.data).errorOrNull(),
-                        data.size
-                    )
-                }
-            }
-
-            model.postValue(newModel)
-        }
+    private fun buildModels(actionList: List<A>) = actionList.map {
+        listItemModelMapper.map(
+            it,
+            actionError.getError(it.data),
+            actionList.size
+        )
     }
 }

@@ -8,13 +8,16 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.databinding.FragmentConfigMappingBinding
+import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
+import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
 import splitties.alertdialog.appcompat.alertDialog
@@ -40,6 +43,16 @@ abstract class ConfigMappingFragment : Fragment() {
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
+            result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
+                viewModel.addAction(it)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,7 +64,6 @@ abstract class ConfigMappingFragment : Fragment() {
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
         ) {
-
             viewModel.actionListViewModel.rebuildModels()
         }
 

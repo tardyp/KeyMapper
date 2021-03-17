@@ -7,12 +7,7 @@ import androidx.lifecycle.map
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerState
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapTriggerUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.TriggerKey
-import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCase
-import io.github.sds100.keymapper.domain.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.domain.trigger.TriggerMode
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel

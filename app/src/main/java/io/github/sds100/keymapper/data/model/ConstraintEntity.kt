@@ -8,7 +8,7 @@ import com.github.salomonbrys.kotson.byString
 import com.github.salomonbrys.kotson.jsonDeserializer
 import com.google.gson.annotations.SerializedName
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.result.ExtraNotFound
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.android.parcel.Parcelize
@@ -145,7 +145,7 @@ data class ConstraintEntity(@ConstraintType
     }
 
     fun getExtraData(extraId: String): Result<String> {
-        val extra = extras.find { it.id == extraId } ?: return ExtraNotFound(extraId)
+        val extra = extras.find { it.id == extraId } ?: return Error.ExtraNotFound(extraId)
 
         return Success(extra.data)
     }

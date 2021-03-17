@@ -7,9 +7,8 @@ import android.telephony.TelephonyManager
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import io.github.sds100.keymapper.util.result.DownloadFailed
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.SSLHandshakeError
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.systemservices.wifiManager
@@ -41,9 +40,9 @@ object NetworkUtils {
 
             { error ->
                 if (error.cause is SSLHandshakeException) {
-                    it.resume(SSLHandshakeError())
+                    it.resume(Error.SSLHandshakeError)
                 } else {
-                    it.resume(DownloadFailed())
+                    it.resume(Error.DownloadFailed)
                 }
             })
 

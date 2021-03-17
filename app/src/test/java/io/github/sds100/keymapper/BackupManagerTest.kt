@@ -16,9 +16,7 @@ import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.BackupRestoreUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.BackupVersionTooNew
-import io.github.sds100.keymapper.util.result.CorruptJsonFile
-import io.github.sds100.keymapper.util.result.EmptyJson
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -221,7 +219,7 @@ class BackupManagerTest {
 
             MatcherAssert.assertThat(
                 eventStream.history,
-                Is.`is`(listOf(RestoreResult(BackupVersionTooNew)))
+                Is.`is`(listOf(RestoreResult(Error.BackupVersionTooNew)))
             )
 
             Mockito.verify(mockKeymapRepository, Mockito.times(0)).restore(anyInt(), anyList())
@@ -237,7 +235,7 @@ class BackupManagerTest {
 
             MatcherAssert.assertThat(
                 eventStream.history,
-                Is.`is`(listOf(RestoreResult(BackupVersionTooNew)))
+                Is.`is`(listOf(RestoreResult(Error.BackupVersionTooNew)))
             )
 
             Mockito.verify(mockFingerprintMapRepository, Mockito.times(0))
@@ -251,7 +249,7 @@ class BackupManagerTest {
         backupManager.restore(emptyFileInputStream)
         advanceUntilIdle()
 
-        MatcherAssert.assertThat(eventStream.history, Is.`is`(listOf(RestoreResult(EmptyJson))))
+        MatcherAssert.assertThat(eventStream.history, Is.`is`(listOf(RestoreResult(Error.EmptyJson))))
     }
 
     @Test
@@ -263,7 +261,7 @@ class BackupManagerTest {
 
         MatcherAssert.assertThat(
             eventStream.history,
-            Is.`is`(listOf(RestoreResult(CorruptJsonFile)))
+            Is.`is`(listOf(RestoreResult(Error.CorruptJsonFile)))
         )
     }
 

@@ -1,3 +1,4 @@
+
 package io.github.sds100.keymapper.util
 
 import android.Manifest
@@ -126,7 +127,7 @@ fun ActionEntity.getTitle(
                 Success(ctx.str(R.string.description_open_app, applicationLabel.toString()))
             } catch (e: PackageManager.NameNotFoundException) {
                 //the app isn't installed
-                AppNotFound(data)
+                RecoverableError.AppNotFound(data)
             }
         }
 
@@ -311,7 +312,7 @@ fun ActionEntity.getIcon(ctx: Context): Result<Drawable?> = when (type) {
             Success(ctx.packageManager.getApplicationIcon(data))
         } catch (e: PackageManager.NameNotFoundException) {
             //if the app isn't installed, it can't find the icon for it
-            AppNotFound(data)
+            RecoverableError.AppNotFound(data)
         }
     }
 
@@ -319,7 +320,7 @@ fun ActionEntity.getIcon(ctx: Context): Result<Drawable?> = when (type) {
         try {
             Success(ctx.packageManager.getApplicationIcon(it))
         } catch (e: PackageManager.NameNotFoundException) {
-            AppNotFound(it)
+            RecoverableError.AppNotFound(it)
         }
     } otherwise { Success(null) }
 
@@ -338,15 +339,15 @@ fun ActionEntity.getIcon(ctx: Context): Result<Drawable?> = when (type) {
 
 fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Result<ActionEntity> {
     //the action has no data
-    if (data.isEmpty()) return NoActionData()
+    if (data.isEmpty()) return Error.NoActionData
 
     if (requiresIME) {
         if (!KeyboardUtils.isCompatibleImeEnabled()) {
-            return NoCompatibleImeEnabled()
+            return RecoverableError.NoCompatibleImeEnabled
         }
 
         if (!KeyboardUtils.isCompatibleImeChosen(ctx)) {
-            return NoCompatibleImeChosen()
+            return RecoverableError.NoCompatibleImeChosen
         }
     }
 
@@ -365,13 +366,13 @@ fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Resul
 
                     //if the app is disabled, show an error message because it won't open
                     if (!appInfo.enabled) {
-                        return@then AppDisabled(data)
+                        return@then RecoverableError.AppDisabled(data)
                     }
 
                     return@then Success(this)
 
                 } catch (e: Exception) {
-                    return@then AppNotFound(data)
+                    return@then RecoverableError.AppNotFound(data)
                 }
             }.otherwise {
                 if (type == ActionType.APP_SHORTCUT) {
@@ -388,19 +389,19 @@ fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Resul
                 .toBoolean()
 
             if (useShell && !hasRootPermission) {
-                return PermissionDenied(Constants.PERMISSION_ROOT)
+                return RecoverableError.PermissionDenied(Constants.PERMISSION_ROOT)
             }
         }
 
         ActionType.TAP_COORDINATE -> {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                return SdkVersionTooLow(Build.VERSION_CODES.N)
+                return Error.SdkVersionTooLow(Build.VERSION_CODES.N)
             }
         }
 
         ActionType.PHONE_CALL -> {
             if (!PermissionUtils.isPermissionGranted(ctx, Manifest.permission.CALL_PHONE)) {
-                return PermissionDenied(Manifest.permission.CALL_PHONE)
+                return RecoverableError.PermissionDenied(Manifest.permission.CALL_PHONE)
             }
         }
 
@@ -416,27 +417,27 @@ fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Resul
                         ) != null
 
                     if (!activityExists) {
-                        return GoogleAppNotFound()
+                        return Error.NoVoiceAssistant
                     }
                 }
 
                 if (Build.VERSION.SDK_INT < systemActionDef.minApi) {
-                    return SdkVersionTooLow(systemActionDef.minApi)
+                    return Error.SdkVersionTooLow(systemActionDef.minApi)
                 }
 
                 if (Build.VERSION.SDK_INT > systemActionDef.maxApi) {
-                    return SdkVersionTooHigh(systemActionDef.maxApi)
+                    return Error.SdkVersionTooHigh(systemActionDef.maxApi)
                 }
 
                 systemActionDef.permissions.forEach { permission ->
                     if (!PermissionUtils.isPermissionGranted(ctx, permission)) {
-                        return PermissionDenied(permission)
+                        return RecoverableError.PermissionDenied(permission)
                     }
                 }
 
                 for (feature in systemActionDef.features) {
                     if (!ctx.packageManager.hasSystemFeature(feature)) {
-                        return FeatureUnavailable(feature)
+                        return Error.FeatureUnavailable(feature)
                     }
                 }
 
@@ -453,8 +454,8 @@ fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Resul
                             if (!CameraUtils.hasFlashFacing(sdkLensId)) {
 
                                 when (lensOptionId) {
-                                    SystemActionOption.LENS_FRONT -> FrontFlashNotFound()
-                                    SystemActionOption.LENS_BACK -> BackFlashNotFound()
+                                    SystemActionOption.LENS_FRONT -> Error.FrontFlashNotFound
+                                    SystemActionOption.LENS_BACK -> Error.BackFlashNotFound
                                 }
                             }
                         }
@@ -471,7 +472,7 @@ fun ActionEntity.canBePerformed(ctx: Context, hasRootPermission: Boolean): Resul
                                 errorData = imeName
                             }
 
-                            return ImeNotFound(errorData)
+                            return Error.ImeNotFound(errorData)
                         }
                     }
                 }

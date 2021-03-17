@@ -6,6 +6,7 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
+import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
@@ -108,6 +109,8 @@ class ConfigFingerprintMapViewModel(
             configUseCase.setFingerprintMap(get(id))
         }
     }
+
+    override fun addAction(actionData: ActionData) = actionListViewModel.addAction(actionData)
 
     class Factory(
         private val save: SaveFingerprintMapUseCase,

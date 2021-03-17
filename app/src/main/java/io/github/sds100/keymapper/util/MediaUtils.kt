@@ -94,7 +94,7 @@ object MediaUtils {
             val packageName = it.elementAtOrNull(0)
 
             if (packageName == null) {
-                NoMediaSessions()
+                Error.NoMediaSessions
             } else {
                 Success(packageName)
             }
@@ -113,6 +113,6 @@ object MediaUtils {
             return Success(mediaSessionManager.getActiveSessions(component))
         }
 
-        return PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+        return RecoverableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
     }
 }

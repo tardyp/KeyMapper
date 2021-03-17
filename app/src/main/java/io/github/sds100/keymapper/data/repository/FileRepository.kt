@@ -17,13 +17,13 @@ class FileRepository(private val context: Context) {
         val path = FileUtils.getPathToFileInAppData(context, fileName)
 
         return NetworkUtils.downloadFile(context, url, path).otherwise {
-            if (it is DownloadFailed) {
+            if (it is Error.DownloadFailed) {
                 val file = File(path)
 
                 if (file.exists() && file.readText().isNotBlank()) {
                     Success(file)
                 } else {
-                    FileNotCached()
+                    Error.FileNotCached
                 }
             } else {
                 it

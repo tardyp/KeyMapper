@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import splitties.bitflags.hasFlag
 
 /**
  * Created by sds100 on 22/02/2021.
@@ -131,16 +132,10 @@ abstract class BaseActionListItemMapper<A : Action>(
             Success(title)
         }
 
-        is SimpleSystemAction -> {
-            val resId = SystemActionUtils.TITLE_MAP[action.id]
-                ?: error("Unable to find system action id title res for ${action.id}")
-
-            Success(getString(resId))
-        }
+        is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action)))
 
         is VolumeSystemAction -> {
-            val resId = SystemActionUtils.TITLE_MAP[action.id]
-                ?: error("Unable to find system action id title res for ${action.id}")
+            val resId = SystemActionUtils.getTitle(action)
 
             if (action.showVolumeUi) {
 
@@ -284,7 +279,7 @@ abstract class BaseActionListItemMapper<A : Action>(
             getString(R.string.action_switch_keyboard_formatted, action.savedImeName).success()
         }
 
-        is CorruptAction -> CorruptActionError
+        is CorruptAction -> Error.CorruptActionError
         is IntentAction -> {
             val resId = when (action.target) {
                 IntentTarget.ACTIVITY -> R.string.action_title_intent_start_activity
@@ -308,10 +303,13 @@ abstract class BaseActionListItemMapper<A : Action>(
                 arrayOf(action.x, action.y)
             ).success()
         }
+
+        is TextAction -> getString(R.string.description_text_block, action.text).success()
+        is UrlAction -> getString(R.string.description_url, action.url).success()
     }
 
     private fun getIcon(action: ActionData): Result<ActionIconInfo> = when (action) {
-        CorruptAction -> CorruptActionError
+        CorruptAction -> Error.CorruptActionError
 
         is KeyEventAction -> ActionIconInfo(
             drawable = null,
@@ -327,7 +325,7 @@ abstract class BaseActionListItemMapper<A : Action>(
         }.firstBlocking()
 
         is SystemAction -> ActionIconInfo(
-            getDrawable(SystemActionUtils.ICON_MAP[action.id]!!),
+            SystemActionUtils.getIcon(action)?.let { getDrawable(it) },
             TintType.ON_SURFACE
         ).success()
 
@@ -337,14 +335,17 @@ abstract class BaseActionListItemMapper<A : Action>(
         ).success()
 
         is PhoneCallAction -> ActionIconInfo(
-            getDrawable(R.drawable.ic_baseline_call_24),
+            getDrawable(R.drawable.ic_outline_call_24),
             tintType = TintType.ON_SURFACE
         ).success()
 
         is TapCoordinateAction -> ActionIconInfo(
-            getDrawable(R.drawable.ic_baseline_touch_app_24),
+            getDrawable(R.drawable.ic_outline_touch_app_24),
             TintType.ON_SURFACE
         ).success()
+
+        is TextAction -> ActionIconInfo(null, TintType.NONE).success()
+        is UrlAction -> ActionIconInfo(null, TintType.NONE).success()
     }
 
     abstract fun getOptionLabels(action: A): List<String>

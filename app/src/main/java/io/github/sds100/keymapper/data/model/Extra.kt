@@ -18,7 +18,7 @@ import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.EXTRA_DOUBL
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.EXTRA_LONG_PRESS_DELAY
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.EXTRA_SEQUENCE_TRIGGER_TIMEOUT
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.EXTRA_VIBRATION_DURATION
-import io.github.sds100.keymapper.util.result.ExtraNotFound
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.android.parcel.Parcelize
@@ -76,7 +76,7 @@ fun List<Extra>.putExtraData(id: String, data: String): List<Extra> {
 fun List<Extra>.getData(extraId: String): Result<String> {
 
     return find { it.id == extraId }.let {
-        it ?: return@let ExtraNotFound(extraId)
+        it ?: return@let Error.ExtraNotFound(extraId)
 
         Success(it.data)
     }

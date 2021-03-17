@@ -11,8 +11,7 @@ import io.github.sds100.keymapper.util.BuildDeviceInfoModels
 import io.github.sds100.keymapper.util.ChooseKeycode
 import io.github.sds100.keymapper.util.Event
 import io.github.sds100.keymapper.util.KeyEventUtils
-import io.github.sds100.keymapper.util.result.CantBeEmpty
-import io.github.sds100.keymapper.util.result.InvalidNumber
+import io.github.sds100.keymapper.util.result.Error
 import splitties.bitflags.hasFlag
 import splitties.bitflags.minusFlag
 import splitties.bitflags.withFlag
@@ -55,8 +54,8 @@ class KeyEventActionTypeViewModel(
 
     val failure = keyCode.map {
         when {
-            it.isNullOrEmpty() -> CantBeEmpty()
-            it.toIntOrNull() == null -> InvalidNumber()
+            it.isNullOrEmpty() -> Error.CantBeEmpty
+            it.toIntOrNull() == null -> Error.InvalidNumber
 
             else -> null
         }

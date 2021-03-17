@@ -38,8 +38,7 @@ class SystemActionListFragment
 
     companion object {
         const val REQUEST_KEY = "request_system_action"
-        const val EXTRA_SYSTEM_ACTION_ID = "extra_system_action_id"
-        const val EXTRA_SYSTEM_ACTION_OPTION_DATA = "extra_system_action_option_data"
+        const val EXTRA_SYSTEM_ACTION = "extra_system_action"
         const val SEARCH_STATE_KEY = "key_system_action_search_state"
     }
 
@@ -165,10 +164,10 @@ class SystemActionListFragment
                 }
             }
 
-            returnResult(
-                EXTRA_SYSTEM_ACTION_ID to systemActionDef.id,
-                EXTRA_SYSTEM_ACTION_OPTION_DATA to selectedOptionData
-            )
+            //TODO rework all of this in the view model
+//            returnResult(
+//
+//            )
         }
 
     @ExperimentalSplittiesApi

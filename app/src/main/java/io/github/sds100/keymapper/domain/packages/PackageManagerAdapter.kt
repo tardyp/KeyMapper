@@ -10,4 +10,6 @@ interface PackageManagerAdapter {
     val installedPackages: StateFlow<DataState<List<PackageInfo>>>
     fun isAppEnabled(packageName: String): Boolean
     fun isAppInstalled(packageName: String): Boolean
+
+    fun isVoiceAssistantInstalled(): Boolean
 }

@@ -6,12 +6,14 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
+import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
-import io.github.sds100.keymapper.domain.trigger.RecordTriggerUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
@@ -62,7 +64,8 @@ class ConfigKeymapViewModel(
         configTrigger,
         triggerKeyListItemMapper,
         recordTriggerUseCase,
-        showDeviceInfoUseCase)
+        showDeviceInfoUseCase
+    )
 
     private val dataState = MutableLiveData<ConfigKeymapState?>()
 
@@ -135,6 +138,8 @@ class ConfigKeymapViewModel(
             }
         }
     }
+
+    override fun addAction(actionData: ActionData) = actionListViewModel.addAction(actionData)
 
     class Factory(
         private val saveKeymap: SaveKeymapUseCase,

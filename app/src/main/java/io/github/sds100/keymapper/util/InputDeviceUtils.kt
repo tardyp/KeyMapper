@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.util
 import android.os.Build
 import android.view.InputDevice
 import io.github.sds100.keymapper.data.model.DeviceInfoEntity
-import io.github.sds100.keymapper.util.result.DeviceNotFound
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import java.lang.reflect.InvocationTargetException
@@ -23,7 +23,7 @@ object InputDeviceUtils {
             }
         }
 
-        return DeviceNotFound()
+        return Error.DeviceNotFound(descriptor)
     }
 
     fun createDeviceInfoModelsForAll() = sequence {

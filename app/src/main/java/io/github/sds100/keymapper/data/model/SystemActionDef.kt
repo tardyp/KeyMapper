@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.util.result.OptionsNotRequired
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 
@@ -40,7 +40,7 @@ class SystemActionDef(
     val getOptions: suspend (ctx: Context) -> Result<List<String>> =
         getOptions ?: {
             if (options == null) {
-                OptionsNotRequired()
+                Error.OptionsNotRequired
             } else {
                 Success(options)
             }

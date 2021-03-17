@@ -7,11 +7,17 @@ import kotlinx.coroutines.flow.StateFlow
  * Created by sds100 on 14/02/2021.
  */
 interface InputMethodAdapter {
-    fun enableCompatibleInputMethods()
-    fun chooseLastUsedIncompatibleInputMethod()
-    fun chooseCompatibleInputMethod()
-    fun showImePickerOutsideApp()
+    fun showImePicker(fromForeground: Boolean)
+
+    fun isImeEnabled(imeId: String):Boolean
+    fun enableIme(imeId: String)
+
+    fun isImeChosen(imeId: String):Boolean
+    fun chooseIme(imeId: String)
+
     fun getLabel(imeId: String): Result<String>
+
+    fun getImeHistory(): List<String>
 
     val chosenImePackageName: StateFlow<String?>
 }

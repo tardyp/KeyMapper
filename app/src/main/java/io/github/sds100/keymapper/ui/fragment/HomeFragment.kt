@@ -33,7 +33,7 @@ import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.NoCompatibleImeEnabled
+import io.github.sds100.keymapper.util.result.RecoverableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -488,7 +488,7 @@ class HomeFragment : Fragment() {
 
             if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
                     .data.any { keymap ->
-                        keymap.actionList.any { it.error is NoCompatibleImeEnabled }
+                        keymap.actionList.any { it.error is RecoverableError.NoCompatibleImeEnabled }
                     }
             ) {
 

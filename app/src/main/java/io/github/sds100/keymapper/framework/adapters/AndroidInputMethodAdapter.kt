@@ -4,24 +4,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
-import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.util.KeyboardUtils
-import io.github.sds100.keymapper.util.PermissionUtils
-import io.github.sds100.keymapper.util.RootUtils
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
-import splitties.toast.toast
 
 /**
  * Created by sds100 on 14/02/2021.
  */
-internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
+ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
     companion object {
         private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
     }
@@ -39,7 +36,6 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
             }
         }
     }
-
 
     private val ctx = context.applicationContext
 
@@ -59,53 +55,35 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
         }
     }
 
-    override fun enableCompatibleInputMethods() {
+    override fun showImePicker(fromForeground: Boolean) {
         TODO("Not yet implemented")
     }
 
-    override fun chooseLastUsedIncompatibleInputMethod() {
-        getLastUsedIncompatibleImeId(ctx).onSuccess {
-            KeyboardUtils.switchIme(ctx, it)
-        }
+    override fun isImeEnabled(imeId: String): Boolean {
+        TODO("Not yet implemented")
     }
 
-    override fun chooseCompatibleInputMethod() {
-        if (PermissionUtils.haveWriteSecureSettingsPermission(ctx)) {
-            getLastUsedCompatibleImeId(ctx).onSuccess {
-                KeyboardUtils.switchIme(ctx, it)
-                return
-            }
-
-            KeyboardUtils.getImeId(Constants.PACKAGE_NAME).valueOrNull()?.let {
-                KeyboardUtils.switchIme(ctx, it)
-                return
-            }
-        }
-
-        KeyboardUtils.showInputMethodPicker()
+    override fun enableIme(imeId: String) {
+        TODO("Not yet implemented")
     }
 
-    override fun showImePickerOutsideApp() {
-        /* Android 8.1 and higher don't seem to allow you to open the input method picker dialog
-             * from outside the app :( but it can be achieved by sending a broadcast with a
-             * system process id (requires root access) */
+    override fun isImeChosen(imeId: String): Boolean {
+        TODO("Not yet implemented")
+    }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
-            ctx.getSystemService<InputMethodManager>()?.showInputMethodPicker()
-        } else if ((Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT)) {
-            val command =
-                "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
-            RootUtils.executeRootCommand(command)
-        } else {
-            ctx.toast(R.string.error_this_is_unsupported)
-        }
+    override fun chooseIme(imeId: String) {
+        TODO("Not yet implemented")
     }
 
     override fun getLabel(imeId: String): Result<String> {
         val label = inputMethodManager.enabledInputMethodList.find { it.id == imeId }
-            ?.loadLabel(ctx.packageManager)?.toString() ?: return InputMethodNotFound(imeId)
+            ?.loadLabel(ctx.packageManager)?.toString() ?: return Error.InputMethodNotFound(imeId)
 
         return Success(label)
+    }
+
+    override fun getImeHistory(): List<String> {
+        TODO("Not yet implemented")
     }
 
     private fun getSubtypeHistoryString(ctx: Context): String {
@@ -126,26 +104,6 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
             .map { it.split(';')[0] }
     }
 
-    private fun getLastUsedCompatibleImeId(ctx: Context): Result<String> {
-        for (id in getInputMethodHistoryIds(ctx)) {
-            if (id.split('/')[0] in KeyboardUtils.KEY_MAPPER_IME_PACKAGE_LIST) {
-                return Success(id)
-            }
-        }
-
-        return KeyboardUtils.getImeId(Constants.PACKAGE_NAME)
-    }
-
-    private fun getLastUsedIncompatibleImeId(ctx: Context): Result<String> {
-        for (id in getInputMethodHistoryIds(ctx)) {
-            if (id.split('/')[0] != Constants.PACKAGE_NAME) {
-                return Success(id)
-            }
-        }
-
-        return NoIncompatibleKeyboardsInstalled()
-    }
-
     private fun getChosenInputMethodPackageName(ctx: Context): Result<String> {
         val chosenImeId = getChosenImeId(ctx)
 
@@ -160,7 +118,7 @@ internal class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter 
         val packageName = inputMethodManager.inputMethodList.find { it.id == imeId }?.packageName
 
         return if (packageName == null) {
-            ImeNotFound(imeId)
+            Error.InputMethodNotFound(imeId)
         } else {
             Success(packageName)
         }

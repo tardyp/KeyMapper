@@ -38,6 +38,9 @@ object KeyboardUtils {
 
     private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
 
+    val CAN_ACCESSIBILITY_SERVICE_SWITCH_KEYBOARD =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
     val KEY_MAPPER_IME_PACKAGE_LIST = arrayOf(
         Constants.PACKAGE_NAME,
         KEY_MAPPER_GUI_IME_PACKAGE
@@ -140,14 +143,14 @@ object KeyboardUtils {
 
     fun getInputMethodLabel(ctx: Context, id: String): Result<String> {
         val label = inputMethodManager.enabledInputMethodList.find { it.id == id }
-            ?.loadLabel(ctx.packageManager)?.toString() ?: return InputMethodNotFound(id)
+            ?.loadLabel(ctx.packageManager)?.toString() ?: return Error.InputMethodNotFound(id)
 
         return Success(label)
     }
 
     fun getInputMethodIds(): Result<List<String>> {
         if (inputMethodManager.enabledInputMethodList.isEmpty()) {
-            return NoEnabledInputMethods()
+            return Error.NoEnabledInputMethods
         }
 
         return Success(inputMethodManager.enabledInputMethodList.map { it.id })
@@ -163,7 +166,7 @@ object KeyboardUtils {
         val packageName = inputMethodManager.inputMethodList.find { it.id == imeId }?.packageName
 
         return if (packageName == null) {
-            ImeNotFound(imeId)
+            Error.ImeNotFound(imeId)
         } else {
             Success(packageName)
         }
@@ -251,7 +254,7 @@ object KeyboardUtils {
 
     fun getImeId(packageName: String): Result<String> {
         val inputMethod = inputMethodManager.inputMethodList.find { it.packageName == packageName }
-            ?: return KeyMapperImeNotFound()
+            ?: return Error.KeyMapperImeNotFound
 
         return Success(inputMethod.id)
     }
@@ -288,7 +291,7 @@ object KeyboardUtils {
             }
         }
 
-        return NoIncompatibleKeyboardsInstalled()
+        return Error.NoIncompatibleKeyboardsInstalled
     }
 }
 

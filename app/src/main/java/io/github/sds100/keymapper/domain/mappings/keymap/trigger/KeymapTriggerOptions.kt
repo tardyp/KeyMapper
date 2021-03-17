@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.mappings.keymap
+package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option

@@ -22,29 +22,29 @@ object ConstraintUtils {
         when (id) {
             ConstraintEntity.BT_DEVICE_CONNECTED, ConstraintEntity.BT_DEVICE_DISCONNECTED -> {
                 if (!ctx.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
-                    return SystemFeatureNotSupported(PackageManager.FEATURE_BLUETOOTH)
+                    return Error.SystemFeatureNotSupported(PackageManager.FEATURE_BLUETOOTH)
                 }
             }
 
             ConstraintEntity.SCREEN_OFF, ConstraintEntity.SCREEN_ON -> {
                 if (!PermissionUtils.isPermissionGranted(ctx, Constants.PERMISSION_ROOT)) {
-                    return PermissionDenied(Constants.PERMISSION_ROOT)
+                    return RecoverableError.PermissionDenied(Constants.PERMISSION_ROOT)
                 }
             }
 
             in ConstraintEntity.ORIENTATION_CONSTRAINTS -> {
                 if (!PermissionUtils.isPermissionGranted(ctx, Manifest.permission.WRITE_SETTINGS)) {
-                    return PermissionDenied(Manifest.permission.WRITE_SETTINGS)
+                    return RecoverableError.PermissionDenied(Manifest.permission.WRITE_SETTINGS)
                 }
             }
 
             ConstraintEntity.APP_PLAYING_MEDIA -> {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    return SdkVersionTooLow(Build.VERSION_CODES.LOLLIPOP)
+                    return Error.SdkVersionTooLow(Build.VERSION_CODES.LOLLIPOP)
                 }
 
                 if (!PermissionUtils.isPermissionGranted(ctx, Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)) {
-                    return PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+                    return RecoverableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
                 }
             }
         }
@@ -86,13 +86,13 @@ private fun ConstraintEntity.getDescription(ctx: Context): Result<String> {
                         ConstraintEntity.APP_FOREGROUND -> R.string.constraint_app_foreground_description
                         ConstraintEntity.APP_NOT_FOREGROUND -> R.string.constraint_app_not_foreground_description
                         ConstraintEntity.APP_PLAYING_MEDIA -> R.string.constraint_app_playing_media_description
-                        else -> return@then ConstraintNotFound()
+                        else -> return@then Error.ConstraintNotFound
                     }
 
                     Success(ctx.str(descriptionRes, applicationLabel))
                 } catch (e: PackageManager.NameNotFoundException) {
                     //the app isn't installed
-                    AppNotFound(it)
+                    RecoverableError.AppNotFound(it)
                 }
             }
 
@@ -116,7 +116,7 @@ private fun ConstraintEntity.getDescription(ctx: Context): Result<String> {
         ConstraintEntity.ORIENTATION_180 -> Success(ctx.str(R.string.constraint_choose_orientation_180))
         ConstraintEntity.ORIENTATION_270 -> Success(ctx.str(R.string.constraint_choose_orientation_270))
 
-        else -> ConstraintNotFound()
+        else -> Error.ConstraintNotFound
     }
 }
 
@@ -128,7 +128,7 @@ private fun ConstraintEntity.getIcon(ctx: Context): Result<Drawable> {
                     Success(ctx.packageManager.getApplicationIcon(it))
                 } catch (e: PackageManager.NameNotFoundException) {
                     //if the app isn't installed, it can't find the icon for it
-                    AppNotFound(it)
+                    RecoverableError.AppNotFound(it)
                 }
             }
 
@@ -147,6 +147,6 @@ private fun ConstraintEntity.getIcon(ctx: Context): Result<Drawable> {
         ConstraintEntity.ORIENTATION_LANDSCAPE, ConstraintEntity.ORIENTATION_90, ConstraintEntity.ORIENTATION_270 ->
             Success(ctx.safeVectorDrawable(R.drawable.ic_outline_stay_current_landscape_24)!!)
 
-        else -> ConstraintNotFound()
+        else -> Error.ConstraintNotFound
     }
 }

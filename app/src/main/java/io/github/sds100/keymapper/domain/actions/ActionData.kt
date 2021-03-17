@@ -13,22 +13,27 @@ object CorruptAction : ActionData()
 
 @Serializable
 data class OpenAppAction(
-    val packageName: String
-) : ActionData()
+   override val packageName: String
+) : ActionData(), AppAction
 
 @Serializable
 data class OpenAppShortcutAction(
-    val packageName: String,
+  override  val packageName: String,
     val shortcutTitle: String,
-) : ActionData()
+    val uri: String
+) : ActionData(), AppAction
 
 @Serializable
 data class KeyEventAction(
     val keyCode: Int,
-    val metaState: Int,
-    val useShell: Boolean,
-    val device: DeviceInfo?
+    val metaState: Int = 0,
+    val useShell: Boolean =false,
+    val device: DeviceInfo? = null
 ) : ActionData()
+
+interface AppAction{
+    val packageName: String
+}
 
 sealed class SystemAction : ActionData() {
     abstract val id: SystemActionId
@@ -109,4 +114,14 @@ data class TapCoordinateAction(
 @Serializable
 data class PhoneCallAction(
     val number: String
+) : ActionData()
+
+@Serializable
+data class UrlAction(
+    val url: String
+) : ActionData()
+
+@Serializable
+data class TextAction(
+    val text: String
 ) : ActionData()

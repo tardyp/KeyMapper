@@ -69,7 +69,7 @@ suspend fun Context.editTextNumberAlertDialog(
 
     fun isValid(text: String?): Result<Int> {
         if (text.isNullOrBlank()) {
-            return InvalidNumber()
+            return Error.InvalidNumber
         }
 
         return try {
@@ -77,19 +77,19 @@ suspend fun Context.editTextNumberAlertDialog(
 
             min?.let {
                 if (num < min) {
-                    return NumberTooSmall(min)
+                    return Error.NumberTooSmall(min)
                 }
             }
 
             max?.let {
                 if (num > max) {
-                    return NumberTooBig(max)
+                    return Error.NumberTooBig(max)
                 }
             }
 
             Success(num)
         } catch (e: NumberFormatException) {
-            InvalidNumber()
+            Error.InvalidNumber
         }
     }
 

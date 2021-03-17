@@ -1,11 +1,13 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
 import io.github.sds100.keymapper.domain.models.Constraint
 import io.github.sds100.keymapper.domain.models.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.ui.actions.ActionUtils
 import io.github.sds100.keymapper.util.delegate.KeymapDetectionDelegate
 import kotlinx.serialization.Serializable
 import java.util.*
@@ -40,7 +42,7 @@ data class KeyMap(
                 value = it.repeat,
                 isAllowed =
                 KeymapDetectionDelegate.performActionOnDown(trigger)
-                    && ActionUtils.canBeHeldDown(it.data)
+                    && it.data.canBeHeldDown()
             ),
 
             multiplier = Option(

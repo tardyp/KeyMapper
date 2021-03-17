@@ -59,10 +59,10 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
         binding.epoxyRecyclerViewActions.adapter = actionListController.adapter
 
-        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
+//        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
             //TODO
 //            openActionOptionsFragment(it)
-        })
+//        })
 
         binding.setOnAddActionClick {
             val direction =

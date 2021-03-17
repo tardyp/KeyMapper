@@ -191,7 +191,7 @@ object SystemActionOption {
             ROTATION_180 -> ctx.str(R.string.orientation_180)
             ROTATION_270 -> ctx.str(R.string.orientation_270)
 
-            else -> return OptionLabelNotFound(optionId)
+            else -> return Error.OptionLabelNotFound(optionId)
         }
 
         return Success(label)
@@ -203,7 +203,7 @@ object SystemActionOption {
         try {
             Success(data.split(',').toSet())
         } catch (e: Exception) {
-            FailedToSplitString(data)
+            Error.FailedToSplitString(data)
         }
 
     fun labelsFromOptionSet(ctx: Context, systemActionId: String, optionSet: Set<String>): Result<Set<String>> {

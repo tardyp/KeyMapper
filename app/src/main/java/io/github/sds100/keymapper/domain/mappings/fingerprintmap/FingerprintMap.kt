@@ -1,10 +1,10 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
+import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.models.Constraint
 import io.github.sds100.keymapper.domain.models.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.ui.actions.ActionUtils
 import kotlinx.serialization.Serializable
 
 /**
@@ -43,7 +43,7 @@ data class FingerprintMap(
 
             holdDownUntilSwipedAgain = Option(
                 value = it.holdDownUntilSwipedAgain,
-                isAllowed = ActionUtils.canBeHeldDown(it.data)
+                isAllowed = it.data.canBeHeldDown()
             ),
 
             holdDownDuration = Option(

@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.trigger
+package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Created by sds100 on 04/03/2021.
  */
-class RecordTriggerUseCaseImpl() :RecordTriggerUseCase{
+class RecordTriggerUseCaseImpl :RecordTriggerUseCase{
     override val state = MutableStateFlow(RecordTriggerState.Stopped
     )
     override val onRecordKey = MutableSharedFlow<RecordedKey>()

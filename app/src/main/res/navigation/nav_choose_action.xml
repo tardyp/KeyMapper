@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_choose_action">
 
         <argument
-            android:name="@string/nav_arg_choose_action_request_key"
+            android:name="choose_action_request_key"
             app:argType="string" />
 
         <action

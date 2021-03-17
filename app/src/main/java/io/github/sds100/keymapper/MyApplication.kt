@@ -6,13 +6,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
 import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
-import io.github.sds100.keymapper.framework.adapters.AndroidAppInfoAdapter
-import io.github.sds100.keymapper.framework.adapters.AndroidBluetoothMonitor
-import io.github.sds100.keymapper.framework.adapters.AndroidPackageManagerAdapter
-import io.github.sds100.keymapper.framework.adapters.ResourceProviderImpl
+import io.github.sds100.keymapper.framework.adapters.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.FileAccessDenied
-import io.github.sds100.keymapper.util.result.GenericError
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.MainScope
@@ -35,17 +31,23 @@ class MyApplication : MultiDexApplication(),
         )
     }
 
-    internal val appRepository by lazy { AndroidAppRepository(packageManager) }
-    internal val appInfoAdapter by lazy { AndroidAppInfoAdapter(packageManager) }
-    internal val resourceProvider by lazy { ResourceProviderImpl(this) }
+    val appRepository by lazy { AndroidAppRepository(packageManager) }
+    val appInfoAdapter by lazy { AndroidAppInfoAdapter(packageManager) }
+    val resourceProvider by lazy { ResourceProviderImpl(this) }
 
-    internal val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }
-    internal val packageManagerAdapter by lazy {
+    val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }
+    val packageManagerAdapter by lazy {
         AndroidPackageManagerAdapter(
             this,
             appCoroutineScope
         )
     }
+
+    val inputMethodAdapter by lazy { AndroidInputMethodAdapter(this) }
+    val externalDeviceAdapter by lazy { AndroidExternalDeviceAdapter(this) }
+    val cameraAdapter by lazy { AndroidCameraAdapter(this) }
+    val permissionAdapter by lazy { AndroidPermissionAdapter(this) }
+    val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
 
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 
@@ -73,8 +75,8 @@ class MyApplication : MultiDexApplication(),
             Success(outputStream)
         } catch (e: Exception) {
             when (e) {
-                is SecurityException -> FileAccessDenied()
-                else -> GenericError(e)
+                is SecurityException -> Error.FileAccessDenied
+                else -> Error.GenericError(e)
             }
         }
     }

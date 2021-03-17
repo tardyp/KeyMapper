@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,11 +16,15 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
+import io.github.sds100.keymapper.domain.actions.*
+import io.github.sds100.keymapper.domain.actions.KeyEventAction
+import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
+import io.github.sds100.keymapper.ui.utils.getJsonSerializable
+import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
 
 /**
@@ -50,81 +53,86 @@ class ChooseActionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        setResultListener(AppListFragment.REQUEST_KEY) {
+        createActionOnResult(AppListFragment.REQUEST_KEY) {
             val packageName = it.getString(AppListFragment.EXTRA_PACKAGE_NAME)
-            ActionEntity.appAction(packageName!!)
+            OpenAppAction(packageName!!)
         }
 
-        setResultListener(AppShortcutListFragment.REQUEST_KEY) {
+        createActionOnResult(AppShortcutListFragment.REQUEST_KEY) {
             val name = it.getString(AppShortcutListFragment.EXTRA_NAME)
             val packageName = it.getString(AppShortcutListFragment.EXTRA_PACKAGE_NAME)
             val uri = it.getString(AppShortcutListFragment.EXTRA_URI)
 
-            ActionEntity.appShortcutAction(name!!, packageName, uri!!)
+            OpenAppShortcutAction(packageName!!, name!!, uri!!)
         }
 
-        setResultListener(KeyActionTypeFragment.REQUEST_KEY) {
+        createActionOnResult(KeyActionTypeFragment.REQUEST_KEY) {
             val keyCode = it.getInt(KeyActionTypeFragment.EXTRA_KEYCODE)
 
-            ActionEntity.keyAction(keyCode)
+            KeyEventAction(keyCode)
         }
 
-        setResultListener(KeyEventActionTypeFragment.REQUEST_KEY) {
-            val keyCode = it.getInt(KeyEventActionTypeFragment.EXTRA_KEYCODE)
-            val metaState = it.getInt(KeyEventActionTypeFragment.EXTRA_META_STATE)
-            val deviceDescriptor = it.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_DESCRIPTOR)
-            val useShell = it.getBoolean(KeyEventActionTypeFragment.EXTRA_USE_SHELL)
+        createActionOnResult(KeyEventActionTypeFragment.REQUEST_KEY) { bundle ->
+            val keyCode = bundle.getInt(KeyEventActionTypeFragment.EXTRA_KEYCODE)
+            val metaState = bundle.getInt(KeyEventActionTypeFragment.EXTRA_META_STATE)
+            val deviceDescriptor =
+                bundle.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_DESCRIPTOR)
+            val deviceName = bundle.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_NAME)
+            val useShell = bundle.getBoolean(KeyEventActionTypeFragment.EXTRA_USE_SHELL)
 
-            ActionEntity.keyEventAction(keyCode, metaState, deviceDescriptor, useShell)
+            val device: DeviceInfo? = if (deviceDescriptor != null && deviceName != null) {
+                DeviceInfo(deviceDescriptor, deviceName)
+            } else {
+                null
+            }
+
+            KeyEventAction(keyCode, metaState, useShell, device)
         }
 
-        setResultListener(TextBlockActionTypeFragment.REQUEST_KEY) {
+        createActionOnResult(TextBlockActionTypeFragment.REQUEST_KEY) {
             val text = it.getString(TextBlockActionTypeFragment.EXTRA_TEXT_BLOCK)
 
-            ActionEntity.textBlockAction(text!!)
+            TextAction(text!!)
         }
 
-        setResultListener(UrlActionTypeFragment.REQUEST_KEY) {
+        createActionOnResult(UrlActionTypeFragment.REQUEST_KEY) {
             val url = it.getString(UrlActionTypeFragment.EXTRA_URL)
 
-            ActionEntity.urlAction(url!!)
+            UrlAction(url!!)
         }
 
-        setResultListener(SystemActionListFragment.REQUEST_KEY) {
-            val id = it.getString(SystemActionListFragment.EXTRA_SYSTEM_ACTION_ID)
-            val optionData = it.getString(SystemActionListFragment.EXTRA_SYSTEM_ACTION_OPTION_DATA)
-
-            ActionEntity.systemAction(requireContext(), id!!, optionData)
+        createActionOnResult(SystemActionListFragment.REQUEST_KEY) {
+            it.getJsonSerializable<SystemAction>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
         }
 
-        setResultListener(KeycodeListFragment.REQUEST_KEY) {
+        createActionOnResult(KeycodeListFragment.REQUEST_KEY) {
             val keyCode = it.getInt(KeycodeListFragment.EXTRA_KEYCODE)
 
-            ActionEntity.keyCodeAction(keyCode)
+            KeyEventAction(keyCode)
         }
 
-        setResultListener(TapCoordinateActionTypeFragment.REQUEST_KEY) {
+        createActionOnResult(TapCoordinateActionTypeFragment.REQUEST_KEY) {
             val x = it.getInt(TapCoordinateActionTypeFragment.EXTRA_X)
             val y = it.getInt(TapCoordinateActionTypeFragment.EXTRA_Y)
             val description = it.getString(TapCoordinateActionTypeFragment.EXTRA_DESCRIPTION)
 
-            ActionEntity.tapCoordinateAction(x, y, description)
+            TapCoordinateAction(x, y, description)
         }
 
-        setResultListener(IntentActionTypeFragment.REQUEST_KEY) { bundle ->
+        createActionOnResult(IntentActionTypeFragment.REQUEST_KEY) { bundle ->
             val description = bundle.getString(IntentActionTypeFragment.EXTRA_DESCRIPTION)!!
             val target = bundle.getString(IntentActionTypeFragment.EXTRA_TARGET)!!.let {
                 IntentTarget.valueOf(it)
             }
             val uri = bundle.getString(IntentActionTypeFragment.EXTRA_URI)!!
 
-            ActionEntity.intentAction(description, target, uri)
+            IntentAction(description, target, uri)
         }
 
-        setResultListener(PhoneCallActionTypeFragment.REQUEST_KEY) {
+        createActionOnResult(PhoneCallActionTypeFragment.REQUEST_KEY) {
             val number = it.getString(PhoneCallActionTypeFragment.EXTRA_PHONE_NUMBER)
 
-            ActionEntity.phoneCallAction(number!!)
+            PhoneCallAction(number!!)
         }
 
         setFragmentResultListener(KeycodeListFragment.REQUEST_KEY) { _, result ->
@@ -184,21 +192,26 @@ class ChooseActionFragment : Fragment() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun setResultListener(
+    private fun createActionOnResult(
         requestKey: String,
-        createAction: (bundle: Bundle) -> ActionEntity
+        createAction: (bundle: Bundle) -> ActionData
     ) {
-        childFragmentManager.setFragmentResultListener(requestKey, viewLifecycleOwner) { _, result ->
+        childFragmentManager.setFragmentResultListener(
+            requestKey,
+            viewLifecycleOwner
+        ) { _, result ->
             val action = createAction(result)
 
             setFragmentResult(
-                this.mArgs.StringNavArgChooseActionRequestKey,
-                bundleOf(EXTRA_ACTION to action))
+                this.mArgs.chooseActionRequestKey,
+                Bundle().apply { putJsonSerializable(EXTRA_ACTION, action) }
+            )
         }
     }
 
     private fun FragmentChooseActionBinding.subscribeSearchView(
-        pagerAdapter: ChooseActionPagerAdapter) {
+        pagerAdapter: ChooseActionPagerAdapter
+    ) {
         val searchViewMenuItem = appBar.menu.findItem(R.id.action_search)
         val searchView = searchViewMenuItem.actionView as SearchView
 
