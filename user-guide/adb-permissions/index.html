@@ -515,11 +515,36 @@
 <p>You might need to attempt this process multiple times because it can be flaky.</p>
 </div>
 <ol>
-<li>Enable developer options on your device by going to device Settings -&gt; About Phone and tapping Build Number many times until it says you've enabled developer options. The location of the Build Number may vary between devices.</li>
-<li>Enable USB Debugging in developer options and plug your device into your PC.</li>
-<li>Download the <a href="https://developer.android.com/studio/releases/platform-tools.html">Android SDK platform tools</a> from here and unzip it.</li>
-<li>Open a terminal/command prompt in the unzipped folder.</li>
-<li>Type  or paste in a terminal: <code>adb devices</code> and your device should show up in the list after you click the prompt on your phone to allow USB debugging from your PC.</li>
+<li>
+<p>Enable developer options on your device by going to device Settings -&gt; 'About Phone' and tapping 'Build Number' many times until it says you've enabled developer options. The location of the Build Number may vary between devices.</p>
+<details class="info"><summary>Screenshot</summary><p><img alt="" src="../../images/android-about-phone.png" /></p>
+</details>
+</li>
+<li>
+<p>Enable USB Debugging in developer options and plug your device into your PC.</p>
+<details class="info"><summary>Screenshot</summary><p><img alt="" src="../../images/android-developer-options-usb-debugging.png" /></p>
+</details>
+</li>
+<li>
+<p>Download the <a href="https://developer.android.com/studio/releases/platform-tools.html">Android SDK platform tools</a> from here and unzip it.</p>
+</li>
+<li>
+<p>Open a terminal/command prompt in the unzipped folder.</p>
+</li>
+<li>
+<p>Type or paste in a terminal: <code>adb devices</code> and your device then click the prompt on your phone to allow USB debugging from your PC.</p>
+<details class="info"><summary>Prompt on phone</summary><p><img alt="" src="../../images/android-allow-usb-debugging-dialog.png" /></p>
+</details>
+</li>
+<li>
+<p>Type <code>adb devices</code> again and make sure you see the correct output as shown below.</p>
+<details class="success"><summary>Correct command prompt output</summary><p><img alt="" src="../../images/command-prompt-adb-devices-success.png" /></p>
+</details>
+<details class="failure"><summary>Incorrect command prompt outputs</summary><p><img alt="" src="../../images/command-prompt-adb-devices-no-devices.png" />
+<img alt="" src="../../images/command-prompt-adb-devices-offline.png" />
+<img alt="" src="../../images/command-prompt-adb-devices-unauthorized.png" /></p>
+</details>
+</li>
 </ol>
 <h2 id="write_secure_settings">WRITE_SECURE_SETTINGS<a class="headerlink" href="#write_secure_settings" title="Permanent link">&para;</a></h2>
 <p>If you need more features of Key Mapper, you may grant the app permission to modify the secure settings on your device.</p>
