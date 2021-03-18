@@ -19,9 +19,14 @@ import splitties.mainthread.isMainThread
 
 // Using varargs doesn't work since prints [LJava.lang.object@32f...etc
 fun Context.str(@StringRes resId: Int, formatArg: Any? = null): String = getString(resId, formatArg)
-fun Context.str(@StringRes resId: Int, formatArgArray: Array<Any?>): String = getString(resId, *formatArgArray)
-fun View.str(@StringRes resId: Int, formatArgs: Any? = null): String = context.str(resId, formatArgs)
-fun Fragment.str(@StringRes resId: Int, formatArgs: Any? = null): String = requireContext().str(resId, formatArgs)
+fun Context.str(@StringRes resId: Int, formatArgArray: Array<Any?>): String =
+    getString(resId, *formatArgArray)
+
+fun View.str(@StringRes resId: Int, formatArgs: Any? = null): String =
+    context.str(resId, formatArgs)
+
+fun Fragment.str(@StringRes resId: Int, formatArgs: Any? = null): String =
+    requireContext().str(resId, formatArgs)
 
 fun Context.strArray(@ArrayRes resId: Int): Array<String> = resources.getStringArray(resId)
 fun Fragment.strArray(@ArrayRes resId: Int): Array<String> = requireContext().strArray(resId)
@@ -38,7 +43,8 @@ fun View.bool(
 fun Context.resourceId(
     attributeSet: AttributeSet,
     @StyleableRes styleableId: IntArray,
-    @StyleableRes attrId: Int): Int? {
+    @StyleableRes attrId: Int
+): Int? {
 
     val typedArray = theme.obtainStyledAttributes(attributeSet, styleableId, 0, 0)
     var attrValue: Int?
@@ -82,7 +88,11 @@ fun Context.bool(
 /**
  * Get a string from an attribute
  */
-fun Context.str(attributeSet: AttributeSet, @StyleableRes styleableId: IntArray, @StyleableRes attrId: Int): String? {
+fun Context.str(
+    attributeSet: AttributeSet,
+    @StyleableRes styleableId: IntArray,
+    @StyleableRes attrId: Int
+): String? {
     val typedArray = theme.obtainStyledAttributes(attributeSet, styleableId, 0, 0)
 
     val attrValue: String?
@@ -137,6 +147,11 @@ fun Context.styledColorSL(@AttrRes attr: Int): ColorStateList? =
 
 fun Fragment.styledColorSL(@AttrRes attr: Int) = context!!.styledColorSL(attr)
 fun View.styledColorSL(@AttrRes attr: Int) = context.styledColorSL(attr)
+
+fun Context.colorSl(@ColorRes color: Int): ColorStateList? =
+    ContextCompat.getColorStateList(this, color)
+
+fun View.colorSl(@ColorRes color: Int) = context.colorSl(color)
 
 private val uiThreadConfinedCachedAttrArray = IntArray(1)
 private val cachedAttrArray = IntArray(1)
