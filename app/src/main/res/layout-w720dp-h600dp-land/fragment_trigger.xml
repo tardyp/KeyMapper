@@ -66,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:checked="@{viewModel.state.shortPressButtonChecked}"
+                android:onCheckedChanged="@{(view, checked) -> viewModel.setShortPressButtonChecked(checked)}"
                 android:text="@string/radio_button_short_press" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -74,7 +75,17 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:checked="@{viewModel.state.longPressButtonChecked}"
+                android:onCheckedChanged="@{(view, checked) -> viewModel.setLongPressButtonChecked(checked)}"
                 android:text="@string/radio_button_long_press" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioButtonDoublePress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:checked="@{!viewModel.state.longPressButtonChecked &amp;&amp; !viewModel.state.shortPressButtonChecked}"
+                android:text="@string/radio_button_long_press"
+                android:visibility="gone" />
         </RadioGroup>
 
         <TextView
@@ -108,6 +119,7 @@
                 android:layout_weight="0.5"
                 android:checked="@{viewModel.state.parallelTriggerModeButtonChecked}"
                 android:enabled="@{viewModel.state.triggerModeButtonsEnabled}"
+                android:onCheckedChanged="@{(view, checked) -> viewModel.setParallelTriggerModeChecked(checked)}"
                 android:text="@string/radio_button_parallel" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -117,7 +129,18 @@
                 android:layout_weight="0.5"
                 android:checked="@{viewModel.state.sequenceTriggerModeButtonChecked}"
                 android:enabled="@{viewModel.state.triggerModeButtonsEnabled}"
+                android:onCheckedChanged="@{(view, checked) -> viewModel.setSequenceTriggerModeChecked(checked)}"
                 android:text="@string/radio_button_sequence" />
+
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioButtonUndefined"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:checked="@{!viewModel.state.parallelTriggerModeButtonChecked &amp;&amp; !viewModel.state.sequenceTriggerModeButtonChecked}"
+                android:text="@string/radio_button_sequence"
+                android:visibility="gone" />
         </RadioGroup>
 
         <Button

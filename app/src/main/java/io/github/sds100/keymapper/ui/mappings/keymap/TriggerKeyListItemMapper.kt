@@ -23,7 +23,7 @@ class TriggerKeyListItemMapperImpl(
 ) : TriggerKeyListItemMapper, ResourceProvider by resourceProvider {
 
     override fun map(keys: List<TriggerKey>, mode: TriggerMode): List<TriggerKeyListItemModel> =
-        keys.map { key ->
+        keys.mapIndexed { index, key ->
             val extraInfo = buildString {
                 append(getDeviceName(key.device))
 
@@ -39,10 +39,10 @@ class TriggerKeyListItemMapperImpl(
                 ClickType.DOUBLE_PRESS -> getString(R.string.clicktype_double_press)
             }
 
-            val linkDrawable = when (mode) {
-                is TriggerMode.Parallel -> R.drawable.ic_baseline_add_24
-                TriggerMode.Sequence -> R.drawable.ic_baseline_arrow_downward_24
-                TriggerMode.Undefined -> null
+            val linkDrawable = when {
+                mode is TriggerMode.Parallel && index < keys.lastIndex -> TriggerKeyLinkType.PLUS
+                mode is TriggerMode.Sequence && index < keys.lastIndex -> TriggerKeyLinkType.ARROW
+                else -> TriggerKeyLinkType.HIDDEN
             }
 
             TriggerKeyListItemModel(
@@ -51,7 +51,7 @@ class TriggerKeyListItemMapperImpl(
                 name = KeyEventUtils.keycodeToString(key.keyCode),
                 clickTypeString = clickTypeString,
                 extraInfo = extraInfo,
-                linkDrawable = linkDrawable,
+                linkType = linkDrawable,
                 isDragDropEnabled = keys.size > 1
             )
         }

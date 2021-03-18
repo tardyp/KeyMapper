@@ -198,12 +198,16 @@ class AccessibilityServiceController(
 
         if (recordingTrigger) {
             if (action == KeyEvent.ACTION_DOWN) {
-                _eventStream.value = RecordedTriggerKeyEvent(
-                    keyCode,
-                    deviceName,
-                    descriptor,
-                    isExternal
-                )
+                lifecycleScope.launchWhenStarted {
+                    _sendEventToUi.emit(
+                        RecordedTriggerKeyEvent(
+                            keyCode,
+                            deviceName,
+                            descriptor,
+                            isExternal
+                        )
+                    )
+                }
             }
 
             return true

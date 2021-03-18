@@ -11,12 +11,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyTouchHelper
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.radiobutton.MaterialRadioButton
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.ui.ListState
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
@@ -137,18 +135,6 @@ class TriggerFragment : Fragment() {
         triggerViewModel.showChooseDeviceDialog.collectWhenStarted(viewLifecycleOwner) { model ->
 
         }
-
-        binding.radioButtonShortPress.setOnClickListener { radioButton ->
-            if ((radioButton as MaterialRadioButton).isChecked) {
-                triggerViewModel.setParallelTriggerClickType(ClickType.SHORT_PRESS)
-            }
-        }
-
-        binding.radioButtonLongPress.setOnClickListener { radioButton ->
-            if ((radioButton as MaterialRadioButton).isChecked) {
-                triggerViewModel.setParallelTriggerClickType(ClickType.LONG_PRESS)
-            }
-        }
     }
 
     override fun onResume() {
@@ -244,8 +230,8 @@ class TriggerFragment : Fragment() {
     private inner class TriggerKeyController : EpoxyController() {
         var modelList: List<TriggerKeyListItemModel> = listOf()
             set(value) {
-                requestModelBuild()
                 field = value
+                requestModelBuild()
             }
 
         override fun buildModels() {

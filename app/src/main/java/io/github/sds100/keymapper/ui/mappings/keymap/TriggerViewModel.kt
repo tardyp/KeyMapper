@@ -64,8 +64,18 @@ class TriggerViewModel(
         UiBuilder(State.Loading(), RecordTriggerState.Stopped).build()
     )
 
-    fun setParallelTriggerMode() = useCase.setParallelTriggerMode()
-    fun setSequenceTriggerMode() = useCase.setSequenceTriggerMode()
+    fun setParallelTriggerModeChecked(checked: Boolean) {
+        if (checked) {
+            useCase.setParallelTriggerMode()
+        }
+    }
+
+    fun setSequenceTriggerModeChecked(checked: Boolean) {
+        if (checked) {
+            useCase.setSequenceTriggerMode()
+        }
+    }
+
     fun setUndefinedTriggerMode() = useCase.setUndefinedTriggerMode()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
@@ -80,6 +90,7 @@ class TriggerViewModel(
             useCase.addTriggerKey(it.keyCode, it.device)
         }.launchIn(coroutineScope)
 
+        //TODO dialogs
         coroutineScope.launch {
             combine(
                 rebuildUiState,
@@ -93,8 +104,17 @@ class TriggerViewModel(
         }
     }
 
-    fun setParallelTriggerClickType(clickType: ClickType) =
-        useCase.setParallelTriggerClickType(clickType)
+    fun setShortPressButtonChecked(checked: Boolean) {
+        if (checked) {
+            useCase.setParallelTriggerShortPress()
+        }
+    }
+
+    fun setLongPressButtonChecked(checked: Boolean) {
+        if (checked) {
+            useCase.setParallelTriggerLongPress()
+        }
+    }
 
     fun setTriggerKeyDevice(uid: String, device: TriggerKeyDevice) =
         useCase.setTriggerKeyDevice(uid, device)
@@ -103,11 +123,11 @@ class TriggerViewModel(
     fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = useCase.moveTriggerKey(fromIndex, toIndex)
 
     fun onTriggerKeyOptionsClick(id: String) {
-        TODO()
+//        TODO()
     }
 
     fun setTriggerKeyOptions(options: TriggerKeyOptions) {
-        TODO()
+//        TODO()
     }
 
     fun onChooseDeviceClick(keyUid: String) {
@@ -169,6 +189,7 @@ class TriggerViewModel(
             listItemMapper.map(config.keys, config.mode).createListState(),
 
             recordTriggerButtonText = recordTriggerButtonText,
+
             clickTypeRadioButtonsVisible = config.mode is TriggerMode.Parallel,
 
             shortPressButtonChecked =

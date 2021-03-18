@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
-import android.graphics.drawable.Drawable
-import androidx.annotation.DrawableRes
-import io.github.sds100.keymapper.domain.utils.ClickType
+import io.github.sds100.keymapper.ui.mappings.keymap.TriggerKeyLinkType
 
 /**
  * Created by sds100 on 27/03/2020.
@@ -19,11 +17,7 @@ data class TriggerKeyListItemModel(
 
     val extraInfo: String?,
 
-    /**
-     * null if should be hidden
-     */
-    @DrawableRes
-    val linkDrawable: Int? = null,
+    val linkType: TriggerKeyLinkType,
 
     val isDragDropEnabled: Boolean
 )

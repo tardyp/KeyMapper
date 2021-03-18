@@ -5,9 +5,8 @@
 
     <data>
 
-        <import type="io.github.sds100.keymapper.data.model.TriggerEntity" />
-
         <import type="android.view.View" />
+        <import type="io.github.sds100.keymapper.ui.mappings.keymap.TriggerKeyLinkType" />
 
         <variable
             name="model"
@@ -35,9 +34,9 @@
             android:id="@+id/imageViewLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@{model.linkDrawable}"
             android:tint="?attr/colorOnSurface"
-            android:visibility="@{model.linkDrawable == null ? View.GONE : View.VISIBLE}"
+            android:src="@{model.linkType == TriggerKeyLinkType.ARROW ? @drawable/ic_baseline_arrow_downward_24 : @drawable/ic_baseline_add_24}"
+            android:visibility="@{model.linkType == TriggerKeyLinkType.HIDDEN ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
