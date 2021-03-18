@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.media.AudioManager
 import android.os.Build.*
+import android.os.Bundle
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.view.KeyEvent
@@ -23,10 +24,14 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.*
 import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.ui.utils.getJsonSerializable
+import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import splitties.bitflags.minusFlag
 import splitties.bitflags.withFlag
 import splitties.systemservices.displayManager
@@ -59,6 +64,8 @@ class MyAccessibilityService : AccessibilityService(),
         const val ACTION_ON_START = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_START"
         const val ACTION_ON_STOP = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_STOP"
         const val ACTION_UPDATE_KEYMAP_LIST_CACHE = "$PACKAGE_NAME.UPDATE_KEYMAP_LIST_CACHE"
+        const val ACTION_SEND_EVENT = "$PACKAGE_NAME.ACTION_EVENT"
+        const val KEY_EVENT = "$PACKAGE_NAME.EXTRA_EVENT"
 
         //DONT CHANGE!!!
         const val ACTION_TRIGGER_KEYMAP_BY_UID = "$PACKAGE_NAME.TRIGGER_KEYMAP_BY_UID"
@@ -136,6 +143,11 @@ class MyAccessibilityService : AccessibilityService(),
                         KeyboardUtils.getChosenInputMethodPackageName(this@MyAccessibilityService)
                             .valueOrNull()
                 }
+
+                ACTION_SEND_EVENT -> {
+                    val event = intent.extras?.getJsonSerializable<Event>(KEY_EVENT) ?: return
+                    controller.onReceiveEvent(event)
+                }
             }
         }
     }
@@ -207,6 +219,7 @@ class MyAccessibilityService : AccessibilityService(),
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             addAction(ACTION_TRIGGER_KEYMAP_BY_UID)
             addAction(Intent.ACTION_INPUT_METHOD_CHANGED)
+            addAction(ACTION_SEND_EVENT)
 
             registerReceiver(broadcastReceiver, this)
         }
@@ -238,6 +251,14 @@ class MyAccessibilityService : AccessibilityService(),
         controller.eventStream.observe(this, Observer {
             onControllerEvent(it)
         })
+
+        controller.sendEventToUi.onEach {
+            val bundle = Bundle().apply {
+                putJsonSerializable(KEY_EVENT, it)
+            }
+
+            sendPackageBroadcast(ACTION_SEND_EVENT, bundle)
+        }.launchIn(lifecycleScope)
     }
 
     override fun onInterrupt() {}
@@ -282,7 +303,10 @@ class MyAccessibilityService : AccessibilityService(),
     override fun isBluetoothDeviceConnected(address: String) =
         connectedBtAddresses.contains(address)
 
-    override fun canActionBePerformed(action: ActionEntity, hasRootPermission: Boolean): Result<ActionEntity> {
+    override fun canActionBePerformed(
+        action: ActionEntity,
+        hasRootPermission: Boolean
+    ): Result<ActionEntity> {
         if (action.requiresIME) {
             return if (isCompatibleImeChosen) {
                 Success(action)

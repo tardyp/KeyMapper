@@ -17,15 +17,17 @@ import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
 import io.github.sds100.keymapper.ui.actions.ActionListItemState
-import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.ifIsData
+import io.github.sds100.keymapper.util.viewLifecycleScope
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.
  */
 abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
-    : RecyclerViewFragment<List<ActionListItemState>, FragmentActionListBinding>() {
+    : RecyclerViewFragment<ListState<ActionListItemState>, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
@@ -33,7 +35,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     abstract val actionListViewModel: ActionListViewModel<A>
 
-    override val modelState: ModelState<List<ActionListItemState>>
+    override val stateProducer: UiStateProducer<ListState<ActionListItemState>>
         get() = actionListViewModel
 
     private val actionListController = ActionListController()
@@ -45,13 +47,16 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     abstract fun openActionOptionsFragment(options: O)
 
-    override fun populateList(
+    override fun updateUi(
         binding: FragmentActionListBinding,
-        model: List<ActionListItemState>?
+        state: ListState<ActionListItemState>
     ) {
         binding.enableActionDragging(actionListController)
 
-        actionListController.state = model ?: emptyList()
+        actionListController.state = when (state) {
+            is ListState.Loaded -> state.data
+            else -> emptyList()
+        }
     }
 
     override fun subscribeUi(binding: FragmentActionListBinding) {
@@ -60,14 +65,16 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
         binding.epoxyRecyclerViewActions.adapter = actionListController.adapter
 
 //        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
-            //TODO
+        //TODO
 //            openActionOptionsFragment(it)
 //        })
 
-        binding.setOnAddActionClick {
-            val direction =
-                NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
-            findNavController().navigate(direction)
+        viewLifecycleScope.launchWhenResumed {
+            actionListViewModel.chooseAction.collectLatest {
+                val direction =
+                    NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
+                findNavController().navigate(direction)
+            }
         }
     }
 
@@ -82,11 +89,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
             .andCallbacks(object : EpoxyTouchHelper.DragCallbacks<ActionBindingModel_>() {
 
                 override fun isDragEnabledForModel(model: ActionBindingModel_?): Boolean {
-                    modelState.model.value?.ifIsData {
-                        if (it.size > 1) return true
-                    }
-
-                    return false
+                    return model?.state()?.dragAndDrop ?: false
                 }
 
                 override fun onModelMoved(

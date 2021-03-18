@@ -11,10 +11,14 @@ import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ViewLoading
+import io.github.sds100.keymapper.util.ViewPopulated
+import io.github.sds100.keymapper.util.ViewState
 import io.github.sds100.keymapper.util.result.RecoverableError
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -79,7 +83,7 @@ class ConfigFingerprintMapViewModel(
 
     init {
         configUseCase.state.onEach {
-            if (it is Data<ConfigFingerprintMapState>) {
+            if (it is State.Data) {
                 dataState.value = it.data
                 _viewState.value = ViewPopulated()
             } else {

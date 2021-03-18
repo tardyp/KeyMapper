@@ -22,7 +22,7 @@ class BluetoothDeviceListFragment
 
     override var requestKey: String? = REQUEST_KEY
 
-    override val model = MutableLiveData<DataState<List<BluetoothDevice>>>(Loading())
+    override val model = MutableLiveData<OldDataState<List<BluetoothDevice>>>(Loading())
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
     override val modelState: ModelState<List<BluetoothDevice>>

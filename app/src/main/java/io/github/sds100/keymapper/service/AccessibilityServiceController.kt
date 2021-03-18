@@ -20,6 +20,9 @@ import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import splitties.bitflags.hasFlag
 import splitties.toast.toast
 import timber.log.Timber
@@ -99,6 +102,7 @@ class AccessibilityServiceController(
         }
     )
 
+    //TODO delete
     private val _eventStream = LiveEvent<Event>().apply {
         //vibrate
         addSource(keymapDetectionDelegate.vibrate) {
@@ -142,6 +146,9 @@ class AccessibilityServiceController(
     }
 
     val eventStream: LiveData<Event> = _eventStream
+
+    private val _sendEventToUi = MutableSharedFlow<Event>()
+    val sendEventToUi: SharedFlow<Event> = _sendEventToUi.asSharedFlow()
 
     init {
         requestFingerprintGestureDetection()
@@ -260,6 +267,10 @@ class AccessibilityServiceController(
         recordingTriggerJob = null
 
         if (wasRecordingTrigger) {
+            lifecycleScope.launchWhenStarted {
+                _sendEventToUi.emit(OnStoppedRecordingTrigger)
+            }
+
             _eventStream.value = OnStoppedRecordingTrigger
         }
     }
@@ -278,10 +289,18 @@ class AccessibilityServiceController(
         _eventStream.value = PerformAction(action)
     }
 
+    fun onReceiveEvent(event: Event) {
+        when (event) {
+            is StartRecordingTrigger -> startRecordingTrigger()
+            is StopRecordingTrigger -> stopRecordingTrigger()
+        }
+    }
+
     private fun recordTriggerJob() = lifecycleScope.launchWhenStarted {
         repeat(RECORD_TRIGGER_TIMER_LENGTH) { iteration ->
             if (isActive) {
                 val timeLeft = RECORD_TRIGGER_TIMER_LENGTH - iteration
+                _sendEventToUi.emit(OnIncrementRecordTriggerTimer(timeLeft))
                 _eventStream.value = OnIncrementRecordTriggerTimer(timeLeft)
 
                 delay(1000)
@@ -289,6 +308,7 @@ class AccessibilityServiceController(
         }
 
         _eventStream.value = OnStoppedRecordingTrigger
+        _sendEventToUi.emit(OnStoppedRecordingTrigger)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

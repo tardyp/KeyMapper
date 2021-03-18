@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.data.model.options.BoolOption
 import io.github.sds100.keymapper.data.model.options.IntOption
 import io.github.sds100.keymapper.data.model.options.OptionsListModel
 import io.github.sds100.keymapper.util.Data
-import io.github.sds100.keymapper.util.DataState
+import io.github.sds100.keymapper.util.OldDataState
 import io.github.sds100.keymapper.util.ViewLoading
 import io.github.sds100.keymapper.util.ViewState
 import io.github.sds100.keymapper.util.delegate.ModelState
@@ -27,7 +27,7 @@ abstract class BaseOptionsViewModel<O : BaseOptions<*>>
     val options = MediatorLiveData<O>()
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
-    override val model: LiveData<DataState<OptionsListModel>> = options.map { options ->
+    override val model: LiveData<OldDataState<OptionsListModel>> = options.map { options ->
         val sliderModels = sequence {
             options.intOptions.forEach {
                 if (it.isAllowed) {

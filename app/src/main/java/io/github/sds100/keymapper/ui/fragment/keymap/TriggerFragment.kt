@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +17,12 @@ import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.utils.ClickType
-import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.triggerKey
+import io.github.sds100.keymapper.ui.ListState
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerViewModel
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -75,8 +75,6 @@ class TriggerFragment : Fragment() {
 
         binding.viewModel = triggerViewModel
 
-        binding.subscribeTriggerList()
-
         binding.epoxyRecyclerViewTriggers.adapter = triggerKeyController.adapter
 
         triggerViewModel.showEnableCapsLockKeyboardLayoutPrompt
@@ -91,37 +89,48 @@ class TriggerFragment : Fragment() {
                 }
             }
 
-        triggerViewModel.showParallelTriggerOrderExplanation.collectWhenStarted(viewLifecycleOwner) { show ->
-            if (show) {
-                parallelTriggerOrderDialog = requireContext().alertDialog {
-                    messageResource = R.string.dialog_message_parallel_trigger_order
+        viewLifecycleScope.launchWhenResumed {
+            triggerViewModel.state.collectLatest { state ->
+                if (state.showParallelTriggerOrderExplanation
+                    && parallelTriggerOrderDialog != null
+                ) {
+                    parallelTriggerOrderDialog = requireContext().alertDialog {
+                        messageResource = R.string.dialog_message_parallel_trigger_order
 
-                    okButton {
-                        triggerViewModel.approvedParallelTriggerOrderExplanation()
+                        okButton {
+                            triggerViewModel.approvedParallelTriggerOrderExplanation()
+                        }
+
+                        show()
                     }
-
-                    show()
+                } else {
+                    parallelTriggerOrderDialog?.dismiss()
+                    parallelTriggerOrderDialog = null
                 }
-            } else {
-                parallelTriggerOrderDialog?.dismiss()
-                parallelTriggerOrderDialog = null
-            }
-        }
 
-        triggerViewModel.showSequenceTriggerExplanation.collectWhenStarted(viewLifecycleOwner) { show ->
-            if (show) {
-                sequenceTriggerExplanationDialog = requireContext().alertDialog {
-                    messageResource = R.string.dialog_message_sequence_trigger_explanation
+                if (state.showSequenceTriggerExplanation && sequenceTriggerExplanationDialog != null) {
+                    sequenceTriggerExplanationDialog = requireContext().alertDialog {
+                        messageResource = R.string.dialog_message_sequence_trigger_explanation
 
-                    okButton {
-                        triggerViewModel.approvedSequenceTriggerExplanation()
+                        okButton {
+                            triggerViewModel.approvedSequenceTriggerExplanation()
+                        }
+
+                        show()
                     }
-
-                    show()
+                } else {
+                    sequenceTriggerExplanationDialog?.dismiss()
+                    sequenceTriggerExplanationDialog = null
                 }
-            } else {
-                sequenceTriggerExplanationDialog?.dismiss()
-                sequenceTriggerExplanationDialog = null
+
+                binding.enableTriggerKeyDragging(triggerKeyController)
+
+                when (state.triggerKeyListModels) {
+                    is ListState.Loaded ->
+                        triggerKeyController.modelList = state.triggerKeyListModels.data
+
+                    else -> triggerKeyController.modelList = emptyList()
+                }
             }
         }
 
@@ -145,13 +154,13 @@ class TriggerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        triggerViewModel.rebuildModels()
+        triggerViewModel.rebuildUiState()
     }
 
     override fun onPause() {
         super.onPause()
 
-        stopRecordingTrigger()
+        triggerViewModel.stopRecordingTrigger()
     }
 
     override fun onDestroyView() {
@@ -162,25 +171,6 @@ class TriggerFragment : Fragment() {
         sequenceTriggerExplanationDialog = null
 
         super.onDestroyView()
-    }
-
-    private fun stopRecordingTrigger() {
-        requireContext().sendPackageBroadcast(MyAccessibilityService.ACTION_STOP_RECORDING_TRIGGER)
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun FragmentTriggerBinding.subscribeTriggerList() {
-        triggerViewModel.modelList.observe(viewLifecycleOwner, { triggerKeyList ->
-
-            viewLifecycleScope.launchWhenResumed {
-                enableTriggerKeyDragging(triggerKeyController)
-
-                when (triggerKeyList) {
-                    is Data -> triggerKeyController.modelList = triggerKeyList.data
-                    else -> triggerKeyController.modelList = emptyList()
-                }
-            }
-        })
     }
 
     private suspend fun showChooseDeviceDialog(devices: List<TriggerKeyDevice>) =

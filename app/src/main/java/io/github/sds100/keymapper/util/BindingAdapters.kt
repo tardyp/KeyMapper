@@ -91,7 +91,7 @@ fun EditText.onTextChangedListener(textWatcher: TextWatcher) {
 }
 
 @BindingAdapter("app:markdown")
-fun TextView.markdown(markdown: DataState<String>) {
+fun TextView.markdown(markdown: OldDataState<String>) {
     when (markdown) {
         is Data -> Markwon.create(context).apply {
             setMarkdown(this@markdown, markdown.data)

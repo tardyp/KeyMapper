@@ -28,7 +28,7 @@ class KeycodeListViewModel : ViewModel(), ModelState<Map<Int, String>> {
 
     val searchQuery: MutableLiveData<String> = MutableLiveData("")
 
-    private val _model = MediatorLiveData<DataState<Map<Int, String>>>().apply {
+    private val _model = MediatorLiveData<OldDataState<Map<Int, String>>>().apply {
         fun filter(query: String) {
             value = Loading()
 

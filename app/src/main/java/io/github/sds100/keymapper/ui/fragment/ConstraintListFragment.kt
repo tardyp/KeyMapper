@@ -16,7 +16,7 @@ import splitties.toast.toast
  * Created by sds100 on 29/11/20.
  */
 abstract class ConstraintListFragment
-    : RecyclerViewFragment<List<ConstraintModel>, FragmentConstraintListBinding>() {
+    : OldRecyclerViewFragment<List<ConstraintModel>, FragmentConstraintListBinding>() {
 
     companion object {
         const val CHOOSE_CONSTRAINT_REQUEST_KEY = "request_choose_constraint"

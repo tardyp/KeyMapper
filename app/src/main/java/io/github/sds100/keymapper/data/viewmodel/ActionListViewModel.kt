@@ -1,17 +1,21 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.domain.actions.*
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.ui.actions.ActionListItemState
+import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.RecoverableError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 22/11/20.
@@ -23,11 +27,9 @@ class ActionListViewModel<A : Action>(
     private val actionError: GetActionErrorUseCase,
     private val testAction: TestActionUseCase,
     private val listItemModelMapper: ActionListItemMapper<A>,
-) : ModelState<List<ActionListItemState>> {
+) : UiStateProducer<ListState<ActionListItemState>> {
 
-    override val model = MutableLiveData<DataState<List<ActionListItemState>>>(Loading())
-
-    override val viewState = MutableLiveData<ViewState>(ViewLoading())
+    override val state = MutableStateFlow<ListState<ActionListItemState>>(ListState.Loading())
 
     private val _openEditOptions = MutableSharedFlow<String>()
 
@@ -42,13 +44,27 @@ class ActionListViewModel<A : Action>(
     private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
     val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
 
+    private val _chooseAction = MutableSharedFlow<Unit>()
+    val chooseAction = _chooseAction.asSharedFlow()
+
+    private val rebuildUiState = MutableSharedFlow<Unit>()
+
     init {
-        combine(
-            configActions.actionList,
-            actionError.invalidateErrors
-        ) { models, _ ->
-            model.value = models.mapData { buildModels(it) }
-        }.launchIn(coroutineScope)
+        coroutineScope.launch {
+            combine(
+                rebuildUiState,
+                configActions.actionList,
+                actionError.invalidateErrors
+            ) { _, actionList, _ ->
+                actionList
+            }.collectLatest { actionList ->
+                when (actionList) {
+                    is State.Data -> state.value = buildModels(actionList.data).createListState()
+
+                    is State.Loading -> state.value = ListState.Loading()
+                }
+            }
+        }
     }
 
     fun addAction(action: ActionData) = configActions.addAction(action)
@@ -74,12 +90,14 @@ class ActionListViewModel<A : Action>(
         _enableAccessibilityServicePrompt.value = Unit
     }
 
-    override fun rebuildModels() {
+    fun onAddActionClick() {
         coroutineScope.launch {
-            model.value = configActions.actionList.first().mapData {
-                buildModels(it)
-            }
+            _chooseAction.emit(Unit)
         }
+    }
+
+    override fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     private fun buildModels(actionList: List<A>) = actionList.map {

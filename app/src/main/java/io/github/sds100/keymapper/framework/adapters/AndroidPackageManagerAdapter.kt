@@ -5,8 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.util.DataState
 import io.github.sds100.keymapper.util.Loading
+import io.github.sds100.keymapper.util.OldDataState
 import io.github.sds100.keymapper.util.getDataState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class AndroidPackageManagerAdapter(
     private val ctx = context.applicationContext
     private val packageManager = ctx.packageManager
 
-    override val installedPackages = MutableStateFlow<DataState<List<PackageInfo>>>(Loading())
+    override val installedPackages = MutableStateFlow<OldDataState<List<PackageInfo>>>(Loading())
 
     //TODO have broadcast receiver that updates the installed packages when a new package is installed, removed or change
 

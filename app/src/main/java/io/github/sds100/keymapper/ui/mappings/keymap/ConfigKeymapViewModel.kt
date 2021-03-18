@@ -15,11 +15,16 @@ import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ViewLoading
+import io.github.sds100.keymapper.util.ViewPopulated
+import io.github.sds100.keymapper.util.ViewState
 import io.github.sds100.keymapper.util.result.RecoverableError
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -42,6 +47,7 @@ class ConfigKeymapViewModel(
     showDeviceInfoUseCase: ShowDeviceInfoUseCase,
     actionListItemMapper: ActionListItemMapper<KeymapAction>,
     triggerKeyListItemMapper: TriggerKeyListItemMapper,
+    resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel {
 
     companion object {
@@ -64,7 +70,8 @@ class ConfigKeymapViewModel(
         configTrigger,
         triggerKeyListItemMapper,
         recordTriggerUseCase,
-        showDeviceInfoUseCase
+        showDeviceInfoUseCase,
+        resourceProvider
     )
 
     private val dataState = MutableLiveData<ConfigKeymapState?>()
@@ -105,7 +112,7 @@ class ConfigKeymapViewModel(
 
     init {
         configUseCase.state.onEach {
-            if (it is Data<ConfigKeymapState>) {
+            if (it is State.Data) {
                 dataState.value = it.data
                 _viewState.value = ViewPopulated()
             } else {
@@ -154,6 +161,7 @@ class ConfigKeymapViewModel(
         private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
         private val actionListItemMapper: ActionListItemMapper<KeymapAction>,
         private val triggerKeyListItemMapper: TriggerKeyListItemMapper,
+        private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
@@ -170,7 +178,8 @@ class ConfigKeymapViewModel(
                 recordTriggerUseCase,
                 showDeviceInfoUseCase,
                 actionListItemMapper,
-                triggerKeyListItemMapper
+                triggerKeyListItemMapper,
+                resourceProvider
             ) as T
     }
 }

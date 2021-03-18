@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.util.InjectorUtils
 /**
  * Created by sds100 on 22/02/2020.
  */
-class AppListFragment : RecyclerViewFragment<List<AppListItemModel>, FragmentAppListBinding>() {
+class AppListFragment : OldRecyclerViewFragment<List<AppListItemModel>, FragmentAppListBinding>() {
 
     companion object {
         const val REQUEST_KEY = "request_app"

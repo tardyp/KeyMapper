@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerOp
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.ui.models.CheckBoxListItem
 import io.github.sds100.keymapper.ui.models.ListItem
 import io.github.sds100.keymapper.ui.models.SliderListItem
@@ -41,12 +42,13 @@ class TriggerOptionsViewModel(
         const val KEY_SCREEN_OFF_TRIGGERS = "screen_off_triggers"
     }
 
-    override val model = MutableLiveData<DataState<List<ListItem>>>(Loading())
+    override val model = MutableLiveData<OldDataState<List<ListItem>>>(Loading())
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 
     init {
+        //TODO use collectlatest
         useCase.state.onEach { state ->
-            if (state is Data) {
+            if (state is State.Data) {
                 model.value = buildModels(state.data.options, state.data.keymapUid).let {
                     if (it.isEmpty()) {
                         Empty()

@@ -8,31 +8,39 @@ import androidx.lifecycle.MutableLiveData
  * Created by sds100 on 06/11/20.
  */
 
+//TODO delete. have observable UiState object in all view models and use ListState for list models in that UiState object
 sealed class ViewState
-class ViewPopulated : ViewState()
+open class ViewPopulated : ViewState()
 class ViewLoading : ViewState()
 class ViewEmpty : ViewState()
 
-sealed class DataState<out T>
+//TODO delete
+sealed class OldDataState<out T>
 
-data class Data<out T>(val data: T) : DataState<T>()
-class Loading : DataState<Nothing>()
-class Empty : DataState<Nothing>()
+data class Data<out T>(val data: T) : OldDataState<T>()
+class Loading : OldDataState<Nothing>()
 
-fun <T, O> DataState<T>.mapData(block: (data: T) -> O): DataState<O> = when (this) {
+/*
+TODO is this really necessary. data shouldn't care about being empty,
+ only the UI should because often UI needs to change if data is empty.
+ also don't need to remember to use the getDataState method on lists
+ */
+class Empty : OldDataState<Nothing>()
+
+fun <T, O> OldDataState<T>.mapData(block: (data: T) -> O): OldDataState<O> = when (this) {
     is Loading -> Loading()
     is Empty -> Empty()
     is Data -> Data(block.invoke(this.data))
 }
 
-suspend fun <T, O> DataState<T>.mapDataSuspend(block: suspend (data: T) -> O): DataState<O> =
+suspend fun <T, O> OldDataState<T>.mapDataSuspend(block: suspend (data: T) -> O): OldDataState<O> =
     when (this) {
         is Loading -> Loading()
         is Empty -> Empty()
         is Data -> Data(block.invoke(this.data))
     }
 
-inline fun <T> DataState<T>.ifIsData(block: (data: T) -> Unit) {
+inline fun <T> OldDataState<T>.ifIsData(block: (data: T) -> Unit) {
     if (this is Data) {
         block.invoke(this.data)
     }

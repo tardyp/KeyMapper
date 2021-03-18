@@ -40,9 +40,9 @@ class TriggerKeyListItemMapperImpl(
             }
 
             val linkDrawable = when (mode) {
-                TriggerMode.PARALLEL -> R.drawable.ic_baseline_add_24
-                TriggerMode.SEQUENCE -> R.drawable.ic_baseline_arrow_downward_24
-                TriggerMode.UNDEFINED -> null
+                is TriggerMode.Parallel -> R.drawable.ic_baseline_add_24
+                TriggerMode.Sequence -> R.drawable.ic_baseline_arrow_downward_24
+                TriggerMode.Undefined -> null
             }
 
             TriggerKeyListItemModel(

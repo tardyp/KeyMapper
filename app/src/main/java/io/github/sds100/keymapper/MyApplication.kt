@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
 import io.github.sds100.keymapper.data.repository.AndroidAppRepository
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.framework.adapters.*
 import io.github.sds100.keymapper.util.*
@@ -48,6 +49,11 @@ class MyApplication : MultiDexApplication(),
     val cameraAdapter by lazy { AndroidCameraAdapter(this) }
     val permissionAdapter by lazy { AndroidPermissionAdapter(this) }
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
+    val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
+
+    val recordTriggerController by lazy {
+        RecordTriggerController(appCoroutineScope, serviceAdapter)
+    }
 
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 

@@ -2,20 +2,26 @@ package io.github.sds100.keymapper.ui.mappings.keymap
 
 import android.view.KeyEvent
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.hadilq.liveevent.LiveEvent
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ViewPopulated
+import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 24/11/20.
@@ -27,8 +33,9 @@ class TriggerViewModel(
     private val useCase: ConfigKeymapTriggerUseCase,
     private val listItemMapper: TriggerKeyListItemMapper,
     private val recordTrigger: RecordTriggerUseCase,
-    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase
-    ) {
+    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+    resourceProvider: ResourceProvider
+) : ResourceProvider by resourceProvider, UiStateProducer<TriggerUiState> {
 
     val optionsViewModel = TriggerOptionsViewModel(
         onboardingUseCase,
@@ -38,100 +45,32 @@ class TriggerViewModel(
     private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
     val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
 
-    private val _showParallelTriggerOrderExplanation = MutableStateFlow(false)
-    val showParallelTriggerOrderExplanation = _showParallelTriggerOrderExplanation.asStateFlow()
-
-    fun approvedParallelTriggerOrderExplanation() {
-        _showParallelTriggerOrderExplanation.value = false
-        onboardingUseCase.shownParallelTriggerOrderExplanation = true
-    }
-
-    private val _showSequenceTriggerExplanation = MutableStateFlow(false)
-    val showSequenceTriggerExplanation = _showSequenceTriggerExplanation.asStateFlow()
-
     private val _showEnableCapsLockKeyboardLayoutPrompt = MutableSharedFlow<Unit>()
     val showEnableCapsLockKeyboardLayoutPrompt =
         _showEnableCapsLockKeyboardLayoutPrompt.asSharedFlow()
 
+    fun approvedParallelTriggerOrderExplanation() {
+        onboardingUseCase.shownParallelTriggerOrderExplanation = true
+    }
+
     fun approvedSequenceTriggerExplanation() {
-        _showSequenceTriggerExplanation.value = false
         onboardingUseCase.shownSequenceTriggerExplanation = true
-    }
-
-    private val dataState = MutableLiveData<ConfigKeymapTriggerState?>()
-
-    //TODO hide UI elements if loading
-    private val _viewState = MutableLiveData<ViewState>(ViewLoading())
-    val viewState: LiveData<ViewState> = _viewState
-
-    val triggerInParallel = dataState.map { it?.mode == TriggerMode.PARALLEL }
-    fun setParallelTriggerMode() = useCase.setMode(TriggerMode.PARALLEL)
-
-    val triggerInSequence = dataState.map { it?.mode == TriggerMode.SEQUENCE }
-    fun setSequenceTriggerMode() = useCase.setMode(TriggerMode.SEQUENCE)
-
-    val triggerModeUndefined = dataState.map { it?.mode == TriggerMode.UNDEFINED }
-    fun setUndefinedTriggerMode() = useCase.setMode(TriggerMode.UNDEFINED)
-
-    val isParallelTriggerClickTypeShortPress = dataState.map {
-        it ?: return@map false
-
-        if (!it.keys.isNullOrEmpty()) {
-            it.keys[0].clickType == ClickType.SHORT_PRESS
-        } else {
-            false
-        }
-    }
-
-    val isParallelTriggerClickTypeLongPress = dataState.map {
-        it ?: return@map false
-
-        if (!it.keys.isNullOrEmpty()) {
-            it.keys[0].clickType == ClickType.LONG_PRESS
-        } else {
-            false
-        }
     }
 
     private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
     val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
 
-    private val _modelList = MutableLiveData<DataState<List<TriggerKeyListItemModel>>>()
-    val modelList: LiveData<DataState<List<TriggerKeyListItemModel>>> = _modelList
+    override val state = MutableStateFlow(
+        UiBuilder(State.Loading(), RecordTriggerState.Stopped).build()
+    )
 
-    val triggerKeyCount = modelList.map {
-        when (it) {
-            is Data -> it.data.size
-            else -> 0
-        }
-    }
+    fun setParallelTriggerMode() = useCase.setParallelTriggerMode()
+    fun setSequenceTriggerMode() = useCase.setSequenceTriggerMode()
+    fun setUndefinedTriggerMode() = useCase.setUndefinedTriggerMode()
 
-    val recordTriggerTimeLeft = MutableLiveData(0)
-    val recordingTrigger = MutableLiveData(false)
-
-    /**
-     * The number of times the user has attempted to record a trigger.
-     */
-    private var recordingTriggerCount = 0
-
-    /**
-     * Whether the user has successfully recorded a trigger.
-     */
-    private var successfullyRecordedTrigger = false
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
-
-        useCase.state.onEach {
-            if (it is Data) {
-                dataState.value = it.data
-                onStateChange(it.data)
-                _viewState.value = ViewPopulated()
-            } else {
-                dataState.value = null
-                _viewState.postValue(ViewLoading())
-            }
-        }.launchIn(coroutineScope)
-
         recordTrigger.onRecordKey.onEach {
 
             if (it.keyCode == KeyEvent.KEYCODE_CAPS_LOCK) {
@@ -140,6 +79,18 @@ class TriggerViewModel(
 
             useCase.addTriggerKey(it.keyCode, it.device)
         }.launchIn(coroutineScope)
+
+        coroutineScope.launch {
+            combine(
+                rebuildUiState,
+                useCase.state,
+                recordTrigger.state
+            ) { _, configState, recordTriggerState ->
+                UiBuilder(configState, recordTriggerState)
+            }.collectLatest {
+                state.value = it.build()
+            }
+        }
     }
 
     fun setParallelTriggerClickType(clickType: ClickType) =
@@ -149,7 +100,6 @@ class TriggerViewModel(
         useCase.setTriggerKeyDevice(uid, device)
 
     fun onRemoveKeyClick(uid: String) = useCase.removeTriggerKey(uid)
-
     fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = useCase.moveTriggerKey(fromIndex, toIndex)
 
     fun onTriggerKeyOptionsClick(id: String) {
@@ -176,47 +126,100 @@ class TriggerViewModel(
         }
     }
 
-    fun recordTrigger() = recordTrigger.record()
-
-    fun stopRecording() = recordTrigger.stopRecording()
-
-    fun rebuildModels() = dataState.value?.let {
-        rebuildModels(it.mode, it.keys)
-    }
-
-    private fun onStateChange(state: ConfigKeymapTriggerState) {
-        /* when the user first chooses to make parallel a trigger,
-           show a dialog informing them that the order in which they
-           list the keys is the order in which they will need to be held down.
-           */
-        if (state.mode == TriggerMode.PARALLEL
-            && state.keys.size > 1
-            && !onboardingUseCase.shownParallelTriggerOrderExplanation
-        ) {
-            _showParallelTriggerOrderExplanation.value = true
-        }
-
-        if (state.mode == TriggerMode.SEQUENCE
-            && state.keys.size > 1
-            && !onboardingUseCase.shownSequenceTriggerExplanation
-        ) {
-            _showSequenceTriggerExplanation.value = true
-        }
-
-        rebuildModels(state.mode, state.keys)
-    }
-
-    private fun rebuildModels(mode: TriggerMode, keys: List<TriggerKey>) {
-        coroutineScope.launch {
-
-            _modelList.value = Loading()
-
-            _modelList.value = with(listItemMapper.map(keys, mode)) {
-                when {
-                    isEmpty() -> Empty()
-                    else -> Data(this)
-                }
+    fun onRecordTriggerButtonClick() {
+        when (recordTrigger.state.value) {
+            is RecordTriggerState.CountingDown -> recordTrigger.stopRecording()
+            RecordTriggerState.Stopped -> recordTrigger.startRecording().onFailure {
+                _enableAccessibilityServicePrompt.value = Unit
             }
         }
     }
+
+    fun stopRecordingTrigger() = recordTrigger.stopRecording()
+
+    override fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
+    }
+
+    /**
+     * Use this object to create the ui state instead of a function because it allows one to combine
+     * multiple flows and then only finish collecting the *latest* combination of those flows.
+     */
+    private inner class UiBuilder(
+        private val configState: State<ConfigKeymapTriggerState>,
+        private val recordTriggerState: RecordTriggerState
+    ) {
+        val recordTriggerButtonText by lazy {
+            when (recordTriggerState) {
+                is RecordTriggerState.CountingDown -> getString(
+                    R.string.button_recording_trigger_countdown,
+                    recordTriggerState.timeLeft
+                )
+                RecordTriggerState.Stopped -> getString(R.string.button_record_trigger)
+            }
+        }
+
+        fun build(): TriggerUiState = when (configState) {
+            is State.Data -> loadedState(configState.data)
+            is State.Loading -> loadingState()
+        }
+
+        private fun loadedState(config: ConfigKeymapTriggerState) = TriggerUiState(
+            triggerKeyListModels =
+            listItemMapper.map(config.keys, config.mode).createListState(),
+
+            recordTriggerButtonText = recordTriggerButtonText,
+            clickTypeRadioButtonsVisible = config.mode is TriggerMode.Parallel,
+
+            shortPressButtonChecked =
+            config.mode is TriggerMode.Parallel && config.mode.clickType == ClickType.SHORT_PRESS,
+            longPressButtonChecked =
+            config.mode is TriggerMode.Parallel && config.mode.clickType == ClickType.LONG_PRESS,
+
+            triggerModeButtonsEnabled = config.keys.size > 1,
+            parallelTriggerModeButtonChecked = config.mode is TriggerMode.Parallel,
+            sequenceTriggerModeButtonChecked = config.mode is TriggerMode.Sequence,
+
+            showSequenceTriggerExplanation = config.mode is TriggerMode.Sequence
+                && !onboardingUseCase.shownSequenceTriggerExplanation,
+
+            showParallelTriggerOrderExplanation = config.mode is TriggerMode.Parallel
+                && config.keys.size > 1
+                && !onboardingUseCase.shownParallelTriggerOrderExplanation
+        )
+
+        private fun loadingState() = TriggerUiState(
+            triggerKeyListModels = ListState.Empty(),
+            recordTriggerButtonText = recordTriggerButtonText,
+
+            clickTypeRadioButtonsVisible = false,
+
+            shortPressButtonChecked = false,
+            longPressButtonChecked = false,
+
+            triggerModeButtonsEnabled = false,
+
+            parallelTriggerModeButtonChecked = false,
+            sequenceTriggerModeButtonChecked = false,
+
+            showSequenceTriggerExplanation = false,
+            showParallelTriggerOrderExplanation = false
+        )
+    }
 }
+
+data class TriggerUiState(
+    val triggerKeyListModels: ListState<TriggerKeyListItemModel>,
+    val recordTriggerButtonText: String,
+
+    val clickTypeRadioButtonsVisible: Boolean,
+    val shortPressButtonChecked: Boolean,
+    val longPressButtonChecked: Boolean,
+
+    val triggerModeButtonsEnabled: Boolean,
+    val parallelTriggerModeButtonChecked: Boolean,
+    val sequenceTriggerModeButtonChecked: Boolean,
+
+    val showSequenceTriggerExplanation: Boolean,
+    val showParallelTriggerOrderExplanation: Boolean
+) : ViewPopulated()

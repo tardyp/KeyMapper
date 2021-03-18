@@ -1,30 +1,56 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
+import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 
 /**
  * Created by sds100 on 04/03/2021.
  */
-class RecordTriggerUseCaseImpl :RecordTriggerUseCase{
-    override val state = MutableStateFlow(RecordTriggerState.Stopped
-    )
+class RecordTriggerController(
+    coroutineScope: CoroutineScope,
+    private val serviceAdapter: ServiceAdapter
+) : RecordTriggerUseCase {
+    override val state = MutableStateFlow<RecordTriggerState>(RecordTriggerState.Stopped)
     override val onRecordKey = MutableSharedFlow<RecordedKey>()
 
-    override fun record() {
+    init {
+        serviceAdapter.eventReceiver.onEach { event ->
+            when (event) {
+                is OnStoppedRecordingTrigger ->
+                    state.value = RecordTriggerState.Stopped
 
+                is OnIncrementRecordTriggerTimer -> state.value =
+                    RecordTriggerState.CountingDown(event.timeLeft)
+
+                is RecordedTriggerKeyEvent -> {
+                    val device = if (event.isExternal) {
+                        TriggerKeyDevice.External(event.deviceDescriptor, event.deviceName)
+                    } else {
+                        TriggerKeyDevice.Internal
+                    }
+
+                    onRecordKey.emit(RecordedKey(event.keyCode, device))
+                }
+            }
+        }.launchIn(coroutineScope)
     }
 
+    override fun startRecording() = serviceAdapter.send(StartRecordingTrigger)
     override fun stopRecording() {
-
+        serviceAdapter.send(StopRecordingTrigger)
     }
 }
 
 interface RecordTriggerUseCase {
     val state: StateFlow<RecordTriggerState>
     val onRecordKey: SharedFlow<RecordedKey>
-    fun record()
+
+    /**
+     * @return Success if started and an Error if failed to start.
+     */
+    fun startRecording(): Result<Unit>
     fun stopRecording()
 }

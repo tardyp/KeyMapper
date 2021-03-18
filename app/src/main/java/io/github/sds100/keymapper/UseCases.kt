@@ -30,4 +30,7 @@ object UseCases {
         ServiceLocator.preferenceRepository(ctx),
         ServiceLocator.externalDeviceAdapter(ctx)
     )
+
+    fun recordTrigger(ctx: Context) =
+        (ctx.applicationContext as MyApplication).recordTriggerController
 }

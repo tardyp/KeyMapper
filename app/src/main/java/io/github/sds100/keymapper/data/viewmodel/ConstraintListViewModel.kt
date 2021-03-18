@@ -25,7 +25,7 @@ class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
     val constraintAndMode = MutableLiveData<Boolean>()
     val constraintOrMode = MutableLiveData<Boolean>()
 
-    private val _model = MutableLiveData<DataState<List<ConstraintModel>>>(Loading())
+    private val _model = MutableLiveData<OldDataState<List<ConstraintModel>>>(Loading())
     override val model = _model
 
     override val viewState = MutableLiveData<ViewState>(ViewLoading())

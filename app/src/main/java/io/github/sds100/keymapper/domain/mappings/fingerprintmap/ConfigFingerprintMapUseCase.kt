@@ -1,7 +1,9 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.domain.constraints.ConfigConstraintUseCaseImpl
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.domain.utils.mapData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -11,7 +13,7 @@ import kotlinx.coroutines.flow.map
  */
 class ConfigFingerprintMapUseCaseImpl : ConfigFingerprintMapUseCase {
 
-    private val fingerprintMap = MutableStateFlow<DataState<FingerprintMap>>(Loading())
+    private val fingerprintMap = MutableStateFlow<State<FingerprintMap>>(State.Loading())
 
     override val state =
         fingerprintMap.map { state -> state.mapData { ConfigFingerprintMapState(it.isEnabled) } }
@@ -22,7 +24,7 @@ class ConfigFingerprintMapUseCaseImpl : ConfigFingerprintMapUseCase {
     override fun setEnabled(enabled: Boolean) = editFingerprintMap { it.copy(isEnabled = enabled) }
 
     override fun setFingerprintMap(fingerprintMap: FingerprintMap) {
-        this.fingerprintMap.value = Data(fingerprintMap)
+        this.fingerprintMap.value = State.Data(fingerprintMap)
     }
 
     override fun getFingerprintMap() = fingerprintMap.value
@@ -33,11 +35,11 @@ class ConfigFingerprintMapUseCaseImpl : ConfigFingerprintMapUseCase {
 }
 
 interface ConfigFingerprintMapUseCase {
-    val state: Flow<DataState<ConfigFingerprintMapState>>
+    val state: Flow<State<ConfigFingerprintMapState>>
     fun setEnabled(enabled: Boolean)
 
     fun setFingerprintMap(fingerprintMap: FingerprintMap)
-    fun getFingerprintMap(): DataState<FingerprintMap>
+    fun getFingerprintMap(): State<FingerprintMap>
 }
 
 data class ConfigFingerprintMapState(val isEnabled: Boolean)

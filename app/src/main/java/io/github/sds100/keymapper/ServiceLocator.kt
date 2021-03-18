@@ -231,6 +231,10 @@ object ServiceLocator {
         return (context.applicationContext as MyApplication).systemFeatureAdapter
     }
 
+    fun serviceAdapter(context: Context): ServiceAdapter {
+        return (context.applicationContext as MyApplication).serviceAdapter
+    }
+
     @VisibleForTesting
     fun resetKeymapRepository() {
         synchronized(lock) {

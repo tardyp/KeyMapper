@@ -62,6 +62,7 @@ sealed class RecoverableError : Error() {
     data class AppDisabled(val packageName: String) : RecoverableError()
     object NoCompatibleImeEnabled : RecoverableError()
     object NoCompatibleImeChosen : RecoverableError()
+    object AccessibilityServiceDisabled : RecoverableError()
 
     data class PermissionDenied(val permission: String) : RecoverableError() {
         companion object {

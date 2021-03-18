@@ -46,17 +46,18 @@ class SystemActionListViewModel(
         emit(systemActionsSortedByCategory)
     }
 
-    private val _model = MediatorLiveData<DataState<Map<Int, List<SystemActionListItemModel>>>>().apply {
-        fun filter(query: String) {
-            modelsSortedByCategory.value ?: return
-            stringResourceProvider ?: return
+    private val _model =
+        MediatorLiveData<OldDataState<Map<Int, List<SystemActionListItemModel>>>>().apply {
+            fun filter(query: String) {
+                modelsSortedByCategory.value ?: return
+                stringResourceProvider ?: return
 
-            value = Loading()
+                value = Loading()
 
-            modelsSortedByCategory.value?.let { modelsSortedByCategory ->
-                if (modelsSortedByCategory is Data) {
-                    val filteredModels = sequence {
-                        for ((category, systemActionList) in modelsSortedByCategory.data) {
+                modelsSortedByCategory.value?.let { modelsSortedByCategory ->
+                    if (modelsSortedByCategory is Data) {
+                        val filteredModels = sequence {
+                            for ((category, systemActionList) in modelsSortedByCategory.data) {
                             val matchedSystemActions = systemActionList.filter {
                                 val descriptionString = stringResourceProvider!!.getStringResource(it.descriptionRes)
 

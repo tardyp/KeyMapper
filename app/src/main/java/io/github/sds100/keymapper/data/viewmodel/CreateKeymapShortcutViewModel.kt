@@ -20,7 +20,7 @@ class CreateKeymapShortcutViewModel(
     private val showActionsUseCase: GetActionErrorUseCase
 ) : ViewModel(), ModelState<List<KeymapListItemModel>> {
 
-    private val _model: MutableLiveData<DataState<List<KeymapListItemModel>>> =
+    private val _model: MutableLiveData<OldDataState<List<KeymapListItemModel>>> =
         MutableLiveData(Loading())
 
     override val model = _model

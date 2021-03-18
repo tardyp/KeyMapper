@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentFingerprintMapListBinding
 import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
-import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
+import io.github.sds100.keymapper.ui.fragment.OldRecyclerViewFragment
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
@@ -26,7 +26,8 @@ import splitties.alertdialog.appcompat.*
  * Created by sds100 on 11/12/2020.
  */
 class FingerprintMapListFragment
-    : RecyclerViewFragment<List<FingerprintMapListItemModel>, FragmentFingerprintMapListBinding>() {
+    :
+    OldRecyclerViewFragment<List<FingerprintMapListItemModel>, FragmentFingerprintMapListBinding>() {
 
     private val viewModel: FingerprintMapListViewModel by activityViewModels {
         InjectorUtils.provideFingerprintMapListViewModel(requireContext())

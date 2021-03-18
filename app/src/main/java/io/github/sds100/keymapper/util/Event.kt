@@ -24,8 +24,10 @@ import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
-abstract class Event
+@Serializable
+sealed class Event
 
 open class MessageEvent(@StringRes val textRes: Int) : Event()
 
@@ -92,6 +94,7 @@ data class AutomaticBackupResult(override val result: Result<Unit>) : ResultEven
 object OnBootEvent : Event(), UpdateNotificationEvent
 
 @Parcelize
+@Serializable
 data class RecordedTriggerKeyEvent(
     val keyCode: Int,
     val deviceName: String,
@@ -99,7 +102,16 @@ data class RecordedTriggerKeyEvent(
     val isExternal: Boolean
 ) : Event(), Parcelable
 
-class OnIncrementRecordTriggerTimer(val timeLeft: Int) : Event()
+@Serializable
+object StartRecordingTrigger : Event()
+
+@Serializable
+object StopRecordingTrigger : Event()
+
+@Serializable
+data class OnIncrementRecordTriggerTimer(val timeLeft: Int) : Event()
+
+@Serializable
 object OnStoppedRecordingTrigger : Event()
 object OnAccessibilityServiceStarted : Event(), UpdateNotificationEvent
 object OnAccessibilityServiceStopped : Event(), UpdateNotificationEvent

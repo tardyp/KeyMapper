@@ -3,8 +3,10 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.KeyEventAction
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.moveElement
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.KeyEventUtils
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
@@ -13,15 +15,15 @@ import kotlinx.coroutines.flow.map
  */
 
 class ConfigKeymapActionsUseCaseImpl(
-    private val keymap: StateFlow<DataState<KeyMap>>,
+    private val keymap: StateFlow<State<KeyMap>>,
     val setKeymap: (keymap: KeyMap) -> Unit
 ) : ConfigKeymapActionsUseCase {
 
     override val actionList = keymap.map { state ->
-        if (state is Data) {
-            state.data.actionList.getDataState()
+        if (state is State.Data) {
+            State.Data(state.data.actionList)
         } else {
-            Loading()
+            State.Loading()
         }
     }
 

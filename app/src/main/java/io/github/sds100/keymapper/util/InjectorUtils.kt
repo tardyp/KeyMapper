@@ -10,7 +10,6 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprint
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
@@ -158,7 +157,7 @@ object InjectorUtils {
             UseCases.getActionError(ctx),
             UseCases.testAction(ctx),
             UseCases.onboarding(ctx),
-            RecordTriggerUseCaseImpl(),
+            UseCases.recordTrigger(ctx),
             UseCases.showDeviceInfo(ctx),
             KeymapActionListItemMapper(
                 UseCases.getActionError(ctx),
@@ -170,7 +169,9 @@ object InjectorUtils {
             TriggerKeyListItemMapperImpl(
                 ServiceLocator.resourceProvider(ctx),
                 UseCases.showDeviceInfo(ctx)
-            )
+            ),
+
+            ServiceLocator.resourceProvider(ctx)
         )
     }
 

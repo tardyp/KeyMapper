@@ -15,14 +15,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.savedstate.SavedStateRegistry
 import com.google.android.material.bottomappbar.BottomAppBar
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ui.UiStateProducer
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.collectLatest
+import io.github.sds100.keymapper.util.delegate.ModelState
 
 /**
  * Created by sds100 on 22/02/2020.
  */
-abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
+abstract class OldRecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
 
     companion object {
         private const val KEY_SAVED_STATE = "key_saved_state"
@@ -43,7 +42,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     private val isSearchEnabled: Boolean
         get() = searchStateKey != null
 
-    abstract val stateProducer: UiStateProducer<T>
+    abstract val modelState: ModelState<T>
 
     open var isAppBarVisible = true
     open var requestKey: String? = null
@@ -83,6 +82,29 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         binding.apply {
             subscribeUi(binding)
 
+            modelState.model.observe(viewLifecycleOwner, { model ->
+                when (model) {
+                    is Empty -> {
+
+                        viewLifecycleScope.launchWhenResumed {
+                            populateList(binding, null)
+                        }
+
+                        modelState.viewState.empty()
+                    }
+                    is Loading -> modelState.viewState.loading()
+                    is Data -> {
+                        modelState.viewState.loading()
+
+                        viewLifecycleScope.launchWhenResumed {
+                            populateList(binding, model.data)
+
+                            modelState.viewState.populated()
+                        }
+                    }
+                }
+            })
+
             setupSearchView(binding)
 
             getBottomAppBar(binding)?.let {
@@ -100,24 +122,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
                 }
             }
         }
-
-        viewLifecycleScope.launchWhenResumed {
-            stateProducer.state.collectLatest { state ->
-                updateUi(binding, state)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        stateProducer.rebuildUiState()
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-
-        super.onDestroyView()
     }
 
     fun returnResult(vararg extras: Pair<String, Any?>) {
@@ -155,6 +159,18 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        modelState.rebuildModels()
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+
+        super.onDestroyView()
+    }
+
     open fun onSearchQuery(query: String?) {}
     open fun getBottomAppBar(binding: BINDING): BottomAppBar? {
         return null
@@ -167,7 +183,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     /**
      * [model] is null if it is empty.
      */
-    abstract fun updateUi(binding: BINDING, state: T)
+    abstract fun populateList(binding: BINDING, model: T?)
     abstract fun subscribeUi(binding: BINDING)
     abstract fun bind(inflater: LayoutInflater, container: ViewGroup?): BINDING
 }

@@ -64,7 +64,7 @@ abstract class ConfigMappingFragment : Fragment() {
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
         ) {
-            viewModel.actionListViewModel.rebuildModels()
+            viewModel.actionListViewModel.rebuildUiState()
         }
 
         FragmentConfigMappingBinding.inflate(inflater, container, false).apply {

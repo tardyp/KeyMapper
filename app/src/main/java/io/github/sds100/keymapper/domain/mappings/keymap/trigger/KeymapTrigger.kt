@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class KeymapTrigger(
     val keys: List<TriggerKey> = emptyList(),
-    val mode: TriggerMode = TriggerMode.UNDEFINED,
+    val mode: TriggerMode = TriggerMode.Undefined,
 
     private val vibrate: Boolean = false,
     private val longPressDoubleVibration: Boolean = false,
@@ -30,7 +30,7 @@ data class KeymapTrigger(
     val options = KeymapTriggerOptions(
         vibrate = Option(
             value = vibrate,
-            isAllowed = (keys.size == 1 || (mode == TriggerMode.PARALLEL))
+            isAllowed = (keys.size == 1 || (mode is TriggerMode.Parallel))
                 && keys.getOrNull(0)?.clickType == ClickType.LONG_PRESS
         ),
 
@@ -51,7 +51,7 @@ data class KeymapTrigger(
 
         longPressDoubleVibration = Option(
             value = longPressDoubleVibration,
-            isAllowed = (keys.size == 1 || (mode == TriggerMode.PARALLEL))
+            isAllowed = (keys.size == 1 || (mode is TriggerMode.Parallel))
                 && keys.getOrNull(0)?.clickType == ClickType.LONG_PRESS
         ),
 
@@ -66,7 +66,7 @@ data class KeymapTrigger(
             value = sequenceTriggerTimeout,
             isAllowed = !keys.isNullOrEmpty()
                 && keys.size > 1
-                && mode == TriggerMode.SEQUENCE
+                && mode is TriggerMode.Sequence
         ),
 
         triggerFromOtherApps = Option(

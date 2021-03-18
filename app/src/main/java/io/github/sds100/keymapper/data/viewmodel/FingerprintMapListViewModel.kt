@@ -57,7 +57,7 @@ class FingerprintMapListViewModel(
 
     val eventStream: LiveData<Event> = _eventStream
 
-    private val _model = MutableLiveData<DataState<List<FingerprintMapListItemModel>>>()
+    private val _model = MutableLiveData<OldDataState<List<FingerprintMapListItemModel>>>()
     override val model = _model
     override val viewState = MutableLiveData<ViewState>(ViewLoading())
 

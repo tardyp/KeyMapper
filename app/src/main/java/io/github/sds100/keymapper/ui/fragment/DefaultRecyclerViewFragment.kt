@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
  * Created by sds100 on 22/02/2020.
  */
 abstract class DefaultRecyclerViewFragment<T>
-    : RecyclerViewFragment<T, FragmentRecyclerviewBinding>() {
+    : OldRecyclerViewFragment<T, FragmentRecyclerviewBinding>() {
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentRecyclerviewBinding.inflate(inflater, container, false).apply {

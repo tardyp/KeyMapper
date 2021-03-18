@@ -97,9 +97,9 @@ class KeymapDetectionDelegate(
         fun performActionOnDown(trigger: KeymapTrigger): Boolean {
             return (trigger.keys.size <= 1
                 && trigger.keys.getOrNull(0)?.clickType != ClickType.DOUBLE_PRESS
-                && trigger.mode == TriggerMode.UNDEFINED)
+                && trigger.mode == TriggerMode.Undefined)
 
-                || trigger.mode == TriggerMode.PARALLEL
+                || trigger.mode is TriggerMode.Parallel
         }
     }
 

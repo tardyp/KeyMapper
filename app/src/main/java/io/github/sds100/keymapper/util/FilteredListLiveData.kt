@@ -9,13 +9,13 @@ import java.util.*
  * Created by sds100 on 13/01/21.
  */
 
-class FilteredListLiveData<T : ISearchable> : MediatorLiveData<DataState<List<T>>>() {
+class FilteredListLiveData<T : ISearchable> : MediatorLiveData<OldDataState<List<T>>>() {
     init {
         value = Loading()
     }
 
     //TODO remove
-    fun filter(models: DataState<List<T>>, query: String?) {
+    fun filter(models: OldDataState<List<T>>, query: String?) {
         value = Loading()
 
         value = when (models) {
@@ -37,7 +37,7 @@ class FilteredListLiveData<T : ISearchable> : MediatorLiveData<DataState<List<T>
         }
     }
 
-    suspend fun filterSuspend(models: DataState<List<T>>, query: String?) =
+    suspend fun filterSuspend(models: OldDataState<List<T>>, query: String?) =
         withContext(Dispatchers.Default) {
             postValue(Loading())
 
