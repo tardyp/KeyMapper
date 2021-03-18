@@ -1,12 +1,14 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
+import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
+import io.github.sds100.keymapper.domain.constraints.Constraint
+import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
+import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
-import io.github.sds100.keymapper.domain.models.Constraint
-import io.github.sds100.keymapper.domain.models.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
 import io.github.sds100.keymapper.util.delegate.KeymapDetectionDelegate
 import kotlinx.serialization.Serializable
@@ -95,7 +97,18 @@ object KeyMapEntityMapper {
         )
     }
 
-    fun toEntity(model: KeyMap): KeyMapEntity {
-        TODO()
+    fun toEntity(keymap: KeyMap): KeyMapEntity {
+        return KeyMapEntity(
+            id = keymap.dbId,
+            trigger = KeymapTriggerEntityMapper.toEntity(keymap.trigger),
+            actionList = keymap.actionList.map { KeymapActionEntityMapper.toEntity(it) },
+            constraintList = keymap.constraintList.map { ConstraintEntityMapper.toEntity(it) },
+            constraintMode = when (keymap.constraintMode) {
+                ConstraintMode.AND -> ConstraintEntity.MODE_AND
+                ConstraintMode.OR -> ConstraintEntity.MODE_OR
+            },
+            isEnabled = keymap.isEnabled,
+            uid = keymap.uid
+        )
     }
 }

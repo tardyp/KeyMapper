@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.models
+package io.github.sds100.keymapper.domain.constraints
 
 /**
  * Created by sds100 on 03/03/2021.

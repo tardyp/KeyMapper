@@ -7,3 +7,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Option<T>(val value: T, val isAllowed: Boolean)
+
+fun <T> Option<T>.ifIsAllowed(block: (value: T) -> Unit) {
+    if (isAllowed) {
+        block.invoke(value)
+    }
+}

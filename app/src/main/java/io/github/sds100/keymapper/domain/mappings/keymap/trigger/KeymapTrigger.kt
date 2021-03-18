@@ -1,12 +1,15 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
+import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
+import io.github.sds100.keymapper.domain.models.ifIsAllowed
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
 import kotlinx.serialization.Serializable
+import splitties.bitflags.withFlag
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -87,7 +90,71 @@ object KeymapTriggerEntityMapper {
         deviceAdapter: ExternalDeviceAdapter
     ): KeymapTrigger {
         return KeymapTrigger(
+            //TODO
             keys = entity.keys.map { KeymapTriggerKeyEntityMapper.fromEntity(it, deviceAdapter) }
+        )
+    }
+
+    fun toEntity(trigger: KeymapTrigger): TriggerEntity {
+        val extras = mutableListOf<Extra>()
+
+        trigger.options.sequenceTriggerTimeout.ifIsAllowed {
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT, it.data.toString()))
+            }
+        }
+
+        trigger.options.longPressDelay.ifIsAllowed {
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_LONG_PRESS_DELAY, it.data.toString()))
+            }
+        }
+
+        trigger.options.doublePressDelay.ifIsAllowed {
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY, it.data.toString()))
+            }
+        }
+
+        trigger.options.vibrateDuration.ifIsAllowed {
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_VIBRATION_DURATION, it.data.toString()))
+            }
+        }
+
+        val mode = when (trigger.mode) {
+            is TriggerMode.Parallel -> TriggerEntity.PARALLEL
+            TriggerMode.Sequence -> TriggerEntity.SEQUENCE
+            TriggerMode.Undefined -> TriggerEntity.UNDEFINED
+        }
+
+        var flags = 0
+
+        trigger.options.vibrate.ifIsAllowed {
+            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
+        }
+
+        trigger.options.longPressDoubleVibration.ifIsAllowed {
+            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
+        }
+
+        trigger.options.screenOffTrigger.ifIsAllowed {
+            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
+        }
+
+        trigger.options.triggerFromOtherApps.ifIsAllowed {
+            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
+        }
+
+        trigger.options.showToast.ifIsAllowed {
+            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SHOW_TOAST)
+        }
+
+        return TriggerEntity(
+            keys = trigger.keys.map { KeymapTriggerKeyEntityMapper.toEntity(it) },
+            extras = extras,
+            mode = mode,
+            flags = flags
         )
     }
 }

@@ -2,8 +2,8 @@ package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
-import io.github.sds100.keymapper.domain.models.Constraint
-import io.github.sds100.keymapper.domain.models.ConstraintMode
+import io.github.sds100.keymapper.domain.constraints.Constraint
+import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
 import kotlinx.serialization.Serializable
 
