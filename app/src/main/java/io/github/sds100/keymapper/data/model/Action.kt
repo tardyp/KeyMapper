@@ -133,7 +133,11 @@ data class Action(
             return keyEventAction(keyCode, metaState = 0)
         }
 
-        fun keyEventAction(keyCode: Int, metaState: Int, deviceDescriptor: String? = null): Action {
+        fun keyEventAction(
+            keyCode: Int,
+            metaState: Int = 0,
+            deviceDescriptor: String? = null
+        ): Action {
             val extras = sequence {
                 yield(Extra(EXTRA_KEY_EVENT_META_STATE, metaState.toString()))
 

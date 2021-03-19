@@ -930,7 +930,7 @@ class KeymapDetectionDelegate(
                             delay(delayBeforeNextAction(actionKey))
                         }
 
-                        initialiseRepeating(triggerIndex)
+                        initialiseRepeating(triggerIndex, calledOnTriggerRelease = false)
                     }
                 }
             }
@@ -1003,7 +1003,7 @@ class KeymapDetectionDelegate(
         if (mDetectSequenceDoublePresses) {
             //iterate over each possible double press event to detect
             for (index in mDoublePressEvents.indices) {
-               val eventLocation = mDoublePressEvents[index]
+                val eventLocation = mDoublePressEvents[index]
                 val doublePressEvent =
                     mSequenceTriggerEvents[eventLocation.triggerIndex][eventLocation.keyIndex]
                 val triggerIndex = eventLocation.triggerIndex
@@ -1021,6 +1021,13 @@ class KeymapDetectionDelegate(
                         /*if the key is in the single pressed state, set the timeout time and start the timer
                         * to imitate the key if it isn't double pressed in the end */
                         SINGLE_PRESSED -> {
+
+                            /*
+                            I just realised that calculating the double press timeout is *SUPPOSED* to be in the onKeyDown
+                            method but it has been this way for so long and no one has complained so leave it.
+                             Changing this might affect people's key maps in ways that I can't fathom.
+                             */
+
                             val doublePressTimeout =
                                 doublePressTimeout(mSequenceTriggerOptions[triggerIndex])
                             mDoublePressTimeoutTimes[index] = currentTime + doublePressTimeout
@@ -1338,6 +1345,8 @@ class KeymapDetectionDelegate(
                     delay(delayBeforeNextAction(actionKey))
                 }
             }
+
+            initialiseRepeating(triggerIndex, calledOnTriggerRelease = true)
         }
 
         if (imitateKeyAfterDoublePressTimeout.isNotEmpty()
@@ -1507,6 +1516,8 @@ class KeymapDetectionDelegate(
                     delay(delayBeforeNextAction(actionKey))
                 }
             }
+
+            initialiseRepeating(triggerIndex, calledOnTriggerRelease = true)
         }
 
         return detectedTriggerIndexes.isNotEmpty()
@@ -1647,14 +1658,14 @@ class KeymapDetectionDelegate(
                 delay(delayBeforeNextAction(actionKey))
             }
 
-            initialiseRepeating(triggerIndex)
+            initialiseRepeating(triggerIndex, calledOnTriggerRelease = false)
         }
     }
 
     /**
      * For parallel triggers only.
      */
-    private fun initialiseRepeating(triggerIndex: Int) {
+    private fun initialiseRepeating(triggerIndex: Int, calledOnTriggerRelease: Boolean) {
         val actionKeys = mParallelTriggerActions[triggerIndex]
         val actionKeysToStartRepeating = actionKeys.toMutableSet()
 
@@ -1667,6 +1678,13 @@ class KeymapDetectionDelegate(
         }
 
         val repeatJobs = mutableListOf<RepeatJob>()
+
+        actionKeys.forEach { key ->
+            //only start repeating when a trigger is released if it is to repeat until pressed again
+            if (!stopRepeatingWhenPressedAgain(key) && calledOnTriggerRelease) {
+                actionKeysToStartRepeating.remove(key)
+            }
+        }
 
         actionKeysToStartRepeating.forEach {
             repeatJobs.add(repeatAction(it))
