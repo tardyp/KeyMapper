@@ -1,101 +1,156 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import androidx.lifecycle.*
-import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.KeymapListItemModel
-import io.github.sds100.keymapper.data.usecase.KeymapListUseCase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
+import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
+import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCase
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ChipUi
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.actions.ActionUiHelper
+import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
+import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemCreator
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
+import io.github.sds100.keymapper.util.ISelectionProvider
+import io.github.sds100.keymapper.util.SelectionProvider
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
+//TODO move to homeviewmodel
 class KeymapListViewModel internal constructor(
-    private val keymapRepository: KeymapListUseCase,
-    private val showActionsUseCase: GetActionErrorUseCase,
-) : ViewModel(), ModelState<List<KeymapListItemModel>> {
+    private val useCase: ListKeymapsUseCase,
+    private val getActionError: GetActionErrorUseCase,
+    actionUiHelper: ActionUiHelper<KeymapAction>,
+    constraintUiHelper: ConstraintUiHelper,
+    isConstraintSupported: IsConstraintSupportedUseCase,
+    resourceProvider: ResourceProvider
+) : ViewModel(), UiStateProducer<ListState<KeymapListItemModel>>, OnChipClickCallback {
 
-    private val _model: MutableLiveData<OldDataState<List<KeymapListItemModel>>> =
-        MutableLiveData(Loading())
+    private val selectionProvider: ISelectionProvider = SelectionProvider()
+    private val modelCreator = KeymapListItemCreator(
+        getActionError,
+        actionUiHelper,
+        constraintUiHelper,
+        isConstraintSupported,
+        resourceProvider
+    )
 
-    override val model = _model
-    override val viewState = MutableLiveData<ViewState>(ViewLoading())
+    override val state = MutableStateFlow<ListState<KeymapListItemModel>>(ListState.Loading())
 
-    val selectionProvider: ISelectionProvider = SelectionProvider()
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
-    private val _eventStream = LiveEvent<Event>().apply {
-        addSource(keymapRepository.keymapList) {
-            viewModelScope.launch {
-//                postValue(
-//                    BuildKeymapListModels(
-//                        it,
-//                        showActionsUseCase.getDeviceInfo(),
-//                        showActionsUseCase.hasRootPermission,
-//                        showActionsUseCase.showDeviceDescriptors
-//                    )
-//                )
+    init {
+        viewModelScope.launch {
+            combine(
+                rebuildUiState,
+                useCase.keymapList,
+                selectionProvider.isSelectable,
+                selectionProvider.selectedIds,
+                getActionError.invalidateErrors
+            ) { _, keymapList, isSelectable, selectedIds, _ ->
+                UiBuilder(keymapList, isSelectable, selectedIds)
+            }.collectLatest {
+                state.value = it.build()
             }
         }
     }
 
-    val eventStream: LiveData<Event> = _eventStream
+    fun duplicateSelectedKeymaps() {
+        TODO()
+    }
 
-    fun duplicate(vararg id: Long) = keymapRepository.duplicateKeymap(*id)
-    fun delete(vararg id: Long) = keymapRepository.deleteKeymap(*id)
-    fun enableSelectedKeymaps() = keymapRepository.enableKeymapById(*selectionProvider.selectedIds)
-    fun disableSelectedKeymaps() =
-        keymapRepository.disableKeymapById(*selectionProvider.selectedIds)
 
-    fun enableAll() = keymapRepository.enableAll()
-    fun disableAll() = keymapRepository.disableAll()
+    fun delete(vararg id: Long) {
+        TODO()
+    }
 
-    override fun rebuildModels() {
-        if (keymapRepository.keymapList.value == null) return
+    fun enableSelectedKeymaps() {
+        TODO()
+    }
 
-        if (keymapRepository.keymapList.value?.isEmpty() == true) {
-            _model.value = Empty()
-            return
-        }
+    fun disableSelectedKeymaps() {
+        TODO()
+    }
 
-        _model.value = Loading()
+    fun enableAll() {
+        TODO()
+    }
 
+    fun disableAll() {
+        TODO()
+    }
+
+    fun backupSelectedKeymaps() {
+        //TODO
+    }
+
+    fun onKeymapCardClick(uid: String) {
+
+    }
+
+    fun onKeymapCardLongClick(uid: String) {
+
+    }
+
+    fun selectAll() {
         viewModelScope.launch {
-//            _eventStream.postValue(
-//                BuildKeymapListModels(
-//                    keymapRepository.keymapList.value ?: emptyList(),
-//                    showActionsUseCase.getDeviceInfo(),
-//                    showActionsUseCase.hasRootPermission,
-//                    showActionsUseCase.showDeviceDescriptors
-//                )
-//            )
+            useCase.keymapList.first()
+                .map { it.dbId }
+                .toLongArray()
+                .let { selectionProvider.select(*it) }
         }
     }
 
-    fun setModelList(list: List<KeymapListItemModel>) {
-        selectionProvider.updateIds(list.map { it.id }.toLongArray())
-
-        _model.value = when {
-            list.isEmpty() -> Empty()
-            else -> Data(list)
-        }
+    override fun onChipClick(chipModel: ChipUi) {
+        TODO("Not yet implemented")
     }
 
-    fun requestBackupSelectedKeymaps() = run { _eventStream.value = RequestBackupSelectedKeymaps() }
+    override fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
+    }
 
-    fun fixError(error: Error) {
-        _eventStream.value = FixFailure(error)
+    private inner class UiBuilder(
+        private val keymapList: List<KeyMap>,
+        private val isSelectable: Boolean,
+        private val selectedIds: Set<Long>
+    ) {
+        fun build(): ListState<KeymapListItemModel> {
+            return keymapList.map { keyMap ->
+                modelCreator.map(
+                    keyMap,
+                    isSelectable,
+                    selectedIds.contains(keyMap.dbId)
+                )
+            }.createListState()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val keymapListUseCase: KeymapListUseCase,
-        private val showActionsUseCase: GetActionErrorUseCase
+        private val useCase: ListKeymapsUseCase,
+        private val getActionError: GetActionErrorUseCase,
+        private val actionUiHelper: ActionUiHelper<KeymapAction>,
+        private val constraintUiHelper: ConstraintUiHelper,
+        private val isConstraintSupported: IsConstraintSupportedUseCase,
+        private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return KeymapListViewModel(
-                keymapListUseCase,
-                showActionsUseCase
+                useCase,
+                getActionError,
+                actionUiHelper,
+                constraintUiHelper,
+                isConstraintSupported,
+                resourceProvider
             ) as T
         }
     }

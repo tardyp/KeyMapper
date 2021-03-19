@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
-import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
@@ -88,11 +87,11 @@ data class KeyMap(
 }
 
 object KeyMapEntityMapper {
-    fun fromEntity(entity: KeyMapEntity, deviceAdapter: ExternalDeviceAdapter): KeyMap {
+    fun fromEntity(entity: KeyMapEntity): KeyMap {
         return KeyMap(
             dbId = entity.id,
             uid = entity.uid,
-            trigger = KeymapTriggerEntityMapper.fromEntity(entity.trigger, deviceAdapter),
+            trigger = KeymapTriggerEntityMapper.fromEntity(entity.trigger),
             //TODO finish
         )
     }

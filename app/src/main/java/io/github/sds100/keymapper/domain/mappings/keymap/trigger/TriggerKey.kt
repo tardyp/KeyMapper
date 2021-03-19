@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.utils.ClickType
 import kotlinx.serialization.Serializable
 import splitties.bitflags.withFlag
@@ -22,8 +21,7 @@ data class TriggerKey(
 
 object KeymapTriggerKeyEntityMapper {
     fun fromEntity(
-        entity: TriggerEntity.KeyEntity,
-        deviceAdapter: ExternalDeviceAdapter
+        entity: TriggerEntity.KeyEntity
     ): TriggerKey {
         return TriggerKey(
             uid = entity.uid,
@@ -31,7 +29,10 @@ object KeymapTriggerKeyEntityMapper {
             device = when (entity.deviceId) {
                 TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE -> TriggerKeyDevice.Internal
                 TriggerEntity.KeyEntity.DEVICE_ID_ANY_DEVICE -> TriggerKeyDevice.Any
-                else -> TriggerKeyDevice.External(entity.deviceId, "TODO")//TODO
+                else -> TriggerKeyDevice.External(
+                    entity.deviceId,
+                    "TODO"
+                )//TODO #612 save device name in action and trigger key
             },
             clickType = when (entity.clickType) {
                 TriggerEntity.SHORT_PRESS -> ClickType.SHORT_PRESS

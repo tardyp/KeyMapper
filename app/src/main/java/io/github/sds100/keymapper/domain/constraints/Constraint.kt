@@ -11,8 +11,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class Constraint {
+
     data class AppInForeground(val packageName: String) : Constraint()
     data class AppNotInForeground(val packageName: String) : Constraint()
+    data class AppPlayingMedia(val packageName: String) : Constraint()
 
     data class BtDeviceConnected(val bluetoothAddress: String, val deviceName: String) :
         Constraint()
@@ -40,6 +42,10 @@ object ConstraintEntityMapper {
             extras = listOf(Extra(ConstraintEntity.EXTRA_PACKAGE_NAME, constraint.packageName))
         )
 
+        is Constraint.AppPlayingMedia -> ConstraintEntity(
+            type = ConstraintEntity.APP_PLAYING_MEDIA,
+            extras = listOf(Extra(ConstraintEntity.EXTRA_PACKAGE_NAME, constraint.packageName))
+        )
 
         is Constraint.BtDeviceConnected -> ConstraintEntity(
             type = ConstraintEntity.BT_DEVICE_CONNECTED,

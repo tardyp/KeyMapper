@@ -37,7 +37,7 @@ class SeedDatabaseWorker(
                 }
             }.toList().toTypedArray()
 
-            ServiceLocator.keymapRepository(applicationContext).insertKeymap(*keymaps)
+            ServiceLocator.defaultKeymapRepository(applicationContext).insertKeymap(*keymaps)
 
             Result.success()
         } catch (e: Exception) {

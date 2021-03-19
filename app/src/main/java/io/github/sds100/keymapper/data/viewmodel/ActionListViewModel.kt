@@ -5,10 +5,12 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ListState
 import io.github.sds100.keymapper.ui.UiStateProducer
-import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
+import io.github.sds100.keymapper.ui.actions.ActionListItemCreator
 import io.github.sds100.keymapper.ui.actions.ActionListItemState
+import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.RecoverableError
@@ -26,11 +28,13 @@ class ActionListViewModel<A : Action>(
     private val configActions: ConfigActionsUseCase<A>,
     private val actionError: GetActionErrorUseCase,
     private val testAction: TestActionUseCase,
-    private val listItemModelMapper: ActionListItemMapper<A>,
+    actionUiHelper: ActionUiHelper<A>,
+    resourceProvider: ResourceProvider
 ) : UiStateProducer<ListState<ActionListItemState>> {
 
     override val state = MutableStateFlow<ListState<ActionListItemState>>(ListState.Loading())
 
+    private val modelCreator = ActionListItemCreator(actionUiHelper, resourceProvider)
     private val _openEditOptions = MutableSharedFlow<String>()
 
     /**
@@ -101,7 +105,7 @@ class ActionListViewModel<A : Action>(
     }
 
     private fun buildModels(actionList: List<A>) = actionList.map {
-        listItemModelMapper.map(
+        modelCreator.map(
             it,
             actionError.getError(it.data),
             actionList.size

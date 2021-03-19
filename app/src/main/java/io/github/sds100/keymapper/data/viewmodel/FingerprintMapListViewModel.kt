@@ -2,10 +2,10 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.usecases.ListFingerprintMapsUseCase
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.Error

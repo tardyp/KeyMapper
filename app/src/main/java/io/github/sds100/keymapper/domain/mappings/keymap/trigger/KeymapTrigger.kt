@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
 import io.github.sds100.keymapper.domain.models.ifIsAllowed
@@ -86,12 +85,11 @@ data class KeymapTrigger(
 
 object KeymapTriggerEntityMapper {
     fun fromEntity(
-        entity: TriggerEntity,
-        deviceAdapter: ExternalDeviceAdapter
+        entity: TriggerEntity
     ): KeymapTrigger {
         return KeymapTrigger(
             //TODO
-            keys = entity.keys.map { KeymapTriggerKeyEntityMapper.fromEntity(it, deviceAdapter) }
+            keys = entity.keys.map { KeymapTriggerKeyEntityMapper.fromEntity(it) }
         )
     }
 
@@ -131,23 +129,34 @@ object KeymapTriggerEntityMapper {
         var flags = 0
 
         trigger.options.vibrate.ifIsAllowed {
-            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
+            if (it) {
+                flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
+            }
         }
 
         trigger.options.longPressDoubleVibration.ifIsAllowed {
-            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
+            if (it) {
+                flags =
+                    flags.withFlag(TriggerEntity.TRIGGER_FLAG_LONG_PRESS_DOUBLE_VIBRATION)
+            }
         }
 
         trigger.options.screenOffTrigger.ifIsAllowed {
-            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
+            if (it) {
+                flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
+            }
         }
 
         trigger.options.triggerFromOtherApps.ifIsAllowed {
-            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
+            if (it) {
+                flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
+            }
         }
 
         trigger.options.showToast.ifIsAllowed {
-            flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SHOW_TOAST)
+            if (it) {
+                flags = flags.withFlag(TriggerEntity.TRIGGER_FLAG_SHOW_TOAST)
+            }
         }
 
         return TriggerEntity(

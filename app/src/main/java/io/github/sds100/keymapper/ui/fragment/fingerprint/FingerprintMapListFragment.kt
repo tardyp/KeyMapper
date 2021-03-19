@@ -6,20 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.switchmaterial.SwitchMaterial
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.FingerprintMapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.FingerprintMapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentFingerprintMapListBinding
-import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
 import io.github.sds100.keymapper.ui.fragment.OldRecyclerViewFragment
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.Error
 import splitties.alertdialog.appcompat.*
 
 /**
@@ -74,25 +70,25 @@ class FingerprintMapListFragment
     ) {
         binding.epoxyRecyclerView.withModels {
             model?.forEach {
-                fingerprintMap {
-                    id(it.id)
-                    model(it)
-
-                    onEnabledSwitchClick { view ->
-                        viewModel.setEnabled(it.id, (view as SwitchMaterial).isChecked)
-                    }
-
-                    onErrorClick(object : ErrorClickCallback {
-                        override fun onErrorClick(error: Error) {
-                            viewModel.fixError(error)
-                        }
-                    })
-
-                    onClick { _ ->
-                        val direction = NavAppDirections.actionToConfigFingerprintMap(it.id)
-                        findNavController().navigate(direction)
-                    }
-                }
+//                fingerprintMap {
+//                    id(it.id)
+//                    model(it)
+//
+//                    onEnabledSwitchClick { view ->
+//                        viewModel.setEnabled(it.id, (view as SwitchMaterial).isChecked)
+//                    }
+//
+//                    onErrorClick(object : OnChipClickCallback {
+//                        override fun onErrorClick(error: Error) {
+//                            viewModel.fixError(error)
+//                        }
+//                    })
+//
+//                    onClick { _ ->
+//                        val direction = NavAppDirections.actionToConfigFingerprintMap(it.id)
+//                        findNavController().navigate(direction)
+//                    }
+//                }//TODO
             }
         }
     }
@@ -105,7 +101,8 @@ class FingerprintMapListFragment
                 when (it) {
                     is BuildFingerprintMapModels -> {
                         viewLifecycleScope.launchWhenResumed {
-                            viewModel.setModels(buildModels(it))
+                            //TODO
+//                            viewModel.setModels(buildModels(it))
                         }
                     }
 
@@ -132,28 +129,28 @@ class FingerprintMapListFragment
 
     private fun buildModels(payload: BuildFingerprintMapModels) =
         payload.maps.map {
-            FingerprintMapListItemModel(
-                id = it.key,
-                header = str(FingerprintMapUtils.HEADERS[it.key]!!),
-
-                actionModels = it.value.actionList.map { action ->
-                    action.buildChipModel(
-                        requireContext(), payload.deviceInfoList,
-                        payload.showDeviceDescriptors,
-                        payload.hasRootPermission
-                    )
-                },
-
-                constraintModels = it.value.constraintList.map { constraint ->
-                    constraint.buildModel(requireContext())
-                },
-
-                constraintMode = it.value.constraintMode,
-
-                isEnabled = it.value.isEnabled,
-
-                optionsDescription = it.value.buildOptionsDescription(requireContext())
-            )
+//            FingerprintMapListItemModel(
+//                id = it.key,
+//                header = str(FingerprintMapUtils.HEADERS[it.key]!!),
+//
+//                actionModels = it.value.actionList.map { action ->
+//                    action.buildChipModel(
+//                        requireContext(), payload.deviceInfoList,
+//                        payload.showDeviceDescriptors,
+//                        payload.hasRootPermission
+//                    )
+//                },
+//
+//                constraintModels = it.value.constraintList.map { constraint ->
+//                    constraint.buildModel(requireContext())
+//                },
+//
+//                constraintMode = it.value.constraintMode,
+//
+//                isEnabled = it.value.isEnabled,
+//
+//                optionsDescription = it.value.buildOptionsDescription(requireContext())
+//            )//TODO
         }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =

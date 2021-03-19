@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
+import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
 import kotlinx.serialization.Serializable
 
@@ -17,8 +18,28 @@ data class FingerprintMap(
     val actionDataList: List<FingerprintMapActionData> = emptyList(),
     val constraintList: List<Constraint> = emptyList(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
-    val isEnabled: Boolean = true
+    val isEnabled: Boolean = true,
+    val vibrate: Boolean = false,
+    val vibrateDuration: Defaultable<Int> = Defaultable.Default(),
+    val showToast: Boolean = false
 ) {
+    val options = FingerprintMapOptions(
+        vibrate = Option(
+            value = vibrate,
+            isAllowed = true
+        ),
+
+        vibrateDuration = Option(
+            value = vibrateDuration,
+            isAllowed = vibrate
+        ),
+
+        showToast = Option(
+            value = showToast,
+            isAllowed = true
+        )
+    )
+
     val actionList = actionDataList.map {
         val options = FingerprintMapActionOptions(
             delayBeforeNextAction = Option(
@@ -64,7 +85,7 @@ object FingerprintMapEntityMapper {
         return FingerprintMap(
             id = id,
             actionDataList = entity.actionList.map { FingerprintMapActionEntityMapper.fromEntity(it) },
-            //TODO
+            TODO()
         )
     }
 

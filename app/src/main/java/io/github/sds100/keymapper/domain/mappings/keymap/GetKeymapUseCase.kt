@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.repository.KeymapRepository
-import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 
 /**
  * Created by sds100 on 08/03/2021.
@@ -9,11 +8,10 @@ import io.github.sds100.keymapper.domain.adapter.ExternalDeviceAdapter
 
 class GetKeymapUseCaseImpl(
     private val keymapRepository: KeymapRepository,
-    private val deviceAdapter: ExternalDeviceAdapter
 ) : GetKeymapUseCase {
 
     override suspend operator fun invoke(id: Long): KeyMap {
-        return KeyMapEntityMapper.fromEntity(keymapRepository.getKeymap(id), deviceAdapter)
+        return KeyMapEntityMapper.fromEntity(keymapRepository.getKeymap(id))
     }
 }
 

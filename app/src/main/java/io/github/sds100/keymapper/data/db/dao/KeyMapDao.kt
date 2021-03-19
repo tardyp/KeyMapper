@@ -3,6 +3,7 @@ package io.github.sds100.keymapper.data.db.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.github.sds100.keymapper.data.model.KeyMapEntity
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by sds100 on 18/02/20.
@@ -31,6 +32,9 @@ interface KeyMapDao {
 
     @Query("SELECT * FROM $TABLE_NAME")
     fun getAll(): List<KeyMapEntity>
+
+    @Query("SELECT * FROM $TABLE_NAME")
+    fun getAllFlow(): Flow<List<KeyMapEntity>>
 
     @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=0")
     suspend fun disableAll()

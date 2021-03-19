@@ -1,38 +1,19 @@
 package io.github.sds100.keymapper.util
 
-import android.util.SparseBooleanArray
-import androidx.core.util.forEach
-import androidx.core.util.set
-import androidx.core.util.size
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.hadilq.liveevent.LiveEvent
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Created by sds100 on 11/02/2020.
  */
 
 class SelectionProvider : ISelectionProvider {
-    override val isSelectable: MutableLiveData<Boolean> = MutableLiveData(false)
-    override val selectedCount: MutableLiveData<Int> = MutableLiveData(0)
+    override val isSelectable = MutableStateFlow(false)
 
-    private val _selectionEvents = LiveEvent<SelectionEvent>()
-
-    override val selectionEvents: LiveData<SelectionEvent> = _selectionEvents
-
-    private var _selectedIds = SparseBooleanArray()
-    override val selectedIds: LongArray
-        get() = sequence {
-            _selectedIds.forEach { id, selected ->
-                if (selected) {
-                    yield(id.toLong())
-                }
-            }
-        }.toList().toLongArray()
+    override val selectedIds = MutableStateFlow(emptySet<Long>())
 
     override fun startSelecting(): Boolean {
-        if (isSelectable.value == false) {
-            unselectAll()
+        if (!isSelectable.value) {
+            deselectAll()
 
             isSelectable.value = true
 
@@ -43,55 +24,40 @@ class SelectionProvider : ISelectionProvider {
     }
 
     override fun stopSelecting() {
-        if (isSelectable.value == true) {
+        if (isSelectable.value) {
             isSelectable.value = false
         }
 
-        unselectAll()
+        deselectAll()
     }
 
     override fun toggleSelection(id: Long) {
-        _selectedIds[id.toInt()] = !isSelected(id)
-
-        if (isSelected(id)) {
-            _selectionEvents.value = Selected(id)
-            selectedCount.value = selectedCount.value?.plus(1)
-        } else {
-            _selectionEvents.value = Unselected(id)
-            selectedCount.value = selectedCount.value?.minus(1)
+        selectedIds.value = selectedIds.value.toMutableSet().apply {
+            if (contains(id)) {
+                remove(id)
+            } else {
+                add(id)
+            }
         }
     }
 
     override fun isSelected(id: Long): Boolean {
-        return _selectedIds[id.toInt()]
+        return selectedIds.value.contains(id)
     }
 
-    override fun updateIds(ids: LongArray) {
-        val newSparseArray = SparseBooleanArray()
-
-        ids.forEach {
-            val id = it.toInt()
-            val value = _selectedIds[id]
-
-            newSparseArray.put(id, value)
-        }
-
-        _selectedIds = newSparseArray
+    override fun select(vararg id: Long) {
+        selectedIds.value = selectedIds.value.plus(id.toSet())
     }
 
-    override fun selectAll() {
-        _selectedIds.forEach { key, _ ->
-            _selectedIds[key] = true
-        }
-        selectedCount.value = _selectedIds.size
-        _selectionEvents.value = SelectAll()
+    override fun deselect(vararg id: Long) {
+        selectedIds.value = selectedIds.value.minus(id.toSet())
     }
 
-    private fun unselectAll() {
-        //unselect all the items
-        _selectedIds.forEach { key, _ ->
-            _selectedIds[key] = false
-        }
-        selectedCount.value = 0
+    private fun deselectAll() {
+        selectedIds.value = emptySet()
+    }
+
+    override fun reset() {
+        selectedIds.value = emptySet()
     }
 }

@@ -9,27 +9,23 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.data.model.KeymapListItemModel" />
+            type="io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel" />
 
         <variable
-            name="onClick"
+            name="onCardClick"
             type="View.OnClickListener" />
 
         <variable
-            name="onLongClick"
+            name="onCheckBoxCheckedChange"
+            type="android.widget.CompoundButton.OnCheckedChangeListener" />
+
+        <variable
+            name="onCardLongClick"
             type="View.OnLongClickListener" />
 
         <variable
-            name="onErrorClick"
-            type="io.github.sds100.keymapper.ui.callback.ErrorClickCallback" />
-
-        <variable
-            name="isSelected"
-            type="Boolean" />
-
-        <variable
-            name="isSelectable"
-            type="Boolean" />
+            name="onChipClick"
+            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -40,8 +36,8 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
-        android:onClick="@{onClick}"
-        app:onLongClick="@{onLongClick}">
+        android:onClick="@{onCardClick}"
+        app:onLongClick="@{onCardLongClick}">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,9 +52,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:checked="@={isSelected}"
-                android:onClick="@{onClick}"
-                android:visibility="@{isSelectable ? View.VISIBLE : View.GONE}"
+                android:checked="@{model.isSelected}"
+                android:onCheckedChanged="@{onCheckBoxCheckedChange}"
+                android:visibility="@{model.isSelectable ? View.VISIBLE : View.GONE}"
                 tools:visibility="gone" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,17 +65,14 @@
                     android:id="@+id/textViewExtraInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@{model.extraInfo}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
                     android:textColor="?attr/colorError"
                     android:textSize="14sp"
-                    android:visibility="@{model.isEnabled &amp;&amp; model.hasActions &amp;&amp; model.hasTrigger &amp;&amp; !model.actionsHaveErrors ? View.GONE : View.VISIBLE}"
-                    app:isKeymapEnabled="@{model.isEnabled}"
+                    android:visibility="@{model.extraInfo.empty ? View.GONE : View.VISIBLE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:noActions="@{!model.hasActions}"
-                    app:noTrigger="@{!model.hasTrigger}"
-                    app:actionsHaveErrors="@{model.actionsHaveErrors}"
                     tools:text="Disabled • No Actions • No Triggers"
                     tools:visibility="gone" />
 
@@ -88,14 +81,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:theme="@style/ActionChipGroup"
-                    android:visibility="@{model.hasActions || model.hasConstraints ? View.VISIBLE : View.GONE}"
-                    app:actions="@{model.actionList}"
-                    app:constraintMode="@{model.constraintMode}"
-                    app:constraints="@{model.constraintList}"
-                    app:errorClickCallback="@{onErrorClick}"
+                    android:visibility="@{model.chipList.isEmpty ? View.GONE : View.VISIBLE}"
+                    app:chipUiModels="@{model.chipList}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewExtraInfo"
+                    app:onChipClickCallback="@{onChipClick}"
                     tools:visibility="visible" />
 
                 <TextView
@@ -132,7 +123,7 @@
                     android:text="@string/option_list_header"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:textStyle="bold"
-                    android:visibility="@{model.hasFlags ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{model.hasOptions ? View.VISIBLE : View.GONE}"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewTrigger" />
@@ -142,9 +133,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="@{model.flagsDescription}"
+                    android:text="@{model.optionsDescription}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:visibility="@{model.hasFlags ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{model.hasOptions ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textViewFlagsHeader"
                     app:layout_constraintTop_toTopOf="@id/textViewFlagsHeader"

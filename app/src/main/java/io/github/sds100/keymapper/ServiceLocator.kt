@@ -29,7 +29,7 @@ object ServiceLocator {
     @Volatile
     private var keymapRepository: DefaultKeymapRepository? = null
 
-    fun keymapRepository(context: Context): DefaultKeymapRepository {
+    fun defaultKeymapRepository(context: Context): DefaultKeymapRepository {
         synchronized(this) {
             return keymapRepository ?: createKeymapRepository(context)
         }
@@ -50,6 +50,22 @@ object ServiceLocator {
     fun deviceInfoRepository(context: Context): DeviceInfoCache {
         synchronized(this) {
             return deviceInfoRepository ?: createDeviceInfoRepository(context)
+        }
+    }
+
+    @Volatile
+    private var roomKeymapRepository: RoomKeymapRepository? = null
+
+    fun roomKeymapRepository(context: Context): RoomKeymapRepository {
+        synchronized(this) {
+            val dataBase = database ?: createDatabase(context.applicationContext)
+
+            return roomKeymapRepository ?: RoomKeymapRepository(
+                dataBase.keymapDao(),
+                (context.applicationContext as MyApplication).appCoroutineScope
+            ).also {
+                this.roomKeymapRepository = it
+            }
         }
     }
 
@@ -176,7 +192,7 @@ object ServiceLocator {
 
     private fun createBackupManager(context: Context): IBackupManager {
         return backupManager ?: BackupManager(
-            keymapRepository(context),
+            defaultKeymapRepository(context),
             fingerprintMapRepository(context),
             deviceInfoRepository(context),
             (context.applicationContext as MyApplication).appCoroutineScope,

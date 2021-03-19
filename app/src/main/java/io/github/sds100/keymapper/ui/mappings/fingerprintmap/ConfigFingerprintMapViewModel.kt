@@ -13,7 +13,9 @@ import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
-import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.actions.ActionUiHelper
+import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.ViewLoading
@@ -37,7 +39,9 @@ class ConfigFingerprintMapViewModel(
     configActions: ConfigActionsUseCase<FingerprintMapAction>,
     getActionError: GetActionErrorUseCase,
     testAction: TestActionUseCase,
-    actionListItemMapper: ActionListItemMapper<FingerprintMapAction>,
+    actionUiHelper: ActionUiHelper<FingerprintMapAction>,
+    constraintUiHelper: ConstraintUiHelper,
+    resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel {
 
     companion object {
@@ -55,7 +59,8 @@ class ConfigFingerprintMapViewModel(
         configActions,
         getActionError,
         testAction,
-        actionListItemMapper
+        actionUiHelper,
+        resourceProvider
     )
 
     val constraintListViewModel =
@@ -123,7 +128,9 @@ class ConfigFingerprintMapViewModel(
         private val configActions: ConfigActionsUseCase<FingerprintMapAction>,
         private val getActionError: GetActionErrorUseCase,
         private val testAction: TestActionUseCase,
-        private val actionListItemMapper: ActionListItemMapper<FingerprintMapAction>,
+        private val actionUiHelper: ActionUiHelper<FingerprintMapAction>,
+        private val constraintUiHelper: ConstraintUiHelper,
+        private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
@@ -135,7 +142,9 @@ class ConfigFingerprintMapViewModel(
                 configActions,
                 getActionError,
                 testAction,
-                actionListItemMapper
+                actionUiHelper,
+                constraintUiHelper,
+                resourceProvider
             ) as T
     }
 }

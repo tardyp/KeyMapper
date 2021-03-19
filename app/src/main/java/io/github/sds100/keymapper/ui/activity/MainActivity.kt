@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        ServiceLocator.keymapRepository(this).apply {
+        ServiceLocator.defaultKeymapRepository(this).apply {
             keymapList.observe(this@MainActivity, {
 
                 sendPackageBroadcast(

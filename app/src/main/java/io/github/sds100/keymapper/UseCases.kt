@@ -3,7 +3,9 @@ package io.github.sds100.keymapper
 import android.content.Context
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
+import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 
 /**
@@ -33,4 +35,13 @@ object UseCases {
 
     fun recordTrigger(ctx: Context) =
         (ctx.applicationContext as MyApplication).recordTriggerController
+
+    fun listKeymaps(ctx: Context) = ListKeymapsUseCaseImpl(
+        ServiceLocator.roomKeymapRepository(ctx)
+    )
+
+    fun isConstraintSupported(ctx: Context) = IsConstraintSupportedUseCaseImpl(
+        ServiceLocator.systemFeatureAdapter(ctx),
+        ServiceLocator.permissionAdapter(ctx)
+    )
 }

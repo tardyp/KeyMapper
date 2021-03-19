@@ -8,7 +8,6 @@ import io.github.sds100.keymapper.util.result.Error
  * Created by sds100 on 26/02/2020.
  */
 
-//TODO use sealed class for ChipModel because this is also used by constraints. subclass for error and normal
 data class ActionChipModel(
     val type: ActionType,
     val description: String? = null,

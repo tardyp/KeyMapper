@@ -1,14 +1,13 @@
 package io.github.sds100.keymapper.ui.actions
 
-import android.graphics.drawable.Drawable
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.catch
@@ -16,71 +15,16 @@ import kotlinx.coroutines.flow.map
 import splitties.bitflags.hasFlag
 
 /**
- * Created by sds100 on 22/02/2021.
+ * Created by sds100 on 18/03/2021.
  */
 
-abstract class BaseActionListItemMapper<A : Action>(
-    private val getActionError: GetActionErrorUseCase,
+abstract class BaseActionUiHelper<A>(
     private val appInfoAdapter: AppInfoAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, ActionListItemMapper<A> {
+) : ActionUiHelper<A>, ResourceProvider by resourceProvider {
 
-    override fun map(
-        action: A,
-        canBePerformedError: Error?,
-        actionCount: Int
-    ): ActionListItemState {
-        var title: String? = null
-        var icon: ActionIconInfo? = null
-
-        val error: Error? = getTitle(action.data)
-            .onSuccess {
-                if (action.multiplier.isAllowed && action.multiplier.value is Defaultable.Custom) {
-                    val multiplier = (action.multiplier.value as Defaultable.Custom<Int>).data
-                    title = "${multiplier}x $it"
-                } else {
-                    title = it
-                }
-            }
-            .then { getIcon(action.data) }.onSuccess { icon = it }
-            .errorOrNull() ?: canBePerformedError
-
-        val extraInfo = buildString {
-            val midDot = getString(R.string.middot)
-
-            getOptionLabels(action).forEachIndexed { index, label ->
-                if (index != 0) {
-                    append(" $midDot ")
-                }
-
-                append(label)
-
-                action.delayBeforeNextAction.apply {
-                    if (isAllowed && value is Defaultable.Custom) {
-                        if (this@buildString.isNotBlank()) {
-                            append(" $midDot ")
-                        }
-
-                        append(getString(R.string.action_title_wait, value.data))
-                    }
-                }
-            }
-
-        }.takeIf { it.isNotBlank() }
-
-        return ActionListItemState(
-            id = action.uid,
-            tintType = icon?.tintType ?: TintType.ERROR,
-            icon = icon?.drawable ?: getDrawable(R.drawable.ic_baseline_error_outline_24),
-            title = title,
-            extraInfo = extraInfo,
-            errorMessage = error?.getFullMessage(this),
-            dragAndDrop = actionCount > 1
-        )
-    }
-
-    private fun getTitle(action: ActionData): Result<String> = when (action) {
+    override fun getTitle(action: ActionData): Result<String> = when (action) {
         is OpenAppAction ->
             appInfoAdapter.getAppName(action.packageName).map { appName ->
                 Success(getString(R.string.description_open_app, appName))
@@ -308,51 +252,49 @@ abstract class BaseActionListItemMapper<A : Action>(
         is UrlAction -> getString(R.string.description_url, action.url).success()
     }
 
-    private fun getIcon(action: ActionData): Result<ActionIconInfo> = when (action) {
+    override fun getIcon(action: ActionData): Result<IconInfo> = when (action) {
         CorruptAction -> Error.CorruptActionError
 
-        is KeyEventAction -> ActionIconInfo(
+        is KeyEventAction -> IconInfo(
             drawable = null,
             tintType = TintType.NONE
         ).success()
 
         is OpenAppAction -> appInfoAdapter.getAppIcon(action.packageName).map {
-            ActionIconInfo(it, TintType.NONE).success()
+            IconInfo(it, TintType.NONE).success()
         }.firstBlocking()
 
         is OpenAppShortcutAction -> appInfoAdapter.getAppIcon(action.packageName).map {
-            ActionIconInfo(it, TintType.NONE).success()
+            IconInfo(it, TintType.NONE).success()
         }.firstBlocking()
 
-        is SystemActionData -> ActionIconInfo(
+        is SystemActionData -> IconInfo(
             SystemActionUtils.getIcon(action)?.let { getDrawable(it) },
             TintType.ON_SURFACE
         ).success()
 
-        is IntentAction -> ActionIconInfo(
+        is IntentAction -> IconInfo(
             drawable = null,
             tintType = TintType.NONE
         ).success()
 
-        is PhoneCallAction -> ActionIconInfo(
+        is PhoneCallAction -> IconInfo(
             getDrawable(R.drawable.ic_outline_call_24),
             tintType = TintType.ON_SURFACE
         ).success()
 
-        is TapCoordinateAction -> ActionIconInfo(
+        is TapCoordinateAction -> IconInfo(
             getDrawable(R.drawable.ic_outline_touch_app_24),
             TintType.ON_SURFACE
         ).success()
 
-        is TextAction -> ActionIconInfo(null, TintType.NONE).success()
-        is UrlAction -> ActionIconInfo(null, TintType.NONE).success()
+        is TextAction -> IconInfo(null, TintType.NONE).success()
+        is UrlAction -> IconInfo(null, TintType.NONE).success()
     }
-
-    abstract fun getOptionLabels(action: A): List<String>
-
-    private data class ActionIconInfo(val drawable: Drawable?, val tintType: TintType)
 }
 
-interface ActionListItemMapper<A : Action> {
-    fun map(action: A, canBePerformedError: Error?, actionCount: Int): ActionListItemState
+interface ActionUiHelper<A> {
+    fun getTitle(action: ActionData): Result<String>
+    fun getOptionLabels(action: A): List<String>
+    fun getIcon(action: ActionData): Result<IconInfo>
 }

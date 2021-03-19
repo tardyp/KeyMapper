@@ -28,7 +28,7 @@ class DefaultKeymapRepository internal constructor(
     BackupRestoreUseCase,
     MenuKeymapUseCase,
     CreateKeymapShortcutUseCase,
-KeymapRepository{
+    KeymapRepository {
 
     companion object {
         private val MIGRATIONS = listOf(

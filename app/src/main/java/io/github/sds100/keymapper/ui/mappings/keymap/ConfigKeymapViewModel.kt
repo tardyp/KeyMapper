@@ -18,7 +18,8 @@ import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.actions.ActionListItemMapper
+import io.github.sds100.keymapper.ui.actions.ActionUiHelper
+import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
@@ -45,8 +46,8 @@ class ConfigKeymapViewModel(
     onboardingUseCase: OnboardingUseCase,
     recordTriggerUseCase: RecordTriggerUseCase,
     showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    actionListItemMapper: ActionListItemMapper<KeymapAction>,
-    triggerKeyListItemMapper: TriggerKeyListItemMapper,
+    actionUiHelper: ActionUiHelper<KeymapAction>,
+    constraintUiHelper: ConstraintUiHelper,
     resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel {
 
@@ -61,14 +62,15 @@ class ConfigKeymapViewModel(
         configActions,
         getActionError,
         testAction,
-        actionListItemMapper
+        actionUiHelper,
+        resourceProvider
     )
 
     val triggerViewModel = TriggerViewModel(
         viewModelScope,
         onboardingUseCase,
         configTrigger,
-        triggerKeyListItemMapper,
+        TriggerKeyListItemMapper(resourceProvider),
         recordTriggerUseCase,
         showDeviceInfoUseCase,
         resourceProvider
@@ -159,8 +161,8 @@ class ConfigKeymapViewModel(
         private val onboardingUseCase: OnboardingUseCase,
         private val recordTriggerUseCase: RecordTriggerUseCase,
         private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-        private val actionListItemMapper: ActionListItemMapper<KeymapAction>,
-        private val triggerKeyListItemMapper: TriggerKeyListItemMapper,
+        private val actionUiHelper: ActionUiHelper<KeymapAction>,
+        private val constraintUiHelper: ConstraintUiHelper,
         private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
@@ -177,8 +179,8 @@ class ConfigKeymapViewModel(
                 onboardingUseCase,
                 recordTriggerUseCase,
                 showDeviceInfoUseCase,
-                actionListItemMapper,
-                triggerKeyListItemMapper,
+                actionUiHelper,
+                constraintUiHelper,
                 resourceProvider
             ) as T
     }

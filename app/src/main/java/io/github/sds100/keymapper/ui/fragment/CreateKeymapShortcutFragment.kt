@@ -9,15 +9,12 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.keymap
-import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.Error
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
@@ -105,21 +102,21 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
     ) {
         binding.epoxyRecyclerView.withModels {
             model?.forEach {
-                keymap {
-                    id(it.id)
-                    model(it)
-                    isSelectable(false)
-
-                    onErrorClick(object : ErrorClickCallback {
-                        override fun onErrorClick(error: Error) {
-                            viewModel.fixError(error)
-                        }
-                    })
-
-                    onClick { _ ->
-                        viewModel.chooseKeymap(it.uid)
-                    }
-                }
+//                keymap {
+//                    id(it.id)
+//                    model(it)
+//                    isSelectable(false)
+//
+//                    onErrorClick(object : OnChipClickCallback {
+//                        override fun onErrorClick(error: Error) {
+//                            viewModel.fixError(error)
+//                        }
+//                    })
+//
+//                    onClick { _ ->
+//                        viewModel.chooseKeymap(it.uid)
+//                    }
+//                } TODO
             }
         }
     }
@@ -132,29 +129,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
 
     private fun buildModelList(payload: BuildKeymapListModels) =
         payload.keymapList.map { keymap ->
-            KeymapListItemModel(
-                id = keymap.id,
-                actionList = keymap.actionList.map {
-                    it.buildChipModel(
-                        requireContext(),
-                        payload.deviceInfoList,
-                        payload.showDeviceDescriptors,
-                        payload.hasRootPermission
-                    )
-                },
-
-                triggerDescription = keymap.trigger.buildDescription(
-                    requireContext(),
-                    payload.deviceInfoList,
-                    payload.showDeviceDescriptors
-                ),
-
-                constraintList = keymap.constraintList.map { it.buildModel(requireContext()) },
-                constraintMode = keymap.constraintMode,
-                flagsDescription = keymap.trigger.buildTriggerFlagsDescription(requireContext()),
-                isEnabled = keymap.isEnabled,
-                uid = keymap.uid
-            )
+            TODO()
         }
 
     override fun onBackPressed() {

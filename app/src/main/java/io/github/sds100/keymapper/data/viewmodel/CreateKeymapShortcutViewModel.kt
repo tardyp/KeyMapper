@@ -2,10 +2,10 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.usecase.CreateKeymapShortcutUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.Error

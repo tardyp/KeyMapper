@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.data.viewmodel
 
+import androidx.annotation.MenuRes
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import kotlinx.coroutines.flow.launchIn
@@ -39,6 +40,18 @@ class HomeViewModel(private val onboarding: OnboardingUseCase) : ViewModel() {
 
     fun approvedQuickStartGuideTapTarget() = onboarding.shownQuickStartGuideHint()
 
+    fun onNavigationMenuClick() {
+        //TODO stop selecting key maps
+    }
+
+    fun onBackPressed() {
+        //TODO move key maplistviewmodel to here. stop selecting if in selection mode
+    }
+
+    fun onDeleteFabPressed() {
+        //TODO stop selecting and delete selected keymaps
+    }
+
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val onboardingUseCase: OnboardingUseCase
@@ -49,3 +62,8 @@ class HomeViewModel(private val onboarding: OnboardingUseCase) : ViewModel() {
         }
     }
 }
+
+data class HomeState(
+    val enableViewPagingSwiping: Boolean,
+    @MenuRes val menuId: Int
+)

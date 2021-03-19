@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.util
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
@@ -13,18 +12,16 @@ import androidx.core.widget.TextViewCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.ui.callback.ErrorClickCallback
+import io.github.sds100.keymapper.ui.ChipUi
+import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.view.SquareImageButton
 import io.github.sds100.keymapper.ui.view.StatusLayout
-import io.github.sds100.keymapper.util.result.Failure
-import io.github.sds100.keymapper.util.result.getBriefMessage
 import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.list_item_status.view.*
 
@@ -107,21 +104,7 @@ fun TextView.markdown(markdown: OldDataState<String>) {
 
 @BindingAdapter("app:tintType")
 fun AppCompatImageView.tintType(tintType: TintType?) {
-    tintType ?: clearColorFilter()
-
-    when (tintType) {
-        TintType.NONE -> clearColorFilter()
-        TintType.ON_SURFACE -> {
-            val color = context.styledColor(R.attr.colorOnSurface)
-
-            setColorFilter(color)
-        }
-        TintType.ERROR -> {
-            val color = context.styledColor(R.attr.colorError)
-
-            setColorFilter(color)
-        }
-    }
+    tintType?.toColor(context)?.let { setColorFilter(it) } ?: clearColorFilter()
 }
 
 @BindingAdapter("app:errorWhenEmpty")
@@ -145,225 +128,19 @@ fun TextInputLayout.errorWhenEmpty(enabled: Boolean) {
     }
 }
 
-@BindingAdapter("app:errorText")
-fun TextInputLayout.errorText(text: String?) {
-    error = text
-}
-
 @BindingAdapter("app:onLongClick")
 fun setLongClickListener(view: View, onLongClickListener: View.OnLongClickListener?) {
     view.setOnLongClickListener(onLongClickListener)
 }
 
-@BindingAdapter("app:actions", "app:errorClickCallback", requireAll = true)
-fun ChipGroup.bindActions(actions: List<ActionChipModel>, callback: ErrorClickCallback) {
-
-    actions.forEach { action ->
-        if (action.hasError) {
-            context.errorChipButton(action.error!!, callback).apply {
-                addView(this)
-            }
-        } else {
-            val iconTint = if (action.type == ActionType.SYSTEM_ACTION) {
-                styledColorSL(R.attr.colorOnSurface)
-            } else {
-                null
-            }
-
-            context.normalChipButton(action.description, action.icon, iconTint).apply {
-                addView(this)
-            }
-        }
-    }
+@BindingAdapter("app:errorText")
+fun TextInputLayout.errorText(text: String?) {
+    error = text
 }
-
-@BindingAdapter(
-    "app:actions",
-    "app:constraints",
-    "app:constraintMode",
-    "app:errorClickCallback",
-    requireAll = true
-)
-fun ChipGroup.bindActionsAndConstraints(
-    actions: List<ActionChipModel>,
-    constraints: List<ConstraintModel>,
-    constraintMode: Int,
-    callback: ErrorClickCallback
-) {
-    removeAllViews()
-
-    bindActions(actions, callback)
-
-    //TODO this logic should be moved to the view model. create a Transparent sub class in ChipModel sealed class
-    if (actions.isNotEmpty() && constraints.isNotEmpty()) {
-        Chip(context).apply {
-            text = str(R.string.chip_while)
-
-            isClickable = false
-            isFocusable = false
-            isCheckable = false
-            isEnabled = false
-
-            chipStrokeWidth = 0f
-
-            addView(this)
-        }
-    }
-
-    bindConstraints(constraints, constraintMode, callback)
-}
-
-@BindingAdapter(
-    "app:isKeymapEnabled",
-    "app:noActions",
-    "app:noTrigger",
-    "app:actionsHaveErrors",
-    requireAll = false
-)
-fun TextView.setKeymapExtraInfo(
-    isKeymapEnabled: Boolean = false,
-    noActions: Boolean = false,
-    noTrigger: Boolean = false,
-    actionsHaveErrors: Boolean = false
-) {
-    text = buildString {
-        val interpunct = str(R.string.middot)
-
-        if (!isKeymapEnabled) {
-            append(str(R.string.disabled))
-        }
-
-        if (actionsHaveErrors) {
-            if (this.isNotEmpty()) {
-                append(" $interpunct ")
-            }
-
-            append(str(R.string.tap_actions_to_fix))
-        }
-
-        if (noActions) {
-            if (this.isNotEmpty()) {
-                append(" $interpunct ")
-            }
-
-            append(str(R.string.no_actions))
-        }
-
-        if (noTrigger) {
-            if (this.isNotEmpty()) {
-                append(" $interpunct ")
-            }
-            append(str(R.string.no_trigger))
-        }
-    }
-}
-
-@BindingAdapter("app:triggerModel")
-fun ChipGroup.bindTriggerModel(triggerChipModel: TriggerChipModel) {
-    val separatorDrawable = when (triggerChipModel.triggerMode) {
-        TriggerEntity.PARALLEL -> drawable(R.drawable.ic_baseline_add_24)
-        TriggerEntity.SEQUENCE -> drawable(R.drawable.ic_baseline_arrow_forward_24)
-        else -> drawable(R.drawable.ic_baseline_add_24)
-    }
-
-    removeAllViews()
-
-    triggerChipModel.triggerKeyDescriptions.forEachIndexed { index, description ->
-
-        //add a chip which is either a + or -> depending on the trigger mode
-        if (index != 0) {
-            Chip(context).apply {
-
-                chipIcon = separatorDrawable
-
-                chipStrokeWidth = 0f
-                textStartPadding = 0f
-                textEndPadding = 0f
-                setChipIconTintResource(R.color.iconTintTriggerKeySeparator)
-
-                addView(this)
-            }
-        }
-
-        Chip(context).apply {
-            text = description
-
-            addView(this)
-        }
-    }
-}
-
-@BindingAdapter(
-    "app:constraints",
-    "app:constraintMode",
-    "app:errorClickCallback",
-    requireAll = true
-)
-fun ChipGroup.bindConstraints(
-    constraintList: List<ConstraintModel>,
-    constraintMode: Int,
-    callback: ErrorClickCallback
-) {
-    val separatorText = when (constraintMode) {
-        ConstraintEntity.MODE_AND -> str(R.string.constraint_mode_and)
-        ConstraintEntity.MODE_OR -> str(R.string.constraint_mode_or)
-        else -> str(R.string.constraint_mode_and)
-    }
-
-    constraintList.forEachIndexed { index, model ->
-
-        //add a chip which is either a + or -> depending on the trigger mode
-        if (index != 0) {
-            Chip(context).apply {
-                text = separatorText
-
-                chipStrokeWidth = 0f
-
-                addView(this)
-            }
-        }
-
-        if (model.hasError) {
-            context.errorChipButton(model.failure!!, callback).apply {
-                addView(this)
-            }
-        } else {
-            val iconTint = if (model.iconTintOnSurface) {
-                styledColorSL(R.attr.colorOnSurface)
-            } else {
-                null
-            }
-
-            context.normalChipButton(model.description, model.icon, iconTint).apply {
-                addView(this)
-            }
-        }
-    }
-}
-
-@BindingAdapter("app:flagModels")
-fun ChipGroup.bindFlagModels(flagModels: List<FlagModel>) {
-    removeAllViews()
-
-    flagModels.forEach {
-        Chip(context).apply {
-            text = it.text
-            chipIcon = drawable(it.icon!!)
-
-            addView(this)
-        }
-    }
-}
-
 
 @BindingAdapter("app:onChangeListener")
 fun SeekBar.setOnChangeListener(onChangeListener: SeekBar.OnSeekBarChangeListener) {
     setOnSeekBarChangeListener(onChangeListener)
-}
-
-@BindingAdapter("app:onSliderChangeListener")
-fun Slider.setOnChangeListener(onChangeListener: Slider.OnChangeListener) {
-    addOnChangeListener(onChangeListener)
 }
 
 @BindingAdapter("app:seekBarEnabled")
@@ -394,30 +171,51 @@ fun SquareImageButton.openUrlOnClick(url: Int?) {
     }
 }
 
+@BindingAdapter("app:chipUiModels", "app:onChipClickCallback", requireAll = true)
+fun ChipGroup.setChipUiModels(
+    models: List<ChipUi>,
+    onClick: OnChipClickCallback
+) {
+    models.forEach { model ->
+        when (model) {
+            is ChipUi.Error -> addView(context.errorChipButton(model, onClick))
+            is ChipUi.Normal -> addView(context.normalChipButton(model))
+            is ChipUi.Transparent -> addView(context.transparentChipButton(model))
+        }
+    }
+}
+
 private fun Context.normalChipButton(
-    text: String?,
-    icon: Drawable?,
-    iconTint: ColorStateList?
+    chipUi: ChipUi.Normal
 ) = baseChipButton().apply {
     isEnabled = false
 
-    this.text = text
-    this.icon = icon
-    this.iconTint = iconTint
+    this.text = chipUi.text
+    this.icon = chipUi.icon?.drawable
+    this.iconTint = chipUi.icon?.tintType?.toColorStateList(context)
+    setBackgroundColor(styledColor(R.attr.colorSurface))
+}
+
+private fun Context.transparentChipButton(
+    chipUi: ChipUi.Transparent
+) = baseChipButton().apply {
+    isEnabled = false
+
+    this.text = chipUi.text
     setBackgroundColor(styledColor(R.attr.colorSurface))
 }
 
 private fun Context.errorChipButton(
-    error: Failure,
-    callback: ErrorClickCallback
+    model: ChipUi.Error,
+    callback: OnChipClickCallback
 ) = baseChipButton().apply {
     isEnabled = true
-    icon = context.safeVectorDrawable(R.drawable.ic_outline_error_outline_64)
+    icon = context.drawable(R.drawable.ic_outline_error_outline_64)
     setBackgroundColor(color(R.color.cardTintRed))
     iconTint = styledColorSL(R.attr.colorError)
 
-    text = error.getBriefMessage(context)
-    setOnClickListener { callback.onErrorClick(error) }
+    text = model.text
+    setOnClickListener { callback.onChipClick(model) }
 }
 
 private fun Context.baseChipButton() =
@@ -441,4 +239,18 @@ private fun Context.baseChipButton() =
         setTextColor(styledColor(R.attr.colorOnSurface))
 
         iconSize = resources.getDimensionPixelSize(R.dimen.button_chip_icon_size)
+    }
+
+private fun TintType.toColorStateList(ctx: Context): ColorStateList? =
+    when (this) {
+        TintType.NONE -> null
+        TintType.ON_SURFACE -> ctx.styledColorSL(R.attr.colorOnSurface)
+        TintType.ERROR -> ctx.styledColorSL(R.attr.colorError)
+    }
+
+private fun TintType.toColor(ctx: Context): Int? =
+    when (this) {
+        TintType.NONE -> null
+        TintType.ON_SURFACE -> ctx.styledColor(R.attr.colorOnSurface)
+        TintType.ERROR -> ctx.styledColor(R.attr.colorError)
     }

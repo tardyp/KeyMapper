@@ -22,7 +22,6 @@ import androidx.work.WorkManager
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.data.model.ChooseAppStoreModel
-import io.github.sds100.keymapper.data.model.KeymapListItemModel
 import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.databinding.DialogChooseAppStoreBinding
 import io.github.sds100.keymapper.databinding.FragmentHomeBinding
@@ -33,7 +32,6 @@ import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import io.github.sds100.keymapper.util.result.RecoverableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -81,13 +79,6 @@ class HomeFragment : Fragment() {
             intent ?: return
 
             when (intent.action) {
-                //TODO remove and replace with observing invalidate error in getactionerrorusecase
-                /*when the input method changes, update the action descriptions in case any need to show an error
-                * that they need the input method to be enabled. */
-                Intent.ACTION_INPUT_METHOD_CHANGED -> {
-                    keymapListViewModel.rebuildModels()
-                    fingerprintMapListViewModel.rebuildModels()
-                }
 
                 MyAccessibilityService.ACTION_ON_START -> {
                     accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
@@ -159,7 +150,7 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner
         ) {
 
-            keymapListViewModel.rebuildModels()
+            keymapListViewModel.rebuildUiState()
         }
 
         FragmentHomeBinding.inflate(inflater, container, false).apply {
@@ -219,7 +210,7 @@ class HomeFragment : Fragment() {
                     }
 
                     R.id.action_select_all -> {
-                        keymapListViewModel.selectionProvider.selectAll()
+                        keymapListViewModel.selectAll()
                         true
                     }
 
@@ -236,13 +227,12 @@ class HomeFragment : Fragment() {
                     }
 
                     R.id.action_duplicate_keymap -> {
-                        keymapListViewModel
-                            .duplicate(*keymapListViewModel.selectionProvider.selectedIds)
+                        keymapListViewModel.duplicateSelectedKeymaps()
                         true
                     }
 
                     R.id.action_backup -> {
-                        keymapListViewModel.requestBackupSelectedKeymaps()
+                        keymapListViewModel.backupSelectedKeymaps()
                         true
                     }
 
@@ -251,38 +241,18 @@ class HomeFragment : Fragment() {
             }
 
             requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-                if (keymapListViewModel.selectionProvider.isSelectable.value == true) {
-                    keymapListViewModel.selectionProvider.stopSelecting()
-                } else {
-                    requireActivity().finish()
-                }
+                homeViewModel.onBackPressed()
             }
 
             appBar.setNavigationOnClickListener {
-                if (keymapListViewModel.selectionProvider.isSelectable.value == true) {
-                    keymapListViewModel.selectionProvider.stopSelecting()
-                } else {
-                    findNavController().navigate(R.id.action_global_menuFragment)
-                }
+                homeViewModel.onNavigationMenuClick()
             }
 
-            keymapListViewModel.selectionProvider.isSelectable
-                .observe(viewLifecycleOwner, { isSelectable ->
-                    viewPager.isUserInputEnabled = !isSelectable
-
-                    if (isSelectable) {
-                        appBar.replaceMenu(R.menu.menu_multi_select)
-                    } else {
-                        appBar.replaceMenu(R.menu.menu_home)
-                    }
-                })
-
-            isSelectable = keymapListViewModel.selectionProvider.isSelectable
-            selectionCount = keymapListViewModel.selectionProvider.selectedCount
+            isSelectable = MutableLiveData(false) //TODO
+            selectionCount = MutableLiveData(0) //TODO
 
             setOnConfirmSelectionClick {
-                keymapListViewModel.delete(*keymapListViewModel.selectionProvider.selectedIds)
-                keymapListViewModel.selectionProvider.stopSelecting()
+                homeViewModel.onDeleteFabPressed()
             }
 
             backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
@@ -385,16 +355,16 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            keymapListViewModel.eventStream.observe(viewLifecycleOwner, {
-                when (it) {
-                    is FixFailure -> coordinatorLayout.showFixActionSnackBar(
-                        it.error,
-                        requireContext(),
-                        recoverFailureDelegate,
-                        findNavController()
-                    )
-                }
-            })
+//            keymapListViewModel.eventStream.observe(viewLifecycleOwner, {
+//                when (it) {
+//                    is FixFailure -> coordinatorLayout.showFixActionSnackBar(
+//                        it.error,
+//                        requireContext(),
+//                        recoverFailureDelegate,
+//                        findNavController()
+//                    )
+//                }
+//            }) //TODO
 
             fingerprintMapListViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
@@ -434,7 +404,6 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        keymapListViewModel.rebuildModels()
         fingerprintMapListViewModel.rebuildModels()
 
         updateStatusLayouts()
@@ -481,23 +450,23 @@ class HomeFragment : Fragment() {
             writeSettingsStatusState.value = StatusLayout.State.WARN
         }
 
-        if (KeyboardUtils.isCompatibleImeEnabled()) {
-            imeServiceStatusState.value = StatusLayout.State.POSITIVE
-
-        } else if (keymapListViewModel.model.value is Data) {
-
-            if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
-                    .data.any { keymap ->
-                        keymap.actionList.any { it.error is RecoverableError.NoCompatibleImeEnabled }
-                    }
-            ) {
-
-                imeServiceStatusState.value = StatusLayout.State.ERROR
-            }
-
-        } else {
-            imeServiceStatusState.value = StatusLayout.State.WARN
-        }
+//        if (KeyboardUtils.isCompatibleImeEnabled()) {
+//            imeServiceStatusState.value = StatusLayout.State.POSITIVE
+//
+//        } else if (keymapListViewModel.model.value is Data) {
+//
+//            if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
+//                    .data.any { keymap ->
+//                        keymap.actionList.any { it.error is RecoverableError.NoCompatibleImeEnabled }
+//                    }
+//            ) {
+//
+//                imeServiceStatusState.value = StatusLayout.State.ERROR
+//            }
+//
+//        } else {
+//            imeServiceStatusState.value = StatusLayout.State.WARN
+//        } //TODO
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionUtils.isPermissionGranted(
