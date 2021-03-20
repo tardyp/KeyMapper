@@ -1,9 +1,9 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
 import android.os.Bundle
-import androidx.lifecycle.*
-import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.ConstraintEntity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -22,16 +22,14 @@ import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
-import io.github.sds100.keymapper.util.ViewLoading
-import io.github.sds100.keymapper.util.ViewPopulated
-import io.github.sds100.keymapper.util.ViewState
 import io.github.sds100.keymapper.util.result.RecoverableError
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 22/11/20.
@@ -61,7 +59,7 @@ class ConfigKeymapViewModel(
         private const val STATE_KEY = "config_keymap"
     }
 
-    override val actionListViewModel = ActionListViewModel(
+    val actionListViewModel = ActionListViewModel(
         viewModelScope,
         configActions,
         getActionError,
@@ -88,49 +86,40 @@ class ConfigKeymapViewModel(
         resourceProvider
     )
 
-    //TODO delete this
-    private val dataState = MutableLiveData<ConfigKeymapState?>()
+    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading()))
 
-    //TODO hide UI elements if loading
-    private val _viewState = MutableLiveData<ViewState>(ViewLoading())
-    override val viewState: LiveData<ViewState> = _viewState
-
-    private val supportedConstraints =
-        ConstraintEntity.COMMON_SUPPORTED_CONSTRAINTS.toMutableList().apply {
-            add(ConstraintEntity.SCREEN_ON)
-            add(ConstraintEntity.SCREEN_OFF)
-        }.toList()
-
-    override val isEnabled = dataState.map { it?.isEnabled ?: false }
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
-    private val _fixError = LiveEvent<RecoverableError>().apply {
-        //TODO use sharedflow
-    }
-    override val fixError: LiveData<RecoverableError> = _fixError
+    override val fixError = MutableSharedFlow<RecoverableError>()
+    override val enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
 
-    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>().apply {
-        addSource(actionListViewModel.enableAccessibilityServicePrompt) {
-            this.value = it
-        }
-
-        addSource(triggerViewModel.enableAccessibilityServicePrompt) {
-            this.value = it
-        }
-    }
-    override val enableAccessibilityServicePrompt: LiveData<Unit> =
-        _enableAccessibilityServicePrompt
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
-        configUseCase.state.onEach {
-            if (it is State.Data) {
-                dataState.value = it.data
-                _viewState.value = ViewPopulated()
-            } else {
-                dataState.value = null
-                _viewState.value = ViewLoading()
+        viewModelScope.launch {
+            combine(rebuildUiState, configUseCase.state) { _, configState ->
+                buildUiState(configState)
+            }.collectLatest {
+                state.value = it
             }
-        }.launchIn(viewModelScope)
+        }
+
+        viewModelScope.launch {
+            merge(actionListViewModel.fixError, constraintListViewModel.fixError).collectLatest {
+                fixError.emit(it)
+            }
+        }
+
+        viewModelScope.launch {
+            merge(
+                actionListViewModel.enableAccessibilityServicePrompt,
+                triggerViewModel.enableAccessibilityServicePrompt
+            ).collectLatest {
+                enableAccessibilityServicePrompt.emit(it)
+            }
+        }
+
+        runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
     override fun save() = configUseCase.getKeymap().ifIsData { save(it) }
@@ -157,7 +146,21 @@ class ConfigKeymapViewModel(
         }
     }
 
+    override fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
+        actionListViewModel.rebuildUiState()
+        constraintListViewModel.rebuildUiState()
+        triggerViewModel.rebuildUiState()
+    }
+
     override fun addAction(actionData: ActionData) = actionListViewModel.addAction(actionData)
+
+    private fun buildUiState(configState: State<ConfigKeymapState>): ConfigKeymapUiState {
+        return when (configState) {
+            is State.Data -> ConfigKeymapUiState(configState.data.isEnabled)
+            is State.Loading -> ConfigKeymapUiState(isEnabled = false)
+        }
+    }
 
     class Factory(
         private val saveKeymap: SaveKeymapUseCase,
@@ -198,3 +201,7 @@ class ConfigKeymapViewModel(
             ) as T
     }
 }
+
+data class ConfigKeymapUiState(
+    override val isEnabled: Boolean
+) : ConfigMappingUiState

@@ -24,9 +24,9 @@ fun CoordinatorLayout.showEnableAccessibilityServiceSnackBar() {
     }
 }
 
-fun CoordinatorLayout.showFixActionSnackBar(
-    error: Error,
+fun CoordinatorLayout.showFixErrorSnackBar(
     ctx: Context,
+    error: Error,
     recoverFailureDelegate: RecoverFailureDelegate,
     navController: NavController
 ) {

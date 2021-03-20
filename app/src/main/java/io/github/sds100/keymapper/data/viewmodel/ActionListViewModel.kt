@@ -1,7 +1,5 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import androidx.lifecycle.LiveData
-import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
@@ -45,8 +43,8 @@ class ActionListViewModel<A : Action>(
     private val _fixError = MutableSharedFlow<RecoverableError>()
     val fixError = _fixError.asSharedFlow()
 
-    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
-    val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
+    private val _enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
+    val enableAccessibilityServicePrompt = _enableAccessibilityServicePrompt.asSharedFlow()
 
     private val _chooseAction = MutableSharedFlow<Unit>()
     val chooseAction = _chooseAction.asSharedFlow()
@@ -91,7 +89,9 @@ class ActionListViewModel<A : Action>(
     }
 
     fun promptToEnableAccessibilityService() {
-        _enableAccessibilityServicePrompt.value = Unit
+        runBlocking {
+            _enableAccessibilityServicePrompt.emit(Unit)
+        }
     }
 
     fun onAddActionClick() {

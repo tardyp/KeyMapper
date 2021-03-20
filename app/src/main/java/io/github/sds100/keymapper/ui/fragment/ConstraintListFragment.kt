@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.ui.fragment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import io.github.sds100.keymapper.constraint
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewState
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
@@ -60,7 +61,16 @@ abstract class ConstraintListFragment
             if (state.constraintList !is ListState.Loaded) return@withModels
 
             state.constraintList.data.forEach { model ->
+                constraint {
+                    model(model)
+                    onCardClick { _ ->
+                        constraintListViewModel.onListItemClick(model.id)
+                    }
 
+                    onRemoveClick { _ ->
+                        constraintListViewModel.onRemoveConstraintClick(model.id)
+                    }
+                }
             }
         }
     }

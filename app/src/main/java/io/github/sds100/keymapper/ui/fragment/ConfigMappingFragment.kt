@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
@@ -20,6 +19,7 @@ import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -64,11 +64,12 @@ abstract class ConfigMappingFragment : Fragment() {
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
         ) {
-            viewModel.actionListViewModel.rebuildUiState()
+            viewModel.rebuildUiState()
         }
 
         FragmentConfigMappingBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
+            viewModel = this@ConfigMappingFragment.viewModel
             _binding = this
 
             return this.root
@@ -80,7 +81,6 @@ abstract class ConfigMappingFragment : Fragment() {
 
         val fragmentInfoList = getFragmentInfoList()
 
-        binding.viewModel = viewModel
         binding.viewPager.adapter = GenericFragmentPagerAdapter(
             this,
             fragmentInfoList.map { it.first.toLong() to it.second.instantiate }
@@ -140,18 +140,22 @@ abstract class ConfigMappingFragment : Fragment() {
             }
         }
 
-        viewModel.enableAccessibilityServicePrompt.observe(viewLifecycleOwner, {
-            binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
-        })
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.enableAccessibilityServicePrompt.collectLatest {
+                binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
+            }
+        }
 
-        viewModel.fixError.observe(viewLifecycleOwner, {
-            binding.coordinatorLayout.showFixActionSnackBar(
-                it,
-                requireContext(),
-                recoverFailureDelegate,
-                findNavController()
-            )
-        })
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.fixError.collectLatest {
+                binding.coordinatorLayout.showFixErrorSnackBar(
+                    requireContext(),
+                    it,
+                    recoverFailureDelegate,
+                    findNavController()
+                )
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

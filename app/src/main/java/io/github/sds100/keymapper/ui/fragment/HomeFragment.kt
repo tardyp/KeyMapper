@@ -368,12 +368,13 @@ class HomeFragment : Fragment() {
 
             fingerprintMapListViewModel.eventStream.observe(viewLifecycleOwner, {
                 when (it) {
-                    is FixFailure -> coordinatorLayout.showFixActionSnackBar(
-                        it.error,
-                        requireContext(),
-                        recoverFailureDelegate,
-                        findNavController()
-                    )
+//                    is FixFailure -> coordinatorLayout.showFixErrorSnackBar(
+//                        it.error,
+//                        requireContext(),
+//                        recoverFailureDelegate,
+//                        findNavController()
+//                    )
+                    //TODO
                 }
             })
 

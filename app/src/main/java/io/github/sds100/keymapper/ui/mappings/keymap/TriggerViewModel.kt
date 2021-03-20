@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
 import android.view.KeyEvent
-import androidx.lifecycle.LiveData
-import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
@@ -42,9 +40,10 @@ class TriggerViewModel(
         useCase
     )
 
-    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
-    val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
+    private val _enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
+    val enableAccessibilityServicePrompt = _enableAccessibilityServicePrompt.asSharedFlow()
 
+    //TODO dialogs
     private val _showEnableCapsLockKeyboardLayoutPrompt = MutableSharedFlow<Unit>()
     val showEnableCapsLockKeyboardLayoutPrompt =
         _showEnableCapsLockKeyboardLayoutPrompt.asSharedFlow()
@@ -75,8 +74,6 @@ class TriggerViewModel(
             useCase.setSequenceTriggerMode()
         }
     }
-
-    fun setUndefinedTriggerMode() = useCase.setUndefinedTriggerMode()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -150,7 +147,7 @@ class TriggerViewModel(
         when (recordTrigger.state.value) {
             is RecordTriggerState.CountingDown -> recordTrigger.stopRecording()
             RecordTriggerState.Stopped -> recordTrigger.startRecording().onFailure {
-                _enableAccessibilityServicePrompt.value = Unit
+                runBlocking { _enableAccessibilityServicePrompt.emit(Unit) }
             }
         }
     }

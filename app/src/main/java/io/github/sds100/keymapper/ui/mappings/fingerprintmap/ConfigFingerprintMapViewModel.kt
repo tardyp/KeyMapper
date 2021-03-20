@@ -1,8 +1,9 @@
 package io.github.sds100.keymapper.ui.mappings.fingerprintmap
 
 import android.os.Bundle
-import androidx.lifecycle.*
-import com.hadilq.liveevent.LiveEvent
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -15,15 +16,13 @@ import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.util.ViewLoading
-import io.github.sds100.keymapper.util.ViewPopulated
-import io.github.sds100.keymapper.util.ViewState
 import io.github.sds100.keymapper.util.result.RecoverableError
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -47,13 +46,7 @@ class ConfigFingerprintMapViewModel(
         private const val STATE_KEY = "config_fingerprint_map"
     }
 
-    private val dataState = MutableLiveData<ConfigFingerprintMapState?>()
-
-    //TODO hide UI elements if loading
-    private val _viewState = MutableLiveData<ViewState>(ViewLoading())
-    override val viewState: LiveData<ViewState> = _viewState
-
-    override val actionListViewModel = ActionListViewModel(
+    val actionListViewModel = ActionListViewModel(
         viewModelScope,
         configActions,
         getActionError,
@@ -64,36 +57,37 @@ class ConfigFingerprintMapViewModel(
 
     val constraintListViewModel: ConstraintListViewModel = TODO()
 
-    override val isEnabled = dataState.map { it?.isEnabled ?: false }
+    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading()))
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
-    private val _fixError = LiveEvent<RecoverableError>().apply {
-//        addSource(actionListViewModel.fixError) {
-//            this.value = it
-//        } //TODO
-    }
-    override val fixError: LiveData<RecoverableError> = _fixError
+    override val fixError = MutableSharedFlow<RecoverableError>()
+    override val enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
 
-    private val _enableAccessibilityServicePrompt = LiveEvent<Unit>().apply {
-        addSource(actionListViewModel.enableAccessibilityServicePrompt) {
-            this.value = it
-        }
-    }
-
-    override val enableAccessibilityServicePrompt: LiveData<Unit> =
-        _enableAccessibilityServicePrompt
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
-        configUseCase.state.onEach {
-            if (it is State.Data) {
-                dataState.value = it.data
-                _viewState.value = ViewPopulated()
-            } else {
-                dataState.value = null
-                _viewState.value = ViewLoading()
+        viewModelScope.launch {
+            combine(rebuildUiState, configUseCase.state) { _, configState ->
+                buildUiState(configState)
+            }.collectLatest {
+                state.value = it
             }
-        }.launchIn(viewModelScope)
+        }
+
+        viewModelScope.launch {
+            merge(actionListViewModel.fixError, constraintListViewModel.fixError).collectLatest {
+                fixError.emit(it)
+            }
+        }
+
+        viewModelScope.launch {
+            merge(actionListViewModel.enableAccessibilityServicePrompt).collectLatest {
+                enableAccessibilityServicePrompt.emit(it)
+            }
+        }
+
+        runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
     override fun save() = configUseCase.getFingerprintMap().ifIsData { save(it) }
@@ -117,7 +111,20 @@ class ConfigFingerprintMapViewModel(
         }
     }
 
+    override fun rebuildUiState() {
+        actionListViewModel.rebuildUiState()
+        constraintListViewModel.rebuildUiState()
+        //TODO rebuild options viewmodel
+    }
+
     override fun addAction(actionData: ActionData) = actionListViewModel.addAction(actionData)
+
+    private fun buildUiState(configState: State<ConfigFingerprintMapState>): ConfigFingerprintMapUiState {
+        return when (configState) {
+            is State.Data -> ConfigFingerprintMapUiState(configState.data.isEnabled)
+            is State.Loading -> ConfigFingerprintMapUiState(isEnabled = false)
+        }
+    }
 
     class Factory(
         private val save: SaveFingerprintMapUseCase,
@@ -146,3 +153,7 @@ class ConfigFingerprintMapViewModel(
             ) as T
     }
 }
+
+data class ConfigFingerprintMapUiState(
+    override val isEnabled: Boolean
+) : ConfigMappingUiState

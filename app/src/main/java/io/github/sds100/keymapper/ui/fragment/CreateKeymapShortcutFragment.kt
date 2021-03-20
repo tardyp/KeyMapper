@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
@@ -62,12 +61,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         viewModel.eventStream.observe(viewLifecycleOwner, { event ->
             when (event) {
                 is FixFailure ->
-                    binding.coordinatorLayout.showFixActionSnackBar(
-                        event.error,
-                        requireContext(),
-                        recoverFailureDelegate,
-                        findNavController()
-                    )
+                    TODO()
 
                 is EnableAccessibilityServicePrompt ->
                     binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
