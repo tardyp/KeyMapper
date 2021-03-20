@@ -179,7 +179,7 @@ object InjectorUtils {
         return ConfigKeymapViewModel.Factory(
             SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             GetKeymapUseCaseImpl(
-                ServiceLocator.defaultKeymapRepository(ctx)
+                ServiceLocator.roomKeymapRepository(ctx)
             ),
             configKeymapUseCase,
             configKeymapUseCase.configActions,

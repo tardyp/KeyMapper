@@ -45,6 +45,12 @@ class KeymapListViewModel internal constructor(
 
     override val state = MutableStateFlow<ListState<KeymapListItemModel>>(ListState.Loading())
 
+    /**
+     * The database id of the key map
+     */
+    private val _launchConfigKeymap = MutableSharedFlow<Long>()
+    val launchConfigKeymap = _launchConfigKeymap.asSharedFlow()
+
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
@@ -84,7 +90,7 @@ class KeymapListViewModel internal constructor(
     }
 
     fun disableAll() {
-        TODO()
+
     }
 
     fun backupSelectedKeymaps() {
@@ -92,11 +98,26 @@ class KeymapListViewModel internal constructor(
     }
 
     fun onKeymapCardClick(uid: String) {
+        viewModelScope.launch {
+            val dbId = getKeymapDbIdFromUid(uid) ?: return@launch
 
+            if (selectionProvider.isSelectable.value) {
+                selectionProvider.select(dbId)
+            } else {
+                _launchConfigKeymap.emit(dbId)
+            }
+        }
     }
 
     fun onKeymapCardLongClick(uid: String) {
+        viewModelScope.launch {
+            val dbId = getKeymapDbIdFromUid(uid) ?: return@launch
 
+            if (!selectionProvider.isSelectable.value) {
+                selectionProvider.startSelecting()
+                selectionProvider.select(dbId)
+            }
+        }
     }
 
     fun selectAll() {
@@ -114,6 +135,10 @@ class KeymapListViewModel internal constructor(
 
     override fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
+    }
+
+    private suspend fun getKeymapDbIdFromUid(uid: String): Long? {
+        return useCase.keymapList.first().singleOrNull { it.uid == uid }?.dbId
     }
 
     private inner class UiBuilder(

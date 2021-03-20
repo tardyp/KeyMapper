@@ -11,4 +11,12 @@ interface KeymapRepository {
 
     fun insert(keymap: KeyMapEntity)
     fun update(keymap: KeyMapEntity)
+    suspend fun get(id: Long): KeyMapEntity
+    fun delete(vararg id: Long)
+
+    fun duplicate(vararg id: Long)
+    fun enableById(vararg id: Long)
+    fun disableById(vararg id: Long)
+    fun enableAll()
+    fun disableAll()
 }

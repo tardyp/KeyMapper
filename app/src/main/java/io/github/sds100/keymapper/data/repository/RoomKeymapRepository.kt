@@ -28,4 +28,50 @@ class RoomKeymapRepository(
             dao.update(keymap)
         }
     }
+
+    override suspend fun get(id: Long): KeyMapEntity {
+        return dao.getById(id)
+    }
+
+    override fun delete(vararg id: Long) {
+        coroutineScope.launch {
+            dao.deleteById(*id)
+        }
+    }
+
+    override fun duplicate(vararg id: Long) {
+        coroutineScope.launch {
+            val keymaps = mutableListOf<KeyMapEntity>()
+
+            id.forEach {
+                keymaps.add(get(it).copy(id = 0))
+            }
+
+            dao.insert(*keymaps.toTypedArray())
+        }
+    }
+
+    override fun enableById(vararg id: Long) {
+        coroutineScope.launch {
+            dao.enableKeymapById(*id)
+        }
+    }
+
+    override fun disableById(vararg id: Long) {
+        coroutineScope.launch {
+            dao.disableKeymapById(*id)
+        }
+    }
+
+    override fun enableAll() {
+        coroutineScope.launch {
+            dao.enableAll()
+        }
+    }
+
+    override fun disableAll() {
+        coroutineScope.launch {
+            dao.disableAll()
+        }
+    }
 }
