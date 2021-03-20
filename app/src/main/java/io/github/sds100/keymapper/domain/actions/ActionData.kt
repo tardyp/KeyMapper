@@ -13,12 +13,12 @@ object CorruptAction : ActionData()
 
 @Serializable
 data class OpenAppAction(
-   override val packageName: String
+    override val packageName: String
 ) : ActionData(), AppAction
 
 @Serializable
 data class OpenAppShortcutAction(
-  override  val packageName: String,
+    override val packageName: String,
     val shortcutTitle: String,
     val uri: String
 ) : ActionData(), AppAction
@@ -27,46 +27,97 @@ data class OpenAppShortcutAction(
 data class KeyEventAction(
     val keyCode: Int,
     val metaState: Int = 0,
-    val useShell: Boolean =false,
+    val useShell: Boolean = false,
     val device: DeviceInfo? = null
 ) : ActionData()
 
-interface AppAction{
+interface AppAction {
     val packageName: String
 }
 
-sealed class SystemActionData : ActionData() {
+sealed class SystemAction : ActionData() {
     abstract val id: SystemActionId
 }
 
 @Serializable
 data class SimpleSystemAction(
     override val id: SystemActionId,
-) : SystemActionData()
+) : SystemAction()
 
 @Serializable
-data class VolumeSystemAction(
-    val showVolumeUi: Boolean,
-    override val id: SystemActionId
-) : SystemActionData()
+sealed class VolumeSystemAction : SystemAction() {
+    abstract val showVolumeUi: Boolean
+
+    sealed class Stream : VolumeSystemAction() {
+        abstract val volumeStream: VolumeStream
+
+        @Serializable
+        data class Increase(
+            override val showVolumeUi: Boolean,
+            override val volumeStream: VolumeStream
+        ) : Stream() {
+            override val id = SystemActionId.VOLUME_INCREASE_STREAM
+        }
+
+        @Serializable
+        data class Decrease(
+            override val showVolumeUi: Boolean,
+            override val volumeStream: VolumeStream
+        ) : Stream() {
+            override val id = SystemActionId.VOLUME_DECREASE_STREAM
+        }
+    }
+
+    @Serializable
+    data class Up(override val showVolumeUi: Boolean) : VolumeSystemAction() {
+        override val id = SystemActionId.VOLUME_UP
+    }
+
+    @Serializable
+    data class Down(override val showVolumeUi: Boolean) : VolumeSystemAction() {
+        override val id = SystemActionId.VOLUME_DOWN
+    }
+
+    @Serializable
+    data class Mute(override val showVolumeUi: Boolean) : VolumeSystemAction() {
+        override val id = SystemActionId.VOLUME_MUTE
+    }
+
+    @Serializable
+    data class UnMute(override val showVolumeUi: Boolean) : VolumeSystemAction() {
+        override val id = SystemActionId.VOLUME_UNMUTE
+    }
+
+    @Serializable
+    data class ToggleMute(override val showVolumeUi: Boolean) : VolumeSystemAction() {
+        override val id = SystemActionId.VOLUME_TOGGLE_MUTE
+    }
+}
 
 @Serializable
-data class ChangeVolumeStreamSystemAction(
-    override val id: SystemActionId,
-    val showVolumeUi: Boolean,
-    val streamType: StreamType
-) : SystemActionData()
+sealed class FlashlightSystemAction : SystemAction() {
+    abstract val lens: CameraLens
 
-@Serializable
-data class FlashlightSystemAction(
-    override val id: SystemActionId,
-    val lens: CameraLens
-) : SystemActionData()
+    @Serializable
+    data class Toggle(override val lens: CameraLens) : FlashlightSystemAction() {
+        override val id = SystemActionId.TOGGLE_FLASHLIGHT
+    }
+
+    @Serializable
+    data class Enable(override val lens: CameraLens) : FlashlightSystemAction() {
+        override val id = SystemActionId.ENABLE_FLASHLIGHT
+    }
+
+    @Serializable
+    data class Disable(override val lens: CameraLens) : FlashlightSystemAction() {
+        override val id = SystemActionId.DISABLE_FLASHLIGHT
+    }
+}
 
 @Serializable
 data class ChangeRingerModeSystemAction(
     val ringerMode: RingerMode
-) : SystemActionData() {
+) : SystemAction() {
     override val id: SystemActionId = SystemActionId.CHANGE_RINGER_MODE
 }
 
@@ -74,28 +125,76 @@ data class ChangeRingerModeSystemAction(
 data class SwitchKeyboardSystemAction(
     val imeId: String,
     val savedImeName: String
-) : SystemActionData() {
+) : SystemAction() {
     override val id = SystemActionId.SWITCH_KEYBOARD
 }
 
 @Serializable
-class ChangeDndModeSystemAction(
-    override val id: SystemActionId,
-    val dndMode: DndMode
-) : SystemActionData()
+sealed class ChangeDndModeSystemAction : SystemAction() {
+    abstract val dndMode: DndMode
+
+    @Serializable
+    data class Toggle(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
+        override val id = SystemActionId.TOGGLE_DND_MODE
+    }
+
+    @Serializable
+    data class Enable(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
+        override val id = SystemActionId.ENABLE_DND_MODE
+    }
+
+    @Serializable
+    data class Disable(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
+        override val id = SystemActionId.DISABLE_DND_MODE
+    }
+}
 
 @Serializable
 data class CycleRotationsSystemAction(
     val orientations: List<Orientation>
-) : SystemActionData() {
+) : SystemAction() {
     override val id = SystemActionId.CYCLE_ROTATIONS
 }
 
 @Serializable
-data class ControlMediaForAppSystemAction(
-    override val id: SystemActionId,
-    val packageName: String
-) : SystemActionData()
+sealed class ControlMediaForAppSystemAction : SystemAction() {
+    abstract val packageName: String
+
+    @Serializable
+    data class Pause(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.PAUSE_MEDIA_PACKAGE
+    }
+
+    @Serializable
+    data class Play(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.PLAY_MEDIA_PACKAGE
+    }
+
+    @Serializable
+    data class PlayPause(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE
+    }
+
+    @Serializable
+    data class NextTrack(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.NEXT_TRACK_PACKAGE
+    }
+
+    @Serializable
+    data class PreviousTrack(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.PREVIOUS_TRACK_PACKAGE
+    }
+
+    @Serializable
+    data class FastForward(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.FAST_FORWARD_PACKAGE
+    }
+
+    @Serializable
+    data class Rewind(override val packageName: String) : ControlMediaForAppSystemAction() {
+        override val id = SystemActionId.REWIND_PACKAGE
+    }
+}
 
 @Serializable
 data class IntentAction(

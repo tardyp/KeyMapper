@@ -66,7 +66,8 @@ class KeymapDetectionDelegateTest {
         private const val VIBRATION_DURATION = 100
         private const val HOLD_DOWN_DURATION = 1000
 
-        private val TEST_ACTION = ActionEntity(ActionType.SYSTEM_ACTION, SystemAction.TOGGLE_FLASHLIGHT)
+        private val TEST_ACTION =
+            ActionEntity(ActionType.SYSTEM_ACTION, OldSystemAction.TOGGLE_FLASHLIGHT)
         private val TEST_ACTION_2 = ActionEntity(ActionType.APP, Constants.PACKAGE_NAME)
 
         private val TEST_ACTIONS = setOf(
@@ -684,7 +685,7 @@ class KeymapDetectionDelegateTest {
             //given
             val action = ActionEntity(
                 type = ActionType.SYSTEM_ACTION,
-                data = SystemAction.VOLUME_UP,
+                data = OldSystemAction.VOLUME_UP,
                 flags = ActionEntity.ACTION_FLAG_REPEAT
             )
 

@@ -1,17 +1,10 @@
 package io.github.sds100.keymapper.data.model
 
-import android.content.Context
 import android.os.Parcelable
 import com.github.salomonbrys.kotson.*
 import com.google.gson.annotations.SerializedName
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.ActionType
-import io.github.sds100.keymapper.util.ActionUtils
-import io.github.sds100.keymapper.util.IntentTarget
-import io.github.sds100.keymapper.util.SystemAction
-import io.github.sds100.keymapper.util.result.onSuccess
 import kotlinx.android.parcel.Parcelize
-import splitties.bitflags.withFlag
 import java.util.*
 
 /**
@@ -33,7 +26,7 @@ import java.util.*
 @Parcelize
 data class ActionEntity(
     @SerializedName(NAME_ACTION_TYPE)
-    val type: ActionType,
+    val type: Type,
 
     /**
      * How each action type saves data:
@@ -61,6 +54,29 @@ data class ActionEntity(
 ) : Parcelable {
     companion object {
 
+        //DON'T CHANGE THESE IDs!!!!
+
+        /**
+         * The KeyEvent meta state is stored as bit flags.
+         */
+        const val EXTRA_KEY_EVENT_META_STATE = "extra_meta_state"
+        const val EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR = "extra_device_descriptor"
+        const val EXTRA_KEY_EVENT_USE_SHELL = "extra_key_event_use_shell"
+
+        const val EXTRA_IME_ID = "extra_ime_id"
+        const val EXTRA_IME_NAME = "extra_ime_name"
+
+        const val EXTRA_SHORTCUT_TITLE = "extra_title"
+        const val EXTRA_PACKAGE_NAME = "extra_package_name"
+        const val EXTRA_STREAM_TYPE = "extra_stream_type"
+        const val EXTRA_LENS = "extra_flash"
+        const val EXTRA_RINGER_MODE = "extra_ringer_mode"
+        const val EXTRA_DND_MODE = "extra_do_not_disturb_mode"
+        const val EXTRA_ORIENTATIONS = "extra_orientations"
+        const val EXTRA_COORDINATE_DESCRIPTION = "extra_coordinate_description"
+        const val EXTRA_INTENT_TARGET = "extra_intent_target"
+        const val EXTRA_INTENT_DESCRIPTION = "extra_intent_description"
+
         //DON'T CHANGE THESE. Used for JSON serialization and parsing.
         const val NAME_ACTION_TYPE = "type"
         const val NAME_DATA = "data"
@@ -81,28 +97,6 @@ data class ActionEntity(
             ACTION_FLAG_HOLD_DOWN to R.string.flag_hold_down
         )
 
-        //DON'T CHANGE THESE IDs!!!!
-        const val EXTRA_SHORTCUT_TITLE = "extra_title"
-        const val EXTRA_PACKAGE_NAME = "extra_package_name"
-        const val EXTRA_STREAM_TYPE = "extra_stream_type"
-        const val EXTRA_LENS = "extra_flash"
-        const val EXTRA_RINGER_MODE = "extra_ringer_mode"
-        const val EXTRA_DND_MODE = "extra_do_not_disturb_mode"
-        const val EXTRA_ORIENTATIONS = "extra_orientations"
-        const val EXTRA_COORDINATE_DESCRIPTION = "extra_coordinate_description"
-        const val EXTRA_INTENT_TARGET = "extra_intent_target"
-        const val EXTRA_INTENT_DESCRIPTION = "extra_intent_description"
-
-        /**
-         * The KeyEvent meta state is stored as bit flags.
-         */
-        const val EXTRA_KEY_EVENT_META_STATE = "extra_meta_state"
-        const val EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR = "extra_device_descriptor"
-        const val EXTRA_KEY_EVENT_USE_SHELL = "extra_key_event_use_shell"
-
-        const val EXTRA_IME_ID = "extra_ime_id"
-        const val EXTRA_IME_NAME = "extra_ime_name"
-
         const val EXTRA_CUSTOM_STOP_REPEAT_BEHAVIOUR = "extra_custom_stop_repeat_behaviour"
         const val EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR = "extra_custom_hold_down_behaviour"
         const val EXTRA_REPEAT_DELAY = "extra_hold_down_until_repeat_delay"
@@ -111,130 +105,9 @@ data class ActionEntity(
         const val EXTRA_DELAY_BEFORE_NEXT_ACTION = "extra_delay_before_next_action"
         const val EXTRA_HOLD_DOWN_DURATION = "extra_hold_down_duration"
 
-        fun appAction(packageName: String): ActionEntity {
-            return ActionEntity(ActionType.APP, packageName)
-        }
-
-        fun appShortcutAction(name: String, packageName: String?, uri: String): ActionEntity {
-            val extras = mutableListOf(
-                Extra(EXTRA_SHORTCUT_TITLE, name),
-            )
-
-            packageName?.let {
-                extras.add(Extra(EXTRA_PACKAGE_NAME, packageName))
-            }
-
-            return ActionEntity(ActionType.APP_SHORTCUT, data = uri, extras = extras)
-        }
-
-        fun keyAction(keyCode: Int): ActionEntity {
-            return keyEventAction(keyCode, metaState = 0)
-        }
-
-        fun keyCodeAction(keyCode: Int): ActionEntity {
-            return keyEventAction(keyCode, metaState = 0)
-        }
-
-        fun keyEventAction(
-            keyCode: Int,
-            metaState: Int,
-            deviceDescriptor: String? = null,
-            useShell: Boolean = false
-        ): ActionEntity {
-            val extras = sequence {
-                if (useShell) {
-                    yield(Extra(EXTRA_KEY_EVENT_USE_SHELL, useShell.toString()))
-                    //no other options are allowed if using the shell
-                    return@sequence
-                }
-
-                yield(Extra(EXTRA_KEY_EVENT_META_STATE, metaState.toString()))
-
-                deviceDescriptor?.let {
-                    yield(Extra(EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR, it))
-                }
-
-            }.toList()
-
-            return ActionEntity(
-                ActionType.KEY_EVENT,
-                keyCode.toString(),
-                extras = extras
-            )
-        }
-
-        fun textBlockAction(text: String): ActionEntity {
-            return ActionEntity(ActionType.TEXT_BLOCK, text, flags = ACTION_FLAG_REPEAT)
-        }
-
-        fun urlAction(url: String): ActionEntity {
-            return ActionEntity(ActionType.URL, url)
-        }
-
-        fun systemAction(ctx: Context, id: String, optionData: String?): ActionEntity {
-            val extras = mutableListOf<Extra>()
-            var flags = 0
-
-            optionData?.let {
-                extras.add(Extra(SystemActionOption.getExtraIdForOption(id), it))
-
-                if (id == SystemAction.SWITCH_KEYBOARD) {
-                    SystemActionOption.getOptionLabel(ctx, id, it).onSuccess { imeName ->
-                        extras.add(Extra(EXTRA_IME_NAME, imeName))
-                    }
-                }
-            }
-
-            //show the volume UI by default when the user chooses a volume action.
-            if (ActionUtils.isVolumeAction(id)) {
-                flags = flags.withFlag(ACTION_FLAG_SHOW_VOLUME_UI).withFlag(ACTION_FLAG_REPEAT)
-            }
-
-            val action = ActionEntity(ActionType.SYSTEM_ACTION, id, extras, flags)
-            return action
-        }
-
-        fun tapCoordinateAction(x: Int, y: Int, coordinateDescription: String?): ActionEntity {
-            val extras = mutableListOf<Extra>()
-
-            if (!coordinateDescription.isNullOrBlank()) {
-                extras.add(Extra(EXTRA_COORDINATE_DESCRIPTION, coordinateDescription))
-            }
-
-            return ActionEntity(
-                ActionType.TAP_COORDINATE,
-                "$x,$y",
-                extras = extras
-            )
-        }
-
-        fun intentAction(
-            description: String,
-            target: IntentTarget,
-            uri: String
-        ): ActionEntity {
-            val actionExtras = listOf(
-                Extra(EXTRA_INTENT_DESCRIPTION, description),
-                Extra(EXTRA_INTENT_TARGET, target.toString())
-            )
-
-            return ActionEntity(
-                type = ActionType.INTENT,
-                data = uri,
-                extras = actionExtras
-            )
-        }
-
-        fun phoneCallAction(number: String): ActionEntity {
-            return ActionEntity(
-                type = ActionType.PHONE_CALL,
-                data = number
-            )
-        }
-
         val DESERIALIZER = jsonDeserializer {
             val typeString by it.json.byString(NAME_ACTION_TYPE)
-            val type = ActionType.valueOf(typeString)
+            val type = Type.valueOf(typeString)
 
             val data by it.json.byString(NAME_DATA)
 
@@ -245,11 +118,19 @@ data class ActionEntity(
 
             val uid by it.json.byNullableString(NAME_UID)
 
-            ActionEntity(type, data, extraList.toMutableList(), flags, uid
-                ?: UUID.randomUUID().toString())
+            ActionEntity(
+                type, data, extraList.toMutableList(), flags, uid
+                    ?: UUID.randomUUID().toString()
+            )
         }
     }
 
-    constructor(type: ActionType, data: String, extra: Extra
+    enum class Type {
+        //DONT CHANGE THESE
+        APP, APP_SHORTCUT, KEY_EVENT, TEXT_BLOCK, URL, SYSTEM_ACTION, TAP_COORDINATE, INTENT, PHONE_CALL
+    }
+
+    constructor(
+        type: Type, data: String, extra: Extra
     ) : this(type, data, mutableListOf(extra))
 }

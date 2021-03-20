@@ -206,7 +206,7 @@ class KeymapDetectionDelegate(
                         modifierKeyEventActions = true
                     }
 
-                    if (keymap.actionList.any { it.type == ActionType.KEY_EVENT && !it.mappedToModifier }) {
+                    if (keymap.actionList.any { it.type == ActionEntity.Type.KEY_EVENT && !it.mappedToModifier }) {
                         notModifierKeyEventActions = true
                     }
 
@@ -729,12 +729,14 @@ class KeymapDetectionDelegate(
                         actionKeys.forEach { actionKey ->
                             val action = actionMap[actionKey] ?: return@forEach
 
-                            if (action.type == ActionType.KEY_EVENT) {
+                            if (action.type == ActionEntity.Type.KEY_EVENT) {
                                 val actionKeyCode = action.data.toInt()
 
                                 if (isModifierKey(actionKeyCode)) {
-                                    val actionMetaState = KeyEventUtils.modifierKeycodeToMetaState(actionKeyCode)
-                                    metaStateFromActions = metaStateFromActions.withFlag(actionMetaState)
+                                    val actionMetaState =
+                                        KeyEventUtils.modifierKeycodeToMetaState(actionKeyCode)
+                                    metaStateFromActions =
+                                        metaStateFromActions.withFlag(actionMetaState)
                                 }
                             }
 
@@ -1118,12 +1120,21 @@ class KeymapDetectionDelegate(
                             actionKeys.forEach { actionKey ->
 
                                 actionMap[actionKey]?.let { action ->
-                                    if (action.type == ActionType.KEY_EVENT) {
+                                    if (action.type == ActionEntity.Type.KEY_EVENT) {
                                         val actionKeyCode = action.data.toInt()
 
-                                        if (action.type == ActionType.KEY_EVENT && isModifierKey(actionKeyCode)) {
-                                            val actionMetaState = KeyEventUtils.modifierKeycodeToMetaState(actionKeyCode)
-                                            metaStateFromActionsToRemove = metaStateFromActionsToRemove.withFlag(actionMetaState)
+                                        if (action.type == ActionEntity.Type.KEY_EVENT && isModifierKey(
+                                                actionKeyCode
+                                            )
+                                        ) {
+                                            val actionMetaState =
+                                                KeyEventUtils.modifierKeycodeToMetaState(
+                                                    actionKeyCode
+                                                )
+                                            metaStateFromActionsToRemove =
+                                                metaStateFromActionsToRemove.withFlag(
+                                                    actionMetaState
+                                                )
                                         }
                                     }
                                 }
@@ -1500,7 +1511,7 @@ class KeymapDetectionDelegate(
             while (true) {
                 actionMap[actionKey]?.let { action ->
 
-                    if (action.type == ActionType.KEY_EVENT) {
+                    if (action.type == ActionEntity.Type.KEY_EVENT) {
                         if (isModifierKey(action.data.toInt())) return@let
                     }
 
@@ -1707,7 +1718,7 @@ class KeymapDetectionDelegate(
         get() = !this.hasFlag(TriggerEntity.KeyEntity.FLAG_DO_NOT_CONSUME_KEY_EVENT)
 
     private val ActionEntity.mappedToModifier
-        get() = type == ActionType.KEY_EVENT && isModifierKey(data.toInt())
+        get() = type == ActionEntity.Type.KEY_EVENT && isModifierKey(data.toInt())
 
     private fun IntArray.vibrate(triggerIndex: Int) = this[triggerIndex].hasFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
 

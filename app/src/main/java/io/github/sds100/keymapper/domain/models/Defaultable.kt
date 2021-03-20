@@ -18,3 +18,9 @@ sealed class Defaultable<T> {
     @Serializable
     class Default<T> : Defaultable<T>()
 }
+
+fun <T> T?.createDefaultable(): Defaultable<T> = if (this == null) {
+    Defaultable.Default<T>()
+} else {
+    Defaultable.Custom(this)
+}

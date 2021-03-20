@@ -10,7 +10,6 @@ import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.util.ActionType
 import kotlinx.coroutines.coroutineScope
 
 /**
@@ -70,11 +69,11 @@ class SeedDatabaseWorker(
     private fun createRandomActionList(): List<ActionEntity> {
         return sequence {
             yield(ActionEntity(
-                type = ActionType.APP,
+                type = ActionEntity.Type.APP,
                 data = Constants.PACKAGE_NAME
             ))
             yield(ActionEntity(
-                type = ActionType.APP,
+                type = ActionEntity.Type.APP,
                 data = "this.app.doesnt.exist"
             ))
         }.toList()

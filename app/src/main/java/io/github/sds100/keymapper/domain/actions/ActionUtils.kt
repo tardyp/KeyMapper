@@ -14,6 +14,6 @@ import android.os.Build
     fun ActionData.requiresImeToPerform() = when (this) {
         is KeyEventAction -> !useShell
         is TextAction -> true
-        is SystemActionData -> id == SystemActionId.MOVE_CURSOR_TO_END
+        is SystemAction -> id == SystemActionId.MOVE_CURSOR_TO_END
         else -> false
     }

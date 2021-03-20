@@ -4,14 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleOwner
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.DeviceInfoEntity
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.activity.LaunchKeymapShortcutActivity
-import io.github.sds100.keymapper.util.result.valueOrNull
 import java.util.*
 
 /**
@@ -51,11 +49,11 @@ object KeymapShortcutUtils {
         if (actionList.size == 1) {
             val action = actionList[0]
 
-            action.getIcon(ctx).valueOrNull()?.let {
-                val bitmap = it.toBitmap()
-
-                return IconCompat.createWithBitmap(bitmap)
-            }
+//            action.getIcon(ctx).valueOrNull()?.let {
+//                val bitmap = it.toBitmap()
+//
+//                return IconCompat.createWithBitmap(bitmap)
+//            } //TODO
         }
 
         return IconCompat.createWithResource(ctx, R.mipmap.ic_launcher_round)
@@ -71,12 +69,12 @@ object KeymapShortcutUtils {
         if (actionList.size == 1) {
             val action = actionList[0]
 
-            action
-                .getTitle(ctx, deviceInfoList, showDeviceDescriptors)
-                .valueOrNull()
-                ?.let {
-                    return it
-                }
+//            action
+//                .getTitle(ctx, deviceInfoList, showDeviceDescriptors)
+//                .valueOrNull()
+//                ?.let {
+//                    return it
+//                } //TODO
         }
 
         return ctx.editTextStringAlertDialog(

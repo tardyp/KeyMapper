@@ -5,7 +5,7 @@ package io.github.sds100.keymapper.util
  */
 
 //todo delete
-object SystemAction {
+object OldSystemAction {
     //wifi
     const val TOGGLE_WIFI = "toggle_wifi"
     const val ENABLE_WIFI = "enable_wifi"

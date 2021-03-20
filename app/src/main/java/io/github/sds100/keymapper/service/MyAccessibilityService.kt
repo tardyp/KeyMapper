@@ -315,7 +315,9 @@ class MyAccessibilityService : AccessibilityService(),
             }
         }
 
-        return action.canBePerformed(this, hasRootPermission)
+//        return action.canBePerformed(this, hasRootPermission)
+        //TODO
+        return Success(action)
     }
 
     override fun getLifecycle() = lifecycleRegistry
@@ -401,7 +403,7 @@ class MyAccessibilityService : AccessibilityService(),
                 KeyEvent.KEYCODE_APP_SWITCH -> performGlobalAction(GLOBAL_ACTION_RECENTS)
                 KeyEvent.KEYCODE_MENU ->
                     actionPerformerDelegate.performSystemAction(
-                        SystemAction.OPEN_MENU,
+                        OldSystemAction.OPEN_MENU,
                         chosenImePackageName,
                         currentPackageName
                     )

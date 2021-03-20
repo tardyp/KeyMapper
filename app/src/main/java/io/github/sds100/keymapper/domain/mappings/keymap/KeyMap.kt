@@ -27,7 +27,6 @@ data class KeyMap(
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true
 ) {
-
     companion object {
         const val NEW_ID = -1L
     }
@@ -88,19 +87,33 @@ data class KeyMap(
 
 object KeyMapEntityMapper {
     fun fromEntity(entity: KeyMapEntity): KeyMap {
+        val actionList = sequence {
+            entity.actionList.forEach { entity ->
+                KeymapActionDataEntityMapper.fromEntity(entity)?.let { yield(it) }
+            }
+        }.toList()
+
         return KeyMap(
             dbId = entity.id,
             uid = entity.uid,
             trigger = KeymapTriggerEntityMapper.fromEntity(entity.trigger),
-            //TODO finish
+            actionDataList = actionList,
+            //TODO
         )
     }
 
     fun toEntity(keymap: KeyMap): KeyMapEntity {
+
+        val actionEntityList = sequence {
+            keymap.actionList.forEach { action ->
+                KeymapActionDataEntityMapper.toEntity(action)?.let { yield(it) }
+            }
+        }.toList()
+
         return KeyMapEntity(
             id = keymap.dbId,
             trigger = KeymapTriggerEntityMapper.toEntity(keymap.trigger),
-            actionList = keymap.actionList.map { KeymapActionEntityMapper.toEntity(it) },
+            actionList = actionEntityList,
             constraintList = keymap.constraintList.map { ConstraintEntityMapper.toEntity(it) },
             constraintMode = when (keymap.constraintMode) {
                 ConstraintMode.AND -> ConstraintEntity.MODE_AND

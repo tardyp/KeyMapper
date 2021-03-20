@@ -82,7 +82,7 @@ class ActionPerformerDelegate(
 
         ctx.apply {
             when (action.type) {
-                ActionType.APP -> {
+                ActionEntity.Type.APP -> {
                     val packageName = action.data
 
                     val leanbackIntent =
@@ -118,7 +118,7 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.APP_SHORTCUT -> {
+                ActionEntity.Type.APP_SHORTCUT -> {
                     val intent = Intent.parseUri(action.data, 0)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
@@ -133,11 +133,11 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.TEXT_BLOCK -> chosenImePackageName?.let {
+                ActionEntity.Type.TEXT_BLOCK -> chosenImePackageName?.let {
                     KeyboardUtils.inputTextFromImeService(ctx, it, action.data)
                 }
 
-                ActionType.URL -> {
+                ActionEntity.Type.URL -> {
                     val guessedUrl = URLUtil.guessUrl(action.data)
                     val uri: Uri = Uri.parse(guessedUrl)
 
@@ -151,13 +151,13 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.SYSTEM_ACTION -> performSystemAction(
+                ActionEntity.Type.SYSTEM_ACTION -> performSystemAction(
                     action,
                     chosenImePackageName,
                     currentPackageName
                 )
 
-                ActionType.TAP_COORDINATE -> {
+                ActionEntity.Type.TAP_COORDINATE -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         val x = action.data.split(',')[0]
                         val y = action.data.split(',')[1]
@@ -203,7 +203,7 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.KEY_EVENT -> {
+                ActionEntity.Type.KEY_EVENT -> {
                     val useShell = action.extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL)
                         .valueOrNull()
                         .toBoolean()
@@ -237,7 +237,7 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.INTENT -> {
+                ActionEntity.Type.INTENT -> {
                     val intent = Intent.parseUri(action.data, 0)
 
                     try {
@@ -256,7 +256,7 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                ActionType.PHONE_CALL -> {
+                ActionEntity.Type.PHONE_CALL -> {
                     Intent(Intent.ACTION_CALL).apply {
                         data = Uri.parse("tel:0987654321")
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -272,7 +272,7 @@ class ActionPerformerDelegate(
         chosenImePackageName: String?,
         currentPackageName: String?
     ) = performSystemAction(
-        ActionEntity(ActionType.SYSTEM_ACTION, id),
+        ActionEntity(ActionEntity.Type.SYSTEM_ACTION, id),
         chosenImePackageName,
         currentPackageName
     )
@@ -315,77 +315,77 @@ class ActionPerformerDelegate(
 
         ctx.apply {
             when (id) {
-                SystemAction.ENABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                OldSystemAction.ENABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
                     this,
                     StateChange.ENABLE
                 )
-                SystemAction.DISABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                OldSystemAction.DISABLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
                     this,
                     StateChange.DISABLE
                 )
-                SystemAction.TOGGLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
+                OldSystemAction.TOGGLE_WIFI -> NetworkUtils.changeWifiStatePreQ(
                     this,
                     StateChange.TOGGLE
                 )
 
-                SystemAction.TOGGLE_WIFI_ROOT -> NetworkUtils.toggleWifiRoot()
-                SystemAction.ENABLE_WIFI_ROOT -> NetworkUtils.enableWifiRoot()
-                SystemAction.DISABLE_WIFI_ROOT -> NetworkUtils.disableWifiRoot()
+                OldSystemAction.TOGGLE_WIFI_ROOT -> NetworkUtils.toggleWifiRoot()
+                OldSystemAction.ENABLE_WIFI_ROOT -> NetworkUtils.enableWifiRoot()
+                OldSystemAction.DISABLE_WIFI_ROOT -> NetworkUtils.disableWifiRoot()
 
-                SystemAction.TOGGLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.TOGGLE)
-                SystemAction.ENABLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.ENABLE)
-                SystemAction.DISABLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.DISABLE)
+                OldSystemAction.TOGGLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.TOGGLE)
+                OldSystemAction.ENABLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.ENABLE)
+                OldSystemAction.DISABLE_BLUETOOTH -> BluetoothUtils.changeBluetoothState(StateChange.DISABLE)
 
-                SystemAction.TOGGLE_MOBILE_DATA -> NetworkUtils.toggleMobileData(this)
-                SystemAction.ENABLE_MOBILE_DATA -> NetworkUtils.enableMobileData()
-                SystemAction.DISABLE_MOBILE_DATA -> NetworkUtils.disableMobileData()
+                OldSystemAction.TOGGLE_MOBILE_DATA -> NetworkUtils.toggleMobileData(this)
+                OldSystemAction.ENABLE_MOBILE_DATA -> NetworkUtils.enableMobileData()
+                OldSystemAction.DISABLE_MOBILE_DATA -> NetworkUtils.disableMobileData()
 
-                SystemAction.TOGGLE_AUTO_BRIGHTNESS -> BrightnessUtils.toggleAutoBrightness(this)
-                SystemAction.ENABLE_AUTO_BRIGHTNESS ->
+                OldSystemAction.TOGGLE_AUTO_BRIGHTNESS -> BrightnessUtils.toggleAutoBrightness(this)
+                OldSystemAction.ENABLE_AUTO_BRIGHTNESS ->
                     BrightnessUtils.setBrightnessMode(
                         this,
                         Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
                     )
 
-                SystemAction.DISABLE_AUTO_BRIGHTNESS ->
+                OldSystemAction.DISABLE_AUTO_BRIGHTNESS ->
                     BrightnessUtils.setBrightnessMode(
                         this,
                         Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
                     )
 
-                SystemAction.INCREASE_BRIGHTNESS -> BrightnessUtils.increaseBrightness(this)
-                SystemAction.DECREASE_BRIGHTNESS -> BrightnessUtils.decreaseBrightness(this)
+                OldSystemAction.INCREASE_BRIGHTNESS -> BrightnessUtils.increaseBrightness(this)
+                OldSystemAction.DECREASE_BRIGHTNESS -> BrightnessUtils.decreaseBrightness(this)
 
-                SystemAction.TOGGLE_AUTO_ROTATE -> ScreenRotationUtils.toggleAutoRotate(this)
-                SystemAction.ENABLE_AUTO_ROTATE -> ScreenRotationUtils.enableAutoRotate(this)
-                SystemAction.DISABLE_AUTO_ROTATE -> ScreenRotationUtils.disableAutoRotate(this)
-                SystemAction.PORTRAIT_MODE -> ScreenRotationUtils.forcePortraitMode(this)
-                SystemAction.LANDSCAPE_MODE -> ScreenRotationUtils.forceLandscapeMode(this)
-                SystemAction.SWITCH_ORIENTATION -> ScreenRotationUtils.switchOrientation(this)
+                OldSystemAction.TOGGLE_AUTO_ROTATE -> ScreenRotationUtils.toggleAutoRotate(this)
+                OldSystemAction.ENABLE_AUTO_ROTATE -> ScreenRotationUtils.enableAutoRotate(this)
+                OldSystemAction.DISABLE_AUTO_ROTATE -> ScreenRotationUtils.disableAutoRotate(this)
+                OldSystemAction.PORTRAIT_MODE -> ScreenRotationUtils.forcePortraitMode(this)
+                OldSystemAction.LANDSCAPE_MODE -> ScreenRotationUtils.forceLandscapeMode(this)
+                OldSystemAction.SWITCH_ORIENTATION -> ScreenRotationUtils.switchOrientation(this)
 
-                SystemAction.CYCLE_ROTATIONS -> getSdkValuesForOptionSet {
+                OldSystemAction.CYCLE_ROTATIONS -> getSdkValuesForOptionSet {
                     ScreenRotationUtils.cycleRotations(this, it)
                 }
 
-                SystemAction.VOLUME_UP -> AudioUtils.adjustVolume(
+                OldSystemAction.VOLUME_UP -> AudioUtils.adjustVolume(
                     this,
                     AudioManager.ADJUST_RAISE,
                     showVolumeUi
                 )
-                SystemAction.VOLUME_DOWN -> AudioUtils.adjustVolume(
+                OldSystemAction.VOLUME_DOWN -> AudioUtils.adjustVolume(
                     this,
                     AudioManager.ADJUST_LOWER,
                     showVolumeUi
                 )
 
                 //the volume UI should always be shown for this action
-                SystemAction.VOLUME_SHOW_DIALOG -> AudioUtils.adjustVolume(
+                OldSystemAction.VOLUME_SHOW_DIALOG -> AudioUtils.adjustVolume(
                     this,
                     AudioManager.ADJUST_SAME,
                     true
                 )
 
-                SystemAction.VOLUME_DECREASE_STREAM -> getSdkValueForOption { stream ->
+                OldSystemAction.VOLUME_DECREASE_STREAM -> getSdkValueForOption { stream ->
                     AudioUtils.adjustSpecificStream(
                         this,
                         AudioManager.ADJUST_LOWER,
@@ -394,7 +394,7 @@ class ActionPerformerDelegate(
                     )
                 }
 
-                SystemAction.VOLUME_INCREASE_STREAM -> getSdkValueForOption { stream ->
+                OldSystemAction.VOLUME_INCREASE_STREAM -> getSdkValueForOption { stream ->
                     AudioUtils.adjustSpecificStream(
                         this,
                         AudioManager.ADJUST_RAISE,
@@ -403,29 +403,29 @@ class ActionPerformerDelegate(
                     )
                 }
 
-                SystemAction.CYCLE_VIBRATE_RING -> AudioUtils.cycleBetweenVibrateAndRing(this)
-                SystemAction.CYCLE_RINGER_MODE -> AudioUtils.cycleThroughAllRingerModes(this)
+                OldSystemAction.CYCLE_VIBRATE_RING -> AudioUtils.cycleBetweenVibrateAndRing(this)
+                OldSystemAction.CYCLE_RINGER_MODE -> AudioUtils.cycleThroughAllRingerModes(this)
 
-                SystemAction.CHANGE_RINGER_MODE -> getSdkValueForOption { ringerMode ->
+                OldSystemAction.CHANGE_RINGER_MODE -> getSdkValueForOption { ringerMode ->
                     AudioUtils.changeRingerMode(this, ringerMode)
                 }
 
-                SystemAction.EXPAND_NOTIFICATION_DRAWER -> StatusBarUtils.expandNotificationDrawer()
-                SystemAction.TOGGLE_NOTIFICATION_DRAWER ->
+                OldSystemAction.EXPAND_NOTIFICATION_DRAWER -> StatusBarUtils.expandNotificationDrawer()
+                OldSystemAction.TOGGLE_NOTIFICATION_DRAWER ->
                     currentPackageName?.let { StatusBarUtils.toggleNotificationDrawer(it) }
-                SystemAction.EXPAND_QUICK_SETTINGS -> StatusBarUtils.expandQuickSettings()
-                SystemAction.TOGGLE_QUICK_SETTINGS_DRAWER ->
+                OldSystemAction.EXPAND_QUICK_SETTINGS -> StatusBarUtils.expandQuickSettings()
+                OldSystemAction.TOGGLE_QUICK_SETTINGS_DRAWER ->
                     currentPackageName?.let { StatusBarUtils.toggleQuickSettingsDrawer(it) }
-                SystemAction.COLLAPSE_STATUS_BAR -> StatusBarUtils.collapseStatusBar()
+                OldSystemAction.COLLAPSE_STATUS_BAR -> StatusBarUtils.collapseStatusBar()
 
-                SystemAction.ENABLE_NFC -> NfcUtils.enable()
-                SystemAction.DISABLE_NFC -> NfcUtils.disable()
-                SystemAction.TOGGLE_NFC -> NfcUtils.toggle(this)
+                OldSystemAction.ENABLE_NFC -> NfcUtils.enable()
+                OldSystemAction.DISABLE_NFC -> NfcUtils.disable()
+                OldSystemAction.TOGGLE_NFC -> NfcUtils.toggle(this)
 
-                SystemAction.GO_BACK -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
-                SystemAction.GO_HOME -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
-                SystemAction.OPEN_RECENTS -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
-                SystemAction.OPEN_MENU -> {
+                OldSystemAction.GO_BACK -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
+                OldSystemAction.GO_HOME -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
+                OldSystemAction.OPEN_RECENTS -> performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
+                OldSystemAction.OPEN_MENU -> {
                     if (performActionsUseCase.hasRootPermission) {
 
                         suProcessDelegate.runCommand("input keyevent ${KeyEvent.KEYCODE_MENU}\n")
@@ -439,7 +439,7 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                SystemAction.GO_LAST_APP -> {
+                OldSystemAction.GO_LAST_APP -> {
                     runBlocking {
                         performGlobalAction(AccessibilityService.GLOBAL_ACTION_RECENTS)
 
@@ -448,41 +448,41 @@ class ActionPerformerDelegate(
                     }
                 }
 
-                SystemAction.OPEN_VOICE_ASSISTANT -> {
+                OldSystemAction.OPEN_VOICE_ASSISTANT -> {
                     val intent =
                         Intent(Intent.ACTION_VOICE_COMMAND).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
 
-                SystemAction.OPEN_DEVICE_ASSISTANT -> {
+                OldSystemAction.OPEN_DEVICE_ASSISTANT -> {
                     Intent(Intent.ACTION_ASSIST).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(this)
                     }
                 }
 
-                SystemAction.OPEN_CAMERA -> {
+                OldSystemAction.OPEN_CAMERA -> {
                     val intent =
                         Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
 
-                SystemAction.LOCK_DEVICE_ROOT ->
+                OldSystemAction.LOCK_DEVICE_ROOT ->
                     suProcessDelegate.runCommand("input keyevent ${KeyEvent.KEYCODE_POWER}")
 
-                SystemAction.SHOW_KEYBOARD_PICKER, SystemAction.SHOW_KEYBOARD_PICKER_ROOT ->
+                OldSystemAction.SHOW_KEYBOARD_PICKER, OldSystemAction.SHOW_KEYBOARD_PICKER_ROOT ->
                     KeyboardUtils.showInputMethodPickerDialogOutsideApp(ctx)
 
-                SystemAction.SECURE_LOCK_DEVICE -> {
+                OldSystemAction.SECURE_LOCK_DEVICE -> {
                     val dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
                     dpm.lockNow()
                 }
 
-                SystemAction.POWER_ON_OFF_DEVICE -> {
+                OldSystemAction.POWER_ON_OFF_DEVICE -> {
                     suProcessDelegate.runCommand("input keyevent ${KeyEvent.KEYCODE_POWER}")
                 }
 
-                SystemAction.MOVE_CURSOR_TO_END -> chosenImePackageName?.let {
+                OldSystemAction.MOVE_CURSOR_TO_END -> chosenImePackageName?.let {
                     KeyboardUtils.inputKeyEventFromImeService(
                         ctx,
                         it,
@@ -492,46 +492,46 @@ class ActionPerformerDelegate(
                     )
                 }
 
-                SystemAction.OPEN_SETTINGS -> {
+                OldSystemAction.OPEN_SETTINGS -> {
                     Intent(Settings.ACTION_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(this)
                     }
                 }
 
-                SystemAction.SWITCH_KEYBOARD -> {
+                OldSystemAction.SWITCH_KEYBOARD -> {
                     action.extras.getData(ActionEntity.EXTRA_IME_ID).onSuccess {
                         KeyboardUtils.switchIme(this, it)
                     }
                 }
 
-                SystemAction.TOGGLE_AIRPLANE_MODE ->
+                OldSystemAction.TOGGLE_AIRPLANE_MODE ->
                     AirplaneModeUtils.toggleAirplaneMode(
                         this,
                         performActionsUseCase.hasRootPermission
                     )
 
-                SystemAction.ENABLE_AIRPLANE_MODE ->
+                OldSystemAction.ENABLE_AIRPLANE_MODE ->
                     AirplaneModeUtils.enableAirplaneMode(performActionsUseCase.hasRootPermission)
 
-                SystemAction.DISABLE_AIRPLANE_MODE ->
+                OldSystemAction.DISABLE_AIRPLANE_MODE ->
                     AirplaneModeUtils.disableAirplaneMode(performActionsUseCase.hasRootPermission)
 
-                SystemAction.SCREENSHOT_ROOT -> ScreenshotUtils.takeScreenshotRoot()
+                OldSystemAction.SCREENSHOT_ROOT -> ScreenshotUtils.takeScreenshotRoot()
 
                 else -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                         when (id) {
-                            SystemAction.TEXT_CUT ->
+                            OldSystemAction.TEXT_CUT ->
                                 rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_CUT)
 
-                            SystemAction.TEXT_COPY ->
+                            OldSystemAction.TEXT_COPY ->
                                 rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_COPY)
 
-                            SystemAction.TEXT_PASTE ->
+                            OldSystemAction.TEXT_PASTE ->
                                 rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_PASTE)
 
-                            SystemAction.SELECT_WORD_AT_CURSOR -> {
+                            OldSystemAction.SELECT_WORD_AT_CURSOR -> {
                                 rootNode.focusedNode {
                                     it ?: return@focusedNode
 
@@ -564,52 +564,54 @@ class ActionPerformerDelegate(
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         when (id) {
-                            SystemAction.PAUSE_MEDIA -> MediaUtils.pauseMediaPlayback(this)
-                            SystemAction.PLAY_MEDIA -> MediaUtils.playMedia(this)
-                            SystemAction.PLAY_PAUSE_MEDIA -> MediaUtils.playPauseMediaPlayback(this)
-                            SystemAction.NEXT_TRACK -> MediaUtils.nextTrack(this)
-                            SystemAction.PREVIOUS_TRACK -> MediaUtils.previousTrack(this)
-                            SystemAction.FAST_FORWARD -> MediaUtils.fastForward(this)
-                            SystemAction.REWIND -> MediaUtils.rewind(this)
+                            OldSystemAction.PAUSE_MEDIA -> MediaUtils.pauseMediaPlayback(this)
+                            OldSystemAction.PLAY_MEDIA -> MediaUtils.playMedia(this)
+                            OldSystemAction.PLAY_PAUSE_MEDIA -> MediaUtils.playPauseMediaPlayback(
+                                this
+                            )
+                            OldSystemAction.NEXT_TRACK -> MediaUtils.nextTrack(this)
+                            OldSystemAction.PREVIOUS_TRACK -> MediaUtils.previousTrack(this)
+                            OldSystemAction.FAST_FORWARD -> MediaUtils.fastForward(this)
+                            OldSystemAction.REWIND -> MediaUtils.rewind(this)
                         }
                     }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         when (id) {
-                            SystemAction.SHOW_POWER_MENU ->
+                            OldSystemAction.SHOW_POWER_MENU ->
                                 performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
 
-                            SystemAction.PLAY_MEDIA_PACKAGE -> {
+                            OldSystemAction.PLAY_MEDIA_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.playMediaForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.PLAY_PAUSE_MEDIA_PACKAGE -> {
+                            OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.playPauseMediaPlaybackForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.PAUSE_MEDIA_PACKAGE -> {
+                            OldSystemAction.PAUSE_MEDIA_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.pauseMediaForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.NEXT_TRACK_PACKAGE -> {
+                            OldSystemAction.NEXT_TRACK_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.nextTrackForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.PREVIOUS_TRACK_PACKAGE -> {
+                            OldSystemAction.PREVIOUS_TRACK_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.previousTrackForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.FAST_FORWARD_PACKAGE -> {
+                            OldSystemAction.FAST_FORWARD_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.fastForwardForPackage(ctx, it)
                                 }
                             }
-                            SystemAction.REWIND_PACKAGE -> {
+                            OldSystemAction.REWIND_PACKAGE -> {
                                 action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
                                     MediaUtils.rewindForPackage(ctx, it)
                                 }
@@ -627,74 +629,75 @@ class ActionPerformerDelegate(
                         }
 
                         when (id) {
-                            SystemAction.VOLUME_UNMUTE -> AudioUtils.adjustVolume(
+                            OldSystemAction.VOLUME_UNMUTE -> AudioUtils.adjustVolume(
                                 this,
                                 AudioManager.ADJUST_UNMUTE,
                                 showVolumeUi
                             )
 
-                            SystemAction.VOLUME_MUTE -> AudioUtils.adjustVolume(
+                            OldSystemAction.VOLUME_MUTE -> AudioUtils.adjustVolume(
                                 this,
                                 AudioManager.ADJUST_MUTE,
                                 showVolumeUi
                             )
 
-                            SystemAction.VOLUME_TOGGLE_MUTE ->
+                            OldSystemAction.VOLUME_TOGGLE_MUTE ->
                                 AudioUtils.adjustVolume(
                                     this,
                                     AudioManager.ADJUST_TOGGLE_MUTE,
                                     showVolumeUi
                                 )
 
-                            SystemAction.TOGGLE_FLASHLIGHT -> flashlightController.toggleFlashlight(
+                            OldSystemAction.TOGGLE_FLASHLIGHT -> flashlightController.toggleFlashlight(
                                 lensFacing
                             )
-                            SystemAction.ENABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
+                            OldSystemAction.ENABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
                                 true,
                                 lensFacing
                             )
-                            SystemAction.DISABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
+                            OldSystemAction.DISABLE_FLASHLIGHT -> flashlightController.setFlashlightMode(
                                 false,
                                 lensFacing
                             )
 
-                            SystemAction.TOGGLE_DND_MODE,
-                            SystemAction.ENABLE_DND_MODE -> {
+                            OldSystemAction.TOGGLE_DND_MODE,
+                            OldSystemAction.ENABLE_DND_MODE -> {
                                 action.extras.getData(ActionEntity.EXTRA_DND_MODE).onSuccess {
-                                    val mode = SystemActionOption.OPTION_ID_SDK_ID_MAP[it] ?: return@onSuccess
+                                    val mode = SystemActionOption.OPTION_ID_SDK_ID_MAP[it]
+                                        ?: return@onSuccess
 
                                     when (id) {
-                                        SystemAction.TOGGLE_DND_MODE -> AudioUtils.toggleDndMode(
+                                        OldSystemAction.TOGGLE_DND_MODE -> AudioUtils.toggleDndMode(
                                             mode
                                         )
-                                        SystemAction.ENABLE_DND_MODE -> AudioUtils.enableDndMode(
+                                        OldSystemAction.ENABLE_DND_MODE -> AudioUtils.enableDndMode(
                                             mode
                                         )
                                     }
                                 }
                             }
 
-                            SystemAction.DISABLE_DND_MODE -> AudioUtils.disableDnd()
+                            OldSystemAction.DISABLE_DND_MODE -> AudioUtils.disableDnd()
                         }
                     }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         when (id) {
-                            SystemAction.TOGGLE_KEYBOARD -> keyboardController?.toggle(this)
-                            SystemAction.SHOW_KEYBOARD -> keyboardController?.show(this)
-                            SystemAction.HIDE_KEYBOARD -> keyboardController?.hide(this)
+                            OldSystemAction.TOGGLE_KEYBOARD -> keyboardController?.toggle(this)
+                            OldSystemAction.SHOW_KEYBOARD -> keyboardController?.show(this)
+                            OldSystemAction.HIDE_KEYBOARD -> keyboardController?.hide(this)
 
-                            SystemAction.TOGGLE_SPLIT_SCREEN ->
+                            OldSystemAction.TOGGLE_SPLIT_SCREEN ->
                                 performGlobalAction(AccessibilityService.GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
                         }
                     }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         when (id) {
-                            SystemAction.SCREENSHOT ->
+                            OldSystemAction.SCREENSHOT ->
                                 performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
 
-                            SystemAction.LOCK_DEVICE ->
+                            OldSystemAction.LOCK_DEVICE ->
                                 performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
                         }
                     }

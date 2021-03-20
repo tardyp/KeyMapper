@@ -127,7 +127,7 @@ inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {
     return this
 }
 
-inline fun <T, U> Result<T>.onFailure(f: (error: Error) -> U): Result<T> {
+infix fun <T, U> Result<T>.onFailure(f: (error: Error) -> U): Result<T> {
     if (this is Error) {
         f(this)
     }

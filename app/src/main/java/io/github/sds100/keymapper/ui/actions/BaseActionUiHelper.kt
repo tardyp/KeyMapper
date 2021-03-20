@@ -78,18 +78,6 @@ abstract class BaseActionUiHelper<A>(
 
         is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action)))
 
-        is VolumeSystemAction -> {
-            val resId = SystemActionUtils.getTitle(action)
-
-            if (action.showVolumeUi) {
-
-                val midDot = getString(R.string.middot)
-                "${getString(resId)} $midDot ${getString(R.string.flag_show_volume_dialog)}".success()
-            } else {
-                getString(resId).success()
-            }
-        }
-
         is ChangeDndModeSystemAction -> {
             val dndModeString = when (action.dndMode) {
                 DndMode.ALARMS -> getString(R.string.dnd_mode_alarms)
@@ -97,22 +85,19 @@ abstract class BaseActionUiHelper<A>(
                 DndMode.NONE -> getString(R.string.dnd_mode_none)
             }
 
-            when (action.id) {
-                SystemActionId.TOGGLE_DND_MODE -> getString(
+            when (action) {
+                is ChangeDndModeSystemAction.Toggle -> getString(
                     R.string.action_toggle_dnd_mode_formatted,
                     dndModeString
                 )
-
-                SystemActionId.ENABLE_DND_MODE -> getString(
+                is ChangeDndModeSystemAction.Disable -> getString(
                     R.string.action_enable_dnd_mode_formatted,
                     dndModeString
                 )
-
-                SystemActionId.DISABLE_DND_MODE -> getString(
-                    R.string.action_disable_dnd_mode
+                is ChangeDndModeSystemAction.Enable -> getString(
+                    R.string.action_enable_dnd_mode_formatted,
+                    dndModeString
                 )
-
-                else -> throw Exception("don't know how to create action title for this ${action.id}")
             }.success()
         }
 
@@ -126,60 +111,71 @@ abstract class BaseActionUiHelper<A>(
             getString(R.string.action_change_ringer_mode_formatted, ringerModeString).success()
         }
 
-        is ChangeVolumeStreamSystemAction -> {
-            val streamString = when (action.streamType) {
-                StreamType.ALARM -> getString(R.string.stream_alarm)
-                StreamType.DTMF -> getString(R.string.stream_dtmf)
-                StreamType.MUSIC -> getString(R.string.stream_music)
-                StreamType.NOTIFICATION -> getString(R.string.stream_notification)
-                StreamType.RING -> getString(R.string.stream_ring)
-                StreamType.SYSTEM -> getString(R.string.stream_system)
-                StreamType.VOICE_CALL -> getString(R.string.stream_voice_call)
-                StreamType.ACCESSIBILITY -> getString(R.string.stream_accessibility)
+        is VolumeSystemAction -> {
+            val string = when (action) {
+                is VolumeSystemAction.Stream -> {
+                    val streamString = when (action.volumeStream) {
+                        VolumeStream.ALARM -> getString(R.string.stream_alarm)
+                        VolumeStream.DTMF -> getString(R.string.stream_dtmf)
+                        VolumeStream.MUSIC -> getString(R.string.stream_music)
+                        VolumeStream.NOTIFICATION -> getString(R.string.stream_notification)
+                        VolumeStream.RING -> getString(R.string.stream_ring)
+                        VolumeStream.SYSTEM -> getString(R.string.stream_system)
+                        VolumeStream.VOICE_CALL -> getString(R.string.stream_voice_call)
+                        VolumeStream.ACCESSIBILITY -> getString(R.string.stream_accessibility)
+                    }
+
+                    when (action) {
+                        is VolumeSystemAction.Stream.Decrease -> getString(
+                            R.string.action_decrease_stream_formatted,
+                            streamString
+                        )
+
+                        is VolumeSystemAction.Stream.Increase -> getString(
+                            R.string.action_increase_stream_formatted,
+                            streamString
+                        )
+                    }
+                }
+
+                is VolumeSystemAction.Down -> getString(R.string.action_volume_down)
+                is VolumeSystemAction.Mute -> getString(R.string.action_volume_mute)
+                is VolumeSystemAction.ToggleMute -> getString(R.string.action_toggle_mute)
+                is VolumeSystemAction.UnMute -> getString(R.string.action_volume_unmute)
+                is VolumeSystemAction.Up -> getString(R.string.action_volume_up)
             }
 
-            when (action.id) {
-                SystemActionId.VOLUME_DECREASE_STREAM -> getString(
-                    R.string.action_decrease_stream_formatted,
-                    streamString
-                )
-                SystemActionId.VOLUME_INCREASE_STREAM -> getString(
-                    R.string.action_increase_stream_formatted,
-                    streamString
-                )
-
-                else -> throw Exception("don't know how to create action title for this ${action.id}")
+            if (action.showVolumeUi) {
+                val midDot = getString(R.string.middot)
+                "$string $midDot ${getString(R.string.flag_show_volume_dialog)}"
+            } else {
+                string
             }.success()
         }
 
         is ControlMediaForAppSystemAction ->
             appInfoAdapter.getAppName(action.packageName).map { appName ->
-                val resId = when (action.id) {
-                    SystemActionId.PLAY_MEDIA_PACKAGE -> R.string.action_play_media_package_formatted
-                    SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_play_pause_media_package_formatted
-                    SystemActionId.PAUSE_MEDIA_PACKAGE -> R.string.action_pause_media_package_formatted
-                    SystemActionId.NEXT_TRACK_PACKAGE -> R.string.action_next_track_package_formatted
-                    SystemActionId.PREVIOUS_TRACK_PACKAGE -> R.string.action_previous_track_package_formatted
-                    SystemActionId.FAST_FORWARD_PACKAGE -> R.string.action_fast_forward_package_formatted
-                    SystemActionId.REWIND_PACKAGE -> R.string.action_rewind_package_formatted
-
-
-                    else -> throw Exception("don't know how to create action title for this ${action.id}")
+                val resId = when (action) {
+                    is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package_formatted
+                    is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package_formatted
+                    is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package_formatted
+                    is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package_formatted
+                    is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package_formatted
+                    is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package_formatted
+                    is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package_formatted
                 }
 
                 getString(resId, appName).success()
 
             }.catch {
-                val resId = when (action.id) {
-                    SystemActionId.PLAY_MEDIA_PACKAGE -> R.string.action_play_media_package
-                    SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_play_pause_media_package
-                    SystemActionId.PAUSE_MEDIA_PACKAGE -> R.string.action_pause_media_package
-                    SystemActionId.NEXT_TRACK_PACKAGE -> R.string.action_next_track_package
-                    SystemActionId.PREVIOUS_TRACK_PACKAGE -> R.string.action_previous_track_package
-                    SystemActionId.FAST_FORWARD_PACKAGE -> R.string.action_fast_forward_package
-                    SystemActionId.REWIND_PACKAGE -> R.string.action_rewind_package
-
-                    else -> throw Exception("don't know how to create action title for this ${action.id}")
+                val resId = when (action) {
+                    is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package
+                    is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package
+                    is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package
+                    is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package
+                    is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package
+                    is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package
+                    is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package
                 }
 
                 getString(resId).success()
@@ -202,11 +198,10 @@ abstract class BaseActionUiHelper<A>(
         }
 
         is FlashlightSystemAction -> {
-            val resId = when (action.id) {
-                SystemActionId.TOGGLE_FLASHLIGHT -> R.string.action_toggle_flashlight_formatted
-                SystemActionId.ENABLE_FLASHLIGHT -> R.string.action_enable_flashlight_formatted
-                SystemActionId.DISABLE_FLASHLIGHT -> R.string.action_disable_flashlight_formatted
-                else -> throw Exception("don't know how to create action title for this ${action.id}")
+            val resId = when (action) {
+                is FlashlightSystemAction.Toggle -> R.string.action_toggle_flashlight_formatted
+                is FlashlightSystemAction.Enable -> R.string.action_enable_flashlight_formatted
+                is FlashlightSystemAction.Disable -> R.string.action_disable_flashlight_formatted
             }
 
             val lensString = when (action.lens) {
@@ -268,7 +263,7 @@ abstract class BaseActionUiHelper<A>(
             IconInfo(it, TintType.NONE).success()
         }.firstBlocking()
 
-        is SystemActionData -> IconInfo(
+        is SystemAction -> IconInfo(
             SystemActionUtils.getIcon(action)?.let { getDrawable(it) },
             TintType.ON_SURFACE
         ).success()

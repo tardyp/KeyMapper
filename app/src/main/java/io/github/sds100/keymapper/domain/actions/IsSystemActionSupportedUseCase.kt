@@ -13,7 +13,7 @@ class IsSystemActionSupportedUseCaseImpl(
    private val adapter: SystemFeatureAdapter
 ) : IsSystemActionSupportedUseCase {
 
-    override fun invoke(action: SystemActionData): Error? {
+    override fun invoke(action: SystemAction): Error? {
         val minApi = SystemActionUtils.getMinApi(action)
         if (Build.VERSION.SDK_INT < minApi) {
             return Error.SdkVersionTooLow(minApi)
@@ -35,5 +35,5 @@ class IsSystemActionSupportedUseCaseImpl(
 }
 
 interface IsSystemActionSupportedUseCase {
-    operator fun invoke(action: SystemActionData): Error?
+    operator fun invoke(action: SystemAction): Error?
 }

@@ -14,101 +14,101 @@ import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.domain.actions.SystemActionId
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_BLUETOOTH
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_FLASHLIGHT
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_KEYBOARD
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_MEDIA
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_MOBILE_DATA
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_NAVIGATION
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_NFC
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_OTHER
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_SCREEN_ROTATION
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_STATUS_BAR
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_VOLUME
-import io.github.sds100.keymapper.util.SystemAction.CATEGORY_WIFI
-import io.github.sds100.keymapper.util.SystemAction.COLLAPSE_STATUS_BAR
-import io.github.sds100.keymapper.util.SystemAction.CONSUME_KEY_EVENT
-import io.github.sds100.keymapper.util.SystemAction.CYCLE_ROTATIONS
-import io.github.sds100.keymapper.util.SystemAction.DECREASE_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_BLUETOOTH
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_NFC
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_WIFI
-import io.github.sds100.keymapper.util.SystemAction.DISABLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_BLUETOOTH
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_NFC
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_WIFI
-import io.github.sds100.keymapper.util.SystemAction.ENABLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.SystemAction.EXPAND_NOTIFICATION_DRAWER
-import io.github.sds100.keymapper.util.SystemAction.EXPAND_QUICK_SETTINGS
-import io.github.sds100.keymapper.util.SystemAction.FAST_FORWARD
-import io.github.sds100.keymapper.util.SystemAction.FAST_FORWARD_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.GO_BACK
-import io.github.sds100.keymapper.util.SystemAction.GO_HOME
-import io.github.sds100.keymapper.util.SystemAction.GO_LAST_APP
-import io.github.sds100.keymapper.util.SystemAction.HIDE_KEYBOARD
-import io.github.sds100.keymapper.util.SystemAction.INCREASE_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.LANDSCAPE_MODE
-import io.github.sds100.keymapper.util.SystemAction.LOCK_DEVICE
-import io.github.sds100.keymapper.util.SystemAction.LOCK_DEVICE_ROOT
-import io.github.sds100.keymapper.util.SystemAction.MOVE_CURSOR_TO_END
-import io.github.sds100.keymapper.util.SystemAction.NEXT_TRACK
-import io.github.sds100.keymapper.util.SystemAction.NEXT_TRACK_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.OPEN_CAMERA
-import io.github.sds100.keymapper.util.SystemAction.OPEN_DEVICE_ASSISTANT
-import io.github.sds100.keymapper.util.SystemAction.OPEN_MENU
-import io.github.sds100.keymapper.util.SystemAction.OPEN_RECENTS
-import io.github.sds100.keymapper.util.SystemAction.OPEN_SETTINGS
-import io.github.sds100.keymapper.util.SystemAction.OPEN_VOICE_ASSISTANT
-import io.github.sds100.keymapper.util.SystemAction.PAUSE_MEDIA
-import io.github.sds100.keymapper.util.SystemAction.PAUSE_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.PLAY_MEDIA
-import io.github.sds100.keymapper.util.SystemAction.PLAY_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.PLAY_PAUSE_MEDIA
-import io.github.sds100.keymapper.util.SystemAction.PLAY_PAUSE_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.PORTRAIT_MODE
-import io.github.sds100.keymapper.util.SystemAction.POWER_ON_OFF_DEVICE
-import io.github.sds100.keymapper.util.SystemAction.PREVIOUS_TRACK
-import io.github.sds100.keymapper.util.SystemAction.PREVIOUS_TRACK_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.REWIND
-import io.github.sds100.keymapper.util.SystemAction.REWIND_PACKAGE
-import io.github.sds100.keymapper.util.SystemAction.SCREENSHOT
-import io.github.sds100.keymapper.util.SystemAction.SCREENSHOT_ROOT
-import io.github.sds100.keymapper.util.SystemAction.SECURE_LOCK_DEVICE
-import io.github.sds100.keymapper.util.SystemAction.SELECT_WORD_AT_CURSOR
-import io.github.sds100.keymapper.util.SystemAction.SHOW_KEYBOARD
-import io.github.sds100.keymapper.util.SystemAction.SHOW_KEYBOARD_PICKER
-import io.github.sds100.keymapper.util.SystemAction.SHOW_KEYBOARD_PICKER_ROOT
-import io.github.sds100.keymapper.util.SystemAction.SHOW_POWER_MENU
-import io.github.sds100.keymapper.util.SystemAction.SWITCH_KEYBOARD
-import io.github.sds100.keymapper.util.SystemAction.SWITCH_ORIENTATION
-import io.github.sds100.keymapper.util.SystemAction.TEXT_COPY
-import io.github.sds100.keymapper.util.SystemAction.TEXT_CUT
-import io.github.sds100.keymapper.util.SystemAction.TEXT_PASTE
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_BLUETOOTH
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_KEYBOARD
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_NFC
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_NOTIFICATION_DRAWER
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_QUICK_SETTINGS_DRAWER
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_SPLIT_SCREEN
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI
-import io.github.sds100.keymapper.util.SystemAction.TOGGLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.SystemAction.VOLUME_MUTE
-import io.github.sds100.keymapper.util.SystemAction.VOLUME_TOGGLE_MUTE
-import io.github.sds100.keymapper.util.SystemAction.VOLUME_UNMUTE
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_AIRPLANE_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_BLUETOOTH
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_FLASHLIGHT
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_KEYBOARD
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_MEDIA
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_MOBILE_DATA
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_NAVIGATION
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_NFC
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_OTHER
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_SCREEN_ROTATION
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_STATUS_BAR
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_VOLUME
+import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_WIFI
+import io.github.sds100.keymapper.util.OldSystemAction.COLLAPSE_STATUS_BAR
+import io.github.sds100.keymapper.util.OldSystemAction.CONSUME_KEY_EVENT
+import io.github.sds100.keymapper.util.OldSystemAction.CYCLE_ROTATIONS
+import io.github.sds100.keymapper.util.OldSystemAction.DECREASE_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AIRPLANE_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AUTO_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AUTO_ROTATE
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_BLUETOOTH
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_MOBILE_DATA
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_NFC
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_WIFI
+import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_WIFI_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AIRPLANE_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AUTO_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AUTO_ROTATE
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_BLUETOOTH
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_MOBILE_DATA
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_NFC
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_WIFI
+import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_WIFI_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.EXPAND_NOTIFICATION_DRAWER
+import io.github.sds100.keymapper.util.OldSystemAction.EXPAND_QUICK_SETTINGS
+import io.github.sds100.keymapper.util.OldSystemAction.FAST_FORWARD
+import io.github.sds100.keymapper.util.OldSystemAction.FAST_FORWARD_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.GO_BACK
+import io.github.sds100.keymapper.util.OldSystemAction.GO_HOME
+import io.github.sds100.keymapper.util.OldSystemAction.GO_LAST_APP
+import io.github.sds100.keymapper.util.OldSystemAction.HIDE_KEYBOARD
+import io.github.sds100.keymapper.util.OldSystemAction.INCREASE_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.LANDSCAPE_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.LOCK_DEVICE
+import io.github.sds100.keymapper.util.OldSystemAction.LOCK_DEVICE_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.MOVE_CURSOR_TO_END
+import io.github.sds100.keymapper.util.OldSystemAction.NEXT_TRACK
+import io.github.sds100.keymapper.util.OldSystemAction.NEXT_TRACK_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_CAMERA
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_DEVICE_ASSISTANT
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_MENU
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_RECENTS
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_SETTINGS
+import io.github.sds100.keymapper.util.OldSystemAction.OPEN_VOICE_ASSISTANT
+import io.github.sds100.keymapper.util.OldSystemAction.PAUSE_MEDIA
+import io.github.sds100.keymapper.util.OldSystemAction.PAUSE_MEDIA_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.PLAY_MEDIA
+import io.github.sds100.keymapper.util.OldSystemAction.PLAY_MEDIA_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.PLAY_PAUSE_MEDIA
+import io.github.sds100.keymapper.util.OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.PORTRAIT_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.POWER_ON_OFF_DEVICE
+import io.github.sds100.keymapper.util.OldSystemAction.PREVIOUS_TRACK
+import io.github.sds100.keymapper.util.OldSystemAction.PREVIOUS_TRACK_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.REWIND
+import io.github.sds100.keymapper.util.OldSystemAction.REWIND_PACKAGE
+import io.github.sds100.keymapper.util.OldSystemAction.SCREENSHOT
+import io.github.sds100.keymapper.util.OldSystemAction.SCREENSHOT_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.SECURE_LOCK_DEVICE
+import io.github.sds100.keymapper.util.OldSystemAction.SELECT_WORD_AT_CURSOR
+import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD
+import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD_PICKER
+import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD_PICKER_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.SHOW_POWER_MENU
+import io.github.sds100.keymapper.util.OldSystemAction.SWITCH_KEYBOARD
+import io.github.sds100.keymapper.util.OldSystemAction.SWITCH_ORIENTATION
+import io.github.sds100.keymapper.util.OldSystemAction.TEXT_COPY
+import io.github.sds100.keymapper.util.OldSystemAction.TEXT_CUT
+import io.github.sds100.keymapper.util.OldSystemAction.TEXT_PASTE
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AIRPLANE_MODE
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AUTO_BRIGHTNESS
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AUTO_ROTATE
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_BLUETOOTH
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_KEYBOARD
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_MOBILE_DATA
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_NFC
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_NOTIFICATION_DRAWER
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_QUICK_SETTINGS_DRAWER
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_SPLIT_SCREEN
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_WIFI
+import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_WIFI_ROOT
+import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_MUTE
+import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_TOGGLE_MUTE
+import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_UNMUTE
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
@@ -141,7 +141,7 @@ object SystemActionUtils {
     )
 
     @StringRes
-    fun getTitle(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int =
+    fun getTitle(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int =
         when (action.id) {
             SystemActionId.TOGGLE_WIFI -> R.string.action_toggle_wifi
             SystemActionId.ENABLE_WIFI -> R.string.action_enable_wifi
@@ -241,7 +241,7 @@ object SystemActionUtils {
         }
 
     @DrawableRes
-    fun getIcon(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int? =
+    fun getIcon(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int? =
         when (action.id) {
             SystemActionId.TOGGLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.ENABLE_WIFI -> R.drawable.ic_outline_wifi_24
@@ -340,7 +340,7 @@ object SystemActionUtils {
             SystemActionId.SHOW_POWER_MENU -> R.drawable.ic_outline_power_settings_new_24
         }
 
-    fun getMinApi(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int {
+    fun getMinApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
         return when (action.id) {
             SystemActionId.TOGGLE_SPLIT_SCREEN -> Build.VERSION_CODES.N
             SystemActionId.GO_LAST_APP -> Build.VERSION_CODES.N
@@ -393,7 +393,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getMaxApi(action: io.github.sds100.keymapper.domain.actions.SystemActionData): Int {
+    fun getMaxApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
         return when (action.id) {
             SystemActionId.SHOW_KEYBOARD_PICKER -> Build.VERSION_CODES.P
 
@@ -401,7 +401,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getRequiredSystemFeatures(action: io.github.sds100.keymapper.domain.actions.SystemActionData): List<String> {
+    fun getRequiredSystemFeatures(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
         return when (action.id) {
             SystemActionId.SECURE_LOCK_DEVICE
             -> listOf(PackageManager.FEATURE_DEVICE_ADMIN)
@@ -420,7 +420,7 @@ object SystemActionUtils {
         }
     }
 
-    fun getRequiredPermissions(action: io.github.sds100.keymapper.domain.actions.SystemActionData): List<String> {
+    fun getRequiredPermissions(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
         when (action.id) {
             SystemActionId.TOGGLE_WIFI,
             SystemActionId.ENABLE_WIFI,
@@ -825,21 +825,21 @@ object SystemActionUtils {
 
         //VOLUME
         SystemActionDef(
-            id = SystemAction.VOLUME_UP,
+            id = OldSystemAction.VOLUME_UP,
             category = CATEGORY_VOLUME,
             iconRes = R.drawable.ic_outline_volume_up_24,
             descriptionRes = R.string.action_volume_up,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
-            id = SystemAction.VOLUME_DOWN,
+            id = OldSystemAction.VOLUME_DOWN,
             category = CATEGORY_VOLUME,
             iconRes = R.drawable.ic_outline_volume_down_24,
             descriptionRes = R.string.action_volume_down,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
-            id = SystemAction.VOLUME_INCREASE_STREAM,
+            id = OldSystemAction.VOLUME_INCREASE_STREAM,
             category = CATEGORY_VOLUME,
             iconRes = R.drawable.ic_outline_volume_up_24,
             descriptionRes = R.string.action_increase_stream,
@@ -848,7 +848,7 @@ object SystemActionUtils {
             options = SystemActionOption.STREAMS
         ),
         SystemActionDef(
-            id = SystemAction.VOLUME_DECREASE_STREAM,
+            id = OldSystemAction.VOLUME_DECREASE_STREAM,
             category = CATEGORY_VOLUME,
             iconRes = R.drawable.ic_outline_volume_down_24,
             descriptionRes = R.string.action_decrease_stream,
@@ -857,24 +857,24 @@ object SystemActionUtils {
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
-            id = SystemAction.VOLUME_SHOW_DIALOG,
+            id = OldSystemAction.VOLUME_SHOW_DIALOG,
             category = CATEGORY_VOLUME,
             descriptionRes = R.string.action_volume_show_dialog
         ),
         SystemActionDef(
-            id = SystemAction.CYCLE_RINGER_MODE,
+            id = OldSystemAction.CYCLE_RINGER_MODE,
             category = CATEGORY_VOLUME,
             descriptionRes = R.string.action_cycle_ringer_mode,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
-            id = SystemAction.CYCLE_VIBRATE_RING,
+            id = OldSystemAction.CYCLE_VIBRATE_RING,
             category = CATEGORY_VOLUME,
             descriptionRes = R.string.action_cycle_vibrate_ring,
             permissions = arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
         ),
         SystemActionDef(
-            id = SystemAction.CHANGE_RINGER_MODE,
+            id = OldSystemAction.CHANGE_RINGER_MODE,
             category = CATEGORY_VOLUME,
             descriptionRes = R.string.action_change_ringer_mode,
             descriptionFormattedRes = R.string.action_change_ringer_mode_formatted,
@@ -913,7 +913,7 @@ object SystemActionUtils {
         ),
 
         SystemActionDef(
-            id = SystemAction.TOGGLE_DND_MODE,
+            id = OldSystemAction.TOGGLE_DND_MODE,
             category = CATEGORY_VOLUME,
             minApi = Build.VERSION_CODES.M,
             iconRes = R.drawable.dnd_circle_outline,
@@ -924,7 +924,7 @@ object SystemActionUtils {
         ),
 
         SystemActionDef(
-            id = SystemAction.ENABLE_DND_MODE,
+            id = OldSystemAction.ENABLE_DND_MODE,
             category = CATEGORY_VOLUME,
             minApi = Build.VERSION_CODES.M,
             iconRes = R.drawable.dnd_circle_outline,
@@ -935,7 +935,7 @@ object SystemActionUtils {
         ),
 
         SystemActionDef(
-            id = SystemAction.DISABLE_DND_MODE,
+            id = OldSystemAction.DISABLE_DND_MODE,
             category = CATEGORY_VOLUME,
             minApi = Build.VERSION_CODES.M,
             iconRes = R.drawable.dnd_circle_off_outline,
@@ -1038,7 +1038,7 @@ object SystemActionUtils {
 
         //FLASHLIGHT
         SystemActionDef(
-            id = SystemAction.TOGGLE_FLASHLIGHT,
+            id = OldSystemAction.TOGGLE_FLASHLIGHT,
             category = CATEGORY_FLASHLIGHT,
             permissions = arrayOf(Manifest.permission.CAMERA),
             features = arrayOf(PackageManager.FEATURE_CAMERA_FLASH),
@@ -1049,7 +1049,7 @@ object SystemActionUtils {
             options = SystemActionOption.LENSES
         ),
         SystemActionDef(
-            id = SystemAction.ENABLE_FLASHLIGHT,
+            id = OldSystemAction.ENABLE_FLASHLIGHT,
             category = CATEGORY_FLASHLIGHT,
             permissions = arrayOf(Manifest.permission.CAMERA),
             features = arrayOf(PackageManager.FEATURE_CAMERA_FLASH),
@@ -1060,7 +1060,7 @@ object SystemActionUtils {
             options = SystemActionOption.LENSES
         ),
         SystemActionDef(
-            id = SystemAction.DISABLE_FLASHLIGHT,
+            id = OldSystemAction.DISABLE_FLASHLIGHT,
             category = CATEGORY_FLASHLIGHT,
             permissions = arrayOf(Manifest.permission.CAMERA),
             features = arrayOf(PackageManager.FEATURE_CAMERA_FLASH),

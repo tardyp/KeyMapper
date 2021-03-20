@@ -66,13 +66,6 @@ data class Extra(@ExtraId
     }
 }
 
-fun List<Extra>.putExtraData(id: String, data: String): List<Extra> {
-    return this.toMutableList().apply {
-        removeAll { it.id == id }
-        add(Extra(id, data))
-    }
-}
-
 fun List<Extra>.getData(extraId: String): Result<String> {
 
     return find { it.id == extraId }.let {

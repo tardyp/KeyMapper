@@ -9,8 +9,10 @@ import android.view.Surface
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.util.KeyboardUtils
-import io.github.sds100.keymapper.util.SystemAction
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.OldSystemAction
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.Success
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -119,30 +121,30 @@ object SystemActionOption {
     @ExtraId
     fun getExtraIdForOption(systemActionId: String): String {
         return when (systemActionId) {
-            SystemAction.VOLUME_DECREASE_STREAM,
-            SystemAction.VOLUME_INCREASE_STREAM -> ActionEntity.EXTRA_STREAM_TYPE
+            OldSystemAction.VOLUME_DECREASE_STREAM,
+            OldSystemAction.VOLUME_INCREASE_STREAM -> ActionEntity.EXTRA_STREAM_TYPE
 
-            SystemAction.DISABLE_FLASHLIGHT,
-            SystemAction.ENABLE_FLASHLIGHT,
-            SystemAction.TOGGLE_FLASHLIGHT -> ActionEntity.EXTRA_LENS
+            OldSystemAction.DISABLE_FLASHLIGHT,
+            OldSystemAction.ENABLE_FLASHLIGHT,
+            OldSystemAction.TOGGLE_FLASHLIGHT -> ActionEntity.EXTRA_LENS
 
-            SystemAction.CHANGE_RINGER_MODE -> ActionEntity.EXTRA_RINGER_MODE
+            OldSystemAction.CHANGE_RINGER_MODE -> ActionEntity.EXTRA_RINGER_MODE
 
-            SystemAction.SWITCH_KEYBOARD -> ActionEntity.EXTRA_IME_ID
+            OldSystemAction.SWITCH_KEYBOARD -> ActionEntity.EXTRA_IME_ID
 
-            SystemAction.TOGGLE_DND_MODE,
-            SystemAction.ENABLE_DND_MODE,
-            SystemAction.DISABLE_DND_MODE -> ActionEntity.EXTRA_DND_MODE
+            OldSystemAction.TOGGLE_DND_MODE,
+            OldSystemAction.ENABLE_DND_MODE,
+            OldSystemAction.DISABLE_DND_MODE -> ActionEntity.EXTRA_DND_MODE
 
-            SystemAction.CYCLE_ROTATIONS -> ActionEntity.EXTRA_ORIENTATIONS
+            OldSystemAction.CYCLE_ROTATIONS -> ActionEntity.EXTRA_ORIENTATIONS
 
-            SystemAction.PLAY_MEDIA_PACKAGE,
-            SystemAction.PLAY_PAUSE_MEDIA_PACKAGE,
-            SystemAction.PAUSE_MEDIA_PACKAGE,
-            SystemAction.NEXT_TRACK_PACKAGE,
-            SystemAction.PREVIOUS_TRACK_PACKAGE,
-            SystemAction.FAST_FORWARD_PACKAGE,
-            SystemAction.REWIND_PACKAGE -> ActionEntity.EXTRA_PACKAGE_NAME
+            OldSystemAction.PLAY_MEDIA_PACKAGE,
+            OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE,
+            OldSystemAction.PAUSE_MEDIA_PACKAGE,
+            OldSystemAction.NEXT_TRACK_PACKAGE,
+            OldSystemAction.PREVIOUS_TRACK_PACKAGE,
+            OldSystemAction.FAST_FORWARD_PACKAGE,
+            OldSystemAction.REWIND_PACKAGE -> ActionEntity.EXTRA_PACKAGE_NAME
 
             else -> throw Exception("Can't find an extra id for that system action $systemActionId")
         }
@@ -150,16 +152,16 @@ object SystemActionOption {
 
     fun getOptionLabel(ctx: Context, systemActionId: String, optionId: String): Result<String> {
         when (systemActionId) {
-            SystemAction.PLAY_MEDIA_PACKAGE,
-            SystemAction.PLAY_PAUSE_MEDIA_PACKAGE,
-            SystemAction.PAUSE_MEDIA_PACKAGE,
-            SystemAction.NEXT_TRACK_PACKAGE,
-            SystemAction.PREVIOUS_TRACK_PACKAGE,
-            SystemAction.FAST_FORWARD_PACKAGE,
-            SystemAction.REWIND_PACKAGE ->
+            OldSystemAction.PLAY_MEDIA_PACKAGE,
+            OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE,
+            OldSystemAction.PAUSE_MEDIA_PACKAGE,
+            OldSystemAction.NEXT_TRACK_PACKAGE,
+            OldSystemAction.PREVIOUS_TRACK_PACKAGE,
+            OldSystemAction.FAST_FORWARD_PACKAGE,
+            OldSystemAction.REWIND_PACKAGE ->
                 return Success(ServiceLocator.packageRepository(ctx).getAppName(optionId))
 
-            SystemAction.SWITCH_KEYBOARD -> {
+            OldSystemAction.SWITCH_KEYBOARD -> {
                 return KeyboardUtils.getInputMethodLabel(ctx, optionId)
             }
         }
@@ -198,25 +200,6 @@ object SystemActionOption {
     }
 
     fun optionSetToString(optionIds: Set<String>) = optionIds.joinToString(",")
-
-    fun optionSetFromString(data: String): Result<Set<String>> =
-        try {
-            Success(data.split(',').toSet())
-        } catch (e: Exception) {
-            Error.FailedToSplitString(data)
-        }
-
-    fun labelsFromOptionSet(ctx: Context, systemActionId: String, optionSet: Set<String>): Result<Set<String>> {
-        val labels = mutableSetOf<String>()
-
-        loop@ for (optionId in optionSet) {
-            getOptionLabel(ctx, systemActionId, optionId).onSuccess {
-                labels.add(it)
-            }.onFailure { return@labelsFromOptionSet it }
-        }
-
-        return Success(labels)
-    }
 }
 
 enum class OptionType {

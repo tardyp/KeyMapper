@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -15,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
@@ -101,7 +99,7 @@ class ChooseActionFragment : Fragment() {
         }
 
         createActionOnResult(SystemActionListFragment.REQUEST_KEY) {
-            it.getJsonSerializable<SystemActionData>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
+            it.getJsonSerializable<SystemAction>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
         }
 
         createActionOnResult(KeycodeListFragment.REQUEST_KEY) {
