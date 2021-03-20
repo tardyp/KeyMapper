@@ -5,9 +5,9 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.domain.actions.ActionData
+import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
@@ -43,7 +43,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
         }
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
-            result.getParcelable<ConstraintEntity>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
+            result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
                 viewModel.constraintListViewModel.addConstraint(it)
             }
         }

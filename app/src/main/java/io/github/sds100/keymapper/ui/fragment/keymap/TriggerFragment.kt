@@ -159,6 +159,7 @@ class TriggerFragment : Fragment() {
         super.onDestroyView()
     }
 
+    //TODO
     private suspend fun showChooseDeviceDialog(devices: List<TriggerKeyDevice>) =
         suspendCoroutine<String> {
             requireContext().alertDialog {

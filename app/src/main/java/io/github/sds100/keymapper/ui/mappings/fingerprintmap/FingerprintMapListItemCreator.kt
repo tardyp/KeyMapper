@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.ui.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCase
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
@@ -20,12 +20,12 @@ class FingerprintMapListItemCreator(
     private val getActionError: GetActionErrorUseCase,
     actionUiHelper: ActionUiHelper<FingerprintMapAction>,
     constraintUiHelper: ConstraintUiHelper,
-    isConstraintSupported: IsConstraintSupportedUseCase,
+    getConstraintErrorUseCase: GetConstraintErrorUseCase,
     resourceProvider: ResourceProvider
 ) : BaseMappingListItemCreator<FingerprintMapAction>(
     getActionError,
     actionUiHelper,
-    isConstraintSupported,
+    getConstraintErrorUseCase,
     constraintUiHelper,
     resourceProvider
 ) {

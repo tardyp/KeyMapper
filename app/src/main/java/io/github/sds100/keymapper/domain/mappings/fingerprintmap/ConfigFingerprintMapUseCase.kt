@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
-import io.github.sds100.keymapper.domain.constraints.ConfigConstraintUseCaseImpl
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.mapData
@@ -19,7 +18,6 @@ class ConfigFingerprintMapUseCaseImpl : ConfigFingerprintMapUseCase {
         fingerprintMap.map { state -> state.mapData { ConfigFingerprintMapState(it.isEnabled) } }
 
     val configActions = ConfigFingerprintMapActionsUseCaseImpl(fingerprintMap, ::setFingerprintMap)
-    val configConstraints = ConfigConstraintUseCaseImpl()
 
     override fun setEnabled(enabled: Boolean) = editFingerprintMap { it.copy(isEnabled = enabled) }
 

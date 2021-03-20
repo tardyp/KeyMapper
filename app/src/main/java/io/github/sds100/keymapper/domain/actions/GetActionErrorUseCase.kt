@@ -3,14 +3,12 @@ package io.github.sds100.keymapper.domain.actions
 import android.Manifest
 import android.os.Build
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.data.repository.DeviceInfoCache
 import io.github.sds100.keymapper.domain.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.adapter.CameraAdapter
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.CameraLens
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
@@ -22,8 +20,6 @@ import kotlinx.coroutines.flow.combine
  * Created by sds100 on 15/02/2021.
  */
 class GetActionErrorUseCaseImpl(
-    private val preferenceRepository: PreferenceRepository,
-    private val deviceInfoRepository: DeviceInfoCache,
     private val packageManager: PackageManagerAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
     private val permissionAdapter: PermissionAdapter,

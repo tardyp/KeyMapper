@@ -71,7 +71,7 @@ object InjectorUtils {
             UseCases.getActionError(ctx),
             keymapActionUiHelper(ctx),
             constraintUiHelper(ctx),
-            UseCases.isConstraintSupported(ctx),
+            UseCases.getConstraintError(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }
@@ -177,14 +177,16 @@ object InjectorUtils {
         val configKeymapUseCase = ConfigKeymapUseCaseImpl()
 
         return ConfigKeymapViewModel.Factory(
-            SaveKeymapUseCaseImpl(ServiceLocator.defaultKeymapRepository(ctx)),
+            SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             GetKeymapUseCaseImpl(
                 ServiceLocator.defaultKeymapRepository(ctx)
             ),
             configKeymapUseCase,
             configKeymapUseCase.configActions,
             configKeymapUseCase.configTrigger,
+            configKeymapUseCase.configConstraints,
             UseCases.getActionError(ctx),
+            UseCases.getConstraintError(ctx),
             UseCases.testAction(ctx),
             UseCases.onboarding(ctx),
             UseCases.recordTrigger(ctx),

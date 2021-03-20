@@ -23,10 +23,11 @@ data class KeyMap(
     val uid: String = UUID.randomUUID().toString(),
     val trigger: KeymapTrigger = KeymapTrigger(),
     val actionDataList: List<KeymapActionData> = emptyList(),
-    val constraintList: List<Constraint> = emptyList(),
+    val constraintList: Set<Constraint> = emptySet(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true
 ) {
+
     companion object {
         const val NEW_ID = -1L
     }
@@ -82,7 +83,7 @@ data class KeyMap(
         )
 
         KeymapAction(it.uid, it.data, options)
-    }
+    }.toList()
 }
 
 object KeyMapEntityMapper {

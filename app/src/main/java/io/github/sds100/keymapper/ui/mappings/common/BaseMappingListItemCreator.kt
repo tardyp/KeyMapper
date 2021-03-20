@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCase
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ChipUi
@@ -20,14 +20,14 @@ import io.github.sds100.keymapper.util.result.*
 abstract class BaseMappingListItemCreator<A : Action>(
     private val getActionError: GetActionErrorUseCase,
     private val actionUiHelper: ActionUiHelper<A>,
-    private val isConstraintSupported: IsConstraintSupportedUseCase,
+    private val getConstraintError: GetConstraintErrorUseCase,
     private val constraintUiHelper: ConstraintUiHelper,
     private val resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
     fun getChipList(
         actionList: List<A>,
-        constraintList: List<Constraint>,
+        constraintList: Set<Constraint>,
         constraintMode: ConstraintMode
     ): List<ChipUi> = sequence {
         val midDot = getString(R.string.middot)
@@ -105,18 +105,17 @@ abstract class BaseMappingListItemCreator<A : Action>(
                 )
             }
 
-            var text: String? = null
+            val text: String = constraintUiHelper.getTitle(constraint)
             var icon: IconInfo? = null
 
-            val error: Error? = constraintUiHelper.getTitle(constraint)
-                .onSuccess { text = it }
-                .then { constraintUiHelper.getIcon(constraint) }.onSuccess { icon = it }
-                .errorOrNull() ?: isConstraintSupported.invoke(constraint)
+            val error: Error? = constraintUiHelper.getIcon(constraint)
+                .onSuccess { icon = it }
+                .errorOrNull() ?: getConstraintError.invoke(constraint)
 
             val chip: ChipUi = if (error == null) {
                 ChipUi.Normal(
                     id = constraint.toString(),
-                    text = text!!,
+                    text = text,
                     icon = icon
                 )
             } else {

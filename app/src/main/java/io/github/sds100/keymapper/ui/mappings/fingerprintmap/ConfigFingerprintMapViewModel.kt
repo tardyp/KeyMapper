@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.ui.mappings.fingerprintmap
 import android.os.Bundle
 import androidx.lifecycle.*
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -63,17 +62,16 @@ class ConfigFingerprintMapViewModel(
         resourceProvider
     )
 
-    val constraintListViewModel =
-        ConstraintListViewModel(viewModelScope, ConstraintEntity.COMMON_SUPPORTED_CONSTRAINTS)
+    val constraintListViewModel: ConstraintListViewModel = TODO()
 
     override val isEnabled = dataState.map { it?.isEnabled ?: false }
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
     private val _fixError = LiveEvent<RecoverableError>().apply {
-        addSource(actionListViewModel.fixError) {
-            this.value = it
-        }
+//        addSource(actionListViewModel.fixError) {
+//            this.value = it
+//        } //TODO
     }
     override val fixError: LiveData<RecoverableError> = _fixError
 

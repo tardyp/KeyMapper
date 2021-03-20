@@ -10,6 +10,8 @@ import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
+import io.github.sds100.keymapper.domain.constraints.ConfigConstraintsUseCase
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
@@ -41,7 +43,9 @@ class ConfigKeymapViewModel(
     private val configUseCase: ConfigKeymapUseCase,
     configActions: ConfigActionsUseCase<KeymapAction>,
     configTrigger: ConfigKeymapTriggerUseCase,
+    configConstraints: ConfigConstraintsUseCase,
     getActionError: GetActionErrorUseCase,
+    getConstraintError: GetConstraintErrorUseCase,
     testAction: TestActionUseCase,
     onboardingUseCase: OnboardingUseCase,
     recordTriggerUseCase: RecordTriggerUseCase,
@@ -76,6 +80,15 @@ class ConfigKeymapViewModel(
         resourceProvider
     )
 
+    val constraintListViewModel = ConstraintListViewModel(
+        viewModelScope,
+        configConstraints,
+        constraintUiHelper,
+        getConstraintError,
+        resourceProvider
+    )
+
+    //TODO delete this
     private val dataState = MutableLiveData<ConfigKeymapState?>()
 
     //TODO hide UI elements if loading
@@ -88,15 +101,11 @@ class ConfigKeymapViewModel(
             add(ConstraintEntity.SCREEN_OFF)
         }.toList()
 
-    val constraintListViewModel = ConstraintListViewModel(viewModelScope, supportedConstraints)
-
     override val isEnabled = dataState.map { it?.isEnabled ?: false }
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
     private val _fixError = LiveEvent<RecoverableError>().apply {
-        addSource(actionListViewModel.fixError) {
-            this.value = it
-        }
+        //TODO use sharedflow
     }
     override val fixError: LiveData<RecoverableError> = _fixError
 
@@ -156,7 +165,9 @@ class ConfigKeymapViewModel(
         private val useCase: ConfigKeymapUseCase,
         private val configActionsUseCase: ConfigActionsUseCase<KeymapAction>,
         private val configTriggerUseCase: ConfigKeymapTriggerUseCase,
+        private val configConstraints: ConfigConstraintsUseCase,
         private val getActionError: GetActionErrorUseCase,
+        private val getConstraintError: GetConstraintErrorUseCase,
         private val testAction: TestActionUseCase,
         private val onboardingUseCase: OnboardingUseCase,
         private val recordTriggerUseCase: RecordTriggerUseCase,
@@ -174,7 +185,9 @@ class ConfigKeymapViewModel(
                 useCase,
                 configActionsUseCase,
                 configTriggerUseCase,
+                configConstraints,
                 getActionError,
+                getConstraintError,
                 testAction,
                 onboardingUseCase,
                 recordTriggerUseCase,

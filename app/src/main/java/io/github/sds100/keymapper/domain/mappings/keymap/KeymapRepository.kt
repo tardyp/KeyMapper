@@ -8,4 +8,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface KeymapRepository {
     val keymapList: Flow<List<KeyMapEntity>>
+
+    fun insert(keymap: KeyMapEntity)
+    fun update(keymap: KeyMapEntity)
 }

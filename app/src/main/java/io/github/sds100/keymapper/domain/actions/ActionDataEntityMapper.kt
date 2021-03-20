@@ -20,10 +20,7 @@ object ActionDataEntityMapper {
 
     fun fromEntity(entity: ActionEntity): ActionData? {
         return when (entity.type) {
-            ActionEntity.Type.APP ->
-                entity.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).then {
-                    OpenAppAction(packageName = it).success()
-                }.valueOrNull()
+            ActionEntity.Type.APP -> OpenAppAction(packageName = entity.data)
 
             ActionEntity.Type.APP_SHORTCUT -> {
                 val packageName =

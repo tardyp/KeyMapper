@@ -128,7 +128,6 @@ class EditActionOptions(val options: BaseOptions<ActionEntity>) : Event()
 
 //constraints
 class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)
-class BuildConstraintListModels(val source: List<ConstraintEntity>) : Event()
 class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
 //fingerprint gesture maps

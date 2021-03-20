@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 data class FingerprintMap(
     val id: FingerprintMapId,
     val actionDataList: List<FingerprintMapActionData> = emptyList(),
-    val constraintList: List<Constraint> = emptyList(),
+    val constraintList: Set<Constraint> = emptySet(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true,
     val vibrate: Boolean = false,
@@ -40,7 +40,7 @@ data class FingerprintMap(
         )
     )
 
-    val actionList = actionDataList.map {
+    val actionList: List<FingerprintMapAction> = actionDataList.map {
         val options = FingerprintMapActionOptions(
             delayBeforeNextAction = Option(
                 value = it.delayBeforeNextAction,
@@ -74,7 +74,7 @@ data class FingerprintMap(
         )
 
         FingerprintMapAction(it.uid, it.data, options)
-    }
+    }.toList()
 }
 
 object FingerprintMapEntityMapper {
@@ -82,9 +82,11 @@ object FingerprintMapEntityMapper {
         id: FingerprintMapId,
         entity: FingerprintMapEntity,
     ): FingerprintMap {
+        val actionList = entity.actionList
+            .map { FingerprintMapActionEntityMapper.fromEntity(it) }
         return FingerprintMap(
             id = id,
-            actionDataList = entity.actionList.map { FingerprintMapActionEntityMapper.fromEntity(it) },
+            actionDataList = actionList,
             TODO()
         )
     }

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCase
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCase
@@ -30,7 +30,7 @@ class KeymapListViewModel internal constructor(
     private val getActionError: GetActionErrorUseCase,
     actionUiHelper: ActionUiHelper<KeymapAction>,
     constraintUiHelper: ConstraintUiHelper,
-    isConstraintSupported: IsConstraintSupportedUseCase,
+    getConstraintErrorUseCase: GetConstraintErrorUseCase,
     resourceProvider: ResourceProvider
 ) : ViewModel(), UiStateProducer<ListState<KeymapListItemModel>>, OnChipClickCallback {
 
@@ -39,7 +39,7 @@ class KeymapListViewModel internal constructor(
         getActionError,
         actionUiHelper,
         constraintUiHelper,
-        isConstraintSupported,
+        getConstraintErrorUseCase,
         resourceProvider
     )
 
@@ -66,7 +66,6 @@ class KeymapListViewModel internal constructor(
     fun duplicateSelectedKeymaps() {
         TODO()
     }
-
 
     fun delete(vararg id: Long) {
         TODO()
@@ -139,7 +138,7 @@ class KeymapListViewModel internal constructor(
         private val getActionError: GetActionErrorUseCase,
         private val actionUiHelper: ActionUiHelper<KeymapAction>,
         private val constraintUiHelper: ConstraintUiHelper,
-        private val isConstraintSupported: IsConstraintSupportedUseCase,
+        private val getConstraintErrorUseCase: GetConstraintErrorUseCase,
         private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -149,7 +148,7 @@ class KeymapListViewModel internal constructor(
                 getActionError,
                 actionUiHelper,
                 constraintUiHelper,
-                isConstraintSupported,
+                getConstraintErrorUseCase,
                 resourceProvider
             ) as T
         }

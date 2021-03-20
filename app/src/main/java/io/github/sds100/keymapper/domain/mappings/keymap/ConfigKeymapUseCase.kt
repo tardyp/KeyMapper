@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.domain.constraints.ConfigConstraintUseCaseImpl
+import io.github.sds100.keymapper.domain.constraints.ConfigConstraintsState
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCaseImpl
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
@@ -22,7 +23,31 @@ class ConfigKeymapUseCaseImpl : ConfigKeymapUseCase {
     val configTrigger = ConfigKeymapTriggerUseCaseImpl(keymap, ::setKeymap)
     val configActions = ConfigKeymapActionsUseCaseImpl(keymap, ::setKeymap)
 
-    val configConstraints = ConfigConstraintUseCaseImpl()
+    val configConstraints = ConfigConstraintUseCaseImpl(
+        state = keymap.map { state ->
+            state.mapData {
+                ConfigConstraintsState(
+                    it.constraintList,
+                    it.constraintMode
+                )
+            }
+        },
+        editState = { block ->
+            editKeymap { oldKeymap ->
+                val newConstraintState = block.invoke(
+                    ConfigConstraintsState(
+                        oldKeymap.constraintList,
+                        oldKeymap.constraintMode
+                    )
+                )
+
+                oldKeymap.copy(
+                    constraintList = newConstraintState.list,
+                    constraintMode = newConstraintState.mode
+                )
+            }
+        }
+    )
 
     override fun loadBlankKeymap() {
         setKeymap(KeyMap())
@@ -41,7 +66,7 @@ class ConfigKeymapUseCaseImpl : ConfigKeymapUseCase {
     }
 }
 
-interface ConfigKeymapUseCase  {
+interface ConfigKeymapUseCase {
     val state: Flow<State<ConfigKeymapState>>
     fun setEnabled(enabled: Boolean)
 

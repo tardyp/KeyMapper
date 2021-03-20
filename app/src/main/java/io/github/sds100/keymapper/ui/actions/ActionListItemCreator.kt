@@ -15,12 +15,12 @@ import io.github.sds100.keymapper.util.result.*
 
 class ActionListItemCreator<A : Action>(
     uiHelper: ActionUiHelper<A>,
+    private val getError: GetActionErrorUseCase,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider, ActionUiHelper<A> by uiHelper {
 
     fun map(
         action: A,
-        canBePerformedError: Error?,
         actionCount: Int
     ): ActionListItemState {
         var title: String? = null
@@ -36,7 +36,7 @@ class ActionListItemCreator<A : Action>(
                 }
             }
             .then { getIcon(action.data) }.onSuccess { icon = it }
-            .errorOrNull() ?: canBePerformedError
+            .errorOrNull() ?: getError.getError(action.data)
 
         val extraInfo = buildString {
             val midDot = getString(R.string.middot)

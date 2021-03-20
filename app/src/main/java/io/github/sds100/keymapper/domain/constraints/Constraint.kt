@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.domain.utils.Orientation
 import kotlinx.serialization.Serializable
+import java.util.*
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -11,22 +12,38 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class Constraint {
+    val uid: String = UUID.randomUUID().toString()
 
+    @Serializable
     data class AppInForeground(val packageName: String) : Constraint()
+
+    @Serializable
     data class AppNotInForeground(val packageName: String) : Constraint()
+
+    @Serializable
     data class AppPlayingMedia(val packageName: String) : Constraint()
 
+    @Serializable
     data class BtDeviceConnected(val bluetoothAddress: String, val deviceName: String) :
         Constraint()
 
+    @Serializable
     data class BtDeviceDisconnected(val bluetoothAddress: String, val deviceName: String) :
         Constraint()
 
+    @Serializable
     object ScreenOn : Constraint()
+
+    @Serializable
     object ScreenOff : Constraint()
 
+    @Serializable
     object OrientationPortrait : Constraint()
+
+    @Serializable
     object OrientationLandscape : Constraint()
+
+    @Serializable
     data class OrientationCustom(val orientation: Orientation) : Constraint()
 }
 

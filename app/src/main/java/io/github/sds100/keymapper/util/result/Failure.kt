@@ -129,6 +129,7 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     Error.NoVoiceAssistant -> TODO()
     is Error.UnknownFileLocation -> TODO()
     RecoverableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
+    Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
 }
 
 fun Error.getBriefMessage(ctx: Context) = when (this) {

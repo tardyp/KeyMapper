@@ -34,7 +34,7 @@ class ActionListViewModel<A : Action>(
 
     override val state = MutableStateFlow<ListState<ActionListItemState>>(ListState.Loading())
 
-    private val modelCreator = ActionListItemCreator(actionUiHelper, resourceProvider)
+    private val modelCreator = ActionListItemCreator(actionUiHelper, actionError, resourceProvider)
     private val _openEditOptions = MutableSharedFlow<String>()
 
     /**
@@ -42,8 +42,8 @@ class ActionListViewModel<A : Action>(
      */
     val openEditOptions = _openEditOptions.asSharedFlow()
 
-    private val _fixError = LiveEvent<RecoverableError>()
-    val fixError: LiveData<RecoverableError> = _fixError
+    private val _fixError = MutableSharedFlow<RecoverableError>()
+    val fixError = _fixError.asSharedFlow()
 
     private val _enableAccessibilityServicePrompt = LiveEvent<Unit>()
     val enableAccessibilityServicePrompt: LiveData<Unit> = _enableAccessibilityServicePrompt
@@ -82,7 +82,7 @@ class ActionListViewModel<A : Action>(
 
                 actionError.getError(actionData)?.let { error ->
                     when (error) {
-                        is RecoverableError -> _fixError.value = error
+                        is RecoverableError -> _fixError.emit(error)
                         else -> testAction(actionData)
                     }
                 }
@@ -105,10 +105,6 @@ class ActionListViewModel<A : Action>(
     }
 
     private fun buildModels(actionList: List<A>) = actionList.map {
-        modelCreator.map(
-            it,
-            actionError.getError(it.data),
-            actionList.size
-        )
+        modelCreator.map(it, actionList.size)
     }
 }

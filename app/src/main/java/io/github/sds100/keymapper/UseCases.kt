@@ -3,7 +3,8 @@ package io.github.sds100.keymapper
 import android.content.Context
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedUseCaseImpl
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseImpl
+import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
@@ -14,13 +15,17 @@ import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 object UseCases {
 
     fun getActionError(ctx: Context) = GetActionErrorUseCaseImpl(
-        ServiceLocator.preferenceRepository(ctx),
-        ServiceLocator.deviceInfoRepository(ctx),
         ServiceLocator.packageManagerAdapter(ctx),
         ServiceLocator.inputMethodAdapter(ctx),
         ServiceLocator.permissionAdapter(ctx),
         ServiceLocator.systemFeatureAdapter(ctx),
         ServiceLocator.cameraAdapter(ctx)
+    )
+
+    fun getConstraintError(ctx: Context) = GetConstraintErrorUseCaseImpl(
+        ServiceLocator.packageManagerAdapter(ctx),
+        ServiceLocator.permissionAdapter(ctx),
+        ServiceLocator.systemFeatureAdapter(ctx),
     )
 
     fun testAction(ctx: Context) = TestActionUseCaseImpl()
@@ -40,8 +45,8 @@ object UseCases {
         ServiceLocator.roomKeymapRepository(ctx)
     )
 
-    fun isConstraintSupported(ctx: Context) = IsConstraintSupportedUseCaseImpl(
-        ServiceLocator.systemFeatureAdapter(ctx),
-        ServiceLocator.permissionAdapter(ctx)
-    )
+    fun isConstraintSupported(ctx: Context) =
+        IsConstraintSupportedByDeviceUseCaseImpl(
+            ServiceLocator.systemFeatureAdapter(ctx)
+        )
 }

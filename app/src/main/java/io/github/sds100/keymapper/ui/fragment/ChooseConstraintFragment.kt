@@ -12,7 +12,6 @@ import io.github.sds100.keymapper.sectionHeader
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.result.getFullMessage
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.messageResource
 import splitties.alertdialog.appcompat.okButton
@@ -114,13 +113,14 @@ class ChooseConstraintFragment
                         primaryText(requireContext().str(constraint.description))
                         isSecondaryTextAnError(true)
 
-                        val isSupported = ConstraintUtils.isSupported(requireContext(), constraint.id)
+                        //TODO
+                        val isSupported = false
 
-                        if (isSupported == null) {
-                            secondaryText(null)
-                        } else {
-                            secondaryText(isSupported.getFullMessage(requireContext()))
-                        }
+//                        if (isSupported == null) {
+//                            secondaryText(null)
+//                        } else {
+//                            secondaryText(isSupported.getFullMessage(requireContext()))
+//                        }
 
                         onClick { _ ->
                             viewModel.chooseConstraint(constraint.id)

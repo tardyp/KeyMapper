@@ -2,21 +2,20 @@ package io.github.sds100.keymapper.ui.fragment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
-import io.github.sds100.keymapper.NavAppDirections
-import io.github.sds100.keymapper.constraint
-import io.github.sds100.keymapper.data.model.ConstraintModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewState
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.util.viewLifecycleScope
+import kotlinx.coroutines.flow.collectLatest
 import splitties.toast.toast
 
 /**
  * Created by sds100 on 29/11/20.
  */
 abstract class ConstraintListFragment
-    : OldRecyclerViewFragment<List<ConstraintModel>, FragmentConstraintListBinding>() {
+    : RecyclerViewFragment<ConstraintListViewState, FragmentConstraintListBinding>() {
 
     companion object {
         const val CHOOSE_CONSTRAINT_REQUEST_KEY = "request_choose_constraint"
@@ -24,13 +23,8 @@ abstract class ConstraintListFragment
 
     abstract val constraintListViewModel: ConstraintListViewModel
 
-    override val modelState: ModelState<List<ConstraintModel>>
-        get() = constraintListViewModel
-
-    override fun onResume() {
-        super.onResume()
-
-        constraintListViewModel.rebuildModels()
+    override val stateProducer: UiStateProducer<ConstraintListViewState> by lazy {
+        constraintListViewModel
     }
 
     override fun bind(
@@ -44,52 +38,29 @@ abstract class ConstraintListFragment
         binding.viewModel = constraintListViewModel
 
         binding.setOnAddConstraintClick {
-            val direction = NavAppDirections.actionGlobalChooseConstraint(
-                CHOOSE_CONSTRAINT_REQUEST_KEY,
-                constraintListViewModel.supportedConstraintList.toTypedArray())
-            findNavController().navigate(direction)
+//            val direction = NavAppDirections.actionGlobalChooseConstraint(
+//                CHOOSE_CONSTRAINT_REQUEST_KEY,
+//                constraintListViewModel.supportedConstraintList.toTypedArray()
+//            )
+//            findNavController().navigate(direction) //TODO
         }
 
-        constraintListViewModel.eventStream.observe(viewLifecycleOwner, { event ->
-            when (event) {
-                is MessageEvent -> toast(event.textRes)
-
-                is BuildConstraintListModels -> {
-                    viewLifecycleScope.launchWhenResumed {
-                        val modelList = event.source.map { it.buildModel(requireContext()) }
-                        constraintListViewModel.setModels(modelList)
-                    }
-                }
+        viewLifecycleScope.launchWhenResumed {
+            constraintListViewModel.showToast.collectLatest {
+                toast(it)
             }
-        })
+        }
     }
 
-    override fun populateList(
+    override fun updateUi(
         binding: FragmentConstraintListBinding,
-        model: List<ConstraintModel>?
+        state: ConstraintListViewState
     ) {
         binding.epoxyRecyclerViewConstraints.withModels {
-            model?.forEach { constraint ->
-                constraint {
-                    id(constraint.id)
-                    model(constraint)
+            if (state.constraintList !is ListState.Loaded) return@withModels
 
-                    onRemoveClick { _ ->
-                        constraintListViewModel.removeConstraint(constraint.id)
-                    }
+            state.constraintList.data.forEach { model ->
 
-                    val tintType = when {
-                        constraint.hasError -> TintType.ERROR
-                        constraint.iconTintOnSurface -> TintType.ON_SURFACE
-                        else -> TintType.NONE
-                    }
-
-                    tintType(tintType)
-
-                    onFixClick { _ ->
-                        constraintListViewModel.onModelClick(constraint.id)
-                    }
-                }
             }
         }
     }

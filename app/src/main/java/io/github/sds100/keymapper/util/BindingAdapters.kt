@@ -176,6 +176,8 @@ fun ChipGroup.setChipUiModels(
     models: List<ChipUi>,
     onClick: OnChipClickCallback
 ) {
+    removeAllViews()
+
     models.forEach { model ->
         when (model) {
             is ChipUi.Error -> addView(context.errorChipButton(model, onClick))

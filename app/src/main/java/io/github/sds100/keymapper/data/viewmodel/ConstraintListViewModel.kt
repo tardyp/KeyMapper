@@ -1,103 +1,122 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.model.ConstraintEntity
-import io.github.sds100.keymapper.data.model.ConstraintModel
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.domain.constraints.*
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
+import io.github.sds100.keymapper.ui.constraints.ConstraintListItemCreator
+import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 29/11/20.
  */
 
-//TODO refactor
-class ConstraintListViewModel(private val coroutineScope: CoroutineScope,
-                              val supportedConstraintList: List<String>) :
-    ModelState<List<ConstraintModel>> {
+class ConstraintListViewModel(
+    private val coroutineScope: CoroutineScope,
+    private val useCase: ConfigConstraintsUseCase,
+    private val uiHelper: ConstraintUiHelper,
+    private val getError: GetConstraintErrorUseCase,
+    resourceProvider: ResourceProvider
+) : UiStateProducer<ConstraintListViewState>, ResourceProvider by resourceProvider {
 
-    private val _constraintList = MutableLiveData<List<ConstraintEntity>>()
-    val constraintList: LiveData<List<ConstraintEntity>> = _constraintList
+    private val modelCreator = ConstraintListItemCreator(uiHelper, getError, resourceProvider)
 
-    val constraintAndMode = MutableLiveData<Boolean>()
-    val constraintOrMode = MutableLiveData<Boolean>()
+    private val _showToast = MutableSharedFlow<String>()
+    val showToast = _showToast.asSharedFlow()
 
-    private val _model = MutableLiveData<OldDataState<List<ConstraintModel>>>(Loading())
-    override val model = _model
+    private val _fixError = MutableSharedFlow<RecoverableError>()
+    val fixError = _fixError.asSharedFlow()
 
-    override val viewState = MutableLiveData<ViewState>(ViewLoading())
+    override val state = MutableStateFlow(buildState(State.Loading()))
 
-    private val _eventStream = LiveEvent<Event>().apply {
-        addSource(constraintList) {
-            value = BuildConstraintListModels(it)
-        }
-    }
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
-    val eventStream: LiveData<Event> = _eventStream
-
-    fun setConstraintList(constraintList: List<ConstraintEntity>, constraintMode: Int) {
-        _constraintList.value = constraintList
-
-        when (constraintMode) {
-            ConstraintEntity.MODE_AND -> {
-                constraintAndMode.value = true
-                constraintOrMode.value = false
-            }
-
-            ConstraintEntity.MODE_OR -> {
-                constraintOrMode.value = true
-                constraintAndMode.value = false
-            }
-        }
-    }
-
-    fun getConstraintMode(): Int = when {
-        constraintAndMode.value == true -> ConstraintEntity.MODE_AND
-        constraintOrMode.value == true -> ConstraintEntity.MODE_OR
-        else -> ConstraintEntity.DEFAULT_MODE
-    }
-
-    fun addConstraint(constraint: ConstraintEntity) {
-        if (constraintList.value?.any { it.uniqueId == constraint.uniqueId } == true) {
-            _eventStream.postValue(DuplicateConstraints())
-
-            return
-        }
-
-        _constraintList.value = constraintList.value?.toMutableList()?.apply {
-            add(constraint)
-        }
-    }
-
-    fun removeConstraint(id: String) {
-        _constraintList.value = constraintList.value?.toMutableList()?.apply {
-            removeAll { it.uniqueId == id }
-        }
-    }
-
-    fun onModelClick(id: String) {
+    init {
         coroutineScope.launch {
-            model.value?.ifIsData { modelList ->
-                val constraint = modelList.singleOrNull { it.id == id } ?: return@launch
+            combine(rebuildUiState, useCase.state) { _, state ->
+                state
+            }.collectLatest { state ->
+                this@ConstraintListViewModel.state.value = buildState(state)
+            }
+        }
+    }
 
-                if (constraint.hasError) {
-                    _eventStream.postValue(FixFailure(constraint.error!!))
+    fun addConstraint(constraint: Constraint) {
+        useCase.addConstraint(constraint).onFailure {
+            if (it is Error.Duplicate) {
+                coroutineScope.launch {
+                    _showToast.emit(getString(R.string.error_duplicate_constraint))
                 }
             }
         }
     }
 
-    fun setModels(models: List<ConstraintModel>) {
-        _model.value = when {
-            models.isEmpty() -> Empty()
-            else -> Data(models)
+    fun onRemoveConstraintClick(id: String) = useCase.removeConstraint(id)
+
+    fun onAndRadioButtonCheckedChange(checked: Boolean) {
+        if (checked) {
+            useCase.setAndMode()
         }
     }
 
-   override fun rebuildModels() {
-       _eventStream.value = BuildConstraintListModels(constraintList.value!!)
-   }
+    fun onOrRadioButtonCheckedChange(checked: Boolean) {
+        if (checked) {
+            useCase.setOrMode()
+        }
+    }
+
+    fun onListItemClick(id: String) {
+        coroutineScope.launch {
+            useCase.state.firstOrNull()?.ifIsData { state ->
+                val error = getError(state.list.singleOrNull { it.uid == id } ?: return@launch)
+
+                if (error is RecoverableError) {
+                    _fixError.emit(error)
+                }
+            }
+        }
+    }
+
+    override fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
+    }
+
+    private fun buildState(state: State<ConfigConstraintsState>): ConstraintListViewState {
+        return when (state) {
+            is State.Data ->
+                ConstraintListViewState(
+                    constraintList = state.data.list.map { modelCreator.map(it) }.createListState(),
+                    showModeRadioButtons = state.data.list.size > 1,
+                    isAndModeChecked = state.data.mode == ConstraintMode.AND,
+                    isOrModeChecked = state.data.mode == ConstraintMode.OR
+                )
+
+            is State.Loading ->
+                ConstraintListViewState(
+                    constraintList = ListState.Loading(),
+                    showModeRadioButtons = false,
+                    isAndModeChecked = false,
+                    isOrModeChecked = false
+                )
+        }
+    }
 }
+
+data class ConstraintListViewState(
+    val constraintList: ListState<ConstraintListItem>,
+    val showModeRadioButtons: Boolean,
+    val isAndModeChecked: Boolean,
+    val isOrModeChecked: Boolean
+)

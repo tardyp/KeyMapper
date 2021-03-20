@@ -55,6 +55,7 @@ sealed class Error : Result<Nothing>() {
     object BackupVersionTooNew : Error()
     object CorruptJsonFile : Error()
     object CorruptActionError : Error()
+    object Duplicate : Error()
 }
 
 sealed class RecoverableError : Error() {

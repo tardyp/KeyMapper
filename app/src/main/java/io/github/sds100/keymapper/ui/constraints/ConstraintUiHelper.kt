@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.util.TintType
 import io.github.sds100.keymapper.util.firstBlocking
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.success
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 /**
@@ -21,22 +22,39 @@ class ConstraintUiHelperImpl(
     resourceProvider: ResourceProvider
 ) : ConstraintUiHelper, ResourceProvider by resourceProvider {
 
-    override fun getTitle(constraint: Constraint): Result<String> = when (constraint) {
-        is Constraint.AppInForeground -> getAppNameTitle(constraint.packageName).success()
-        is Constraint.AppNotInForeground -> getAppNameTitle(constraint.packageName).success()
-        is Constraint.AppPlayingMedia -> getAppNameTitle(constraint.packageName).success()
+    override fun getTitle(constraint: Constraint): String = when (constraint) {
+        is Constraint.AppInForeground ->
+            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+                getString(R.string.constraint_app_foreground_description, appName)
+            }.catch {
+                getString(R.string.constraint_choose_app_foreground)
+            }.firstBlocking()
+
+        is Constraint.AppNotInForeground ->
+            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+                getString(R.string.constraint_app_not_foreground_description, appName)
+            }.catch {
+                getString(R.string.constraint_choose_app_not_foreground)
+            }.firstBlocking()
+
+        is Constraint.AppPlayingMedia ->
+            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+                getString(R.string.constraint_app_playing_media_description, appName)
+            }.catch {
+                getString(R.string.constraint_choose_app_playing_media)
+            }.firstBlocking()
 
         is Constraint.BtDeviceConnected ->
             getString(
                 R.string.constraint_bt_device_connected_description,
                 constraint.deviceName
-            ).success()
+            )
 
         is Constraint.BtDeviceDisconnected ->
             getString(
                 R.string.constraint_bt_device_disconnected_description,
                 constraint.deviceName
-            ).success()
+            )
 
         is Constraint.OrientationCustom -> {
             val resId = when (constraint.orientation) {
@@ -46,20 +64,20 @@ class ConstraintUiHelperImpl(
                 Orientation.ORIENTATION_270 -> R.string.constraint_choose_orientation_270
             }
 
-            getString(resId).success()
+            getString(resId)
         }
 
         Constraint.OrientationLandscape ->
-            getString(R.string.constraint_choose_orientation_landscape).success()
+            getString(R.string.constraint_choose_orientation_landscape)
 
         Constraint.OrientationPortrait ->
-            getString(R.string.constraint_choose_orientation_landscape).success()
+            getString(R.string.constraint_choose_orientation_landscape)
 
         Constraint.ScreenOff ->
-            getString(R.string.constraint_screen_off_description).success()
+            getString(R.string.constraint_screen_off_description)
 
         Constraint.ScreenOn ->
-            getString(R.string.constraint_screen_on_description).success()
+            getString(R.string.constraint_screen_on_description)
     }
 
     override fun getIcon(constraint: Constraint): Result<IconInfo> = when (constraint) {
@@ -116,15 +134,9 @@ class ConstraintUiHelperImpl(
             IconInfo(it, TintType.NONE)
         }.firstBlocking()
     }
-
-    private fun getAppNameTitle(packageName: String): String {
-        return appInfoAdapter.getAppName(packageName).map { appName ->
-            getString(R.string.description_open_app, appName)
-        }.firstBlocking()
-    }
 }
 
 interface ConstraintUiHelper {
-    fun getTitle(constraint: Constraint): Result<String>
+    fun getTitle(constraint: Constraint): String
     fun getIcon(constraint: Constraint): Result<IconInfo>
 }
