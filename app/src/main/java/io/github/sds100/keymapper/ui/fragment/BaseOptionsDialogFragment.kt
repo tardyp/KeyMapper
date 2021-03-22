@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +14,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.BaseOptionsDialogViewModel
-import io.github.sds100.keymapper.data.viewmodel.BaseOptionsViewModel
-import io.github.sds100.keymapper.ui.adapter.OptionsController
 import io.github.sds100.keymapper.util.*
 
 /**
  * Created by sds100 on 27/06/2020.
  */
 
+//TODO
 abstract class BaseOptionsDialogFragment<BINDING : ViewDataBinding, O : BaseOptions<*>>
     : BottomSheetDialogFragment() {
 
@@ -33,16 +31,6 @@ abstract class BaseOptionsDialogFragment<BINDING : ViewDataBinding, O : BaseOpti
     abstract val optionsViewModel: BaseOptionsDialogViewModel<O>
     abstract val requestKey: String
     abstract val initialOptions: O
-
-    private val controller by lazy {
-        object : OptionsController(viewLifecycleOwner) {
-            override val ctx: Context
-                get() = requireContext()
-
-            override val viewModel: BaseOptionsViewModel<*>
-                get() = optionsViewModel
-        }
-    }
 
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
@@ -85,11 +73,10 @@ abstract class BaseOptionsDialogFragment<BINDING : ViewDataBinding, O : BaseOpti
 
         optionsViewModel.model.observe(viewLifecycleOwner, { options ->
             options.ifIsData {
-                controller.optionsListModel = it
+//                controller.optionsListModel = it
             }
         })
 
-        setRecyclerViewAdapter(binding, controller.adapter)
         subscribeCustomUi(binding)
     }
 

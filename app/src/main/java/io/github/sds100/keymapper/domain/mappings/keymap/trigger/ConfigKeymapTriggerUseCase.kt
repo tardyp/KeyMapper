@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.utils.*
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -182,10 +182,34 @@ class ConfigKeymapTriggerUseCaseImpl(
     override fun setVibrateEnabled(enabled: Boolean) = editTrigger { it.copy(vibrate = enabled) }
 
     override fun setVibrationDuration(duration: Defaultable<Int>) =
-        editTrigger { it.copy(vibrateDuration = duration) }
+        editTrigger { it.copy(vibrateDuration = duration.valueIfCustom()) }
 
     override fun setLongPressDelay(delay: Defaultable<Int>) =
-        editTrigger { it.copy(longPressDelay = delay) }
+        editTrigger { it.copy(longPressDelay = delay.valueIfCustom()) }
+
+    override fun setDoublePressDelay(delay: Defaultable<Int>) {
+        editTrigger { it.copy(doublePressDelay = delay.valueIfCustom()) }
+    }
+
+    override fun setSequenceTriggerTimeout(delay: Defaultable<Int>) {
+        editTrigger { it.copy(sequenceTriggerTimeout = delay.valueIfCustom()) }
+    }
+
+    override fun setLongPressDoubleVibrationEnabled(enabled: Boolean) {
+        editTrigger { it.copy(longPressDoubleVibration = enabled) }
+    }
+
+    override fun setTriggerWhenScreenOff(enabled: Boolean) {
+        editTrigger { it.copy(screenOffTrigger = enabled) }
+    }
+
+    override fun setTriggerFromOtherAppsEnabled(enabled: Boolean) {
+        editTrigger { it.copy(triggerFromOtherApps = enabled) }
+    }
+
+    override fun setShowToastEnabled(enabled: Boolean) {
+        editTrigger { it.copy(showToast = enabled) }
+    }
 
     private fun editTrigger(block: (trigger: KeymapTrigger) -> KeymapTrigger) {
         keymapFlow.value.ifIsData { keymap ->
@@ -216,6 +240,12 @@ interface ConfigKeymapTriggerUseCase {
     fun setVibrateEnabled(enabled: Boolean)
     fun setVibrationDuration(duration: Defaultable<Int>)
     fun setLongPressDelay(delay: Defaultable<Int>)
+    fun setDoublePressDelay(delay: Defaultable<Int>)
+    fun setSequenceTriggerTimeout(delay: Defaultable<Int>)
+    fun setLongPressDoubleVibrationEnabled(enabled: Boolean)
+    fun setTriggerWhenScreenOff(enabled: Boolean)
+    fun setTriggerFromOtherAppsEnabled(enabled: Boolean)
+    fun setShowToastEnabled(enabled: Boolean)
 }
 
 data class ConfigKeymapTriggerState(

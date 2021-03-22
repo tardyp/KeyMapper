@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -11,10 +12,8 @@ import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.int
-import io.github.sds100.keymapper.util.intArray
+import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.
@@ -52,6 +51,22 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         setFragmentResultListener(TriggerKeyOptionsFragment.REQUEST_KEY) { _, result ->
             result.getParcelable<TriggerKeyOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)?.let {
                 viewModel.triggerViewModel.setTriggerKeyOptions(it)
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.createLauncherShortcutLabel.collectLatest {
+                val label = requireContext().editTextStringAlertDialog(
+                    viewLifecycleOwner,
+                    hint = str(R.string.hint_shortcut_name),
+                    allowEmpty = false
+                )
+
+                viewModel.createLauncherShortcut(label)
             }
         }
     }

@@ -193,6 +193,7 @@ object InjectorUtils {
             UseCases.showDeviceInfo(ctx),
             keymapActionUiHelper(ctx),
             constraintUiHelper(ctx),
+            ServiceLocator.launcherShortcutAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }

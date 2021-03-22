@@ -94,7 +94,8 @@ class FingerprintMapMigrationTest {
                 dataStore.edit {
                     it[SWIPE_DOWN_KEY] = data
                 }
-                repository.restore(SWIPE_DOWN_KEY.name, data)
+                TODO()
+//                repository.restore(SWIPE_DOWN_KEY.name, data)
 
                 //must come before getting value from live data test wrapper
                 advanceUntilIdle()

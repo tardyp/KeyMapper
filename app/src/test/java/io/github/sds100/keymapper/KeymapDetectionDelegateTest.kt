@@ -26,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.withTimeout
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.After
@@ -34,7 +33,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import splitties.bitflags.withFlag
 import kotlin.random.Random
 
 /**
@@ -66,9 +64,11 @@ class KeymapDetectionDelegateTest {
         private const val VIBRATION_DURATION = 100
         private const val HOLD_DOWN_DURATION = 1000
 
-        private val TEST_ACTION =
-            ActionEntity(ActionType.SYSTEM_ACTION, OldSystemAction.TOGGLE_FLASHLIGHT)
-        private val TEST_ACTION_2 = ActionEntity(ActionType.APP, Constants.PACKAGE_NAME)
+        private val TEST_ACTION: ActionEntity = TODO()
+
+        //            ActionEntity(ActionType.SYSTEM_ACTION, OldSystemAction.TOGGLE_FLASHLIGHT)
+        private val TEST_ACTION_2: ActionEntity = TODO()
+//        ActionEntity(ActionType.APP, Constants.PACKAGE_NAME)
 
         private val TEST_ACTIONS = setOf(
             TEST_ACTION,
@@ -163,124 +163,124 @@ class KeymapDetectionDelegateTest {
         val trigger = parallelTrigger(
             TriggerEntity.KeyEntity(KeyEvent.KEYCODE_META_LEFT, deviceId = FAKE_KEYBOARD_DESCRIPTOR)
         )
-
-        val action = ActionEntity.keyCodeAction(KeyEvent.KEYCODE_META_LEFT)
-            .copy(flags = ActionEntity.ACTION_FLAG_HOLD_DOWN)
-
-        delegate.keymapListCache = listOf(
-            KeyMapEntity(0, trigger, listOf(action))
-        )
-        val metaState = KeyEvent.META_META_ON.withFlag(KeyEvent.META_META_LEFT_ON)
-
-        inputKeyEvent(
-            KeyEvent.KEYCODE_META_LEFT,
-            KeyEvent.ACTION_DOWN,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 117
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_E,
-            KeyEvent.ACTION_DOWN,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 33
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_META_LEFT,
-            KeyEvent.ACTION_UP,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            deviceId = FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 117
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_E,
-            KeyEvent.ACTION_UP,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            deviceId = FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 33
-        )
-
-        val expectedEvents = listOf(
-            PerformAction(action, metaState, InputEventType.DOWN),
-            ImitateButtonPress(
-                KeyEvent.KEYCODE_E,
-                metaState,
-                FAKE_KEYBOARD_DEVICE_ID,
-                InputEventType.DOWN,
-                scanCode = 33
-            ),
-            PerformAction(action, 0, InputEventType.UP),
-            ImitateButtonPress(
-                KeyEvent.KEYCODE_E,
-                metaState = 0,
-                FAKE_KEYBOARD_DEVICE_ID,
-                InputEventType.UP,
-                scanCode = 33
-            )
-        )
-
-        assertThat(eventStream.history, `is`(expectedEvents))
-        eventStream.reset()
-
-        inputKeyEvent(
-            KeyEvent.KEYCODE_META_LEFT,
-            KeyEvent.ACTION_DOWN,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 117
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_E,
-            KeyEvent.ACTION_DOWN,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 33
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_E,
-            KeyEvent.ACTION_UP,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 33
-        )
-        inputKeyEvent(
-            KeyEvent.KEYCODE_META_LEFT,
-            KeyEvent.ACTION_UP,
-            FAKE_KEYBOARD_DESCRIPTOR,
-            metaState = 0,
-            FAKE_KEYBOARD_DEVICE_ID,
-            scanCode = 117
-        )
-
-        advanceUntilIdle()
-
-        val expectedEvents2 = listOf(
-            PerformAction(action, metaState, InputEventType.DOWN),
-            ImitateButtonPress(
-                KeyEvent.KEYCODE_E,
-                metaState,
-                FAKE_KEYBOARD_DEVICE_ID,
-                InputEventType.DOWN,
-                scanCode = 33
-            ),
-            ImitateButtonPress(
-                KeyEvent.KEYCODE_E,
-                metaState,
-                FAKE_KEYBOARD_DEVICE_ID,
-                InputEventType.UP,
-                scanCode = 33
-            ),
-            PerformAction(action, additionalMetaState = 0, InputEventType.UP),
-        )
-
-        assertThat(eventStream.history, `is`(expectedEvents2))
+        TODO()
+//        val action = ActionEntity.keyCodeAction(KeyEvent.KEYCODE_META_LEFT)
+//            .copy(flags = ActionEntity.ACTION_FLAG_HOLD_DOWN)
+//
+//        delegate.keymapListCache = listOf(
+//            KeyMapEntity(0, trigger, listOf(action))
+//        )
+//        val metaState = KeyEvent.META_META_ON.withFlag(KeyEvent.META_META_LEFT_ON)
+//
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_META_LEFT,
+//            KeyEvent.ACTION_DOWN,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 117
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_E,
+//            KeyEvent.ACTION_DOWN,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 33
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_META_LEFT,
+//            KeyEvent.ACTION_UP,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            deviceId = FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 117
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_E,
+//            KeyEvent.ACTION_UP,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            deviceId = FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 33
+//        )
+//
+//        val expectedEvents = listOf(
+//            PerformAction(action, metaState, InputEventType.DOWN),
+//            ImitateButtonPress(
+//                KeyEvent.KEYCODE_E,
+//                metaState,
+//                FAKE_KEYBOARD_DEVICE_ID,
+//                InputEventType.DOWN,
+//                scanCode = 33
+//            ),
+//            PerformAction(action, 0, InputEventType.UP),
+//            ImitateButtonPress(
+//                KeyEvent.KEYCODE_E,
+//                metaState = 0,
+//                FAKE_KEYBOARD_DEVICE_ID,
+//                InputEventType.UP,
+//                scanCode = 33
+//            )
+//        )
+//
+//        assertThat(eventStream.history, `is`(expectedEvents))
+//        eventStream.reset()
+//
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_META_LEFT,
+//            KeyEvent.ACTION_DOWN,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 117
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_E,
+//            KeyEvent.ACTION_DOWN,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 33
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_E,
+//            KeyEvent.ACTION_UP,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 33
+//        )
+//        inputKeyEvent(
+//            KeyEvent.KEYCODE_META_LEFT,
+//            KeyEvent.ACTION_UP,
+//            FAKE_KEYBOARD_DESCRIPTOR,
+//            metaState = 0,
+//            FAKE_KEYBOARD_DEVICE_ID,
+//            scanCode = 117
+//        )
+//
+//        advanceUntilIdle()
+//
+//        val expectedEvents2 = listOf(
+//            PerformAction(action, metaState, InputEventType.DOWN),
+//            ImitateButtonPress(
+//                KeyEvent.KEYCODE_E,
+//                metaState,
+//                FAKE_KEYBOARD_DEVICE_ID,
+//                InputEventType.DOWN,
+//                scanCode = 33
+//            ),
+//            ImitateButtonPress(
+//                KeyEvent.KEYCODE_E,
+//                metaState,
+//                FAKE_KEYBOARD_DEVICE_ID,
+//                InputEventType.UP,
+//                scanCode = 33
+//            ),
+//            PerformAction(action, additionalMetaState = 0, InputEventType.UP),
+//        )
+//
+//        assertThat(eventStream.history, `is`(expectedEvents2))
     }
 
     @Test
@@ -410,15 +410,17 @@ class KeymapDetectionDelegateTest {
                 mode = TriggerEntity.UNDEFINED
             )
 
-            val action = ActionEntity.keyCodeAction(KeyEvent.KEYCODE_B).copy(
-                flags = ActionEntity.ACTION_FLAG_HOLD_DOWN,
-                extras = listOf(
-                    Extra(
-                        ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR,
-                        ActionEntity.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN.toString()
-                    )
-                )
-            )
+            val action: ActionEntity = TODO()
+//            ActionEntity.keyCodeAction(KeyEvent.KEYCODE_B).copy(
+//                flags = ActionEntity.ACTION_FLAG_HOLD_DOWN,
+//                extras = listOf(
+//                    Extra(
+//                        ActionEntity.EXTRA_CUSTOM_HOLD_DOWN_BEHAVIOUR,
+//                        ActionEntity.STOP_HOLD_DOWN_BEHAVIOR_TRIGGER_PRESSED_AGAIN.toString()
+//                    )
+//                )
+//            )//TODO
+            TODO()
 
             val keymap = KeyMapEntity(
                 0,
@@ -452,15 +454,16 @@ class KeymapDetectionDelegateTest {
     @Test
     fun `trigger with modifier key and modifier keycode action, don't include metastate from the trigger modifier key when an unmapped modifier key is pressed`() =
         coroutineScope.runBlockingTest {
+            TODO()
             val trigger = undefinedTrigger(TriggerEntity.KeyEntity(KeyEvent.KEYCODE_CTRL_LEFT))
 
-            delegate.keymapListCache = listOf(
-                KeyMapEntity(
-                    0,
-                    trigger,
-                    actionList = listOf(ActionEntity.keyCodeAction(KeyEvent.KEYCODE_ALT_LEFT))
-                )
-            )
+//            delegate.keymapListCache = listOf(
+//                KeyMapEntity(
+//                    0,
+//                    trigger,
+//                    actionList = listOf(ActionEntity.keyCodeAction(KeyEvent.KEYCODE_ALT_LEFT))
+//                )
+//            )
 
             //imitate how modifier keys are sent on Android by also changing the metastate of the keyevent
 
@@ -682,39 +685,40 @@ class KeymapDetectionDelegateTest {
     @Parameters(method = "params_repeatAction")
     fun parallelTrigger_holdDown_repeatAction10Times(description: String, trigger: TriggerEntity) =
         coroutineScope.runBlockingTest {
+            TODO()
             //given
-            val action = ActionEntity(
-                type = ActionType.SYSTEM_ACTION,
-                data = OldSystemAction.VOLUME_UP,
-                flags = ActionEntity.ACTION_FLAG_REPEAT
-            )
-
-            val keymap = KeyMapEntity(0, trigger, actionList = listOf(action))
-            delegate.keymapListCache = listOf(keymap)
-
-            var repeatCount = 0
-
-            //when
-            withTimeout(2000) {
-                trigger.keys.forEach {
-                    inputKeyEvent(
-                        it.keyCode,
-                        KeyEvent.ACTION_DOWN,
-                        deviceIdToDescriptor(it.deviceId)
-                    )
-                }
-
-                //given
-                while (repeatCount < 10) {
-                    repeatCount++
-                }
-            }
-
-            trigger.keys.forEach {
-                inputKeyEvent(it.keyCode, KeyEvent.ACTION_UP, deviceIdToDescriptor(it.deviceId))
-            }
-
-            assertThat("Failed to repeat at least 10 times in 2 seconds", repeatCount >= 10)
+//            val action = ActionEntity(
+//                type = ActionType.SYSTEM_ACTION,
+//                data = OldSystemAction.VOLUME_UP,
+//                flags = ActionEntity.ACTION_FLAG_REPEAT
+//            )
+//
+//            val keymap = KeyMapEntity(0, trigger, actionList = listOf(action))
+//            delegate.keymapListCache = listOf(keymap)
+//
+//            var repeatCount = 0
+//
+//            //when
+//            withTimeout(2000) {
+//                trigger.keys.forEach {
+//                    inputKeyEvent(
+//                        it.keyCode,
+//                        KeyEvent.ACTION_DOWN,
+//                        deviceIdToDescriptor(it.deviceId)
+//                    )
+//                }
+//
+//                //given
+//                while (repeatCount < 10) {
+//                    repeatCount++
+//                }
+//            }
+//
+//            trigger.keys.forEach {
+//                inputKeyEvent(it.keyCode, KeyEvent.ACTION_UP, deviceIdToDescriptor(it.deviceId))
+//            }
+//
+//            assertThat("Failed to repeat at least 10 times in 2 seconds", repeatCount >= 10)
         }
 
     fun params_repeatAction() = listOf(

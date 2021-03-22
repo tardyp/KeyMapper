@@ -1,25 +1,25 @@
-package io.github.sds100.keymapper.ui.models
+package io.github.sds100.keymapper.ui
 
-import androidx.annotation.StringRes
 import io.github.sds100.keymapper.data.model.SliderModel
 
 interface ListItem {
     val id: String
 }
 
-class SliderListItem(
+data class SliderListItem(
     override val id: String,
-    @StringRes val label: Int,
+    val label: String,
     val sliderModel: SliderModel
 ) : ListItem
 
-class CheckBoxListItem(
-    override val id: String, val isChecked: Boolean, @StringRes val label: Int
+data class CheckBoxListItem(
+    override val id: String, val isChecked: Boolean, val label: String
 ) : ListItem
 
-class TriggerFromOtherAppsListItem(
+data class TriggerFromOtherAppsListItem(
     override val id: String,
     val isEnabled: Boolean,
     val keymapUid: String,
-    @StringRes val label: Int
+    val label: String,
+    val areLauncherShortcutsSupported: Boolean
 ) : ListItem

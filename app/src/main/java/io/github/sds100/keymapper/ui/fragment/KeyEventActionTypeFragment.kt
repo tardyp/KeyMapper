@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -91,10 +90,10 @@ class KeyEventActionTypeFragment : Fragment() {
                         checkbox {
                             id(it.id)
                             primaryText(str(it.label))
-                            isSelected(it.isChecked)
+                            isChecked(it.isChecked)
 
-                            onClick { view ->
-                                viewModel.setModifierKey(it.id.toInt(), (view as CheckBox).isChecked)
+                            onCheckedChange { view, isChecked ->
+                                viewModel.setModifierKey(it.id.toInt(), isChecked)
                             }
                         }
                     }

@@ -50,6 +50,7 @@ class MyApplication : MultiDexApplication(),
     val permissionAdapter by lazy { AndroidPermissionAdapter(this) }
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
+    val launcherShortcutAdapter by lazy { LauncherShortcutAdapterImpl(this) }
 
     val recordTriggerController by lazy {
         RecordTriggerController(appCoroutineScope, serviceAdapter)

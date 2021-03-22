@@ -1,20 +1,28 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
+import android.content.ClipData
 import androidx.navigation.navGraphViewModels
+import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.ui.fragment.DefaultRecyclerViewFragment
+import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
+import io.github.sds100.keymapper.triggerFromOtherApps
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerOptionsViewModel
-import io.github.sds100.keymapper.ui.models.ListItem
+import io.github.sds100.keymapper.ui.utils.configuredCheckBox
+import io.github.sds100.keymapper.ui.utils.configuredSlider
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.util.UrlUtils
+import io.github.sds100.keymapper.util.str
+import splitties.systemservices.clipboardManager
+import splitties.toast.toast
 
 /**
  * Created by sds100 on 29/11/20.
  */
-class TriggerOptionsFragment : DefaultRecyclerViewFragment<List<ListItem>>() {
+class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
 
     class Info : FragmentInfo(
         R.string.option_list_header,
@@ -22,105 +30,72 @@ class TriggerOptionsFragment : DefaultRecyclerViewFragment<List<ListItem>>() {
         { TriggerOptionsFragment() }
     )
 
-    val configKeymapViewModel: ConfigKeymapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
+    private val configKeymapViewModel: ConfigKeymapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
         InjectorUtils.provideConfigKeymapViewModel(requireContext())
     }
 
-    val viewModel: TriggerOptionsViewModel
+    private val viewModel: TriggerOptionsViewModel
         get() = configKeymapViewModel.triggerViewModel.optionsViewModel
 
     override var isAppBarVisible = false
 
-    override val modelState: ModelState<List<ListItem>>
+    override val stateProducer: UiStateProducer<ListState<ListItem>>
         get() = viewModel
 
-    override fun populateList(binding: FragmentRecyclerviewBinding, model: List<ListItem>?) {
+    override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
 
     }
 
-//    val controller by lazy { TriggerOptionsController() } TODO
+    override fun populateRecyclerView(recyclerView: EpoxyRecyclerView, list: List<ListItem>) {
+        recyclerView.withModels {
+            list.forEach { listItem ->
+                if (listItem is CheckBoxListItem) {
+                    configuredCheckBox(this@TriggerOptionsFragment, listItem) { isChecked ->
+                        viewModel.setCheckboxValue(listItem.id, isChecked)
+                    }
+                }
 
-    //TODO
-//    inner class TriggerOptionsController : OptionsController(viewLifecycleOwner) {
-//        var triggerByIntentModel: TriggerFromOtherAppsModel? = null
-//            set(value) {
-//                field = value
-//                requestModelBuild()
-//            }
-//
-//        override val ctx: Context
-//            get() = requireContext()
-//
-//        override val viewModel: BaseOptionsViewModel<*>
-//            get() = this@TriggerOptionsFragment.viewModel
-//
-//        override fun buildModels() {
-//            if (triggerByIntentModel != null) {
-//                triggerFromOtherApps {
-//                    id("trigger_by_intent")
-//
-//                    model(triggerByIntentModel)
-//
-//                    onClick { view ->
-//                        viewModel.setValue(
-//                            TriggerOptions.ID_TRIGGER_FROM_OTHER_APPS, (view as CheckBox).isChecked
-//                        )
-//                    }
-//
-//                    onCopyClick { _ ->
-//                        triggerByIntentModel ?: return@onCopyClick
-//
-//                        val clipData = ClipData.newPlainText(
-//                            str(R.string.clipboard_label_keymap_uid),
-//                            triggerByIntentModel?.uid
-//                        )
-//
-//                        clipboardManager.setPrimaryClip(clipData)
-//
-//                        toast(R.string.toast_copied_keymap_uid_to_clipboard)
-//                    }
-//
-//                    isCreatingLauncherShortcutsSupported(
-//                        ShortcutManagerCompat.isRequestPinShortcutSupported(requireContext())
-//                    )
-//
-//                    onCreateLauncherShortcutClick { _ ->
-//                        triggerByIntentModel?.uid?.let {
-//                            viewLifecycleScope.launchWhenResumed {
-//                                createLauncherShortcut(it)
-//                            }
-//                        }
-//                    }
-//
-//                    openIntentGuide { _ ->
-//                        UrlUtils.openUrl(
-//                            requireContext(),
-//                            str(R.string.url_trigger_by_intent_guide)
-//                        )
-//                    }
-//                }
-//            }
-//
-//            super.buildModels()
-//        }
-//    }
+                if (listItem is SliderListItem) {
+                    configuredSlider(this@TriggerOptionsFragment, listItem) { newValue ->
+                        viewModel.setSliderValue(listItem.id, newValue)
+                    }
+                }
 
-    //TODO
-//    private suspend fun createLauncherShortcut(uuid: String) {
-//        if (!ShortcutManagerCompat.isRequestPinShortcutSupported(requireContext())) return
-//
-//        val actionList = configKeymapViewModel.actionListViewModel.actionList.value ?: return
-//
-//        val shortcutInfo = KeymapShortcutUtils.createShortcut(
-//            requireContext(),
-//            viewLifecycleOwner,
-//            uuid,
-//            actionList,
-//            viewModel.getDeviceInfoList(),
-//            viewModel.showDeviceDescriptors
-//        )
-//
-//        ShortcutManagerCompat.requestPinShortcut(requireContext(), shortcutInfo, null)
-//    }
+                if (listItem is TriggerFromOtherAppsListItem) {
+                    triggerFromOtherApps {
+                        id(listItem.id)
+
+                        model(listItem)
+
+                        onCheckedChange { buttonView, isChecked ->
+                            viewModel.setCheckboxValue(listItem.id, isChecked)
+                        }
+
+                        onCopyClick { _ ->
+                            val clipData = ClipData.newPlainText(
+                                str(R.string.clipboard_label_keymap_uid),
+                                listItem.keymapUid
+                            )
+
+                            clipboardManager.setPrimaryClip(clipData)
+
+                            toast(R.string.toast_copied_keymap_uid_to_clipboard)
+                        }
+
+                        onCreateLauncherShortcutClick { _ ->
+                            configKeymapViewModel.createLauncherShortcut()
+                        }
+
+                        openIntentGuide { _ ->
+                            UrlUtils.openUrl(
+                                requireContext(),
+                                str(R.string.url_trigger_by_intent_guide)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 

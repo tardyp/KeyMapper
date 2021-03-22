@@ -2,7 +2,9 @@ package io.github.sds100.keymapper.domain.constraints
 
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
+import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.domain.utils.Orientation
+import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -47,7 +49,59 @@ sealed class Constraint {
     data class OrientationCustom(val orientation: Orientation) : Constraint()
 }
 
+object ConstraintModeEntityMapper {
+    fun fromEntity(entity: Int): ConstraintMode = when (entity) {
+        ConstraintEntity.MODE_AND -> ConstraintMode.AND
+        ConstraintEntity.MODE_OR -> ConstraintMode.OR
+        else -> throw Exception("don't know how to convert constraint mode entity $entity")
+    }
+
+    fun toEntity(constraintMode: ConstraintMode): Int = when (constraintMode) {
+        ConstraintMode.AND -> ConstraintEntity.MODE_AND
+        ConstraintMode.OR -> ConstraintEntity.MODE_OR
+    }
+}
+
 object ConstraintEntityMapper {
+    fun fromEntity(entity: ConstraintEntity): Constraint {
+        fun getPackageName(): String {
+            return entity.extras.getData(ConstraintEntity.EXTRA_PACKAGE_NAME).valueOrNull()!!
+        }
+
+        fun getBluetoothAddress(): String {
+            return entity.extras.getData(ConstraintEntity.EXTRA_BT_ADDRESS).valueOrNull()!!
+        }
+
+        fun getBluetoothDeviceName(): String {
+            return entity.extras.getData(ConstraintEntity.EXTRA_BT_NAME).valueOrNull()!!
+        }
+
+        return when (entity.type) {
+            ConstraintEntity.APP_FOREGROUND -> Constraint.AppInForeground(getPackageName())
+            ConstraintEntity.APP_NOT_FOREGROUND -> Constraint.AppNotInForeground(getPackageName())
+            ConstraintEntity.APP_PLAYING_MEDIA -> Constraint.AppPlayingMedia(getPackageName())
+
+            ConstraintEntity.BT_DEVICE_CONNECTED ->
+                Constraint.BtDeviceConnected(getBluetoothAddress(), getBluetoothDeviceName())
+
+            ConstraintEntity.BT_DEVICE_DISCONNECTED ->
+                Constraint.BtDeviceConnected(getBluetoothAddress(), getBluetoothDeviceName())
+
+            ConstraintEntity.ORIENTATION_0 -> Constraint.OrientationCustom(Orientation.ORIENTATION_0)
+            ConstraintEntity.ORIENTATION_90 -> Constraint.OrientationCustom(Orientation.ORIENTATION_90)
+            ConstraintEntity.ORIENTATION_180 -> Constraint.OrientationCustom(Orientation.ORIENTATION_180)
+            ConstraintEntity.ORIENTATION_270 -> Constraint.OrientationCustom(Orientation.ORIENTATION_270)
+
+            ConstraintEntity.ORIENTATION_PORTRAIT -> Constraint.OrientationPortrait
+            ConstraintEntity.ORIENTATION_LANDSCAPE -> Constraint.OrientationLandscape
+
+            ConstraintEntity.SCREEN_OFF -> Constraint.ScreenOff
+            ConstraintEntity.SCREEN_ON -> Constraint.ScreenOn
+
+            else -> throw Exception("don't know how to convert constraint entity with type ${entity.type}")
+        }
+    }
+
     fun toEntity(constraint: Constraint): ConstraintEntity = when (constraint) {
         is Constraint.AppInForeground -> ConstraintEntity(
             type = ConstraintEntity.APP_FOREGROUND,

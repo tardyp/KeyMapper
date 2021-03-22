@@ -1,8 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
-import kotlinx.serialization.Serializable
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 
 /**
  * Created by sds100 on 26/02/2021.
@@ -11,7 +10,6 @@ import kotlinx.serialization.Serializable
 /**
  * Int options are null if a custom value isn't being used.
  */
-@Serializable
 data class KeymapTriggerOptions(
     val vibrate: Option<Boolean>,
     val longPressDoubleVibration: Option<Boolean>,

@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings
 
-import io.github.sds100.keymapper.domain.models.Defaultable
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 
 /**
  * Created by sds100 on 15/03/2021.

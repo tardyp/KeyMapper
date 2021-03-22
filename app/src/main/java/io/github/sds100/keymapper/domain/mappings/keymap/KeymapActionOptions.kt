@@ -1,10 +1,8 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
-import kotlinx.serialization.Serializable
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 
-@Serializable
 data class KeymapActionOptions(
     val repeat: Option<Boolean>,
     val holdDown: Option<Boolean>,

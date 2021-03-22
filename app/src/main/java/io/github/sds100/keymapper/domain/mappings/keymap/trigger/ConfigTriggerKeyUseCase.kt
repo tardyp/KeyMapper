@@ -1,6 +1,4 @@
-package io.github.sds100.keymapper.domain.mappings.keymap
-
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKey
+package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
 /**
  * Created by sds100 on 07/03/2021.

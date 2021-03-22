@@ -15,6 +15,7 @@ import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
+import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import kotlinx.coroutines.runBlocking
 
@@ -249,6 +250,10 @@ object ServiceLocator {
 
     fun serviceAdapter(context: Context): ServiceAdapter {
         return (context.applicationContext as MyApplication).serviceAdapter
+    }
+
+    fun launcherShortcutAdapter(context: Context): LauncherShortcutAdapter {
+        return (context.applicationContext as MyApplication).launcherShortcutAdapter
     }
 
     @VisibleForTesting

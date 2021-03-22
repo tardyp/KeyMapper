@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ListState
 import io.github.sds100.keymapper.ui.UiStateProducer
@@ -32,17 +33,22 @@ class TriggerViewModel(
     private val listItemMapper: TriggerKeyListItemMapper,
     private val recordTrigger: RecordTriggerUseCase,
     private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
+    private val launcherShortcutAdapter: LauncherShortcutAdapter,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider, UiStateProducer<TriggerUiState> {
 
     val optionsViewModel = TriggerOptionsViewModel(
+        coroutineScope,
         onboardingUseCase,
-        useCase
+        useCase,
+        launcherShortcutAdapter,
+        resourceProvider,
     )
 
     private val _enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
     val enableAccessibilityServicePrompt = _enableAccessibilityServicePrompt.asSharedFlow()
 
+    //TODO dialog that prompts the user to restart the accessibility service if failing to record a trigger too many times
     //TODO dialogs
     private val _showEnableCapsLockKeyboardLayoutPrompt = MutableSharedFlow<Unit>()
     val showEnableCapsLockKeyboardLayoutPrompt =

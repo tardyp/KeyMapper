@@ -4,9 +4,10 @@ import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.domain.models.Option
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -19,10 +20,11 @@ data class FingerprintMap(
     val constraintList: Set<Constraint> = emptySet(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true,
-    val vibrate: Boolean = false,
-    val vibrateDuration: Defaultable<Int> = Defaultable.Default(),
-    val showToast: Boolean = false
+    private val vibrate: Boolean = false,
+    private val vibrateDuration: Int? = null,
+    private val showToast: Boolean = false
 ) {
+    @Transient
     val options = FingerprintMapOptions(
         vibrate = Option(
             value = vibrate,
@@ -30,7 +32,7 @@ data class FingerprintMap(
         ),
 
         vibrateDuration = Option(
-            value = vibrateDuration,
+            value = Defaultable.create(vibrateDuration),
             isAllowed = vibrate
         ),
 
@@ -40,15 +42,16 @@ data class FingerprintMap(
         )
     )
 
+    @Transient
     val actionList: List<FingerprintMapAction> = actionDataList.map {
         val options = FingerprintMapActionOptions(
             delayBeforeNextAction = Option(
-                value = it.delayBeforeNextAction,
+                value = Defaultable.create(it.delayBeforeNextAction),
                 isAllowed = actionDataList.isNotEmpty()
             ),
 
             multiplier = Option(
-                value = it.multiplier,
+                value = Defaultable.create(it.multiplier),
                 true
             ),
 
@@ -58,7 +61,7 @@ data class FingerprintMap(
             ),
 
             repeatRate = Option(
-                value = it.repeatRate,
+                value = Defaultable.create(it.repeatRate),
                 isAllowed = it.repeatUntilSwipedAgain
             ),
 
@@ -68,7 +71,7 @@ data class FingerprintMap(
             ),
 
             holdDownDuration = Option(
-                value = it.holdDownDuration,
+                value = Defaultable.create(it.holdDownDuration),
                 isAllowed = it.holdDownUntilSwipedAgain
             )
         )

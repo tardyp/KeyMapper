@@ -6,7 +6,6 @@ import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
-import io.github.sds100.keymapper.domain.models.Defaultable
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.IconInfo
@@ -38,8 +37,8 @@ abstract class BaseMappingListItemCreator<A : Action>(
 
             val error: Error? = actionUiHelper.getTitle(action.data)
                 .onSuccess {
-                    if (action.multiplier.isAllowed && action.multiplier.value is Defaultable.Custom) {
-                        val multiplier = (action.multiplier.value as Defaultable.Custom<Int>).data
+                    if (action.multiplier.isAllowed && action.multiplier.value != null) {
+                        val multiplier = action.multiplier.value
                         title = "${multiplier}x $it"
                     } else {
                         title = it
@@ -60,12 +59,12 @@ abstract class BaseMappingListItemCreator<A : Action>(
                             append(label)
 
                             action.delayBeforeNextAction.apply {
-                                if (isAllowed && value is Defaultable.Custom) {
+                                if (isAllowed && value != null) {
                                     if (this@buildString.isNotBlank()) {
                                         append(" $midDot ")
                                     }
 
-                                    append(getString(R.string.action_title_wait, value.data))
+                                    append(getString(R.string.action_title_wait, value))
                                 }
                             }
                         }

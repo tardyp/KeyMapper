@@ -9,8 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
-import io.github.sds100.keymapper.domain.models.Defaultable
-import io.github.sds100.keymapper.util.int
+import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -55,9 +54,9 @@ class SliderWithLabel(context: Context,
     }
 
     fun applyModel(model: SliderModel) {
-        val min = context.int(model.min)
-        val max = context.int(model.max)
-        var stepSize = context.int(model.stepSize)
+        val min = model.min
+        val max = model.max
+        var stepSize = model.stepSize
 
         if (model.value is Defaultable.Custom) {
             if (model.value.data % stepSize != 0 || model.value.data > max) {
