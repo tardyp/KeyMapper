@@ -15,20 +15,8 @@
         <import type="androidx.lifecycle.LiveData" />
 
         <variable
-            name="hideAlerts"
-            type="Boolean" />
-
-        <variable
             name="expanded"
             type="LiveData&lt;Boolean>" />
-
-        <variable
-            name="onConfirmSelectionClick"
-            type="View.OnClickListener" />
-
-        <variable
-            name="onNewKeymapClick"
-            type="View.OnClickListener" />
 
         <variable
             name="collapsedStatusLayoutState"
@@ -79,14 +67,6 @@
             type="View.OnClickListener" />
 
         <variable
-            name="isSelectable"
-            type="LiveData&lt;Boolean>" />
-
-        <variable
-            name="selectionCount"
-            type="LiveData&lt;Integer>" />
-
-        <variable
             name="isFingerprintGestureDetectionAvailable"
             type="Boolean" />
 
@@ -111,7 +91,7 @@
                 android:id="@+id/headerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{hideAlerts ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.state.hideAlerts ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -240,7 +220,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="@{getNewGuiKeyboard}"
-                android:visibility="@{viewModel.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.state.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/headerLayout"
@@ -255,7 +235,7 @@
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="48dp"
                         android:layout_height="0dp"
-                        android:onClick="@{() -> viewModel.shownGuiKeyboardAd()}"
+                        android:onClick="@{() -> viewModel.approvedGuiKeyboardAd()}"
                         android:tint="?attr/colorOnSurface"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -305,7 +285,7 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{!isSelectable &amp;&amp; isFingerprintGestureDetectionAvailable ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.state.showTabs ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutNewGuiKeyboardAd"
@@ -327,7 +307,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:visibility="@{isSelectable ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.state.multiSelecting ? View.VISIBLE : View.GONE}"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="8dp"
@@ -343,7 +323,7 @@
                     android:paddingTop="8dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="8dp"
-                    android:text='@{@string/selection_count(selectionCount)}'
+                    android:text='@{viewModel.state.selectedCountString}'
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
                     android:textSize="17sp"
                     tools:text="0 Selected" />
@@ -356,8 +336,8 @@
             android:layout_width="wrap_content"
             android:contentDescription="@string/content_description_fab_new_keymap"
             android:layout_height="wrap_content"
-            android:onClick="@{isSelectable ? onConfirmSelectionClick : onNewKeymapClick}"
-            android:src='@{isSelectable ? @drawable/ic_baseline_delete_outline_24 : @drawable/ic_baseline_add_24}'
+            android:onClick="@{() -> viewModel.onFabPressed()}"
+            android:src='@{viewModel.state.multiSelecting ? @drawable/ic_baseline_delete_outline_24 : @drawable/ic_baseline_add_24}'
             app:layout_anchor="@id/appBar" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
@@ -368,10 +348,10 @@
             android:layout_gravity="bottom"
             android:gravity="center"
             app:backgroundTint="?attr/colorPrimarySurface"
-            app:fabAlignmentMode="@{isSelectable ? BottomAppBar.FAB_ALIGNMENT_MODE_END : BottomAppBar.FAB_ALIGNMENT_MODE_CENTER}"
+            app:fabAlignmentMode="@{viewModel.state.multiSelecting ? BottomAppBar.FAB_ALIGNMENT_MODE_END : BottomAppBar.FAB_ALIGNMENT_MODE_CENTER}"
             app:fabAnimationMode="slide"
             app:menu="@menu/menu_home"
-            app:navigationIcon='@{isSelectable ? @drawable/ic_baseline_arrow_back_24 : @drawable/ic_baseline_menu_24}' />
+            app:navigationIcon='@{viewModel.state.multiSelecting ? @drawable/ic_baseline_arrow_back_24 : @drawable/ic_baseline_menu_24}' />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

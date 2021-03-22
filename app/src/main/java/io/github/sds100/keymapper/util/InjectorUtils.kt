@@ -8,10 +8,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerpri
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeymapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
-import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
@@ -63,17 +60,6 @@ object InjectorUtils {
 
     fun provideAppShortcutListViewModel(context: Context): AppShortcutListViewModel.Factory {
         return AppShortcutListViewModel.Factory(ServiceLocator.packageRepository(context))
-    }
-
-    fun provideKeymapListViewModel(ctx: Context): KeymapListViewModel.Factory {
-        return KeymapListViewModel.Factory(
-            UseCases.listKeymaps(ctx),
-            UseCases.getActionError(ctx),
-            keymapActionUiHelper(ctx),
-            constraintUiHelper(ctx),
-            UseCases.getConstraintError(ctx),
-            ServiceLocator.resourceProvider(ctx)
-        )
     }
 
     fun provideBackupRestoreViewModel(context: Context): BackupRestoreViewModel.Factory {
@@ -225,8 +211,20 @@ object InjectorUtils {
         )
     }
 
-    fun provideHomeViewModel(context: Context): HomeViewModel.Factory {
-        return HomeViewModel.Factory(UseCases.onboarding(context))
+    fun provideHomeViewModel(ctx: Context): HomeViewModel.Factory {
+        return HomeViewModel.Factory(
+            UseCases.onboarding(ctx),
+            UseCases.listKeymaps(ctx),
+            DeleteKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            EnableDisableKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            DuplicateKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            UseCases.getActionError(ctx),
+            keymapActionUiHelper(ctx),
+            constraintUiHelper(ctx),
+            UseCases.getConstraintError(ctx),
+            ServiceLocator.resourceProvider(ctx),
+            UseCases.getSettings(ctx),
+        )
     }
 
     fun provideApplicationViewModel(context: Context): ApplicationViewModel {

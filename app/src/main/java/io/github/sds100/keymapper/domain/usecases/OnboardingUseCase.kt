@@ -65,7 +65,14 @@ class OnboardingUseCaseImpl(
         set(Keys.lastInstalledVersionCodeHomeScreen, Constants.VERSION_CODE)
     }
 
-    override val shownQuickStartGuideHint by FlowPrefDelegate(Keys.shownQuickStartGuideHint, false)
+    override val showQuickStartGuideHint = get(Keys.shownQuickStartGuideHint).map {
+        if (it == null) {
+            true
+        } else {
+            !it
+        }
+    }
+
     override fun shownQuickStartGuideHint() {
         preferenceRepository.set(Keys.shownQuickStartGuideHint, true)
     }
@@ -88,6 +95,6 @@ interface OnboardingUseCase {
     val showOnboardingAfterUpdateHomeScreen: Flow<Boolean>
     fun showedOnboardingAfterUpdateHomeScreen()
 
-    val shownQuickStartGuideHint: Flow<Boolean>
+    val showQuickStartGuideHint: Flow<Boolean>
     fun shownQuickStartGuideHint()
 }

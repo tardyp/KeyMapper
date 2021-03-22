@@ -36,6 +36,7 @@ import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
@@ -46,10 +47,6 @@ import splitties.toast.toast
 import java.util.*
 
 class HomeFragment : Fragment() {
-
-    private val keymapListViewModel: KeymapListViewModel by activityViewModels {
-        InjectorUtils.provideKeymapListViewModel(requireContext())
-    }
 
     private val homeViewModel: HomeViewModel by activityViewModels {
         InjectorUtils.provideHomeViewModel(requireContext())
@@ -149,8 +146,7 @@ class HomeFragment : Fragment() {
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
         ) {
-
-            keymapListViewModel.rebuildUiState()
+            homeViewModel.rebuildUiState()
         }
 
         FragmentHomeBinding.inflate(inflater, container, false).apply {
@@ -187,12 +183,6 @@ class HomeFragment : Fragment() {
 
             viewPager.registerOnPageChangeCallback(onPageChangeCallback)
 
-            setOnNewKeymapClick {
-                val direction =
-                    HomeFragmentDirections.actionToConfigKeymap(ConfigKeymapViewModel.NEW_KEYMAP_ID)
-                findNavController().navigate(direction)
-            }
-
             appBar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_help -> {
@@ -210,29 +200,27 @@ class HomeFragment : Fragment() {
                     }
 
                     R.id.action_select_all -> {
-                        keymapListViewModel.selectAll()
+                        homeViewModel.onSelectAllClick()
                         true
                     }
 
                     R.id.action_enable -> {
-                        keymapListViewModel
-                            .enableSelectedKeymaps()
+                        homeViewModel.onEnableSelectedKeymapsClick()
                         true
                     }
 
                     R.id.action_disable -> {
-                        keymapListViewModel
-                            .disableSelectedKeymaps()
+                        homeViewModel.onDisableSelectedKeymapsClick()
                         true
                     }
 
                     R.id.action_duplicate_keymap -> {
-                        keymapListViewModel.duplicateSelectedKeymaps()
+                        homeViewModel.onDuplicateSelectedKeymapsClick()
                         true
                     }
 
                     R.id.action_backup -> {
-                        keymapListViewModel.backupSelectedKeymaps()
+                        homeViewModel.onBackupSelectedKeymapsClick()
                         true
                     }
 
@@ -245,14 +233,7 @@ class HomeFragment : Fragment() {
             }
 
             appBar.setNavigationOnClickListener {
-                homeViewModel.onNavigationMenuClick()
-            }
-
-            isSelectable = MutableLiveData(false) //TODO
-            selectionCount = MutableLiveData(0) //TODO
-
-            setOnConfirmSelectionClick {
-                homeViewModel.onDeleteFabPressed()
+                homeViewModel.onAppBarNavigationButtonClick()
             }
 
             backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
@@ -265,6 +246,7 @@ class HomeFragment : Fragment() {
                 }
             })
 
+            //TODO move all this to view model
             expanded = expandedHeader
             collapsedStatusLayoutState = this@HomeFragment.collapsedStatusState
             accessibilityServiceStatusState = this@HomeFragment.accessibilityServiceStatusState
@@ -355,57 +337,63 @@ class HomeFragment : Fragment() {
                 }
             }
 
-//            keymapListViewModel.eventStream.observe(viewLifecycleOwner, {
-//                when (it) {
-//                    is FixFailure -> coordinatorLayout.showFixActionSnackBar(
-//                        it.error,
-//                        requireContext(),
-//                        recoverFailureDelegate,
-//                        findNavController()
-//                    )
-//                }
-//            }) //TODO
-
-            fingerprintMapListViewModel.eventStream.observe(viewLifecycleOwner, {
-                when (it) {
-//                    is FixFailure -> coordinatorLayout.showFixErrorSnackBar(
-//                        it.error,
-//                        requireContext(),
-//                        recoverFailureDelegate,
-//                        findNavController()
-//                    )
-                    //TODO
+            viewLifecycleScope.launchWhenResumed {
+                homeViewModel.fixFailure.collectLatest {
+                    coordinatorLayout.showFixErrorSnackBar(
+                        requireContext(),
+                        it,
+                        recoverFailureDelegate,
+                        findNavController()
+                    )
                 }
-            })
+            }
+        }
 
-            homeViewModel.showQuickStartGuideTapTarget.observe(viewLifecycleOwner, { show ->
-                if (!show) return@observe
+        viewLifecycleScope.launchWhenResumed {
+            homeViewModel.state.collectLatest { state ->
+                if (state.multiSelecting) {
+                    appBar.replaceMenu(R.menu.menu_multi_select)
+                } else {
+                    appBar.replaceMenu(R.menu.menu_home)
+                }
 
-                viewLifecycleScope.launchWhenResumed {
+                if (state.showQuickStartGuideTapTarget) {
                     QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
                         homeViewModel.approvedQuickStartGuideTapTarget()
                     }
                 }
-            })
 
-            homeViewModel.showWhatsNew.observe(viewLifecycleOwner, {
-                if (!it) return@observe
+                if (state.showWhatsNew) {
+                    val direction = NavAppDirections.actionGlobalOnlineFileFragment(
+                        R.string.whats_new,
+                        R.string.url_changelog
+                    )
+                    findNavController().navigate(direction)
 
-                val direction = NavAppDirections.actionGlobalOnlineFileFragment(
-                    R.string.whats_new,
-                    R.string.url_changelog
-                )
+                    homeViewModel.approvedWhatsNew()
+                }
+            }
+        }
+
+        viewLifecycleScope.launchWhenResumed {
+            homeViewModel.navigateToCreateKeymapScreen.collectLatest {
+                val direction =
+                    HomeFragmentDirections.actionToConfigKeymap(ConfigKeymapViewModel.NEW_KEYMAP_ID)
                 findNavController().navigate(direction)
+            }
+        }
 
-                homeViewModel.shownWhatsNew()
-            })
+        viewLifecycleScope.launchWhenResumed {
+            homeViewModel.showMenu.collectLatest {
+                findNavController().navigate(R.id.action_global_menuFragment)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
 
-        fingerprintMapListViewModel.rebuildModels()
+        homeViewModel.rebuildUiState()
 
         updateStatusLayouts()
 
@@ -435,9 +423,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateStatusLayouts() {
-        binding.hideAlerts = ServiceLocator.preferenceRepository(requireContext())
-            .get(Keys.hideHomeScreenAlerts).firstBlocking()
-
         if (AccessibilityUtils.isServiceEnabled(requireContext())) {
             accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
 

@@ -6,6 +6,7 @@ import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
+import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.keymap
@@ -22,9 +23,12 @@ import kotlinx.coroutines.flow.collectLatest
  */
 class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
 
-    private val viewModel: KeymapListViewModel by activityViewModels {
-        InjectorUtils.provideKeymapListViewModel(requireContext())
+    private val homeViewModel: HomeViewModel by activityViewModels {
+        InjectorUtils.provideHomeViewModel(requireContext())
     }
+
+    private val viewModel: KeymapListViewModel
+        get() = homeViewModel.keymapListViewModel
 
     private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
         InjectorUtils.provideBackupRestoreViewModel(requireContext())

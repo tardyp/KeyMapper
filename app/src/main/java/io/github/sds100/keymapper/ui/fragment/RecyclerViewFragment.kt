@@ -86,7 +86,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         binding.apply {
             //initially only show the progress bar
             getProgressBar(binding).isVisible = true
-            getRecyclerView(binding).isVisible = false
+            getRecyclerView(binding).isVisible = true
             getEmptyListPlaceHolder(binding).isVisible = false
 
             subscribeUi(binding)
@@ -117,7 +117,13 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
                         getRecyclerView(binding).isVisible = false
                         getEmptyListPlaceHolder(binding).isVisible = true
 
-                        getRecyclerView(binding).withModels { /* empty list */ }
+                        /*
+                        Don't clear the recyclerview here because if a custom epoxy controller is set then
+                        it will be cleared which means no items are shown when a request to populate it
+                        is made again.
+                         */
+                        populateList(getRecyclerView(binding), emptyList())
+
                     }
 
                     is ListUiState.Loaded -> {

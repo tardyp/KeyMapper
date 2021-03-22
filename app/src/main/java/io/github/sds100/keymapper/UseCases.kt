@@ -7,6 +7,7 @@ import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseIm
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
+import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 
 /**
@@ -49,4 +50,8 @@ object UseCases {
         IsConstraintSupportedByDeviceUseCaseImpl(
             ServiceLocator.systemFeatureAdapter(ctx)
         )
+
+    fun getSettings(ctx: Context) = GetSettingsUseCaseImpl(
+        ServiceLocator.preferenceRepository(ctx)
+    )
 }

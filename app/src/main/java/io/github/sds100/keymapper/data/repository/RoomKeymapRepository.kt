@@ -6,6 +6,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.KeymapRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.util.*
 
 /**
  * Created by sds100 on 18/03/2021.
@@ -44,7 +45,7 @@ class RoomKeymapRepository(
             val keymaps = mutableListOf<KeyMapEntity>()
 
             id.forEach {
-                keymaps.add(get(it).copy(id = 0))
+                keymaps.add(get(it).copy(id = 0, uid = UUID.randomUUID().toString()))
             }
 
             dao.insert(*keymaps.toTypedArray())
