@@ -13,10 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import androidx.savedstate.SavedStateRegistry
+import com.airbnb.epoxy.EpoxyRecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ui.UiStateProducer
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.util.observeCurrentDestinationLiveData
+import io.github.sds100.keymapper.util.viewLifecycleScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -32,18 +35,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         private const val KEY_SEARCH_STATE_KEY = "key_search_state_key"
     }
 
-    private val savedStateProvider = SavedStateRegistry.SavedStateProvider {
-        Bundle().apply {
-            putBoolean(KEY_IS_APPBAR_VISIBLE, isAppBarVisible)
-            putString(KEY_REQUEST_KEY, requestKey)
-            putString(KEY_SEARCH_STATE_KEY, searchStateKey)
-        }
-    }
-
-    private val isSearchEnabled: Boolean
-        get() = searchStateKey != null
-
-    abstract val stateProducer: UiStateProducer<T>
+    abstract val listItems: Flow<ListUiState<T>>
 
     open var isAppBarVisible = true
     open var requestKey: String? = null
@@ -55,6 +47,17 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     private var _binding: BINDING? = null
     val binding: BINDING
         get() = _binding!!
+
+    private val savedStateProvider = SavedStateRegistry.SavedStateProvider {
+        Bundle().apply {
+            putBoolean(KEY_IS_APPBAR_VISIBLE, isAppBarVisible)
+            putString(KEY_REQUEST_KEY, requestKey)
+            putString(KEY_SEARCH_STATE_KEY, searchStateKey)
+        }
+    }
+
+    private val isSearchEnabled: Boolean
+        get() = searchStateKey != null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +84,11 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
+            //initially only show the progress bar
+            getProgressBar(binding).isVisible = true
+            getRecyclerView(binding).isVisible = false
+            getEmptyListPlaceHolder(binding).isVisible = false
+
             subscribeUi(binding)
 
             setupSearchView(binding)
@@ -102,8 +110,34 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         }
 
         viewLifecycleScope.launchWhenResumed {
-            stateProducer.state.collectLatest { state ->
-                updateUi(binding, state)
+            listItems.collectLatest { state ->
+                when (state) {
+                    ListUiState.Empty -> {
+                        getProgressBar(binding).isVisible = false
+                        getRecyclerView(binding).isVisible = false
+                        getEmptyListPlaceHolder(binding).isVisible = true
+
+                        getRecyclerView(binding).withModels { /* empty list */ }
+                    }
+
+                    is ListUiState.Loaded -> {
+                        getProgressBar(binding).isVisible = true
+                        getRecyclerView(binding).isVisible = false
+                        getEmptyListPlaceHolder(binding).isVisible = false
+
+                        populateList(getRecyclerView(binding), state.data)
+
+                        getProgressBar(binding).isVisible = false
+                        getRecyclerView(binding).isVisible =
+                            true //show the recyclerview once it has been populated
+                    }
+
+                    ListUiState.Loading -> {
+                        getProgressBar(binding).isVisible = true
+                        getRecyclerView(binding).isVisible = false
+                        getEmptyListPlaceHolder(binding).isVisible = false
+                    }
+                }
             }
         }
     }
@@ -111,7 +145,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        stateProducer.rebuildUiState()
+        rebuildUiState()
     }
 
     override fun onDestroyView() {
@@ -164,10 +198,11 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         findNavController().navigateUp()
     }
 
-    /**
-     * [model] is null if it is empty.
-     */
-    abstract fun updateUi(binding: BINDING, state: T)
+    abstract fun rebuildUiState()
+    abstract fun getRecyclerView(binding: BINDING): EpoxyRecyclerView
+    abstract fun getProgressBar(binding: BINDING): View
+    abstract fun getEmptyListPlaceHolder(binding: BINDING): View
     abstract fun subscribeUi(binding: BINDING)
+    abstract fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<T>)
     abstract fun bind(inflater: LayoutInflater, container: ViewGroup?): BINDING
 }

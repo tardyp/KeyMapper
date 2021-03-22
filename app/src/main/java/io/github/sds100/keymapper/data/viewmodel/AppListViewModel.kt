@@ -1,18 +1,21 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.github.sds100.keymapper.data.model.AppListItemModel
+import io.github.sds100.keymapper.data.model.AppListItem
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
+import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.util.filterByQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -21,70 +24,81 @@ import java.util.*
 class AppListViewModel internal constructor(
     private val appInfoAdapter: AppInfoAdapter,
     packageManager: PackageManagerAdapter
-) : ViewModel(), ModelState<List<AppListItemModel>> {
-
-    private val launchableAppModelList =
-        packageManager.installedPackages
-            .map { state ->
-                state.mapDataSuspend { list ->
-                    list.filter { it.canBeLaunched }.buildModels()
-                }
-            }
-            .flowOn(Dispatchers.Default)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, Loading())
-
-    private val allAppModelList = packageManager.installedPackages
-        .map { state -> state.mapDataSuspend { it.buildModels() } }
-        .flowOn(Dispatchers.Default)
-        .stateIn(viewModelScope, SharingStarted.Eagerly, Loading())
+) : ViewModel() {
 
     val searchQuery = MutableStateFlow<String?>(null)
 
-    val showHiddenApps = MutableStateFlow(false)
+    private val showHiddenApps = MutableStateFlow(false)
 
-    val showHiddenAppsButton = launchableAppModelList.map {
-        if (it is Data) {
-            it.data.isNotEmpty()
-        } else {
-            false
-        }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val _state = MutableStateFlow(
+        AppListState(
+            ListUiState.Loading,
+            showHiddenAppsButton = false,
+            isHiddenAppsChecked = false
+        )
+    )
+    val state = _state.asStateFlow()
 
-    override val model = FilteredListLiveData<AppListItemModel>().apply {
+    private val rebuildUiState = MutableSharedFlow<Unit>()
 
+    init {
         viewModelScope.launch {
             combine(
-                allAppModelList,
-                launchableAppModelList,
+                packageManager.installedPackages,
                 showHiddenApps,
-                searchQuery
-            ) { allModels, launchableModels, showHiddenApps, query ->
+                searchQuery,
+                rebuildUiState
+            ) { packageInfoList, showHiddenApps, query, _ ->
 
-                val modelsToFilter = if (showHiddenApps) {
-                    allModels
+                val packagesToFilter = if (showHiddenApps) {
+                    packageInfoList
                 } else {
-                    launchableModels
+                    withContext(Dispatchers.Default) {
+                        packageInfoList.mapData { list -> list.filter { it.canBeLaunched } }
+                    }
                 }
 
-                Pair(modelsToFilter, query)
+                Pair(packagesToFilter, query)
 
-            }.collectLatest {
-                filterSuspend(it.first, it.second)
+            }.collectLatest { pair ->
+                val packageInfoList = pair.first
+                val query = pair.second
+
+                when (val modelList = packageInfoList.mapData { it.buildListItems() }) {
+                    is State.Data -> modelList.data.filterByQuery(query).collect { modelListState ->
+                        _state.value = AppListState(
+                            modelListState,
+                            showHiddenAppsButton = true,
+                            isHiddenAppsChecked = showHiddenApps.value
+                        )
+                    }
+
+                    is State.Loading -> _state.value =
+                        AppListState(
+                            ListUiState.Loading,
+                            showHiddenAppsButton = true,
+                            isHiddenAppsChecked = showHiddenApps.value
+                        )
+                }
             }
         }
     }
 
-    override val viewState = MutableLiveData<ViewState>(ViewLoading())
+    fun onHiddenAppsCheckedChange(checked: Boolean) {
+        showHiddenApps.value = checked
+    }
 
-    override fun rebuildModels() {}//leave blank
+    fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
+    }
 
-    private suspend fun List<PackageInfo>.buildModels(): List<AppListItemModel> = flow {
+    private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> = flow {
         forEach {
             combine(
                 appInfoAdapter.getAppName(it.packageName),
                 appInfoAdapter.getAppIcon(it.packageName)
             ) { name, icon ->
-                val model = AppListItemModel(
+                val model = AppListItem(
                     packageName = it.packageName,
                     appName = name,
                     icon = icon
@@ -105,3 +119,9 @@ class AppListViewModel internal constructor(
             AppListViewModel(appInfoAdapter, packageManager) as T
     }
 }
+
+data class AppListState(
+    val listItems: ListUiState<AppListItem>,
+    val showHiddenAppsButton: Boolean,
+    val isHiddenAppsChecked: Boolean
+)

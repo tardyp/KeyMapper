@@ -57,7 +57,7 @@ class ConfigFingerprintMapViewModel(
 
     val constraintListViewModel: ConstraintListViewModel = TODO()
 
-    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading()))
+    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 

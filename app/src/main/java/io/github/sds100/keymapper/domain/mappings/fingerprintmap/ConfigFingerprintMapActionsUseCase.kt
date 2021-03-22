@@ -21,7 +21,7 @@ class ConfigFingerprintMapActionsUseCaseImpl(
         if (state is State.Data) {
             State.Data(state.data.actionList)
         } else {
-            State.Loading()
+            State.Loading
         }
     }
 

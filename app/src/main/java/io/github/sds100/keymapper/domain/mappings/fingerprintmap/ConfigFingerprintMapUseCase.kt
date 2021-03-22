@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
  */
 class ConfigFingerprintMapUseCaseImpl : ConfigFingerprintMapUseCase {
 
-    private val fingerprintMap = MutableStateFlow<State<FingerprintMap>>(State.Loading())
+    private val fingerprintMap = MutableStateFlow<State<FingerprintMap>>(State.Loading)
 
     override val state =
         fingerprintMap.map { state -> state.mapData { ConfigFingerprintMapState(it.isEnabled) } }

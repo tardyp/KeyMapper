@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

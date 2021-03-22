@@ -4,10 +4,9 @@ import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.actions.ActionListItem
 import io.github.sds100.keymapper.ui.actions.ActionListItemCreator
-import io.github.sds100.keymapper.ui.actions.ActionListItemState
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.*
@@ -28,9 +27,10 @@ class ActionListViewModel<A : Action>(
     private val testAction: TestActionUseCase,
     actionUiHelper: ActionUiHelper<A>,
     resourceProvider: ResourceProvider
-) : UiStateProducer<ListState<ActionListItemState>> {
+) {
 
-    override val state = MutableStateFlow<ListState<ActionListItemState>>(ListState.Loading())
+    private val _state = MutableStateFlow<ListUiState<ActionListItem>>(ListUiState.Loading)
+    val state = _state.asStateFlow()
 
     private val modelCreator = ActionListItemCreator(actionUiHelper, actionError, resourceProvider)
     private val _openEditOptions = MutableSharedFlow<String>()
@@ -61,9 +61,9 @@ class ActionListViewModel<A : Action>(
                 actionList
             }.collectLatest { actionList ->
                 when (actionList) {
-                    is State.Data -> state.value = buildModels(actionList.data).createListState()
+                    is State.Data -> _state.value = buildModels(actionList.data).createListState()
 
-                    is State.Loading -> state.value = ListState.Loading()
+                    is State.Loading -> _state.value = ListUiState.Loading
                 }
             }
         }
@@ -100,7 +100,7 @@ class ActionListViewModel<A : Action>(
         }
     }
 
-    override fun rebuildUiState() {
+    fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
     }
 

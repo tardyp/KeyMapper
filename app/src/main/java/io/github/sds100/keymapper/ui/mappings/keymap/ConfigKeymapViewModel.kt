@@ -98,7 +98,7 @@ class ConfigKeymapViewModel(
     private val _createLauncherShortcutLabel = MutableSharedFlow<Unit>()
     val createLauncherShortcutLabel = _createLauncherShortcutLabel.asSharedFlow()
 
-    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading()))
+    override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 

@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.domain.models.Option
 import io.github.sds100.keymapper.domain.models.ifIsAllowed
 import io.github.sds100.keymapper.domain.utils.ClickType
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable
@@ -33,6 +33,8 @@ data class KeymapTrigger(
     private val triggerFromOtherApps: Boolean = false,
     private val showToast: Boolean = false
 ) {
+
+
     @Transient
     val options = KeymapTriggerOptions(
         vibrate = Option(
@@ -132,26 +134,26 @@ object KeymapTriggerEntityMapper {
         val extras = mutableListOf<Extra>()
 
         trigger.options.sequenceTriggerTimeout.ifIsAllowed {
-            if (it != null) {
-                extras.add(Extra(TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT, it.toString()))
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT, it.data.toString()))
             }
         }
 
         trigger.options.longPressDelay.ifIsAllowed {
-            if (it != null) {
-                extras.add(Extra(TriggerEntity.EXTRA_LONG_PRESS_DELAY, it.toString()))
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_LONG_PRESS_DELAY, it.data.toString()))
             }
         }
 
         trigger.options.doublePressDelay.ifIsAllowed {
-            if (it != null) {
-                extras.add(Extra(TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY, it.toString()))
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY, it.data.toString()))
             }
         }
 
         trigger.options.vibrateDuration.ifIsAllowed {
-            if (it != null) {
-                extras.add(Extra(TriggerEntity.EXTRA_VIBRATION_DURATION, it.toString()))
+            if (it is Defaultable.Custom) {
+                extras.add(Extra(TriggerEntity.EXTRA_VIBRATION_DURATION, it.data.toString()))
             }
         }
 

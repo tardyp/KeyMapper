@@ -5,8 +5,7 @@ import io.github.sds100.keymapper.domain.constraints.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItemCreator
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
@@ -29,7 +28,7 @@ class ConstraintListViewModel(
     private val uiHelper: ConstraintUiHelper,
     private val getError: GetConstraintErrorUseCase,
     resourceProvider: ResourceProvider
-) : UiStateProducer<ConstraintListViewState>, ResourceProvider by resourceProvider {
+) : ResourceProvider by resourceProvider {
 
     private val modelCreator = ConstraintListItemCreator(uiHelper, getError, resourceProvider)
 
@@ -39,7 +38,8 @@ class ConstraintListViewModel(
     private val _fixError = MutableSharedFlow<RecoverableError>()
     val fixError = _fixError.asSharedFlow()
 
-    override val state = MutableStateFlow(buildState(State.Loading()))
+    private val _state = MutableStateFlow(buildState(State.Loading))
+    val state = _state.asStateFlow()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -48,7 +48,7 @@ class ConstraintListViewModel(
             combine(rebuildUiState, useCase.state) { _, state ->
                 state
             }.collectLatest { state ->
-                this@ConstraintListViewModel.state.value = buildState(state)
+                this@ConstraintListViewModel._state.value = buildState(state)
             }
         }
     }
@@ -89,7 +89,7 @@ class ConstraintListViewModel(
         }
     }
 
-    override fun rebuildUiState() {
+    fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
@@ -105,7 +105,7 @@ class ConstraintListViewModel(
 
             is State.Loading ->
                 ConstraintListViewState(
-                    constraintList = ListState.Loading(),
+                    constraintList = ListUiState.Loading,
                     showModeRadioButtons = false,
                     isAndModeChecked = false,
                     isOrModeChecked = false
@@ -115,7 +115,7 @@ class ConstraintListViewModel(
 }
 
 data class ConstraintListViewState(
-    val constraintList: ListState<ConstraintListItem>,
+    val constraintList: ListUiState<ConstraintListItem>,
     val showModeRadioButtons: Boolean,
     val isAndModeChecked: Boolean,
     val isOrModeChecked: Boolean

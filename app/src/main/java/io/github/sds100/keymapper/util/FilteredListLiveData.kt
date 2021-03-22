@@ -37,6 +37,7 @@ class FilteredListLiveData<T : ISearchable> : MediatorLiveData<OldDataState<List
         }
     }
 
+    //TODO remove
     suspend fun filterSuspend(models: OldDataState<List<T>>, query: String?) =
         withContext(Dispatchers.Default) {
             postValue(Loading())

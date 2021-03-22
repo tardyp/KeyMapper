@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 
 data class KeymapActionOptions(
     val repeat: Option<Boolean>,

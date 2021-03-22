@@ -7,11 +7,7 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.util.ViewEmpty" />
-
-        <import type="io.github.sds100.keymapper.util.ViewPopulated" />
-
-        <import type="io.github.sds100.keymapper.util.ViewLoading" />
+        <import type="io.github.sds100.keymapper.ui.ListUiState" />
 
         <variable
             name="viewModel"
@@ -23,7 +19,7 @@
         android:layout_height="match_parent">
 
         <FrameLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/listLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -37,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:visibility="@{viewModel.viewState instanceof ViewPopulated ? View.VISIBLE : View.GONE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/list_item_simple" />
 
@@ -50,7 +45,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:visibility="@{viewModel.viewState instanceof ViewLoading ? View.VISIBLE : View.GONE}"
                 tools:visibility="visible" />
 
             <TextView
@@ -58,12 +52,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/emptyListPlaceHolder"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/recyclerview_placeholder"
-                android:visibility="@{viewModel.viewState instanceof ViewEmpty ? View.VISIBLE : View.GONE}" />
+                android:text="@string/recyclerview_placeholder" />
         </FrameLayout>
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -72,12 +66,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:checked="@={viewModel.showHiddenApps}"
+            android:checked="@{viewModel.state.isHiddenAppsChecked}"
+            android:onCheckedChanged="@{(view, checked) -> viewModel.onHiddenAppsCheckedChange(checked)}"
             android:paddingHorizontal="8dp"
             android:text="@string/show_hidden_apps"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="?attr/colorOnSurface"
-            android:visibility="@{viewModel.showHiddenAppsButton == true ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.state.showHiddenAppsButton ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

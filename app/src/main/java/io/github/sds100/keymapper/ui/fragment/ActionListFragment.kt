@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
+import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.epoxy.EpoxyTouchHelper
 import com.google.android.material.card.MaterialCardView
 import io.github.sds100.keymapper.ActionBindingModel_
@@ -17,17 +18,17 @@ import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
-import io.github.sds100.keymapper.ui.actions.ActionListItemState
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.actions.ActionListItem
 import io.github.sds100.keymapper.util.viewLifecycleScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.
  */
 abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
-    : RecyclerViewFragment<ListState<ActionListItemState>, FragmentActionListBinding>() {
+    : RecyclerViewFragment<ActionListItem, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
@@ -35,8 +36,8 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     abstract val actionListViewModel: ActionListViewModel<A>
 
-    override val stateProducer: UiStateProducer<ListState<ActionListItemState>>
-        get() = actionListViewModel
+    override val listItems: Flow<ListUiState<ActionListItem>>
+        get() = actionListViewModel.state
 
     private val actionListController = ActionListController()
 
@@ -47,22 +48,16 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     abstract fun openActionOptionsFragment(options: O)
 
-    override fun updateUi(
-        binding: FragmentActionListBinding,
-        state: ListState<ActionListItemState>
-    ) {
+    override fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<ActionListItem>) {
         binding.enableActionDragging(actionListController)
 
-        actionListController.state = when (state) {
-            is ListState.Loaded -> state.data
-            else -> emptyList()
-        }
+        actionListController.state = listItems
     }
 
     override fun subscribeUi(binding: FragmentActionListBinding) {
         binding.viewModel = actionListViewModel
 
-        binding.epoxyRecyclerViewActions.adapter = actionListController.adapter
+        binding.epoxyRecyclerView.adapter = actionListController.adapter
 
 //        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
         //TODO
@@ -78,12 +73,19 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
         }
     }
 
+    override fun getRecyclerView(binding: FragmentActionListBinding) = binding.epoxyRecyclerView
+    override fun getProgressBar(binding: FragmentActionListBinding) = binding.progressBar
+    override fun getEmptyListPlaceHolder(binding: FragmentActionListBinding) =
+        binding.emptyListPlaceHolder
+
+    override fun rebuildUiState() = actionListViewModel.rebuildUiState()
+
     private fun FragmentActionListBinding.enableActionDragging(
         controller: EpoxyController
     ): ItemTouchHelper {
 
         return EpoxyTouchHelper.initDragging(controller)
-            .withRecyclerView(epoxyRecyclerViewActions)
+            .withRecyclerView(epoxyRecyclerView)
             .forVerticalList()
             .withTarget(ActionBindingModel_::class.java)
             .andCallbacks(object : EpoxyTouchHelper.DragCallbacks<ActionBindingModel_>() {
@@ -116,7 +118,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
     }
 
     private inner class ActionListController : EpoxyController() {
-        var state: List<ActionListItemState> = listOf()
+        var state: List<ActionListItem> = listOf()
             set(value) {
                 field = value
                 requestModelBuild()

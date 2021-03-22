@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
  */
 class ConfigKeymapUseCaseImpl : ConfigKeymapUseCase {
 
-    private val keymap = MutableStateFlow<State<KeyMap>>(State.Loading())
+    private val keymap = MutableStateFlow<State<KeyMap>>(State.Loading)
 
     override val state =
         keymap.map { state -> state.mapData { ConfigKeymapState(it.uid, it.isEnabled) } }

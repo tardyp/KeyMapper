@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
@@ -10,8 +9,7 @@ import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
-import io.github.sds100.keymapper.domain.utils.moveElement
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.util.delegate.KeymapDetectionDelegate
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -26,7 +24,7 @@ data class KeyMap(
     val dbId: Long = NEW_ID,
     val uid: String = UUID.randomUUID().toString(),
     val trigger: KeymapTrigger = KeymapTrigger(),
-    private val actionDataList: List<KeymapActionData> = emptyList(),
+    val actionDataList: List<KeymapActionData> = emptyList(),
     val constraintList: Set<Constraint> = emptySet(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true
@@ -89,46 +87,6 @@ data class KeyMap(
 
         KeymapAction(it.uid, it.data, options)
     }.toList()
-
-    fun addAction(data: ActionData): KeyMap {
-        actionDataList.toMutableList().apply {
-            add(KeymapActionData(data = data))
-            return copy(actionDataList = this)
-        }
-    }
-
-    fun moveAction(fromIndex: Int, toIndex: Int): KeyMap {
-        actionDataList.toMutableList().apply {
-            moveElement(fromIndex, toIndex)
-            return copy(actionDataList = this)
-        }
-    }
-
-    fun removeAction(uid: String): KeyMap {
-        actionDataList.toMutableList().apply {
-            removeAll { it.uid == uid }
-            return copy(actionDataList = this)
-        }
-    }
-
-    fun setRepeatEnabled(uid: String, enabled: Boolean): KeyMap {
-        return setActionOption(uid) { it.copy(repeat = enabled) }
-    }
-
-    private fun setActionOption(
-        uid: String,
-        block: (action: KeymapActionData) -> KeymapActionData
-    ): KeyMap {
-        return actionDataList.map {
-            if (it.uid == uid) {
-                block.invoke(it)
-            } else {
-                it
-            }
-        }.let {
-            copy(actionDataList = it)
-        }
-    }
 }
 
 object KeyMapEntityMapper {

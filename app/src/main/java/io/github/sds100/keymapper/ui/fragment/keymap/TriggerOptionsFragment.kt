@@ -4,7 +4,6 @@ import android.content.ClipData
 import androidx.navigation.navGraphViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
@@ -16,6 +15,7 @@ import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.UrlUtils
 import io.github.sds100.keymapper.util.str
+import kotlinx.coroutines.flow.Flow
 import splitties.systemservices.clipboardManager
 import splitties.toast.toast
 
@@ -39,16 +39,12 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
 
     override var isAppBarVisible = false
 
-    override val stateProducer: UiStateProducer<ListState<ListItem>>
-        get() = viewModel
+    override val listItems: Flow<ListUiState<ListItem>>
+        get() = viewModel.state
 
-    override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
-
-    }
-
-    override fun populateRecyclerView(recyclerView: EpoxyRecyclerView, list: List<ListItem>) {
+    override fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<ListItem>) {
         recyclerView.withModels {
-            list.forEach { listItem ->
+            listItems.forEach { listItem ->
                 if (listItem is CheckBoxListItem) {
                     configuredCheckBox(this@TriggerOptionsFragment, listItem) { isChecked ->
                         viewModel.setCheckboxValue(listItem.id, isChecked)
@@ -97,5 +93,7 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
             }
         }
     }
+
+    override fun rebuildUiState() = viewModel.rebuildUiState()
 }
 

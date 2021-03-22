@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.utils.defaultable
+package io.github.sds100.keymapper.domain.utils
 
 /**
  * Created by sds100 on 28/02/2021.

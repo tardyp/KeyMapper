@@ -10,11 +10,10 @@ import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
-import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
+import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.util.ViewPopulated
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,7 @@ class TriggerViewModel(
     private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
     private val launcherShortcutAdapter: LauncherShortcutAdapter,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, UiStateProducer<TriggerUiState> {
+) : ResourceProvider by resourceProvider {
 
     val optionsViewModel = TriggerOptionsViewModel(
         coroutineScope,
@@ -65,9 +64,10 @@ class TriggerViewModel(
     private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
     val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
 
-    override val state = MutableStateFlow(
-        UiBuilder(State.Loading(), RecordTriggerState.Stopped).build()
+    private val _state = MutableStateFlow(
+        UiBuilder(State.Loading, RecordTriggerState.Stopped).build()
     )
+    val state = _state.asStateFlow()
 
     fun setParallelTriggerModeChecked(checked: Boolean) {
         if (checked) {
@@ -102,7 +102,7 @@ class TriggerViewModel(
             ) { _, configState, recordTriggerState ->
                 UiBuilder(configState, recordTriggerState)
             }.collectLatest {
-                state.value = it.build()
+                _state.value = it.build()
             }
         }
     }
@@ -160,7 +160,7 @@ class TriggerViewModel(
 
     fun stopRecordingTrigger() = recordTrigger.stopRecording()
 
-    override fun rebuildUiState() {
+    fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
@@ -188,7 +188,7 @@ class TriggerViewModel(
         }
 
         private fun loadedState(config: ConfigKeymapTriggerState) = TriggerUiState(
-            triggerKeyListModels =
+            triggerKeyListItems =
             listItemMapper.map(config.keys, config.mode).createListState(),
 
             recordTriggerButtonText = recordTriggerButtonText,
@@ -213,7 +213,7 @@ class TriggerViewModel(
         )
 
         private fun loadingState() = TriggerUiState(
-            triggerKeyListModels = ListState.Empty(),
+            triggerKeyListItems = ListUiState.Empty,
             recordTriggerButtonText = recordTriggerButtonText,
 
             clickTypeRadioButtonsVisible = false,
@@ -233,7 +233,7 @@ class TriggerViewModel(
 }
 
 data class TriggerUiState(
-    val triggerKeyListModels: ListState<TriggerKeyListItemModel>,
+    val triggerKeyListItems: ListUiState<TriggerKeyListItem>,
     val recordTriggerButtonText: String,
 
     val clickTypeRadioButtonsVisible: Boolean,

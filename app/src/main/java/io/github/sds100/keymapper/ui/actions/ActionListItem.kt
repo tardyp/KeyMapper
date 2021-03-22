@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.util.TintType
  * Created by sds100 on 26/03/2020.
  */
 
-data class ActionListItemState(
+data class ActionListItem(
     val id: String,
     val tintType: TintType,
     val title: String?,

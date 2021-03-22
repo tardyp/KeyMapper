@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 
 data class FingerprintMapActionOptions(
     val delayBeforeNextAction: Option<Defaultable<Int>>,

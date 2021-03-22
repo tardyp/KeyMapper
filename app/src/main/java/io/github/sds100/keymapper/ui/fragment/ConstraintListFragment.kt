@@ -2,21 +2,23 @@ package io.github.sds100.keymapper.ui.fragment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.constraint
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewState
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
 import io.github.sds100.keymapper.util.viewLifecycleScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import splitties.toast.toast
 
 /**
  * Created by sds100 on 29/11/20.
  */
 abstract class ConstraintListFragment
-    : RecyclerViewFragment<ConstraintListViewState, FragmentConstraintListBinding>() {
+    : RecyclerViewFragment<ConstraintListItem, FragmentConstraintListBinding>() {
 
     companion object {
         const val CHOOSE_CONSTRAINT_REQUEST_KEY = "request_choose_constraint"
@@ -24,9 +26,8 @@ abstract class ConstraintListFragment
 
     abstract val constraintListViewModel: ConstraintListViewModel
 
-    override val stateProducer: UiStateProducer<ConstraintListViewState> by lazy {
-        constraintListViewModel
-    }
+    override val listItems: Flow<ListUiState<ConstraintListItem>>
+        get() = constraintListViewModel.state.map { it.constraintList }
 
     override fun bind(
         inflater: LayoutInflater,
@@ -53,14 +54,12 @@ abstract class ConstraintListFragment
         }
     }
 
-    override fun updateUi(
-        binding: FragmentConstraintListBinding,
-        state: ConstraintListViewState
+    override fun populateList(
+        recyclerView: EpoxyRecyclerView,
+        listItems: List<ConstraintListItem>
     ) {
-        binding.epoxyRecyclerViewConstraints.withModels {
-            if (state.constraintList !is ListState.Loaded) return@withModels
-
-            state.constraintList.data.forEach { model ->
+        recyclerView.withModels {
+            listItems.forEach { model ->
                 constraint {
                     model(model)
                     onCardClick { _ ->
@@ -74,4 +73,10 @@ abstract class ConstraintListFragment
             }
         }
     }
+
+    override fun rebuildUiState() = constraintListViewModel.rebuildUiState()
+    override fun getRecyclerView(binding: FragmentConstraintListBinding) = binding.epoxyRecyclerView
+    override fun getProgressBar(binding: FragmentConstraintListBinding) = binding.progressBar
+    override fun getEmptyListPlaceHolder(binding: FragmentConstraintListBinding) =
+        binding.emptyListPlaceHolder
 }

@@ -5,16 +5,13 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
-import com.google.gson.Gson
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.ActivityHomeBinding
-import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.onFailure
@@ -68,12 +65,13 @@ class MainActivity : AppCompatActivity() {
         ServiceLocator.defaultKeymapRepository(this).apply {
             keymapList.observe(this@MainActivity, {
 
-                sendPackageBroadcast(
-                    MyAccessibilityService.ACTION_UPDATE_KEYMAP_LIST_CACHE,
-                    bundleOf(
-                        MyAccessibilityService.EXTRA_KEYMAP_LIST to Gson().toJson(it)
-                    )
-                )
+                //TODO
+//                sendPackageBroadcast(
+//                    MyAccessibilityService.ACTION_UPDATE_KEYMAP_LIST_CACHE,
+//                    bundleOf(
+//                        MyAccessibilityService.EXTRA_KEYMAP_LIST to Gson().toJson(it)
+//                    )
+//                )
             })
         }
 

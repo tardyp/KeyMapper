@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ActionDataEntityMapper
 import io.github.sds100.keymapper.domain.models.ifIsAllowed
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.util.result.success
 import io.github.sds100.keymapper.util.result.then
 import io.github.sds100.keymapper.util.result.valueOrNull
@@ -110,32 +110,32 @@ object KeymapActionDataEntityMapper {
 
         val extras = mutableListOf<Extra>().apply {
             action.options.delayBeforeNextAction.ifIsAllowed {
-                if (it != null) {
-                    add(Extra(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION, it.toString()))
+                if (it is Defaultable.Custom) {
+                    add(Extra(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION, it.data.toString()))
                 }
             }
 
             action.options.multiplier.ifIsAllowed {
-                if (it != null) {
-                    add(Extra(ActionEntity.EXTRA_MULTIPLIER, it.toString()))
+                if (it is Defaultable.Custom) {
+                    add(Extra(ActionEntity.EXTRA_MULTIPLIER, it.data.toString()))
                 }
             }
 
             action.options.holdDownDuration.ifIsAllowed {
-                if (it != null) {
-                    add(Extra(ActionEntity.EXTRA_HOLD_DOWN_DURATION, it.toString()))
+                if (it is Defaultable.Custom) {
+                    add(Extra(ActionEntity.EXTRA_HOLD_DOWN_DURATION, it.data.toString()))
                 }
             }
 
             action.options.repeatRate.ifIsAllowed {
-                if (it != null) {
-                    add(Extra(ActionEntity.EXTRA_REPEAT_RATE, it.toString()))
+                if (it is Defaultable.Custom) {
+                    add(Extra(ActionEntity.EXTRA_REPEAT_RATE, it.data.toString()))
                 }
             }
 
             action.options.repeatDelay.ifIsAllowed {
-                if (it != null) {
-                    add(Extra(ActionEntity.EXTRA_REPEAT_DELAY, it.toString()))
+                if (it is Defaultable.Custom) {
+                    add(Extra(ActionEntity.EXTRA_REPEAT_DELAY, it.data.toString()))
                 }
             }
 

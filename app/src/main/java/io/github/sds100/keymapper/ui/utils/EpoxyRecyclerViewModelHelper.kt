@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.ui.utils
 import androidx.fragment.app.Fragment
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.checkbox
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.slider
 import io.github.sds100.keymapper.ui.CheckBoxListItem
 import io.github.sds100.keymapper.ui.SliderListItem

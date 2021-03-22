@@ -7,7 +7,7 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.ui.ListState" />
+        <import type="io.github.sds100.keymapper.ui.ListUiState" />
 
         <variable
             name="viewModel"
@@ -21,30 +21,47 @@
         android:layout_marginTop="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.airbnb.epoxy.EpoxyRecyclerView
-            android:id="@+id/epoxyRecyclerViewTriggers"
+        <FrameLayout
+            android:id="@+id/listLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="@{viewModel.state.triggerKeyListModels instanceof ListState.Empty ? View.GONE : View.VISIBLE}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/textViewRadioGroupHeader"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toTopOf="@id/radioGroupParallelTriggerClickType"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:itemCount="100"
-            tools:visibility="visible" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            style="@style/RecyclerViewPlaceholderTextView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/triggers_recyclerview_placeholder"
-            android:visibility="@{viewModel.state.triggerKeyListModels instanceof ListState.Empty ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@+id/buttonRecordKeys"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone" />
+            <com.airbnb.epoxy.EpoxyRecyclerView
+                android:id="@+id/epoxyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/list_item_simple" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/emptyListPlaceHolder"
+                style="@style/RecyclerViewPlaceholderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/triggers_recyclerview_placeholder" />
+        </FrameLayout>
 
         <RadioGroup
             android:id="@+id/radioGroupParallelTriggerClickType"

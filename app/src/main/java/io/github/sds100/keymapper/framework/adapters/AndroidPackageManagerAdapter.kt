@@ -5,9 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.util.Loading
-import io.github.sds100.keymapper.util.OldDataState
-import io.github.sds100.keymapper.util.getDataState
+import io.github.sds100.keymapper.domain.utils.State
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -22,13 +20,13 @@ class AndroidPackageManagerAdapter(
     private val ctx = context.applicationContext
     private val packageManager = ctx.packageManager
 
-    override val installedPackages = MutableStateFlow<OldDataState<List<PackageInfo>>>(Loading())
+    override val installedPackages = MutableStateFlow<State<List<PackageInfo>>>(State.Loading)
 
     //TODO have broadcast receiver that updates the installed packages when a new package is installed, removed or change
 
     init {
         coroutineScope.launch {
-            installedPackages.value = Loading()
+            installedPackages.value = State.Loading
 
             packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
                 val canBeLaunched =
@@ -37,7 +35,7 @@ class AndroidPackageManagerAdapter(
                         && packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null))
 
                 PackageInfo(it.packageName, canBeLaunched)
-            }.let { installedPackages.value = it.getDataState() }
+            }.let { installedPackages.value = State.Data(it) }
         }
     }
 

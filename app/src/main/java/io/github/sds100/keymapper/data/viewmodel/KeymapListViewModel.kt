@@ -10,8 +10,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ChipUi
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
@@ -32,7 +31,7 @@ class KeymapListViewModel internal constructor(
     constraintUiHelper: ConstraintUiHelper,
     getConstraintErrorUseCase: GetConstraintErrorUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), UiStateProducer<ListState<KeymapListItemModel>>, OnChipClickCallback {
+) : ViewModel(), OnChipClickCallback {
 
     private val selectionProvider: ISelectionProvider = SelectionProvider()
     private val modelCreator = KeymapListItemCreator(
@@ -43,7 +42,8 @@ class KeymapListViewModel internal constructor(
         resourceProvider
     )
 
-    override val state = MutableStateFlow<ListState<KeymapListItemModel>>(ListState.Loading())
+    private val _state = MutableStateFlow<ListUiState<KeymapListItemModel>>(ListUiState.Loading)
+    val state = _state.asStateFlow()
 
     /**
      * The database id of the key map
@@ -64,7 +64,7 @@ class KeymapListViewModel internal constructor(
             ) { _, keymapList, isSelectable, selectedIds, _ ->
                 UiBuilder(keymapList, isSelectable, selectedIds)
             }.collectLatest {
-                state.value = it.build()
+                _state.value = it.build()
             }
         }
     }
@@ -133,7 +133,7 @@ class KeymapListViewModel internal constructor(
         TODO("Not yet implemented")
     }
 
-    override fun rebuildUiState() {
+    fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
@@ -146,7 +146,7 @@ class KeymapListViewModel internal constructor(
         private val isSelectable: Boolean,
         private val selectedIds: Set<Long>
     ) {
-        fun build(): ListState<KeymapListItemModel> {
+        fun build(): ListUiState<KeymapListItemModel> {
             return keymapList.map { keyMap ->
                 modelCreator.map(
                     keyMap,

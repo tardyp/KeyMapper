@@ -9,7 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.util.str
 
 /**

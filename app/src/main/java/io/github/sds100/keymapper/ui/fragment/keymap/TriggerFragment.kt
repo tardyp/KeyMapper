@@ -1,14 +1,13 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
+import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.epoxy.EpoxyTouchHelper
 import com.google.android.material.card.MaterialCardView
 import io.github.sds100.keymapper.R
@@ -16,16 +15,18 @@ import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.triggerKey
-import io.github.sds100.keymapper.ui.ListState
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerViewModel
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
 import splitties.alertdialog.appcompat.okButton
-import splitties.experimental.ExperimentalSplittiesApi
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -33,15 +34,13 @@ import kotlin.coroutines.suspendCoroutine
  * Created by sds100 on 25/11/20.
  */
 
-class TriggerFragment : Fragment() {
+class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTriggerBinding>() {
 
     class Info : FragmentInfo(
         R.string.trigger_header,
         R.string.url_trigger_guide,
         { TriggerFragment() }
     )
-
-    private lateinit var binding: FragmentTriggerBinding
 
     private val triggerViewModel: TriggerViewModel by lazy {
         navGraphViewModels<ConfigKeymapViewModel>(R.id.nav_config_keymap) {
@@ -51,29 +50,21 @@ class TriggerFragment : Fragment() {
 
     private val triggerKeyController = TriggerKeyController()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        FragmentTriggerBinding.inflate(inflater, container, false).apply {
-            binding = this
-            lifecycleOwner = viewLifecycleOwner
+    override val listItems: Flow<ListUiState<TriggerKeyListItem>>
+        get() = triggerViewModel.state.map { it.triggerKeyListItems }
 
-            return this.root
+    override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentTriggerBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
         }
-    }
 
     private var parallelTriggerOrderDialog: AlertDialog? = null
     private var sequenceTriggerExplanationDialog: AlertDialog? = null
 
-    @ExperimentalSplittiesApi
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun subscribeUi(binding: FragmentTriggerBinding) {
         binding.viewModel = triggerViewModel
 
-        binding.epoxyRecyclerViewTriggers.adapter = triggerKeyController.adapter
+        binding.epoxyRecyclerView.adapter = triggerKeyController.adapter
 
         triggerViewModel.showEnableCapsLockKeyboardLayoutPrompt
             .collectWhenStarted(viewLifecycleOwner) {
@@ -122,13 +113,6 @@ class TriggerFragment : Fragment() {
                 }
 
                 binding.enableTriggerKeyDragging(triggerKeyController)
-
-                when (state.triggerKeyListModels) {
-                    is ListState.Loaded ->
-                        triggerKeyController.modelList = state.triggerKeyListModels.data
-
-                    else -> triggerKeyController.modelList = emptyList()
-                }
             }
         }
 
@@ -137,9 +121,19 @@ class TriggerFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun populateList(
+        recyclerView: EpoxyRecyclerView,
+        listItems: List<TriggerKeyListItem>
+    ) {
+        triggerKeyController.modelList = listItems
+    }
 
+    override fun getRecyclerView(binding: FragmentTriggerBinding) = binding.epoxyRecyclerView
+    override fun getProgressBar(binding: FragmentTriggerBinding) = binding.progressBar
+    override fun getEmptyListPlaceHolder(binding: FragmentTriggerBinding) =
+        binding.emptyListPlaceHolder
+
+    override fun rebuildUiState() {
         triggerViewModel.rebuildUiState()
     }
 
@@ -196,7 +190,7 @@ class TriggerFragment : Fragment() {
 
     private fun FragmentTriggerBinding.enableTriggerKeyDragging(controller: EpoxyController): ItemTouchHelper {
         return EpoxyTouchHelper.initDragging(controller)
-            .withRecyclerView(epoxyRecyclerViewTriggers)
+            .withRecyclerView(epoxyRecyclerView)
             .forVerticalList()
             .withTarget(TriggerKeyBindingModel_::class.java)
             .andCallbacks(object : EpoxyTouchHelper.DragCallbacks<TriggerKeyBindingModel_>() {
@@ -229,7 +223,7 @@ class TriggerFragment : Fragment() {
     }
 
     private inner class TriggerKeyController : EpoxyController() {
-        var modelList: List<TriggerKeyListItemModel> = listOf()
+        var modelList: List<TriggerKeyListItem> = listOf()
             set(value) {
                 field = value
                 requestModelBuild()

@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.ui.mappings.keymap.TriggerKeyLinkType
 /**
  * Created by sds100 on 27/03/2020.
  */
-data class TriggerKeyListItemModel(
+data class TriggerKeyListItem(
     val id: String,
     val keyCode: Int,
     val name: String,

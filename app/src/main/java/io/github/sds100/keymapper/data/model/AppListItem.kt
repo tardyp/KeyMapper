@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.util.ISearchable
 /**
  * Created by sds100 on 27/01/2020.
  */
-data class AppListItemModel(
+data class AppListItem(
     val packageName: String,
     val appName: String,
     val icon: Drawable?

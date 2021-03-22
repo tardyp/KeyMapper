@@ -9,12 +9,12 @@ import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.keymap
-import io.github.sds100.keymapper.ui.ListState
-import io.github.sds100.keymapper.ui.UiStateProducer
+import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -42,8 +42,8 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
 
     private val controller = KeymapController()
 
-    override val stateProducer: UiStateProducer<ListState<KeymapListItemModel>>
-        get() = viewModel
+    override val listItems: Flow<ListUiState<KeymapListItemModel>>
+        get() = viewModel.state
 
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         binding.epoxyRecyclerView.adapter = controller.adapter
@@ -56,12 +56,14 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
         }
     }
 
-    override fun populateRecyclerView(
+    override fun populateList(
         recyclerView: EpoxyRecyclerView,
-        list: List<KeymapListItemModel>
+        listItems: List<KeymapListItemModel>
     ) {
-        controller.keymapList = list
+        controller.keymapList = listItems
     }
+
+    override fun rebuildUiState() = viewModel.rebuildUiState()
 
     inner class KeymapController : EpoxyController() {
         var keymapList: List<KeymapListItemModel> = listOf()

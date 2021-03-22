@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.KeyEventAction
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.domain.utils.moveElement
 import io.github.sds100.keymapper.util.KeyEventUtils
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -22,28 +23,35 @@ class ConfigKeymapActionsUseCaseImpl(
         if (state is State.Data) {
             State.Data(state.data.actionList)
         } else {
-            State.Loading()
+            State.Loading
         }
     }
 
     override fun addAction(action: ActionData) = keymap.value.ifIsData { keymap ->
-        setKeymap(keymap.addAction(action))
+        keymap.actionDataList.toMutableList().apply {
+            add(createKeymapActionData(action))
+            setKeymap(keymap.copy(actionDataList = this))
+        }
     }
 
     override fun moveAction(fromIndex: Int, toIndex: Int) = keymap.value.ifIsData { keymap ->
-        setKeymap(keymap.moveAction(fromIndex, toIndex))
+        keymap.actionDataList.toMutableList().apply {
+            moveElement(fromIndex, toIndex)
+            setKeymap(keymap.copy(actionDataList = this))
+        }
     }
 
     override fun removeAction(uid: String) = keymap.value.ifIsData { keymap ->
-        setKeymap(keymap.removeAction(uid))
+        keymap.actionDataList.toMutableList().apply {
+            removeAll { it.uid == uid }
+            setKeymap(keymap.copy(actionDataList = this))
+        }
     }
 
-    override fun setRepeatEnabled(uid: String, enabled: Boolean) = keymap.value.ifIsData { keymap ->
-        setKeymap(keymap.setRepeatEnabled(uid, enabled))
-    }
+    override fun setRepeatEnabled(uid: String, enabled: Boolean) =
+        setActionOption(uid) { it.copy(repeat = enabled) }
 
-    //TODO
-    private fun createAction(actionData: ActionData): KeymapActionData {
+    private fun createKeymapActionData(actionData: ActionData): KeymapActionData {
         var holdDown = false
         var repeat = false
 
@@ -63,6 +71,22 @@ class ConfigKeymapActionsUseCaseImpl(
         )
     }
 
+    private fun setActionOption(
+        uid: String,
+        block: (action: KeymapActionData) -> KeymapActionData
+    ) {
+        keymap.value.ifIsData { keymap ->
+            keymap.actionDataList.map {
+                if (it.uid == uid) {
+                    block.invoke(it)
+                } else {
+                    it
+                }
+            }.let {
+                setKeymap.invoke(keymap.copy(actionDataList = it))
+            }
+        }
+    }
 }
 
 interface ConfigKeymapActionsUseCase : ConfigActionsUseCase<KeymapAction> {

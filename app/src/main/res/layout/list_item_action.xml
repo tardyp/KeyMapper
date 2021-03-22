@@ -11,7 +11,7 @@
 
         <variable
             name="state"
-            type="io.github.sds100.keymapper.ui.actions.ActionListItemState" />
+            type="io.github.sds100.keymapper.ui.actions.ActionListItem" />
 
         <variable
             name="onRemoveClick"

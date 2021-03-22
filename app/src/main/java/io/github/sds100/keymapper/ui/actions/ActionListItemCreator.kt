@@ -21,14 +21,14 @@ class ActionListItemCreator<A : Action>(
     fun map(
         action: A,
         actionCount: Int
-    ): ActionListItemState {
+    ): ActionListItem {
         var title: String? = null
         var icon: IconInfo? = null
 
         val error: Error? = getTitle(action.data)
             .onSuccess {
-                if (action.multiplier.isAllowed && action.multiplier.value != null) {
-                    val multiplier = action.multiplier.value
+                if (action.multiplier.isAllowed && action.multiplier.value is Defaultable.Custom) {
+                    val multiplier = (action.multiplier.value as Defaultable.Custom<Int>).data
                     title = "${multiplier}x $it"
                 } else {
                     title = it
@@ -48,19 +48,19 @@ class ActionListItemCreator<A : Action>(
                 append(label)
 
                 action.delayBeforeNextAction.apply {
-                    if (isAllowed && value != null) {
+                    if (isAllowed && value is Defaultable.Custom) {
                         if (this@buildString.isNotBlank()) {
                             append(" $midDot ")
                         }
 
-                        append(getString(R.string.action_title_wait, value))
+                        append(getString(R.string.action_title_wait, value.data))
                     }
                 }
             }
 
         }.takeIf { it.isNotBlank() }
 
-        return ActionListItemState(
+        return ActionListItem(
             id = action.uid,
             tintType = icon?.tintType ?: TintType.ERROR,
             icon = icon?.drawable ?: getDrawable(R.drawable.ic_baseline_error_outline_24),

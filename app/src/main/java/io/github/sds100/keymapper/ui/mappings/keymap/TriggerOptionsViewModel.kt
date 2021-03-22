@@ -6,17 +6,14 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTri
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
 import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.domain.utils.defaultable.Defaultable
 import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.UserResponse
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -29,7 +26,7 @@ class TriggerOptionsViewModel(
     private val useCase: ConfigKeymapTriggerUseCase,
     private val launcherShortcutAdapter: LauncherShortcutAdapter,
     resourceProvider: ResourceProvider
-) : UiStateProducer<ListState<ListItem>>, ResourceProvider by resourceProvider {
+) : ResourceProvider by resourceProvider {
 
     private companion object {
         const val ID_LONG_PRESS_DELAY = "long_press_delay"
@@ -47,7 +44,8 @@ class TriggerOptionsViewModel(
 
     //TODO screen off triggers explanation
 
-    override val state = MutableStateFlow(buildUiState(State.Loading()))
+    private val _state = MutableStateFlow(buildUiState(State.Loading))
+    val state = _state.asStateFlow()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -56,7 +54,7 @@ class TriggerOptionsViewModel(
             combine(rebuildUiState, useCase.state) { _, configState ->
                 configState
             }.collectLatest {
-                state.value = buildUiState(it)
+                _state.value = buildUiState(it)
             }
         }
     }
@@ -87,11 +85,11 @@ class TriggerOptionsViewModel(
         }
     }
 
-    override fun rebuildUiState() {
+    fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
-    private fun buildUiState(configState: State<ConfigKeymapTriggerState>): ListState<ListItem> {
+    private fun buildUiState(configState: State<ConfigKeymapTriggerState>): ListUiState<ListItem> {
         return when (configState) {
             is State.Data -> sequence {
                 val options = configState.data.options
@@ -214,7 +212,7 @@ class TriggerOptionsViewModel(
                 }
             }.toList().createListState()
 
-            is State.Loading -> ListState.Loading()
+            is State.Loading -> ListUiState.Loading
         }
     }
 }

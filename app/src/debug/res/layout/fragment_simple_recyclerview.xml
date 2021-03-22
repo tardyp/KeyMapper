@@ -7,12 +7,6 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.ui.ListState" />
-
-        <variable
-            name="state"
-            type="ListState" />
-
         <variable
             name="caption"
             type="String" />
@@ -32,7 +26,7 @@
             android:layout_marginBottom="16dp"
             android:text="@{caption}"
             android:visibility='@{caption == null || caption == "" ? View.GONE : View.VISIBLE}'
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintBottom_toTopOf="@+id/listLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +34,7 @@
             tools:visibility="visible" />
 
         <FrameLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/listLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -54,7 +48,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:visibility="@{state instanceof ListState.Loaded ? View.VISIBLE : View.GONE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/list_item_simple"
                 tools:visibility="gone" />
@@ -68,10 +61,10 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:visibility="@{state instanceof ListState.Loading ? View.VISIBLE : View.GONE}"
                 tools:visibility="gone" />
 
             <TextView
+                android:id="@+id/emptyListPlaceHolder"
                 style="@style/RecyclerViewPlaceholderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -80,8 +73,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/recyclerview_placeholder"
-                android:visibility="@{state instanceof ListState.Empty ? View.VISIBLE : View.GONE}" />
+                android:text="@string/recyclerview_placeholder" />
         </FrameLayout>
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout

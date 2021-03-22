@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.LONG_PRESS
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.PARALLEL
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.SEQUENCE
 import io.github.sds100.keymapper.data.model.TriggerEntity.Companion.TRIGGER_FLAG_LABEL_MAP
-import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
+import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import splitties.bitflags.hasFlag
 
 /**
@@ -80,7 +80,7 @@ fun TriggerEntity.KeyEntity.buildModel(
     ctx: Context,
     deviceInfoList: List<DeviceInfoEntity>,
     showDeviceDescriptors: Boolean
-): TriggerKeyListItemModel {
+): TriggerKeyListItem {
 //
 //    val extraInfo = buildString {
 //        append(getDeviceName(ctx, deviceInfoList, showDeviceDescriptors))

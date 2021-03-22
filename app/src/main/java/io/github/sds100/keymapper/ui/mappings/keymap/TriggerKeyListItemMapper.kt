@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevic
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItemModel
+import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.util.KeyEventUtils
 
 /**
@@ -17,7 +17,7 @@ class TriggerKeyListItemMapper(
     private val resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
-    fun map(keys: List<TriggerKey>, mode: TriggerMode): List<TriggerKeyListItemModel> =
+    fun map(keys: List<TriggerKey>, mode: TriggerMode): List<TriggerKeyListItem> =
         keys.mapIndexed { index, key ->
             val extraInfo = buildString {
                 append(getDeviceName(key.device))
@@ -40,7 +40,7 @@ class TriggerKeyListItemMapper(
                 else -> TriggerKeyLinkType.HIDDEN
             }
 
-            TriggerKeyListItemModel(
+            TriggerKeyListItem(
                 id = key.uid,
                 keyCode = key.keyCode,
                 name = KeyEventUtils.keycodeToString(key.keyCode),
