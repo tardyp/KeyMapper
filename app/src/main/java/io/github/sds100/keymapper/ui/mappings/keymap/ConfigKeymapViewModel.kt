@@ -1,11 +1,9 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -22,18 +20,16 @@ import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.mapData
-import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
+import io.github.sds100.keymapper.ui.shortcuts.CreateKeymapShortcutUseCase
+import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.result.RecoverableError
-import io.github.sds100.keymapper.util.result.onSuccess
-import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -57,7 +53,8 @@ class ConfigKeymapViewModel(
     showDeviceInfoUseCase: ShowDeviceInfoUseCase,
     private val actionUiHelper: ActionUiHelper<KeymapAction>,
     constraintUiHelper: ConstraintUiHelper,
-    private val launcherShortcutAdapter: LauncherShortcutAdapter,
+    private val createKeymapShortcut: CreateKeymapShortcutUseCase,
+    areShortcutsSupported: IsRequestShortcutSupported,
     resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
 
@@ -83,7 +80,7 @@ class ConfigKeymapViewModel(
         TriggerKeyListItemMapper(resourceProvider),
         recordTriggerUseCase,
         showDeviceInfoUseCase,
-        launcherShortcutAdapter,
+        areShortcutsSupported,
         resourceProvider
     )
 
@@ -162,9 +159,10 @@ class ConfigKeymapViewModel(
         viewModelScope.launch {
             configActions.actionList.firstOrNull()?.ifIsData { actionList ->
                 if (actionList.size == 1) {
-                    actionUiHelper.getTitle(actionList[0].data).onSuccess {
-                        createLauncherShortcut(it)
-                    }
+                    val keymapUid = configUseCase.state.firstOrNull()?.mapData { it.uid }
+
+                    if (keymapUid !is State.Data) return@launch
+                    createKeymapShortcut.createForSingleAction(keymapUid.data, actionList[0])
                 } else {
                     _createLauncherShortcutLabel.emit(Unit)
                 }
@@ -173,32 +171,11 @@ class ConfigKeymapViewModel(
     }
 
     fun createLauncherShortcut(label: String) {
-        if (!launcherShortcutAdapter.isSupported) return
-
         viewModelScope.launch {
             val keymapUid = configUseCase.state.firstOrNull()?.mapData { it.uid }
 
             if (keymapUid !is State.Data) return@launch
-
-            configActions.actionList.firstOrNull()?.ifIsData { actionList ->
-                val icon = if (actionList.size == 1) {
-                    actionUiHelper.getIcon(actionList[0].data).valueOrNull()?.drawable
-                        ?: getDrawable(R.mipmap.ic_launcher_round)
-                } else {
-                    getDrawable(R.mipmap.ic_launcher_round)
-                }
-
-                val intent = Intent().apply {
-                    action = MyAccessibilityService.ACTION_TRIGGER_KEYMAP_BY_UID
-                    putExtra(MyAccessibilityService.EXTRA_KEYMAP_UID, keymapUid.data)
-                }
-
-                launcherShortcutAdapter.create(
-                    icon = icon,
-                    label = label,
-                    intent = intent
-                )
-            }
+            createKeymapShortcut.createForMultipleActions(keymapUid.data, label)
         }
     }
 
@@ -233,7 +210,8 @@ class ConfigKeymapViewModel(
         private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
         private val actionUiHelper: ActionUiHelper<KeymapAction>,
         private val constraintUiHelper: ConstraintUiHelper,
-        private val launcherShortcutAdapter: LauncherShortcutAdapter,
+        private val createKeymapShortcut: CreateKeymapShortcutUseCase,
+        private val isRequestShortcutSupported: IsRequestShortcutSupported,
         private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
@@ -254,7 +232,8 @@ class ConfigKeymapViewModel(
                 showDeviceInfoUseCase,
                 actionUiHelper,
                 constraintUiHelper,
-                launcherShortcutAdapter,
+                createKeymapShortcut,
+                isRequestShortcutSupported,
                 resourceProvider
             ) as T
     }

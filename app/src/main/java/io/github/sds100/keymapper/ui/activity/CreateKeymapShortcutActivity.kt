@@ -9,6 +9,7 @@ import io.github.sds100.keymapper.databinding.ActivityCreateKeymapShortcutBindin
 /**
  * Created by sds100 on 08/09/20.
  */
+//TODO test whether moving this to a different package affects old shortcut intents
 class CreateKeymapShortcutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

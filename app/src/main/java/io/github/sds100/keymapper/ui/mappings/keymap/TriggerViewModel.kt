@@ -8,12 +8,12 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
+import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.util.ViewPopulated
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +32,7 @@ class TriggerViewModel(
     private val listItemMapper: TriggerKeyListItemMapper,
     private val recordTrigger: RecordTriggerUseCase,
     private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    private val launcherShortcutAdapter: LauncherShortcutAdapter,
+    private val areShortcutsSupported: IsRequestShortcutSupported,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
@@ -40,7 +40,7 @@ class TriggerViewModel(
         coroutineScope,
         onboardingUseCase,
         useCase,
-        launcherShortcutAdapter,
+        areShortcutsSupported,
         resourceProvider,
     )
 

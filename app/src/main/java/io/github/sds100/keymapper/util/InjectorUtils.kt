@@ -18,7 +18,6 @@ import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelperImpl
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapActionUiHelper
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapActionUiHelper
 import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
 
 /**
@@ -31,14 +30,6 @@ object InjectorUtils {
     private fun constraintUiHelper(ctx: Context): ConstraintUiHelper {
         return ConstraintUiHelperImpl(
             ServiceLocator.appInfoAdapter(ctx),
-            ServiceLocator.resourceProvider(ctx)
-        )
-    }
-
-    private fun keymapActionUiHelper(ctx: Context): ActionUiHelper<KeymapAction> {
-        return KeymapActionUiHelper(
-            ServiceLocator.appInfoAdapter(ctx),
-            ServiceLocator.inputMethodAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }
@@ -177,9 +168,10 @@ object InjectorUtils {
             UseCases.onboarding(ctx),
             UseCases.recordTrigger(ctx),
             UseCases.showDeviceInfo(ctx),
-            keymapActionUiHelper(ctx),
+            UseCases.keymapActionUiHelper(ctx),
             constraintUiHelper(ctx),
-            ServiceLocator.launcherShortcutAdapter(ctx),
+            UseCases.createKeymapShortcut(ctx),
+            UseCases.isRequestShortcutSupported(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }
@@ -219,7 +211,7 @@ object InjectorUtils {
             EnableDisableKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             DuplicateKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             UseCases.getActionError(ctx),
-            keymapActionUiHelper(ctx),
+            UseCases.keymapActionUiHelper(ctx),
             constraintUiHelper(ctx),
             UseCases.getConstraintError(ctx),
             ServiceLocator.resourceProvider(ctx),

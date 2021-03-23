@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.framework.adapters
 
-import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 
 /**
  * Created by sds100 on 20/03/2021.
@@ -12,6 +12,7 @@ interface LauncherShortcutAdapter {
     fun create(
         icon: Drawable,
         label: String,
-        intent: Intent
+        intentAction: String,
+        intentExtras: Bundle
     )
 }

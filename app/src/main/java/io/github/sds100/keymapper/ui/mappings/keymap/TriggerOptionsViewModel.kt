@@ -8,9 +8,9 @@ import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.util.UserResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -24,7 +24,7 @@ class TriggerOptionsViewModel(
     private val coroutineScope: CoroutineScope,
     private val onboardingUseCase: OnboardingUseCase,
     private val useCase: ConfigKeymapTriggerUseCase,
-    private val launcherShortcutAdapter: LauncherShortcutAdapter,
+    private val areShortcutsSupported: IsRequestShortcutSupported,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
@@ -72,7 +72,7 @@ class TriggerOptionsViewModel(
         when (id) {
             ID_VIBRATE -> useCase.setVibrateEnabled(value)
             ID_TRIGGER_FROM_OTHER_APPS -> useCase.setTriggerFromOtherAppsEnabled(value)
-            ID_LONG_PRESS_DOUBLE_VIBRATION -> useCase.setTriggerFromOtherAppsEnabled(value)
+            ID_LONG_PRESS_DOUBLE_VIBRATION -> useCase.setLongPressDoubleVibrationEnabled(value)
             ID_SHOW_TOAST -> useCase.setShowToastEnabled(value)
             ID_SCREEN_OFF_TRIGGER -> useCase.setTriggerWhenScreenOff(value)
         }
@@ -102,7 +102,7 @@ class TriggerOptionsViewModel(
                             isEnabled = options.triggerFromOtherApps.value,
                             keymapUid = keymapUid,
                             label = getString(R.string.flag_trigger_from_other_apps),
-                            areLauncherShortcutsSupported = launcherShortcutAdapter.isSupported
+                            areLauncherShortcutsSupported = areShortcutsSupported.invoke()
                         )
                     )
                 }
@@ -137,6 +137,16 @@ class TriggerOptionsViewModel(
                     )
                 }
 
+                if (options.longPressDoubleVibration.isAllowed) {
+                    yield(
+                        CheckBoxListItem(
+                            id = ID_LONG_PRESS_DOUBLE_VIBRATION,
+                            isChecked = options.longPressDoubleVibration.value,
+                            label = getString(R.string.flag_long_press_double_vibration)
+                        )
+                    )
+                }
+
                 if (options.vibrateDuration.isAllowed) {
                     yield(
                         SliderListItem(
@@ -165,16 +175,6 @@ class TriggerOptionsViewModel(
                                 max = 5000,
                                 stepSize = 5,
                             )
-                        )
-                    )
-                }
-
-                if (options.longPressDoubleVibration.isAllowed) {
-                    yield(
-                        CheckBoxListItem(
-                            id = ID_LONG_PRESS_DOUBLE_VIBRATION,
-                            isChecked = options.longPressDoubleVibration.value,
-                            label = getString(R.string.flag_long_press_double_vibration)
                         )
                     )
                 }
