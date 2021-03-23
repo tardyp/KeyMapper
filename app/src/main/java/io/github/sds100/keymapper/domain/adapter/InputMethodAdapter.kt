@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 interface InputMethodAdapter {
     fun showImePicker(fromForeground: Boolean)
 
-    fun isImeEnabled(imeId: String):Boolean
+    fun isImeEnabled(imeId: String): Boolean
     fun enableIme(imeId: String)
 
-    fun isImeChosen(imeId: String):Boolean
+    fun getImeId(packageName: String): Result<String>
+
+    fun isImeChosen(imeId: String): Boolean
     fun chooseIme(imeId: String)
 
     fun getLabel(imeId: String): Result<String>

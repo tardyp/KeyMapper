@@ -13,7 +13,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.checkbox
-import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentKeyeventActionTypeBinding
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.getFullMessage
@@ -22,7 +22,7 @@ import io.github.sds100.keymapper.util.result.getFullMessage
  * Created by sds100 on 30/03/2020.
  */
 
-class KeyEventActionTypeFragment : Fragment() {
+class ConfigKeyEventFragment : Fragment() {
     companion object {
         const val REQUEST_KEY = "request_key_event"
         const val EXTRA_KEYCODE = "extra_keycode"
@@ -32,7 +32,7 @@ class KeyEventActionTypeFragment : Fragment() {
         const val EXTRA_DEVICE_NAME = "extra_device_name"
     }
 
-    private val viewModel: KeyEventActionTypeViewModel by activityViewModels {
+    private val viewModel: ConfigKeyEventViewModel by activityViewModels {
         InjectorUtils.provideKeyEventActionTypeViewModel(requireContext())
     }
 

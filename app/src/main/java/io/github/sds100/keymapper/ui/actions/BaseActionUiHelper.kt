@@ -70,7 +70,7 @@ abstract class BaseActionUiHelper<A>(
                     R.string.description_keyevent
                 }
 
-                getString(strRes, arrayOf(metaStateString, key))
+                getString(strRes, args = arrayOf(metaStateString, key))
             }
 
             Success(title)

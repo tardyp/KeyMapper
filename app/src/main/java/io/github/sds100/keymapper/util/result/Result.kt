@@ -56,6 +56,7 @@ sealed class Error : Result<Nothing>() {
     object CorruptJsonFile : Error()
     object CorruptActionError : Error()
     object Duplicate : Error()
+    data class ImeNotFoundForPackage(val packageName: String) : Error()
 }
 
 sealed class RecoverableError : Error() {

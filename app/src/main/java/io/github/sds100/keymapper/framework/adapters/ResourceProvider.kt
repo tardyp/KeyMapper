@@ -15,7 +15,7 @@ class ResourceProviderImpl(context: Context): ResourceProvider {
     private val ctx = context.applicationContext
 
     override fun getString(resId: Int, args: Array<Any>): String {
-        return ctx.str(resId, args)
+        return ctx.str(resId, formatArgArray = args)
     }
 
     override fun getString(resId: Int, arg: Any): String {

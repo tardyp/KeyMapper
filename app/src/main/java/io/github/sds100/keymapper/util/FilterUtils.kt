@@ -22,8 +22,7 @@ suspend fun <T : ISearchable> List<T>.filterByQuery(query: String?): Flow<ListUi
 
         val filteredList = withContext(Dispatchers.Default) {
             this@filterByQuery.filter { model ->
-                model.getSearchableString().toLowerCase(Locale.getDefault())
-                    .contains(query)
+                model.getSearchableString().toLowerCase(Locale.getDefault()).contains(query)
             }
         }
 

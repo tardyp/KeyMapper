@@ -43,9 +43,8 @@ data class KeyMap(
             ),
 
             holdDown = Option(
-                value = it.repeat,
-                isAllowed =
-                KeymapDetectionDelegate.performActionOnDown(trigger)
+                value = it.holdDown,
+                isAllowed = KeymapDetectionDelegate.performActionOnDown(trigger)
                     && it.data.canBeHeldDown()
             ),
 

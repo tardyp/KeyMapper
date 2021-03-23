@@ -130,6 +130,7 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.UnknownFileLocation -> TODO()
     RecoverableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
+    is Error.ImeNotFoundForPackage -> TODO()
 }
 
 fun Error.getBriefMessage(ctx: Context) = when (this) {

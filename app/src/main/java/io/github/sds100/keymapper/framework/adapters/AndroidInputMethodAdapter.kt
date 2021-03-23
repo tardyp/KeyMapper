@@ -9,16 +9,15 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.util.KeyboardUtils
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Created by sds100 on 14/02/2021.
  */
- class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
+
+//TODO inject root process delegate
+class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
     companion object {
         private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
     }
@@ -40,7 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
     private val ctx = context.applicationContext
 
     override val chosenImePackageName = MutableStateFlow(
-        getChosenInputMethodPackageName(ctx).valueOrNull()
+        getChosenInputMethodPackageName().valueOrNull()
     )
 
     private val inputMethodManager: InputMethodManager
@@ -60,19 +59,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
     }
 
     override fun isImeEnabled(imeId: String): Boolean {
-        TODO("Not yet implemented")
+        return inputMethodManager.enabledInputMethodList.any { it.id == imeId }
     }
 
     override fun enableIme(imeId: String) {
-        TODO("Not yet implemented")
+        //TODO
     }
 
     override fun isImeChosen(imeId: String): Boolean {
-        TODO("Not yet implemented")
+        return getChosenImeId() == imeId
     }
 
     override fun chooseIme(imeId: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun getImeId(packageName: String): Result<String> {
+        return inputMethodManager.inputMethodList
+            .find { it.packageName == packageName }
+            ?.id?.success() ?: Error.ImeNotFoundForPackage(packageName)
     }
 
     override fun getLabel(imeId: String): Result<String> {
@@ -104,13 +109,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
             .map { it.split(';')[0] }
     }
 
-    private fun getChosenInputMethodPackageName(ctx: Context): Result<String> {
-        val chosenImeId = getChosenImeId(ctx)
+    private fun getChosenInputMethodPackageName(): Result<String> {
+        val chosenImeId = getChosenImeId()
 
         return getImePackageName(chosenImeId)
     }
 
-    private fun getChosenImeId(ctx: Context): String {
+    private fun getChosenImeId(): String {
         return Settings.Secure.getString(ctx.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
     }
 

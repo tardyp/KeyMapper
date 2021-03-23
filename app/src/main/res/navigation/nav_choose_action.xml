@@ -22,6 +22,6 @@
 
     <fragment
         android:id="@+id/keycodeListFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.KeycodeListFragment"
+        android:name="io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment"
         android:label="KeycodeListFragment" />
 </navigation>

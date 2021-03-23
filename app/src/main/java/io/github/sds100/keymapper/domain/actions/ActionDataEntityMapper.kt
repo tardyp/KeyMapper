@@ -40,23 +40,30 @@ object ActionDataEntityMapper {
             ActionEntity.Type.KEY_EVENT -> {
                 val metaState =
                     entity.extras.getData(ActionEntity.EXTRA_KEY_EVENT_META_STATE).valueOrNull()
-                        ?: return null
+                        ?.toInt()
+                        ?: 0
 
                 val deviceDescriptor =
                     entity.extras.getData(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR)
                         .valueOrNull()
-                        ?: return null
+                        ?: ""
 
                 val useShell =
                     entity.extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL).then {
                         (it == "true").success()
-                    }.valueOrNull() ?: return null
+                    }.valueOrNull() ?: false
+
+                val device: DeviceInfo? = if (deviceDescriptor == null) {
+                    null //TODO issue #612 get device name name
+                } else {
+                    null
+                }
 
                 KeyEventAction(
                     keyCode = entity.data.toInt(),
-                    metaState = metaState.toInt(),
+                    metaState = metaState,
                     useShell = useShell,
-                    device = DeviceInfo(descriptor = deviceDescriptor, name = TODO())
+                    device = device
                 )
             }
 
@@ -268,11 +275,13 @@ object ActionDataEntityMapper {
     }
 
     private fun getFlags(data: ActionData): Int = when (data) {
-        is VolumeSystemAction -> if (data.showVolumeUi) {
-            ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI
-        } else {
-            0
-        }
+        is VolumeSystemAction ->
+            if (data.showVolumeUi) {
+                ActionEntity.ACTION_FLAG_SHOW_VOLUME_UI
+            } else {
+                0
+            }
+
         else -> 0
     }
 

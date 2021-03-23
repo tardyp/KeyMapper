@@ -20,9 +20,7 @@ import splitties.bitflags.withFlag
  * Created by sds100 on 30/03/2020.
  */
 
-
-//TODO move to CreateKeyEventActionUseCase
-class KeyEventActionTypeViewModel(
+class ConfigKeyEventViewModel(
     private val getDeviceNameUseCase: GetDeviceNameUseCase
 ) : ViewModel() {
 
@@ -112,7 +110,7 @@ class KeyEventActionTypeViewModel(
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return KeyEventActionTypeViewModel(getDeviceNameUseCase) as T
+            return ConfigKeyEventViewModel(getDeviceNameUseCase) as T
         }
     }
 }

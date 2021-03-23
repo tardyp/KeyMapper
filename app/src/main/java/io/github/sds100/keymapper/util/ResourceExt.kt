@@ -19,7 +19,7 @@ import splitties.mainthread.isMainThread
 
 // Using varargs doesn't work since prints [LJava.lang.object@32f...etc
 fun Context.str(@StringRes resId: Int, formatArg: Any? = null): String = getString(resId, formatArg)
-fun Context.str(@StringRes resId: Int, formatArgArray: Array<Any?>): String =
+fun Context.str(@StringRes resId: Int, formatArgArray: Array<Any>): String =
     getString(resId, *formatArgArray)
 
 fun View.str(@StringRes resId: Int, formatArgs: Any? = null): String =

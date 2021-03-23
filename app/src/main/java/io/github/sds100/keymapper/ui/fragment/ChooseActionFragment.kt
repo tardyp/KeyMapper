@@ -17,11 +17,12 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
-import io.github.sds100.keymapper.data.viewmodel.KeyEventActionTypeViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
+import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
 import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
 import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutResult
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
@@ -76,13 +77,13 @@ class ChooseActionFragment : Fragment() {
             KeyEventAction(keyCode)
         }
 
-        createActionOnResult(KeyEventActionTypeFragment.REQUEST_KEY) { bundle ->
-            val keyCode = bundle.getInt(KeyEventActionTypeFragment.EXTRA_KEYCODE)
-            val metaState = bundle.getInt(KeyEventActionTypeFragment.EXTRA_META_STATE)
+        createActionOnResult(ConfigKeyEventFragment.REQUEST_KEY) { bundle ->
+            val keyCode = bundle.getInt(ConfigKeyEventFragment.EXTRA_KEYCODE)
+            val metaState = bundle.getInt(ConfigKeyEventFragment.EXTRA_META_STATE)
             val deviceDescriptor =
-                bundle.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_DESCRIPTOR)
-            val deviceName = bundle.getString(KeyEventActionTypeFragment.EXTRA_DEVICE_NAME)
-            val useShell = bundle.getBoolean(KeyEventActionTypeFragment.EXTRA_USE_SHELL)
+                bundle.getString(ConfigKeyEventFragment.EXTRA_DEVICE_DESCRIPTOR)
+            val deviceName = bundle.getString(ConfigKeyEventFragment.EXTRA_DEVICE_NAME)
+            val useShell = bundle.getBoolean(ConfigKeyEventFragment.EXTRA_USE_SHELL)
 
             val device: DeviceInfo? = if (deviceDescriptor != null && deviceName != null) {
                 DeviceInfo(deviceDescriptor, deviceName)
@@ -109,8 +110,8 @@ class ChooseActionFragment : Fragment() {
             it.getJsonSerializable<SystemAction>(SystemActionListFragment.EXTRA_SYSTEM_ACTION)!!
         }
 
-        createActionOnResult(KeycodeListFragment.REQUEST_KEY) {
-            val keyCode = it.getInt(KeycodeListFragment.EXTRA_KEYCODE)
+        createActionOnResult(KeyCodeListFragment.REQUEST_KEY) {
+            val keyCode = it.getInt(KeyCodeListFragment.EXTRA_KEYCODE)
 
             KeyEventAction(keyCode)
         }
@@ -139,12 +140,12 @@ class ChooseActionFragment : Fragment() {
             PhoneCallAction(number!!)
         }
 
-        setFragmentResultListener(KeycodeListFragment.REQUEST_KEY) { _, result ->
-            val keyEventViewModel by activityViewModels<KeyEventActionTypeViewModel> {
+        setFragmentResultListener(KeyCodeListFragment.REQUEST_KEY) { _, result ->
+            val keyEventViewModel by activityViewModels<ConfigKeyEventViewModel> {
                 InjectorUtils.provideKeyEventActionTypeViewModel(requireContext())
             }
 
-            result.getInt(KeycodeListFragment.EXTRA_KEYCODE).let {
+            result.getInt(KeyCodeListFragment.EXTRA_KEYCODE).let {
                 keyEventViewModel.keyCode.value = it.toString()
             }
         }

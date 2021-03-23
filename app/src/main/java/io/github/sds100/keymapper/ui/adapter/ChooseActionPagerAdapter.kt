@@ -6,6 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.TabFragmentModel
 import io.github.sds100.keymapper.ui.fragment.*
+import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
 import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
 
 /**
@@ -27,10 +28,12 @@ class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
                 isAppBarVisible = false
             }
         },
-        TabFragmentModel(R.string.action_type_title_key_code,
-            KeycodeListFragment.SEARCH_STATE_KEY) {
+        TabFragmentModel(
+            R.string.action_type_title_key_code,
+            KeyCodeListFragment.SEARCH_STATE_KEY
+        ) {
 
-            KeycodeListFragment().apply {
+            KeyCodeListFragment().apply {
                 isAppBarVisible = false
             }
         },
@@ -50,7 +53,7 @@ class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
         },
 
         TabFragmentModel(R.string.action_type_title_keyevent, null) {
-            KeyEventActionTypeFragment()
+            ConfigKeyEventFragment()
         },
 
         TabFragmentModel(R.string.action_type_title_text_block, null) {

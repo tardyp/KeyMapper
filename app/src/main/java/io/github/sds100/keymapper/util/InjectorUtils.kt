@@ -77,14 +77,14 @@ object InjectorUtils {
 
     fun provideKeyEventActionTypeViewModel(
         context: Context
-    ): KeyEventActionTypeViewModel.Factory {
-        return KeyEventActionTypeViewModel.Factory(
+    ): ConfigKeyEventViewModel.Factory {
+        return ConfigKeyEventViewModel.Factory(
             UseCases.showDeviceInfo(context)
         )
     }
 
-    fun provideKeycodeListViewModel(): KeycodeListViewModel.Factory {
-        return KeycodeListViewModel.Factory()
+    fun provideKeycodeListViewModel(): KeyCodeListViewModel.Factory {
+        return KeyCodeListViewModel.Factory()
     }
 
     fun provideIntentActionTypeViewModel(): IntentActionTypeViewModel.Factory {
