@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.flow
  * Created by sds100 on 03/03/2021.
  */
 
-class AndroidAppInfoAdapter(
+class AndroidAppUiAdapter(
     private val packageManager: PackageManager
-) : AppInfoAdapter {
+) : AppUiAdapter {
     override fun getAppName(packageName: String): Flow<String> = flow {
         emit(packageManager.getApplicationInfo(packageName, 0).loadLabel(packageManager).toString())
     }

@@ -6,6 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.TabFragmentModel
 import io.github.sds100.keymapper.ui.fragment.*
+import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
 
 /**
  * Created by sds100 on 26/01/2020.

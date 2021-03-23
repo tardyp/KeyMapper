@@ -64,7 +64,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
                     viewLifecycleOwner,
                     hint = str(R.string.hint_shortcut_name),
                     allowEmpty = false
-                )
+                ) ?: return@collectLatest
 
                 viewModel.createLauncherShortcut(label)
             }

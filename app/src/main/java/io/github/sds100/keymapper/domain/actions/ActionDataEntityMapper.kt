@@ -25,7 +25,6 @@ object ActionDataEntityMapper {
             ActionEntity.Type.APP_SHORTCUT -> {
                 val packageName =
                     entity.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).valueOrNull()
-                        ?: return null
 
                 val shortcutTitle =
                     entity.extras.getData(ActionEntity.EXTRA_SHORTCUT_TITLE).valueOrNull()
@@ -320,10 +319,10 @@ object ActionDataEntityMapper {
         }.toList()
 
         is OpenAppAction -> emptyList()
-        is OpenAppShortcutAction -> listOf(
-            Extra(ActionEntity.EXTRA_SHORTCUT_TITLE, data.shortcutTitle),
-            Extra(ActionEntity.EXTRA_PACKAGE_NAME, data.packageName)
-        )
+        is OpenAppShortcutAction -> sequence {
+            yield(Extra(ActionEntity.EXTRA_SHORTCUT_TITLE, data.shortcutTitle))
+            data.packageName?.let { yield(Extra(ActionEntity.EXTRA_PACKAGE_NAME, it)) }
+        }.toList()
 
         is PhoneCallAction -> emptyList()
 

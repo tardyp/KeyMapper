@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.utils.*
-import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
+import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.util.*
@@ -19,14 +19,14 @@ import splitties.bitflags.hasFlag
  */
 
 abstract class BaseActionUiHelper<A>(
-    private val appInfoAdapter: AppInfoAdapter,
+    private val appUiAdapter: AppUiAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
     resourceProvider: ResourceProvider
 ) : ActionUiHelper<A>, ResourceProvider by resourceProvider {
 
     override fun getTitle(action: ActionData): Result<String> = when (action) {
         is OpenAppAction ->
-            appInfoAdapter.getAppName(action.packageName).map { appName ->
+            appUiAdapter.getAppName(action.packageName).map { appName ->
                 Success(getString(R.string.description_open_app, appName))
             }.firstBlocking()
 
@@ -154,7 +154,7 @@ abstract class BaseActionUiHelper<A>(
         }
 
         is ControlMediaForAppSystemAction ->
-            appInfoAdapter.getAppName(action.packageName).map { appName ->
+            appUiAdapter.getAppName(action.packageName).map { appName ->
                 val resId = when (action) {
                     is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package_formatted
                     is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package_formatted
@@ -255,13 +255,19 @@ abstract class BaseActionUiHelper<A>(
             tintType = TintType.NONE
         ).success()
 
-        is OpenAppAction -> appInfoAdapter.getAppIcon(action.packageName).map {
+        is OpenAppAction -> appUiAdapter.getAppIcon(action.packageName).map {
             IconInfo(it, TintType.NONE).success()
         }.firstBlocking()
 
-        is OpenAppShortcutAction -> appInfoAdapter.getAppIcon(action.packageName).map {
-            IconInfo(it, TintType.NONE).success()
-        }.firstBlocking()
+        is OpenAppShortcutAction -> {
+            if (action.packageName == null) {
+                IconInfo(null, TintType.NONE).success()
+            } else {
+                appUiAdapter.getAppIcon(action.packageName).map {
+                    IconInfo(it, TintType.NONE).success()
+                }.firstBlocking()
+            }
+        }
 
         is SystemAction -> IconInfo(
             SystemActionUtils.getIcon(action)?.let { getDrawable(it) },

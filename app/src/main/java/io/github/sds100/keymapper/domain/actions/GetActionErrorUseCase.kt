@@ -44,7 +44,19 @@ class GetActionErrorUseCaseImpl(
         }
 
         when (action) {
-            is AppAction -> {
+            is OpenAppAction -> {
+                if (!packageManager.isAppEnabled(action.packageName)) {
+                    return RecoverableError.AppDisabled(action.packageName)
+                }
+
+                if (!packageManager.isAppInstalled(action.packageName)) {
+                    return RecoverableError.AppNotFound(action.packageName)
+                }
+            }
+
+            is OpenAppShortcutAction -> {
+                action.packageName ?: return null
+
                 if (!packageManager.isAppEnabled(action.packageName)) {
                     return RecoverableError.AppDisabled(action.packageName)
                 }

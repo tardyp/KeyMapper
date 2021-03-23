@@ -1,11 +1,9 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.fragment.app.activityViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
@@ -71,20 +69,21 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
                 }
 
                 is CreateKeymapShortcutEvent -> viewLifecycleScope.launch {
-                    val shortcutInfo = KeymapShortcutUtils.createShortcut(
-                        requireContext(),
-                        viewLifecycleOwner,
-                        event.uuid,
-                        event.actionList,
-                        event.deviceInfoList,
-                        event.showDeviceDescriptors
-                    )
-
-                    ShortcutManagerCompat.createShortcutResultIntent(requireContext(), shortcutInfo)
-                        .apply {
-                            requireActivity().setResult(Activity.RESULT_OK, this)
-                            requireActivity().finish()
-                        }
+//                    val shortcutInfo = KeymapShortcutUtils.createShortcut(
+//                        requireContext(),
+//                        viewLifecycleOwner,
+//                        event.uuid,
+//                        event.actionList,
+//                        event.deviceInfoList,
+//                        event.showDeviceDescriptors
+//                    )
+//
+//                    ShortcutManagerCompat.createShortcutResultIntent(requireContext(), shortcutInfo)
+//                        .apply {
+//                            requireActivity().setResult(Activity.RESULT_OK, this)
+//                            requireActivity().finish()
+//                        }
+                    //TODO
                 }
             }
         })

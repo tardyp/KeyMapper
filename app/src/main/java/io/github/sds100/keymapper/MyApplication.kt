@@ -33,7 +33,7 @@ class MyApplication : MultiDexApplication(),
     }
 
     val appRepository by lazy { AndroidAppRepository(packageManager) }
-    val appInfoAdapter by lazy { AndroidAppInfoAdapter(packageManager) }
+    val appInfoAdapter by lazy { AndroidAppUiAdapter(packageManager) }
     val resourceProvider by lazy { ResourceProviderImpl(this) }
 
     val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }

@@ -9,7 +9,11 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapA
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.*
+import io.github.sds100.keymapper.domain.packages.GetPackagesUseCaseImpl
+import io.github.sds100.keymapper.domain.shortcuts.GetAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
+import io.github.sds100.keymapper.framework.adapters.AndroidAppShortcutUiAdapter
+import io.github.sds100.keymapper.framework.adapters.AndroidAppUiAdapter
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
@@ -45,12 +49,16 @@ object InjectorUtils {
     fun provideAppListViewModel(context: Context): AppListViewModel.Factory {
         return AppListViewModel.Factory(
             ServiceLocator.appInfoAdapter(context),
-            ServiceLocator.packageManagerAdapter(context)
+            GetPackagesUseCaseImpl(ServiceLocator.packageManagerAdapter(context))
         )
     }
 
     fun provideAppShortcutListViewModel(context: Context): AppShortcutListViewModel.Factory {
-        return AppShortcutListViewModel.Factory(ServiceLocator.packageRepository(context))
+        return AppShortcutListViewModel.Factory(
+            GetAppShortcutsUseCaseImpl(context.applicationContext.packageManager),
+            AndroidAppShortcutUiAdapter(context),
+            AndroidAppUiAdapter(context.applicationContext.packageManager)
+        )
     }
 
     fun provideBackupRestoreViewModel(context: Context): BackupRestoreViewModel.Factory {
@@ -70,7 +78,6 @@ object InjectorUtils {
     fun provideKeyEventActionTypeViewModel(
         context: Context
     ): KeyEventActionTypeViewModel.Factory {
-        val deviceInfoRepository = ServiceLocator.deviceInfoRepository(context)
         return KeyEventActionTypeViewModel.Factory(
             UseCases.showDeviceInfo(context)
         )

@@ -5,17 +5,16 @@ import android.view.LayoutInflater
 import android.widget.SeekBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.SeekBarListItemModel
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
 import io.github.sds100.keymapper.databinding.DialogSeekbarListBinding
 import io.github.sds100.keymapper.util.result.*
-import splitties.alertdialog.appcompat.alertDialog
-import splitties.alertdialog.appcompat.cancelButton
-import splitties.alertdialog.appcompat.message
-import splitties.alertdialog.appcompat.okButton
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.suspendCancellableCoroutine
+import splitties.alertdialog.appcompat.*
+import splitties.alertdialog.material.materialAlertDialog
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -23,16 +22,17 @@ import kotlin.coroutines.suspendCoroutine
  * Created by sds100 on 30/03/2020.
  */
 
+//TODO delete
 suspend fun Context.editTextStringAlertDialog(
     lifecycleOwner: LifecycleOwner,
     hint: String,
     allowEmpty: Boolean = false
-) = suspendCoroutine<String> {
+) = suspendCoroutine<String?> { continuation ->
     alertDialog {
         val inflater = LayoutInflater.from(this@editTextStringAlertDialog)
 
         DialogEdittextStringBinding.inflate(inflater).apply {
-            val text = MutableLiveData("")
+            val text = MutableStateFlow("")
 
             setHint(hint)
             setText(text)
@@ -40,24 +40,82 @@ suspend fun Context.editTextStringAlertDialog(
 
             setView(this.root)
 
-            okButton { _ ->
-                it.resume(text.value!!)
+            okButton {
+                continuation.resume(text.value)
             }
 
             cancelButton()
 
             show().apply {
-                text.observe(lifecycleOwner, {
-                    getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                        if (allowEmpty) {
-                            true
-                        } else {
-                            !it.isNullOrBlank()
-                        }
-                })
+                lifecycleOwner.lifecycle.coroutineScope.launchWhenResumed {
+                    text.collectLatest {
+                        getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                            if (allowEmpty) {
+                                true
+                            } else {
+                                it.isNotBlank()
+                            }
+                    }
+                }
+            }
+
+            onDismiss {
+                continuation.resume(null)
+            }
+
+            setOnCancelListener {
+                continuation.resume(null)
             }
         }
     }
+}
+
+suspend fun Context.editTextStringAlertDialogFlow(
+    lifecycleOwner: LifecycleOwner,
+    hint: String,
+    allowEmpty: Boolean = false
+) = suspendCancellableCoroutine<String?> { continuation ->
+
+    val text = MutableStateFlow("")
+
+    val alertDialog = materialAlertDialog {
+        val inflater = LayoutInflater.from(this@editTextStringAlertDialogFlow)
+
+        DialogEdittextStringBinding.inflate(inflater).apply {
+            setHint(hint)
+            setText(text)
+            setAllowEmpty(allowEmpty)
+
+            setView(this.root)
+        }
+
+        okButton {
+            continuation.resume(text.value)
+        }
+
+        cancelButton()
+    }
+
+    alertDialog.show()
+
+    lifecycleOwner.lifecycleScope.launchWhenResumed {
+        text.collectLatest {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                if (allowEmpty) {
+                    true
+                } else {
+                    it.isNotBlank()
+                }
+        }
+    }
+
+    //this prevents window leak
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun onDestroy() {
+            alertDialog.dismiss()
+        }
+    })
 }
 
 suspend fun Context.editTextNumberAlertDialog(
@@ -169,12 +227,13 @@ suspend fun Context.seekBarAlertDialog(
 /**
  * @return whether the ok button was pressed
  */
-suspend fun Context.okDialog(@StringRes messageRes: Int) = suspendCoroutine<Boolean> { continuation ->
-    alertDialog {
-        message = str(messageRes)
+suspend fun Context.okDialog(@StringRes messageRes: Int) =
+    suspendCoroutine<Boolean> { continuation ->
+        alertDialog {
+            message = str(messageRes)
 
-        okButton {
-            continuation.resume(true)
+            okButton {
+                continuation.resume(true)
+            }
         }
     }
-}

@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.data.model.AppListItem
+import io.github.sds100.keymapper.domain.packages.GetPackagesUseCase
 import io.github.sds100.keymapper.domain.packages.PackageInfo
-import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.mapData
-import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
+import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.filterByQuery
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,8 @@ import java.util.*
  * Created by sds100 on 27/01/2020.
  */
 class AppListViewModel internal constructor(
-    private val appInfoAdapter: AppInfoAdapter,
-    packageManager: PackageManagerAdapter
+    private val appUiAdapter: AppUiAdapter,
+    getPackages: GetPackagesUseCase
 ) : ViewModel() {
 
     val searchQuery = MutableStateFlow<String?>(null)
@@ -44,11 +44,18 @@ class AppListViewModel internal constructor(
     init {
         viewModelScope.launch {
             combine(
-                packageManager.installedPackages,
+                getPackages.installedPackages,
                 showHiddenApps,
                 searchQuery,
                 rebuildUiState
             ) { packageInfoList, showHiddenApps, query, _ ->
+
+                Triple(packageInfoList, query, showHiddenApps)
+
+            }.collectLatest { pair ->
+                val packageInfoList = pair.first
+                val query = pair.second
+                val showHiddenApps = pair.third
 
                 val packagesToFilter = if (showHiddenApps) {
                     packageInfoList
@@ -58,26 +65,23 @@ class AppListViewModel internal constructor(
                     }
                 }
 
-                Pair(packagesToFilter, query)
-
-            }.collectLatest { pair ->
-                val packageInfoList = pair.first
-                val query = pair.second
-
-                when (val modelList = packageInfoList.mapData { it.buildListItems() }) {
-                    is State.Data -> modelList.data.filterByQuery(query).collect { modelListState ->
-                        _state.value = AppListState(
-                            modelListState,
-                            showHiddenAppsButton = true,
-                            isHiddenAppsChecked = showHiddenApps.value
-                        )
-                    }
+                when (val modelList = packagesToFilter.mapData { it.buildListItems() }) {
+                    is State.Data ->
+                        modelList.data.filterByQuery(query)
+                            .flowOn(Dispatchers.Default)
+                            .collect { modelListState ->
+                                _state.value = AppListState(
+                                    modelListState,
+                                    showHiddenAppsButton = true,
+                                    isHiddenAppsChecked = showHiddenApps
+                                )
+                            }
 
                     is State.Loading -> _state.value =
                         AppListState(
                             ListUiState.Loading,
                             showHiddenAppsButton = true,
-                            isHiddenAppsChecked = showHiddenApps.value
+                            isHiddenAppsChecked = showHiddenApps
                         )
                 }
             }
@@ -95,8 +99,8 @@ class AppListViewModel internal constructor(
     private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> = flow {
         forEach {
             combine(
-                appInfoAdapter.getAppName(it.packageName),
-                appInfoAdapter.getAppIcon(it.packageName)
+                appUiAdapter.getAppName(it.packageName),
+                appUiAdapter.getAppIcon(it.packageName)
             ) { name, icon ->
                 val model = AppListItem(
                     packageName = it.packageName,
@@ -110,13 +114,13 @@ class AppListViewModel internal constructor(
     }.toList().sortedBy { it.appName.toLowerCase(Locale.getDefault()) }
 
     class Factory(
-        private val appInfoAdapter: AppInfoAdapter,
-        private val packageManager: PackageManagerAdapter
+        private val appUiAdapter: AppUiAdapter,
+        private val getPackages: GetPackagesUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            AppListViewModel(appInfoAdapter, packageManager) as T
+            AppListViewModel(appUiAdapter, getPackages) as T
     }
 }
 

@@ -22,6 +22,8 @@ import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
+import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
+import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutResult
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
@@ -58,11 +60,14 @@ class ChooseActionFragment : Fragment() {
         }
 
         createActionOnResult(AppShortcutListFragment.REQUEST_KEY) {
-            val name = it.getString(AppShortcutListFragment.EXTRA_NAME)
-            val packageName = it.getString(AppShortcutListFragment.EXTRA_PACKAGE_NAME)
-            val uri = it.getString(AppShortcutListFragment.EXTRA_URI)
+            val result =
+                it.getJsonSerializable<ChooseAppShortcutResult>(AppShortcutListFragment.EXTRA_RESULT)
 
-            OpenAppShortcutAction(packageName!!, name!!, uri!!)
+            OpenAppShortcutAction(
+                result!!.packageName,
+                result.shortcutName,
+                result.uri
+            )
         }
 
         createActionOnResult(KeyActionTypeFragment.REQUEST_KEY) {

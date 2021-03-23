@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.ui.constraints
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.utils.Orientation
-import io.github.sds100.keymapper.framework.adapters.AppInfoAdapter
+import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.util.TintType
@@ -18,27 +18,27 @@ import kotlinx.coroutines.flow.map
  */
 
 class ConstraintUiHelperImpl(
-    private val appInfoAdapter: AppInfoAdapter,
+    private val appUiAdapter: AppUiAdapter,
     resourceProvider: ResourceProvider
 ) : ConstraintUiHelper, ResourceProvider by resourceProvider {
 
     override fun getTitle(constraint: Constraint): String = when (constraint) {
         is Constraint.AppInForeground ->
-            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+            appUiAdapter.getAppName(constraint.packageName).map { appName ->
                 getString(R.string.constraint_app_foreground_description, appName)
             }.catch {
                 getString(R.string.constraint_choose_app_foreground)
             }.firstBlocking()
 
         is Constraint.AppNotInForeground ->
-            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+            appUiAdapter.getAppName(constraint.packageName).map { appName ->
                 getString(R.string.constraint_app_not_foreground_description, appName)
             }.catch {
                 getString(R.string.constraint_choose_app_not_foreground)
             }.firstBlocking()
 
         is Constraint.AppPlayingMedia ->
-            appInfoAdapter.getAppName(constraint.packageName).map { appName ->
+            appUiAdapter.getAppName(constraint.packageName).map { appName ->
                 getString(R.string.constraint_app_playing_media_description, appName)
             }.catch {
                 getString(R.string.constraint_choose_app_playing_media)
@@ -130,7 +130,7 @@ class ConstraintUiHelperImpl(
     }
 
     private fun getAppIcon(packageName: String): IconInfo {
-        return appInfoAdapter.getAppIcon(packageName).map {
+        return appUiAdapter.getAppIcon(packageName).map {
             IconInfo(it, TintType.NONE)
         }.firstBlocking()
     }

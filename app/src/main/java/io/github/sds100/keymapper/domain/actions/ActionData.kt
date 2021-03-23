@@ -13,15 +13,15 @@ object CorruptAction : ActionData()
 
 @Serializable
 data class OpenAppAction(
-    override val packageName: String
-) : ActionData(), AppAction
+    val packageName: String
+) : ActionData()
 
 @Serializable
 data class OpenAppShortcutAction(
-    override val packageName: String,
+    val packageName: String?,
     val shortcutTitle: String,
     val uri: String
-) : ActionData(), AppAction
+) : ActionData()
 
 @Serializable
 data class KeyEventAction(
@@ -30,10 +30,6 @@ data class KeyEventAction(
     val useShell: Boolean = false,
     val device: DeviceInfo? = null
 ) : ActionData()
-
-interface AppAction {
-    val packageName: String
-}
 
 sealed class SystemAction : ActionData() {
     abstract val id: SystemActionId
