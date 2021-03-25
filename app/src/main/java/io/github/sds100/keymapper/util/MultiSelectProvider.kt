@@ -17,12 +17,12 @@ interface MultiSelectProvider {
 
     fun stopSelecting()
 
-    fun toggleSelection(id: Long)
+    fun toggleSelection(id: String)
 
-    fun select(vararg id: Long)
-    fun deselect(vararg id: Long)
+    fun select(vararg id: String)
+    fun deselect(vararg id: String)
 
-    fun isSelected(id: Long): Boolean
+    fun isSelected(id: String): Boolean
 
     fun reset()
 }

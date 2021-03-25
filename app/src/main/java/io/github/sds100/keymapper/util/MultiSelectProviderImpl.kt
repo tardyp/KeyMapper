@@ -8,11 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
  */
 
 class MultiSelectProviderImpl : MultiSelectProvider {
+    private val lock = Any()
     override val state = MutableStateFlow<SelectionState>(SelectionState.NotSelecting)
 
     override fun startSelecting(): Boolean {
         if (state.value !is SelectionState.Selecting) {
-            state.value = SelectionState.Selecting(emptyList())
+            state.value = SelectionState.Selecting(emptySet())
 
             return true
         }
@@ -26,37 +27,38 @@ class MultiSelectProviderImpl : MultiSelectProvider {
         }
     }
 
-    override fun toggleSelection(id: Long) {
+    override fun toggleSelection(id: String) {
         if (state.value !is SelectionState.Selecting) return
-        val newIds = (state.value as SelectionState.Selecting).selectedIds.toMutableSet().apply {
-            if (contains(id)) {
-                remove(id)
-            } else {
-                add(id)
-            }
-        }
 
-        state.value = SelectionState.Selecting(newIds.toList())
+        if ((state.value as SelectionState.Selecting).selectedIds.contains(id)) {
+            deselect(id)
+        } else {
+            select(id)
+        }
     }
 
-    override fun isSelected(id: Long): Boolean {
+    override fun isSelected(id: String): Boolean {
         return state.value is SelectionState.Selecting
             && (state.value as SelectionState.Selecting).selectedIds.contains(id)
     }
 
-    override fun select(vararg id: Long) {
-        state.value.apply {
-            if (this !is SelectionState.Selecting) return
+    override fun select(vararg id: String) {
+        synchronized(lock) {
+            state.value.apply {
+                if (this !is SelectionState.Selecting) return
 
-            state.value = SelectionState.Selecting(selectedIds.plus(id.toSet()))
+                state.value = SelectionState.Selecting(selectedIds.plus(id))
+            }
         }
     }
 
-    override fun deselect(vararg id: Long) {
-        state.value.apply {
-            if (this !is SelectionState.Selecting) return
+    override fun deselect(vararg id: String) {
+        synchronized(lock) {
+            state.value.apply {
+                if (this !is SelectionState.Selecting) return
 
-            state.value = SelectionState.Selecting(selectedIds.minus(id.toSet()))
+                state.value = SelectionState.Selecting(selectedIds.minus(id))
+            }
         }
     }
 

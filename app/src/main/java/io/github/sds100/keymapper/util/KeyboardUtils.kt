@@ -162,7 +162,7 @@ object KeyboardUtils {
         return getImePackageName(chosenImeId)
     }
 
-    fun getImePackageName(imeId: String): Result<String> {
+    private fun getImePackageName(imeId: String): Result<String> {
         val packageName = inputMethodManager.inputMethodList.find { it.id == imeId }?.packageName
 
         return if (packageName == null) {

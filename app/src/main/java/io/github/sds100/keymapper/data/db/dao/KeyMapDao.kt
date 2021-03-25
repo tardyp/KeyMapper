@@ -27,6 +27,9 @@ interface KeyMapDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $KEY_ID = (:id)")
     suspend fun getById(id: Long): KeyMapEntity
 
+    @Query("SELECT * FROM $TABLE_NAME WHERE $KEY_UID = (:uid)")
+    suspend fun getByUid(uid: String): KeyMapEntity?
+
     @Query("SELECT * FROM $TABLE_NAME")
     fun observeAll(): LiveData<List<KeyMapEntity>>
 
@@ -42,11 +45,11 @@ interface KeyMapDao {
     @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=1")
     suspend fun enableAll()
 
-    @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=1 WHERE $KEY_ID in (:id)")
-    suspend fun enableKeymapById(vararg id: Long)
+    @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=1 WHERE $KEY_UID in (:uid)")
+    suspend fun enableKeymapByUid(vararg uid: String)
 
-    @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=0 WHERE $KEY_ID in (:id)")
-    suspend fun disableKeymapById(vararg id: Long)
+    @Query("UPDATE $TABLE_NAME SET $KEY_ENABLED=0 WHERE $KEY_UID in (:uid)")
+    suspend fun disableKeymapByUid(vararg uid: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg keyMap: KeyMapEntity)
@@ -57,8 +60,8 @@ interface KeyMapDao {
     @Query("DELETE FROM $TABLE_NAME")
     suspend fun deleteAll()
 
-    @Query("DELETE FROM $TABLE_NAME WHERE $KEY_ID in (:id)")
-    suspend fun deleteById(vararg id: Long)
+    @Query("DELETE FROM $TABLE_NAME WHERE $KEY_UID in (:uid)")
+    suspend fun deleteById(vararg uid: String)
 
     @Update
     suspend fun update(vararg keyMap: KeyMapEntity)

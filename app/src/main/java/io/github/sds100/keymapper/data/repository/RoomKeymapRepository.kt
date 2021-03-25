@@ -30,37 +30,38 @@ class RoomKeymapRepository(
         }
     }
 
-    override suspend fun get(id: Long): KeyMapEntity {
-        return dao.getById(id)
+    override suspend fun get(uid: String): KeyMapEntity? {
+        return dao.getByUid(uid)
     }
 
-    override fun delete(vararg id: Long) {
+    override fun delete(vararg uid: String) {
         coroutineScope.launch {
-            dao.deleteById(*id)
+            dao.deleteById(*uid)
         }
     }
 
-    override fun duplicate(vararg id: Long) {
+    override fun duplicate(vararg uid: String) {
         coroutineScope.launch {
             val keymaps = mutableListOf<KeyMapEntity>()
 
-            id.forEach {
-                keymaps.add(get(it).copy(id = 0, uid = UUID.randomUUID().toString()))
+            uid.forEach {
+                val keymap = get(it) ?: return@forEach
+                keymaps.add(keymap.copy(id = 0, uid = UUID.randomUUID().toString()))
             }
 
             dao.insert(*keymaps.toTypedArray())
         }
     }
 
-    override fun enableById(vararg id: Long) {
+    override fun enableById(vararg uid: String) {
         coroutineScope.launch {
-            dao.enableKeymapById(*id)
+            dao.enableKeymapByUid(*uid)
         }
     }
 
-    override fun disableById(vararg id: Long) {
+    override fun disableById(vararg uid: String) {
         coroutineScope.launch {
-            dao.disableKeymapById(*id)
+            dao.disableKeymapByUid(*uid)
         }
     }
 

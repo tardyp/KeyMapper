@@ -12,6 +12,8 @@
 
         <import type="io.github.sds100.keymapper.ui.view.StatusLayout.State" />
 
+        <import type="io.github.sds100.keymapper.data.viewmodel.HomeAppBarState" />
+
         <import type="androidx.lifecycle.LiveData" />
 
         <variable
@@ -91,7 +93,7 @@
                 android:id="@+id/headerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.state.hideAlerts ? View.GONE : View.VISIBLE}"
+                android:visibility="@{viewModel.statusLayoutState.isVisible ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -220,7 +222,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="@{getNewGuiKeyboard}"
-                android:visibility="@{viewModel.state.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.onboardingState.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/headerLayout"
@@ -285,7 +287,7 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.state.showTabs ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.tabsState.showTabs ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutNewGuiKeyboardAd"
@@ -307,8 +309,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:visibility="@{viewModel.state.multiSelecting ? View.VISIBLE : View.GONE}"
-                app:cardBackgroundColor="?attr/colorSurface"
+                android:visibility="@{viewModel.selectionCountViewState.isVisible ? View.VISIBLE : View.GONE}"
+                app:cardBackgroundColor="?attr/colorBackgroundFloating"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -318,12 +320,12 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorSurface"
+                    android:background="?attr/colorBackgroundFloating"
                     android:paddingStart="16dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="8dp"
-                    android:text='@{viewModel.state.selectedCountString}'
+                    android:text='@{viewModel.selectionCountViewState.text}'
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
                     android:textSize="17sp"
                     tools:text="0 Selected" />
@@ -337,7 +339,7 @@
             android:contentDescription="@string/content_description_fab_new_keymap"
             android:layout_height="wrap_content"
             android:onClick="@{() -> viewModel.onFabPressed()}"
-            android:src='@{viewModel.state.multiSelecting ? @drawable/ic_baseline_delete_outline_24 : @drawable/ic_baseline_add_24}'
+            android:src='@{viewModel.appBarState == HomeAppBarState.MULTI_SELECTING ? @drawable/ic_baseline_delete_outline_24 : @drawable/ic_baseline_add_24}'
             app:layout_anchor="@id/appBar" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
@@ -348,10 +350,10 @@
             android:layout_gravity="bottom"
             android:gravity="center"
             app:backgroundTint="?attr/colorPrimarySurface"
-            app:fabAlignmentMode="@{viewModel.state.multiSelecting ? BottomAppBar.FAB_ALIGNMENT_MODE_END : BottomAppBar.FAB_ALIGNMENT_MODE_CENTER}"
+            app:fabAlignmentMode="@{viewModel.appBarState == HomeAppBarState.MULTI_SELECTING ? BottomAppBar.FAB_ALIGNMENT_MODE_END : BottomAppBar.FAB_ALIGNMENT_MODE_CENTER}"
             app:fabAnimationMode="slide"
             app:menu="@menu/menu_home"
-            app:navigationIcon='@{viewModel.state.multiSelecting ? @drawable/ic_baseline_arrow_back_24 : @drawable/ic_baseline_menu_24}' />
+            app:navigationIcon='@{viewModel.appBarState == HomeAppBarState.MULTI_SELECTING ? @drawable/ic_baseline_arrow_back_24 : @drawable/ic_baseline_menu_24}' />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

@@ -13,19 +13,20 @@ class IsSystemActionSupportedUseCaseImpl(
    private val adapter: SystemFeatureAdapter
 ) : IsSystemActionSupportedUseCase {
 
-    override fun invoke(action: SystemAction): Error? {
-        val minApi = SystemActionUtils.getMinApi(action)
+    override fun invoke(id: SystemActionId): Error? {
+        val minApi = SystemActionUtils.getMinApi(id)
+
         if (Build.VERSION.SDK_INT < minApi) {
             return Error.SdkVersionTooLow(minApi)
         }
 
-        val maxApi = SystemActionUtils.getMaxApi(action)
+        val maxApi = SystemActionUtils.getMaxApi(id)
         if (Build.VERSION.SDK_INT > maxApi) {
             return Error.SdkVersionTooHigh(maxApi)
         }
 
-        SystemActionUtils.getRequiredSystemFeatures(action).forEach { feature ->
-            if (!adapter.hasSystemFeature(feature)){
+        SystemActionUtils.getRequiredSystemFeatures(id).forEach { feature ->
+            if (!adapter.hasSystemFeature(feature)) {
                 return Error.FeatureUnavailable(feature)
             }
         }
@@ -35,5 +36,5 @@ class IsSystemActionSupportedUseCaseImpl(
 }
 
 interface IsSystemActionSupportedUseCase {
-    operator fun invoke(action: SystemAction): Error?
+    operator fun invoke(id: SystemActionId): Error?
 }

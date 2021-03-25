@@ -6,10 +6,11 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 
 class SaveKeymapUseCaseImpl(private val keymapRepository: KeymapRepository) : SaveKeymapUseCase {
     override fun invoke(keymap: KeyMap) {
-        if (keymap.dbId == KeyMap.NEW_ID) {
-            keymapRepository.insert(KeyMapEntityMapper.toEntity(keymap.copy(dbId = 0)))
+
+        if (keymap.dbId == null) {
+            keymapRepository.insert(KeyMapEntityMapper.toEntity(keymap, 0))
         } else {
-            keymapRepository.update(KeyMapEntityMapper.toEntity(keymap))
+            keymapRepository.update(KeyMapEntityMapper.toEntity(keymap, keymap.dbId))
         }
     }
 }

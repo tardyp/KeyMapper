@@ -123,19 +123,23 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
                         is made again.
                          */
                         populateList(getRecyclerView(binding), emptyList())
-
                     }
 
                     is ListUiState.Loaded -> {
                         getProgressBar(binding).isVisible = true
-                        getRecyclerView(binding).isVisible = false
                         getEmptyListPlaceHolder(binding).isVisible = false
 
+                        /*
+                        Don't hide the recyclerview here because if the state changes in response to
+                        an onclick event in the recyclerview then there isn't a smooth transition
+                        between the states. E.g the ripple effect on a button or card doesn't complete
+                         */
                         populateList(getRecyclerView(binding), state.data)
 
                         getProgressBar(binding).isVisible = false
-                        getRecyclerView(binding).isVisible =
-                            true //show the recyclerview once it has been populated
+
+                        //show the recyclerview once it has been populated
+                        getRecyclerView(binding).isVisible = true
                     }
 
                     ListUiState.Loading -> {

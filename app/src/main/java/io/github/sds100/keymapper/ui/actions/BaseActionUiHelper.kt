@@ -4,10 +4,10 @@ import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.IconInfo
+import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.catch
@@ -76,14 +76,10 @@ abstract class BaseActionUiHelper<A>(
             Success(title)
         }
 
-        is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action)))
+        is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action.id)))
 
         is ChangeDndModeSystemAction -> {
-            val dndModeString = when (action.dndMode) {
-                DndMode.ALARMS -> getString(R.string.dnd_mode_alarms)
-                DndMode.PRIORITY -> getString(R.string.dnd_mode_priority)
-                DndMode.NONE -> getString(R.string.dnd_mode_none)
-            }
+            val dndModeString = getString(DndModeUtils.getLabel(action.dndMode))
 
             when (action) {
                 is ChangeDndModeSystemAction.Toggle -> getString(
@@ -102,11 +98,7 @@ abstract class BaseActionUiHelper<A>(
         }
 
         is ChangeRingerModeSystemAction -> {
-            val ringerModeString = when (action.ringerMode) {
-                RingerMode.NORMAL -> getString(R.string.ringer_mode_normal)
-                RingerMode.VIBRATE -> getString(R.string.ringer_mode_vibrate)
-                RingerMode.SILENT -> getString(R.string.ringer_mode_silent)
-            }
+            val ringerModeString = getString(RingerModeUtils.getLabel(action.ringerMode))
 
             getString(R.string.action_change_ringer_mode_formatted, ringerModeString).success()
         }
@@ -114,16 +106,9 @@ abstract class BaseActionUiHelper<A>(
         is VolumeSystemAction -> {
             val string = when (action) {
                 is VolumeSystemAction.Stream -> {
-                    val streamString = when (action.volumeStream) {
-                        VolumeStream.ALARM -> getString(R.string.stream_alarm)
-                        VolumeStream.DTMF -> getString(R.string.stream_dtmf)
-                        VolumeStream.MUSIC -> getString(R.string.stream_music)
-                        VolumeStream.NOTIFICATION -> getString(R.string.stream_notification)
-                        VolumeStream.RING -> getString(R.string.stream_ring)
-                        VolumeStream.SYSTEM -> getString(R.string.stream_system)
-                        VolumeStream.VOICE_CALL -> getString(R.string.stream_voice_call)
-                        VolumeStream.ACCESSIBILITY -> getString(R.string.stream_accessibility)
-                    }
+                    val streamString = getString(
+                        VolumeStreamUtils.getLabel(action.volumeStream)
+                    )
 
                     when (action) {
                         is VolumeSystemAction.Stream.Decrease -> getString(
@@ -183,12 +168,7 @@ abstract class BaseActionUiHelper<A>(
 
         is CycleRotationsSystemAction -> {
             val orientationStrings = action.orientations.map {
-                when (it) {
-                    Orientation.ORIENTATION_0 -> getString(R.string.orientation_0)
-                    Orientation.ORIENTATION_90 -> getString(R.string.orientation_90)
-                    Orientation.ORIENTATION_180 -> getString(R.string.orientation_180)
-                    Orientation.ORIENTATION_270 -> getString(R.string.orientation_270)
-                }
+                getString(OrientationUtils.getLabel(it))
             }
 
             getString(
@@ -204,10 +184,7 @@ abstract class BaseActionUiHelper<A>(
                 is FlashlightSystemAction.Disable -> R.string.action_disable_flashlight_formatted
             }
 
-            val lensString = when (action.lens) {
-                CameraLens.FRONT -> getString(R.string.lens_front)
-                CameraLens.BACK -> getString(R.string.lens_back)
-            }
+            val lensString = getString(CameraLensUtils.getLabel(action.lens))
 
             getString(resId, lensString).success()
         }
@@ -260,7 +237,7 @@ abstract class BaseActionUiHelper<A>(
         }.firstBlocking()
 
         is OpenAppShortcutAction -> {
-            if (action.packageName == null) {
+            if (action.packageName.isNullOrBlank()) {
                 IconInfo(null, TintType.NONE).success()
             } else {
                 appUiAdapter.getAppIcon(action.packageName).map {
@@ -270,7 +247,7 @@ abstract class BaseActionUiHelper<A>(
         }
 
         is SystemAction -> IconInfo(
-            SystemActionUtils.getIcon(action)?.let { getDrawable(it) },
+            SystemActionUtils.getIcon(action.id)?.let { getDrawable(it) },
             TintType.ON_SURFACE
         ).success()
 

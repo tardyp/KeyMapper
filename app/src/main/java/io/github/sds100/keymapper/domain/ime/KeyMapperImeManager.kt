@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain
+package io.github.sds100.keymapper.domain.ime
 
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter

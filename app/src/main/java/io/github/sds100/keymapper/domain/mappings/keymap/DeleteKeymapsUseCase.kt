@@ -8,11 +8,11 @@ class DeleteKeymapsUseCaseImpl(
     private val repository: KeymapRepository,
 ) : DeleteKeymapsUseCase {
 
-    override operator fun invoke(vararg id: Long) {
-        repository.delete(*id)
+    override operator fun invoke(vararg uid: String) {
+        repository.delete(*uid)
     }
 }
 
 interface DeleteKeymapsUseCase {
-    operator fun invoke(vararg id: Long)
+    operator fun invoke(vararg uid: String)
 }

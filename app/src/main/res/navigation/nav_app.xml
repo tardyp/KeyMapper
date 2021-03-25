@@ -38,8 +38,10 @@
         app:popEnterAnim="@anim/slide_in_left"
         app:popExitAnim="@anim/slide_out_right">
         <argument
-            android:name="keymapId"
-            app:argType="long" />
+            android:name="keymapUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </action>
 
     <action

@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.domain.usecases
+package io.github.sds100.keymapper.domain.settings
 
 import androidx.datastore.preferences.core.Preferences
 import io.github.sds100.keymapper.domain.preferences.Keys

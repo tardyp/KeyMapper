@@ -8,7 +8,7 @@ import androidx.fragment.app.activityViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
@@ -22,13 +22,13 @@ import splitties.alertdialog.appcompat.positiveButton
  * Created by sds100 on 08/09/20.
  */
 
-class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapListItemModel>>() {
+class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapListItem>>() {
 
     private val viewModel by activityViewModels<CreateKeymapShortcutViewModel> {
         InjectorUtils.provideCreateActionShortcutViewModel(requireContext())
     }
 
-    override val modelState: ModelState<List<KeymapListItemModel>>
+    override val modelState: ModelState<List<KeymapListItem>>
         get() = viewModel
 
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
@@ -91,7 +91,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
 
     override fun populateList(
         binding: FragmentRecyclerviewBinding,
-        model: List<KeymapListItemModel>?
+        model: List<KeymapListItem>?
     ) {
         binding.epoxyRecyclerView.withModels {
             model?.forEach {

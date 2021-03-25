@@ -9,11 +9,11 @@ class GetKeymapUseCaseImpl(
     private val repository: KeymapRepository,
 ) : GetKeymapUseCase {
 
-    override suspend operator fun invoke(id: Long): KeyMap {
-        return KeyMapEntityMapper.fromEntity(repository.get(id))
+    override suspend operator fun invoke(uid: String): KeyMap? {
+        return repository.get(uid)?.let { KeyMapEntityMapper.fromEntity(it) }
     }
 }
 
 interface GetKeymapUseCase {
-    suspend operator fun invoke(id: Long): KeyMap
+    suspend operator fun invoke(uid: String): KeyMap?
 }

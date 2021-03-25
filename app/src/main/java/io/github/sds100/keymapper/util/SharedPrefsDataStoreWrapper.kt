@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.util
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.core.preferencesSetKey
 import androidx.preference.PreferenceDataStore
-import io.github.sds100.keymapper.domain.usecases.ConfigSettingsUseCase
+import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCase
 
 /**
  * Created by sds100 on 19/01/21.

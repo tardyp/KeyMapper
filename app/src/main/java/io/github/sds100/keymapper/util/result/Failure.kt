@@ -61,10 +61,11 @@ fun Error.getFullMessage(ctx: Context) = when (this) {
 }
 
 fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
-    is RecoverableError.PermissionDenied -> RecoverableError.PermissionDenied.getMessageForPermission(
-        resourceProvider,
-        permission
-    )
+    is RecoverableError.PermissionDenied ->
+        RecoverableError.PermissionDenied.getMessageForPermission(
+            resourceProvider,
+            permission
+        )
     is RecoverableError.AppNotFound -> resourceProvider.getString(
         R.string.error_app_isnt_installed,
         packageName

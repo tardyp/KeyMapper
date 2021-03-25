@@ -4,12 +4,15 @@ import android.content.Context
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.data.viewmodel.*
+import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
+import io.github.sds100.keymapper.domain.ime.GetEnabledInputMethodsUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.packages.GetPackagesUseCaseImpl
+import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.shortcuts.GetAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.framework.adapters.AndroidAppShortcutUiAdapter
@@ -57,7 +60,8 @@ object InjectorUtils {
         return AppShortcutListViewModel.Factory(
             GetAppShortcutsUseCaseImpl(context.applicationContext.packageManager),
             AndroidAppShortcutUiAdapter(context),
-            AndroidAppUiAdapter(context.applicationContext.packageManager)
+            AndroidAppUiAdapter(context.applicationContext.packageManager),
+            ServiceLocator.resourceProvider(context)
         )
     }
 
@@ -104,7 +108,13 @@ object InjectorUtils {
     }
 
     fun provideSystemActionListViewModel(context: Context): SystemActionListViewModel.Factory {
-        return SystemActionListViewModel.Factory(ServiceLocator.systemActionRepository(context))
+        return SystemActionListViewModel.Factory(
+            ServiceLocator.resourceProvider(context),
+            IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(context)),
+            GetEnabledInputMethodsUseCaseImpl(ServiceLocator.inputMethodAdapter(context)),
+            GetPackagesUseCaseImpl(ServiceLocator.packageManagerAdapter(context)),
+            AndroidAppUiAdapter(context.packageManager)
+        )
     }
 
     fun provideUnsupportedActionListViewModel(

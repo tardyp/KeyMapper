@@ -1,28 +1,29 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.airbnb.epoxy.EpoxyController
+import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
-import io.github.sds100.keymapper.data.model.SystemActionListItemModel
+import io.github.sds100.keymapper.data.model.SystemActionListItem
 import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.viewmodel.SystemActionListViewModel
-import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
+import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.sectionHeader
 import io.github.sds100.keymapper.simple
-import io.github.sds100.keymapper.ui.callback.StringResourceProvider
+import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.util.result.handle
 import io.github.sds100.keymapper.util.result.onSuccess
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.appcompat.coroutines.showAndAwaitOkOrDismiss
 import splitties.experimental.ExperimentalSplittiesApi
@@ -32,9 +33,7 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Created by sds100 on 31/03/2020.
  */
-class SystemActionListFragment
-    : DefaultRecyclerViewFragment<Map<Int, List<SystemActionListItemModel>>>(),
-    StringResourceProvider {
+class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
 
     companion object {
         const val REQUEST_KEY = "request_system_action"
@@ -46,62 +45,82 @@ class SystemActionListFragment
         InjectorUtils.provideSystemActionListViewModel(requireContext())
     }
 
-    override val modelState: ModelState<Map<Int, List<SystemActionListItemModel>>>
-        get() = viewModel
-
     override var searchStateKey: String? = SEARCH_STATE_KEY
     override var requestKey: String? = REQUEST_KEY
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.registerStringResourceProvider(this)
-        super.onViewCreated(view, savedInstanceState)
-    }
+    override val listItems: Flow<ListUiState<ListItem>>
+        get() = viewModel.state.map { it.listItems }
 
-    override fun onDestroyView() {
-        viewModel.unregisterStringResourceProvider()
-
-        super.onDestroyView()
-    }
-
-    override fun subscribeUi(binding: FragmentRecyclerviewBinding) {
+    override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         super.subscribeUi(binding)
 
-        viewModel.allActionsAreSupported.observe(viewLifecycleOwner, {
-            binding.caption = if (it == false) {
-                str(R.string.your_device_doesnt_support_some_actions)
-            } else {
-                null
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.state.collectLatest { state ->
+                binding.caption = if (state.showUnsupportedActionsMessage) {
+                    str(R.string.your_device_doesnt_support_some_actions)
+                } else {
+                    null
+                }
             }
-        })
+        }
+
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.showDialog.collectLatest {
+                viewModel.onDialogResponse(
+                    it.key,
+                    it.ui.show(this@SystemActionListFragment)
+                )
+            }
+        }
+
+        viewLifecycleScope.launchWhenResumed {
+            viewModel.returnResult.collectLatest {
+                returnResult(EXTRA_SYSTEM_ACTION to Json.encodeToString(it))
+            }
+        }
     }
 
-    override fun populateList(
-        binding: FragmentRecyclerviewBinding,
-        model: Map<Int, List<SystemActionListItemModel>>?
-    ) {
-        binding.epoxyRecyclerView.withModels {
-            for ((sectionHeader, systemActions) in model ?: emptyMap()) {
-                sectionHeader {
-                    id(sectionHeader)
-                    header(str(sectionHeader))
+    override fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<ListItem>) {
+        recyclerView.withModels {
+            listItems.forEach { listItem ->
+                if (listItem is SectionHeaderListItem) {
+                    sectionHeader {
+                        id(listItem.id)
+                        header(listItem.text)
+                    }
                 }
 
-                systemActions.forEach { systemAction ->
-                    createSimpleListItem(systemAction)
+                if (listItem is SystemActionListItem) {
+                    simple {
+                        id(listItem.id)
+                        primaryText(listItem.title)
+                        icon(listItem.icon)
+                        tintType(TintType.ON_SURFACE)
+
+                        isSecondaryTextAnError(listItem.showRequiresRootMessage)
+
+                        if (listItem.showRequiresRootMessage) {
+                            secondaryText(str(R.string.requires_root))
+                        } else {
+                            secondaryText(null)
+                        }
+
+                        onClick { _ ->
+                            viewModel.onSystemActionClick(listItem.systemActionId)
+                        }
+                    }
                 }
             }
         }
     }
 
     override fun onSearchQuery(query: String?) {
-        /*TODO instead of passing a string resource provider to the view model,
-            get the string res ids from the view models
-            then get the strings
-            then pass a map of the system action ids to their string name with the query*/
         viewModel.searchQuery.value = query
     }
 
-    override fun getStringResource(resId: Int) = str(resId)
+    override fun rebuildUiState() {
+        viewModel.rebuildUiState()
+    }
 
     @ExperimentalSplittiesApi
     private suspend fun onSystemActionClick(systemActionDef: SystemActionDef) =
@@ -118,7 +137,11 @@ class SystemActionListFragment
 
             systemActionDef.getOptions(requireContext()).onSuccess { options ->
                 val optionLabels = options.map { optionId ->
-                    SystemActionOption.getOptionLabel(requireContext(), systemActionDef.id, optionId).handle(
+                    SystemActionOption.getOptionLabel(
+                        requireContext(),
+                        systemActionDef.id,
+                        optionId
+                    ).handle(
                         onSuccess = { it },
                         onError = { it.getFullMessage(requireContext()) }
                     )
@@ -148,7 +171,9 @@ class SystemActionListFragment
 
                                 okButton { _ ->
                                     val data = SystemActionOption.optionSetToString(
-                                        options.filterIndexed { index, _ -> checkedOptions[index] }.toSet())
+                                        options.filterIndexed { index, _ -> checkedOptions[index] }
+                                            .toSet()
+                                    )
 
                                     it.resume(data)
                                 }
@@ -168,30 +193,5 @@ class SystemActionListFragment
 //            returnResult(
 //
 //            )
-        }
-
-    @ExperimentalSplittiesApi
-    private fun EpoxyController.createSimpleListItem(systemAction: SystemActionListItemModel) =
-        simple {
-            id(systemAction.id)
-            primaryText(str(systemAction.descriptionRes))
-            icon(systemAction.iconRes?.let { drawable(it) })
-            tintType(TintType.ON_SURFACE)
-
-            isSecondaryTextAnError(systemAction.requiresRoot)
-
-            if (systemAction.requiresRoot) {
-                secondaryText(str(R.string.requires_root))
-            } else {
-                secondaryText(null)
-            }
-
-            onClick { _ ->
-                SystemActionUtils.getSystemActionDef(systemAction.id).onSuccess {
-                    viewLifecycleScope.launch {
-                        onSystemActionClick(it)
-                    }
-                }
-            }
         }
 }

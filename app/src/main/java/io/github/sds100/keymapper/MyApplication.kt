@@ -47,7 +47,12 @@ class MyApplication : MultiDexApplication(),
     val inputMethodAdapter by lazy { AndroidInputMethodAdapter(this) }
     val externalDeviceAdapter by lazy { AndroidExternalDeviceAdapter(this) }
     val cameraAdapter by lazy { AndroidCameraAdapter(this) }
-    val permissionAdapter by lazy { AndroidPermissionAdapter(this) }
+    val permissionAdapter by lazy {
+        AndroidPermissionAdapter(
+            this,
+            ServiceLocator.preferenceRepository(this)
+        )
+    }
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
     val launcherShortcutAdapter by lazy { LauncherShortcutAdapterImpl(this) }

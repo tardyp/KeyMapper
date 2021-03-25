@@ -1,15 +1,18 @@
 package io.github.sds100.keymapper.util
 
+import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.SeekBar
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.SeekBarListItemModel
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
 import io.github.sds100.keymapper.databinding.DialogSeekbarListBinding
+import io.github.sds100.keymapper.ui.dialogs.DialogResponse
+import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -21,6 +24,78 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Created by sds100 on 30/03/2020.
  */
+
+suspend fun DialogUi<*>.show(fragment: Fragment): DialogResponse {
+    val lifecycleOwner = fragment.viewLifecycleOwner
+    val ctx = fragment.requireContext()
+
+    return show(lifecycleOwner, ctx)
+}
+
+suspend fun DialogUi<*>.show(lifecycleOwner: LifecycleOwner, ctx: Context): DialogResponse {
+    return when (this) {
+        is DialogUi.OkMessage -> ctx.okDialog(lifecycleOwner, this.message)
+        is DialogUi.Text ->
+            ctx.editTextStringAlertDialogFlow(
+                lifecycleOwner,
+                this.hint,
+                this.allowEmpty
+            )
+        is DialogUi.MultiChoice<*> -> ctx.multiChoiceDialog(lifecycleOwner, this.items)
+        is DialogUi.SingleChoice<*> -> ctx.singleChoiceDialog(lifecycleOwner, this.items)
+    }
+}
+
+suspend fun <ID> Context.multiChoiceDialog(
+    lifecycleOwner: LifecycleOwner,
+    items: List<Pair<ID, String>>
+) = suspendCancellableCoroutine<DialogUi.MultiChoiceResponse<ID>> { continuation ->
+    materialAlertDialog {
+        val checkedItems = BooleanArray(items.size) { false }
+
+        setMultiChoiceItems(
+            items.map { it.second }.toTypedArray(),
+            checkedItems
+        ) { _, which, checked ->
+            checkedItems[which] = checked
+        }
+
+        cancelButton()
+
+        okButton {
+            val checkedItemIds = sequence {
+                checkedItems.forEachIndexed { index, checked ->
+                    if (checked) {
+                        yield(items[index].first)
+                    }
+                }
+            }.toList()
+
+            continuation.resume(DialogUi.MultiChoiceResponse(checkedItemIds))
+        }
+
+        show().apply {
+            dismissOnDestroy(lifecycleOwner)
+        }
+    }
+}
+
+suspend fun <ID> Context.singleChoiceDialog(
+    lifecycleOwner: LifecycleOwner,
+    items: List<Pair<ID, String>>
+) = suspendCancellableCoroutine<DialogUi.SingleChoiceResponse<ID>> { continuation ->
+    materialAlertDialog {
+        setItems(
+            items.map { it.second }.toTypedArray(),
+        ) { _, position ->
+            continuation.resume(DialogUi.SingleChoiceResponse(items[position].first))
+        }
+
+        show().apply {
+            dismissOnDestroy(lifecycleOwner)
+        }
+    }
+}
 
 //TODO delete
 suspend fun Context.editTextStringAlertDialog(
@@ -74,7 +149,7 @@ suspend fun Context.editTextStringAlertDialogFlow(
     lifecycleOwner: LifecycleOwner,
     hint: String,
     allowEmpty: Boolean = false
-) = suspendCancellableCoroutine<String?> { continuation ->
+) = suspendCancellableCoroutine<DialogUi.TextResponse> { continuation ->
 
     val text = MutableStateFlow("")
 
@@ -90,7 +165,7 @@ suspend fun Context.editTextStringAlertDialogFlow(
         }
 
         okButton {
-            continuation.resume(text.value)
+            continuation.resume(DialogUi.TextResponse(text.value))
         }
 
         cancelButton()
@@ -110,12 +185,7 @@ suspend fun Context.editTextStringAlertDialogFlow(
     }
 
     //this prevents window leak
-    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        fun onDestroy() {
-            alertDialog.dismiss()
-        }
-    })
+    alertDialog.dismissOnDestroy(lifecycleOwner)
 }
 
 suspend fun Context.editTextNumberAlertDialog(
@@ -182,6 +252,35 @@ suspend fun Context.editTextNumberAlertDialog(
     }
 }
 
+suspend fun Context.okDialog(
+    lifecycleOwner: LifecycleOwner,
+    message: String
+) = suspendCancellableCoroutine<DialogUi.OkResponse> { continuation ->
+
+    val alertDialog = materialAlertDialog {
+
+        setMessage(message)
+
+        okButton {
+            continuation.resume(DialogUi.OkResponse)
+        }
+    }
+
+    alertDialog.show()
+
+    //this prevents window leak
+    alertDialog.dismissOnDestroy(lifecycleOwner)
+}
+
+fun Dialog.dismissOnDestroy(lifecycleOwner: LifecycleOwner) {
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun onDestroy() {
+            dismiss()
+        }
+    })
+}
+
 suspend fun Context.seekBarAlertDialog(
     lifecycleOwner: LifecycleOwner,
     seekBarListItemModel: SeekBarListItemModel
@@ -223,17 +322,3 @@ suspend fun Context.seekBarAlertDialog(
         show()
     }
 }
-
-/**
- * @return whether the ok button was pressed
- */
-suspend fun Context.okDialog(@StringRes messageRes: Int) =
-    suspendCoroutine<Boolean> { continuation ->
-        alertDialog {
-            message = str(messageRes)
-
-            okButton {
-                continuation.resume(true)
-            }
-        }
-    }

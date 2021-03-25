@@ -59,8 +59,6 @@ class ConfigKeymapViewModel(
 ) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
 
     companion object {
-        const val NEW_KEYMAP_ID = -1L
-
         private const val STATE_KEY = "config_keymap"
     }
 
@@ -131,7 +129,11 @@ class ConfigKeymapViewModel(
         runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
-    override fun save() = configUseCase.getKeymap().ifIsData { save(it) }
+    override fun save() = configUseCase.getKeymap().ifIsData {
+        viewModelScope.launch {
+            save(it)
+        }
+    }
 
     override fun saveState(outState: Bundle) {
         configUseCase.getKeymap().ifIsData {
@@ -146,12 +148,13 @@ class ConfigKeymapViewModel(
         } ?: configUseCase.loadBlankKeymap()
     }
 
-    fun loadKeymap(id: Long) {
+    fun loadNewKeymap() {
+        configUseCase.loadBlankKeymap()
+    }
+
+    fun loadKeymap(uid: String) {
         viewModelScope.launch {
-            when (id) {
-                NEW_KEYMAP_ID -> configUseCase.loadBlankKeymap()
-                else -> configUseCase.setKeymap(get(id))
-            }
+            configUseCase.setKeymap(get(uid)!!)
         }
     }
 

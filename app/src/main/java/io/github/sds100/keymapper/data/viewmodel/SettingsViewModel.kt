@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.github.sds100.keymapper.domain.usecases.ConfigSettingsUseCase
+import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCase
 import io.github.sds100.keymapper.util.SharedPrefsDataStoreWrapper
 
 /**

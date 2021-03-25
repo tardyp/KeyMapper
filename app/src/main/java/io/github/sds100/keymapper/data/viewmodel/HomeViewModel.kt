@@ -52,17 +52,70 @@ class HomeViewModel(
 
     private val rebuildState = MutableSharedFlow<Unit>()
 
-    private val _state = MutableStateFlow(
-        buildState(
-            hideHomeScreenAlerts = false,
-            areKeymapsSelectable = false,
-            selectedKeymapsCount = 0,
-            showGuiKeyboardAd = false,
-            showWhatsNew = false,
-            showQuickStartGuideTapTarget = false
+    val onboardingState = combine(
+        onboarding.showGuiKeyboardAdFlow,
+        onboarding.showOnboardingAfterUpdateHomeScreen,
+        onboarding.showQuickStartGuideHint
+    ) { showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint ->
+        HomeOnboardingState(showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeOnboardingState())
+
+    val statusLayoutState = settings.hideHomeScreenAlerts.map { hide ->
+        HomeStatusLayoutState(isVisible = !hide)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeStatusLayoutState(isVisible = true))
+
+    val selectionCountViewState = multiSelectProvider.state.map {
+        when (it) {
+            SelectionState.NotSelecting -> SelectionCountViewState(
+                isVisible = false,
+                text = ""
+            )
+            is SelectionState.Selecting -> SelectionCountViewState(
+                isVisible = true,
+                text = getString(R.string.selection_count, it.selectedIds.size)
+            )
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        SelectionCountViewState(
+            isVisible = false,
+            text = ""
         )
     )
-    val state = _state.asStateFlow()
+
+    val tabsState = multiSelectProvider.state.map {
+        when (it) {
+            SelectionState.NotSelecting ->
+                HomeTabsState(
+                    enableViewPagerSwiping = true,
+                    showTabs = true
+                )
+            is SelectionState.Selecting -> HomeTabsState(
+                enableViewPagerSwiping = false,
+                showTabs = true
+            )
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        HomeTabsState(
+            enableViewPagerSwiping = true,
+            showTabs = true
+        )
+    )
+
+    val appBarState = multiSelectProvider.state.map {
+        when (it) {
+            SelectionState.NotSelecting -> HomeAppBarState.NORMAL
+
+            is SelectionState.Selecting -> HomeAppBarState.MULTI_SELECTING
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        HomeAppBarState.NORMAL
+    )
 
     private val _showMenu = MutableSharedFlow<Unit>()
     val showMenu = _showMenu.asSharedFlow()
@@ -77,37 +130,6 @@ class HomeViewModel(
     private val _fixFailure = MutableSharedFlow<RecoverableError>()
     val fixFailure = _fixFailure.asSharedFlow()
 
-    init {
-
-        viewModelScope.launch {
-            val onboardingStateFlow = combine(
-                onboarding.showGuiKeyboardAdFlow,
-                onboarding.showOnboardingAfterUpdateHomeScreen,
-                onboarding.showQuickStartGuideHint
-            ) { showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint ->
-                OnboardingState(showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint)
-            }
-
-            combine(
-                settings.hideHomeScreenAlerts,
-                multiSelectProvider.state,
-                onboardingStateFlow
-            ) { hideHomeScreenAlerts, selectionState, onboardingState ->
-                buildState(
-                    hideHomeScreenAlerts,
-                    areKeymapsSelectable = selectionState is SelectionState.Selecting,
-                    selectedKeymapsCount = (selectionState as? SelectionState.Selecting)?.selectedIds?.size
-                        ?: 0,
-                    showGuiKeyboardAd = onboardingState.showGuiKeyboardAd,
-                    showWhatsNew = onboardingState.showWhatsNew,
-                    showQuickStartGuideTapTarget = onboardingState.showQuickStartGuideTapTarget
-                )
-            }.collectLatest {
-                _state.value = it
-            }
-        }
-    }
-
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
     fun approvedWhatsNew() = onboarding.showedOnboardingAfterUpdateHomeScreen()
@@ -116,7 +138,7 @@ class HomeViewModel(
 
     fun onAppBarNavigationButtonClick() {
         viewModelScope.launch {
-            if (state.value.multiSelecting) {
+            if (multiSelectProvider.state.value is SelectionState.Selecting) {
                 multiSelectProvider.stopSelecting()
             } else {
                 _showMenu.emit(Unit)
@@ -136,10 +158,10 @@ class HomeViewModel(
 
     fun onFabPressed() {
         viewModelScope.launch {
-            if (state.value.multiSelecting) {
+            if (multiSelectProvider.state.value is SelectionState.Selecting) {
                 multiSelectProvider.state.value.apply {
                     if (this is SelectionState.Selecting) {
-                        deleteKeymaps.invoke(*selectedIds.toLongArray())
+                        deleteKeymaps.invoke(*selectedIds.toTypedArray())
                     }
                 }
                 multiSelectProvider.stopSelecting()
@@ -156,21 +178,21 @@ class HomeViewModel(
     fun onEnableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            enableDisableKeymaps.enable(*selectedIds.toLongArray())
+            enableDisableKeymaps.enable(*selectedIds.toTypedArray())
         }
     }
 
     fun onDisableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            enableDisableKeymaps.disable(*selectedIds.toLongArray())
+            enableDisableKeymaps.disable(*selectedIds.toTypedArray())
         }
     }
 
     fun onDuplicateSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            duplicateKeymaps.invoke(*selectedIds.toLongArray())
+            duplicateKeymaps.invoke(*selectedIds.toTypedArray())
         }
     }
 
@@ -181,33 +203,6 @@ class HomeViewModel(
     fun rebuildUiState() {
         runBlocking { rebuildState.emit(Unit) }
     }
-
-    private fun buildState(
-        hideHomeScreenAlerts: Boolean,
-        areKeymapsSelectable: Boolean,
-        selectedKeymapsCount: Int,
-        showGuiKeyboardAd: Boolean,
-        showWhatsNew: Boolean,
-        showQuickStartGuideTapTarget: Boolean
-    ): HomeState {
-
-        return HomeState(
-            enableViewPagerSwiping = true, //TODO
-            selectedCountString = getString(R.string.selection_count, selectedKeymapsCount),
-            showTabs = !areKeymapsSelectable,
-            hideAlerts = hideHomeScreenAlerts,
-            showGuiKeyboardAd = showGuiKeyboardAd,
-            showWhatsNew = showWhatsNew,
-            showQuickStartGuideTapTarget = showQuickStartGuideTapTarget,
-            multiSelecting = areKeymapsSelectable
-        )
-    }
-
-    private data class OnboardingState(
-        val showGuiKeyboardAd: Boolean,
-        val showWhatsNew: Boolean,
-        val showQuickStartGuideTapTarget: Boolean
-    )
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
@@ -242,13 +237,26 @@ class HomeViewModel(
     }
 }
 
-data class HomeState(
-    val enableViewPagerSwiping: Boolean,
-    val showTabs: Boolean,
-    val selectedCountString: String,
-    val hideAlerts: Boolean,
-    val showGuiKeyboardAd: Boolean,
-    val multiSelecting: Boolean,
-    val showWhatsNew: Boolean,
-    val showQuickStartGuideTapTarget: Boolean
+data class SelectionCountViewState(
+    val isVisible: Boolean,
+    val text: String
+)
+
+enum class HomeAppBarState {
+    NORMAL, MULTI_SELECTING
+}
+
+data class HomeOnboardingState(
+    val showGuiKeyboardAd: Boolean = false,
+    val showWhatsNew: Boolean = false,
+    val showQuickStartGuideTapTarget: Boolean = false,
+)
+
+data class HomeTabsState(
+    val enableViewPagerSwiping: Boolean = true,
+    val showTabs: Boolean = false,
+)
+
+data class HomeStatusLayoutState(
+    val isVisible: Boolean = true,
 )

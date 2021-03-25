@@ -31,6 +31,7 @@ data class KeyEventAction(
     val device: DeviceInfo? = null
 ) : ActionData()
 
+@Serializable
 sealed class SystemAction : ActionData() {
     abstract val id: SystemActionId
 }

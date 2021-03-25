@@ -8,16 +8,16 @@
         <import type="android.view.View" />
 
         <variable
-            name="model"
-            type="io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel" />
+            name="keymapUiState"
+            type="io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem.KeymapUiState" />
+
+        <variable
+            name="selectionState"
+            type="io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem.SelectionUiState" />
 
         <variable
             name="onCardClick"
             type="View.OnClickListener" />
-
-        <variable
-            name="onCheckBoxCheckedChange"
-            type="android.widget.CompoundButton.OnCheckedChangeListener" />
 
         <variable
             name="onCardLongClick"
@@ -52,9 +52,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:checked="@{model.isSelected}"
-                android:onCheckedChanged="@{onCheckBoxCheckedChange}"
-                android:visibility="@{model.isSelectable ? View.VISIBLE : View.GONE}"
+                android:checked="@{selectionState.isSelected}"
+                android:onClick="@{onCardClick}"
+                android:visibility="@{selectionState.isSelectable ? View.VISIBLE : View.GONE}"
                 tools:visibility="gone" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,11 +65,11 @@
                     android:id="@+id/textViewExtraInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{model.extraInfo}"
+                    android:text="@{keymapUiState.extraInfo}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
                     android:textColor="?attr/colorError"
                     android:textSize="14sp"
-                    android:visibility="@{model.extraInfo.empty ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{keymapUiState.extraInfo.empty ? View.GONE : View.VISIBLE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -81,8 +81,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:theme="@style/ActionChipGroup"
-                    android:visibility="@{model.chipList.isEmpty ? View.GONE : View.VISIBLE}"
-                    app:chipUiModels="@{model.chipList}"
+                    android:visibility="@{keymapUiState.chipList.isEmpty ? View.GONE : View.VISIBLE}"
+                    app:chipUiModels="@{keymapUiState.chipList}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewExtraInfo"
@@ -97,7 +97,7 @@
                     android:text="@string/trigger_header"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:textStyle="bold"
-                    android:visibility="@{model.hasTrigger ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{keymapUiState.hasTrigger ? View.VISIBLE : View.GONE}"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/chipGroupActionsAndConstraints" />
@@ -107,9 +107,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="@{model.triggerDescription}"
+                    android:text="@{keymapUiState.triggerDescription}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:visibility="@{model.hasTrigger ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{keymapUiState.hasTrigger ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textViewTriggerHeader"
                     app:layout_constraintTop_toTopOf="@+id/textViewTriggerHeader"
@@ -123,7 +123,7 @@
                     android:text="@string/option_list_header"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:textStyle="bold"
-                    android:visibility="@{model.hasOptions ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{keymapUiState.hasOptions ? View.VISIBLE : View.GONE}"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textViewTrigger" />
@@ -133,9 +133,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="@{model.optionsDescription}"
+                    android:text="@{keymapUiState.optionsDescription}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:visibility="@{model.hasOptions ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{keymapUiState.hasOptions ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textViewFlagsHeader"
                     app:layout_constraintTop_toTopOf="@id/textViewFlagsHeader"

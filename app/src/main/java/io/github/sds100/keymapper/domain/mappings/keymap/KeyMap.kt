@@ -21,7 +21,7 @@ import java.util.*
 
 @Serializable
 data class KeyMap(
-    val dbId: Long = NEW_ID,
+    val dbId: Long? = null,
     val uid: String = UUID.randomUUID().toString(),
     val trigger: KeymapTrigger = KeymapTrigger(),
     val actionDataList: List<KeymapActionData> = emptyList(),
@@ -29,10 +29,6 @@ data class KeyMap(
     val constraintMode: ConstraintMode = ConstraintMode.AND,
     val isEnabled: Boolean = true
 ) {
-
-    companion object {
-        const val NEW_ID = -1L
-    }
 
     @Transient
     val actionList: List<KeymapAction> = actionDataList.map {
@@ -108,7 +104,7 @@ object KeyMapEntityMapper {
         )
     }
 
-    fun toEntity(keymap: KeyMap): KeyMapEntity {
+    fun toEntity(keymap: KeyMap, dbId: Long): KeyMapEntity {
 
         val actionEntityList = sequence {
             keymap.actionList.forEach { action ->
@@ -117,7 +113,7 @@ object KeyMapEntityMapper {
         }.toList()
 
         return KeyMapEntity(
-            id = keymap.dbId,
+            id = dbId,
             trigger = KeymapTriggerEntityMapper.toEntity(keymap.trigger),
             actionList = actionEntityList,
             constraintList = keymap.constraintList.map { ConstraintEntityMapper.toEntity(it) },

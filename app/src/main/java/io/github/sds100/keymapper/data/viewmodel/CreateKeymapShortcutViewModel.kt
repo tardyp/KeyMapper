@@ -5,7 +5,7 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.usecase.CreateKeymapShortcutUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.result.Error
@@ -18,9 +18,9 @@ import splitties.bitflags.withFlag
 class CreateKeymapShortcutViewModel(
     private val keymapRepository: CreateKeymapShortcutUseCase,
     private val showActionsUseCase: GetActionErrorUseCase
-) : ViewModel(), ModelState<List<KeymapListItemModel>> {
+) : ViewModel(), ModelState<List<KeymapListItem>> {
 
-    private val _model: MutableLiveData<OldDataState<List<KeymapListItemModel>>> =
+    private val _model: MutableLiveData<OldDataState<List<KeymapListItem>>> =
         MutableLiveData(Loading())
 
     override val model = _model
@@ -68,7 +68,7 @@ class CreateKeymapShortcutViewModel(
         }
     }
 
-    fun setModelList(list: List<KeymapListItemModel>) {
+    fun setModelList(list: List<KeymapListItem>) {
         _model.value = when {
             list.isEmpty() -> Empty()
             else -> Data(list)

@@ -3,11 +3,11 @@ package io.github.sds100.keymapper.domain.actions
 import android.Manifest
 import android.os.Build
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.domain.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.adapter.CameraAdapter
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
 import io.github.sds100.keymapper.util.SystemActionUtils
@@ -30,7 +30,7 @@ class GetActionErrorUseCaseImpl(
     private val isSystemActionSupported = IsSystemActionSupportedUseCaseImpl(systemFeatureAdapter)
     private val keyMapperImeManager = KeyMapperImeManager(inputMethodAdapter)
 
-    override val invalidateErrors = combine(inputMethodAdapter.chosenImePackageName) {}
+    override val invalidateErrors = combine(inputMethodAdapter.chosenIme) {}
 
     override fun getError(action: ActionData): Error? {
         if (action.requiresImeToPerform()) {
@@ -38,7 +38,7 @@ class GetActionErrorUseCaseImpl(
                 return RecoverableError.NoCompatibleImeEnabled
             }
 
-            if (keyMapperImeManager.isCompatibleImeChosen()) {
+            if (!keyMapperImeManager.isCompatibleImeChosen()) {
                 return RecoverableError.NoCompatibleImeChosen
             }
         }
@@ -84,18 +84,18 @@ class GetActionErrorUseCaseImpl(
                     return RecoverableError.PermissionDenied(Manifest.permission.CALL_PHONE)
                 }
 
-            is SystemAction -> action.getError()
+            is SystemAction -> return action.getError()
         }
 
         return null
     }
 
     private fun SystemAction.getError(): Error? {
-        isSystemActionSupported.invoke(this)?.let {
+        isSystemActionSupported.invoke(this.id)?.let {
             return it
         }
 
-        SystemActionUtils.getRequiredPermissions(this).forEach { permission ->
+        SystemActionUtils.getRequiredPermissions(this.id).forEach { permission ->
             if (!permissionAdapter.isGranted(permission)) {
                 return RecoverableError.PermissionDenied(permission)
             }
@@ -106,12 +106,13 @@ class GetActionErrorUseCaseImpl(
                 return Error.NoVoiceAssistant
             }
 
-            this is FlashlightSystemAction -> if (!cameraAdapter.hasFlashFacing(this.lens)) {
-                return when (lens) {
-                    CameraLens.FRONT -> Error.FrontFlashNotFound
-                    CameraLens.BACK -> Error.BackFlashNotFound
+            this is FlashlightSystemAction ->
+                if (!cameraAdapter.hasFlashFacing(this.lens)) {
+                    return when (lens) {
+                        CameraLens.FRONT -> Error.FrontFlashNotFound
+                        CameraLens.BACK -> Error.BackFlashNotFound
+                    }
                 }
-            }
 
             this is SwitchKeyboardSystemAction ->
                 if (!inputMethodAdapter.isImeEnabled(this.imeId)) {

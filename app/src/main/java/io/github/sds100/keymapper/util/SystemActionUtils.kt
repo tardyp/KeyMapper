@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.model.OptionType
 import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.data.model.SystemActionOption
+import io.github.sds100.keymapper.domain.actions.SystemActionCategory
 import io.github.sds100.keymapper.domain.actions.SystemActionId
 import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_AIRPLANE_MODE
 import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_BLUETOOTH
@@ -120,29 +121,140 @@ import java.util.*
 
 object SystemActionUtils {
 
-    /**
-     * Maps system action category ids to the string resource of their label
-     */
-    val CATEGORY_LABEL_MAP = mapOf(
-        CATEGORY_WIFI to R.string.system_action_cat_wifi,
-        CATEGORY_BLUETOOTH to R.string.system_action_cat_bluetooth,
-        CATEGORY_MOBILE_DATA to R.string.system_action_cat_mobile_data,
-        CATEGORY_NAVIGATION to R.string.system_action_cat_navigation,
-        CATEGORY_SCREEN_ROTATION to R.string.system_action_cat_screen_rotation,
-        CATEGORY_VOLUME to R.string.system_action_cat_volume,
-        CATEGORY_BRIGHTNESS to R.string.system_action_cat_brightness,
-        CATEGORY_STATUS_BAR to R.string.system_action_cat_status_bar,
-        CATEGORY_MEDIA to R.string.system_action_cat_media,
-        CATEGORY_FLASHLIGHT to R.string.system_action_cat_flashlight,
-        CATEGORY_KEYBOARD to R.string.system_action_cat_keyboard,
-        CATEGORY_NFC to R.string.system_action_cat_nfc,
-        CATEGORY_AIRPLANE_MODE to R.string.system_action_cat_airplane_mode,
-        CATEGORY_OTHER to R.string.system_action_cat_other
-    )
+    @StringRes
+    fun getCategoryLabel(category: SystemActionCategory): Int =
+        when (category) {
+            SystemActionCategory.WIFI -> R.string.system_action_cat_wifi
+            SystemActionCategory.BLUETOOTH -> R.string.system_action_cat_bluetooth
+            SystemActionCategory.MOBILE_DATA -> R.string.system_action_cat_mobile_data
+            SystemActionCategory.NAVIGATION -> R.string.system_action_cat_navigation
+            SystemActionCategory.SCREEN_ROTATION -> R.string.system_action_cat_screen_rotation
+            SystemActionCategory.VOLUME -> R.string.system_action_cat_volume
+            SystemActionCategory.BRIGHTNESS -> R.string.system_action_cat_brightness
+            SystemActionCategory.STATUS_BAR -> R.string.system_action_cat_status_bar
+            SystemActionCategory.MEDIA -> R.string.system_action_cat_media
+            SystemActionCategory.FLASHLIGHT -> R.string.system_action_cat_flashlight
+            SystemActionCategory.KEYBOARD -> R.string.system_action_cat_keyboard
+            SystemActionCategory.NFC -> R.string.system_action_cat_nfc
+            SystemActionCategory.AIRPLANE_MODE -> R.string.system_action_cat_airplane_mode
+            SystemActionCategory.OTHER -> R.string.system_action_cat_other
+        }
+
+    fun getCategory(id: SystemActionId): SystemActionCategory =
+        when (id) {
+            SystemActionId.TOGGLE_WIFI -> SystemActionCategory.WIFI
+            SystemActionId.ENABLE_WIFI -> SystemActionCategory.WIFI
+            SystemActionId.DISABLE_WIFI -> SystemActionCategory.WIFI
+            SystemActionId.TOGGLE_WIFI_ROOT -> SystemActionCategory.WIFI
+            SystemActionId.ENABLE_WIFI_ROOT -> SystemActionCategory.WIFI
+            SystemActionId.DISABLE_WIFI_ROOT -> SystemActionCategory.WIFI
+
+            SystemActionId.TOGGLE_BLUETOOTH -> SystemActionCategory.BLUETOOTH
+            SystemActionId.ENABLE_BLUETOOTH -> SystemActionCategory.BLUETOOTH
+            SystemActionId.DISABLE_BLUETOOTH -> SystemActionCategory.BLUETOOTH
+
+            SystemActionId.TOGGLE_MOBILE_DATA -> SystemActionCategory.MOBILE_DATA
+            SystemActionId.ENABLE_MOBILE_DATA -> SystemActionCategory.MOBILE_DATA
+            SystemActionId.DISABLE_MOBILE_DATA -> SystemActionCategory.MOBILE_DATA
+
+            SystemActionId.TOGGLE_AUTO_BRIGHTNESS -> SystemActionCategory.BRIGHTNESS
+            SystemActionId.DISABLE_AUTO_BRIGHTNESS -> SystemActionCategory.BRIGHTNESS
+            SystemActionId.ENABLE_AUTO_BRIGHTNESS -> SystemActionCategory.BRIGHTNESS
+            SystemActionId.INCREASE_BRIGHTNESS -> SystemActionCategory.BRIGHTNESS
+            SystemActionId.DECREASE_BRIGHTNESS -> SystemActionCategory.BRIGHTNESS
+
+            SystemActionId.TOGGLE_AUTO_ROTATE -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.ENABLE_AUTO_ROTATE -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.DISABLE_AUTO_ROTATE -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.PORTRAIT_MODE -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.LANDSCAPE_MODE -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.SWITCH_ORIENTATION -> SystemActionCategory.SCREEN_ROTATION
+            SystemActionId.CYCLE_ROTATIONS -> SystemActionCategory.SCREEN_ROTATION
+
+            SystemActionId.VOLUME_UP -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_DOWN -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_SHOW_DIALOG -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_DECREASE_STREAM -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_INCREASE_STREAM -> SystemActionCategory.VOLUME
+            SystemActionId.CYCLE_RINGER_MODE -> SystemActionCategory.VOLUME
+            SystemActionId.CHANGE_RINGER_MODE -> SystemActionCategory.VOLUME
+            SystemActionId.CYCLE_VIBRATE_RING -> SystemActionCategory.VOLUME
+            SystemActionId.TOGGLE_DND_MODE -> SystemActionCategory.VOLUME
+            SystemActionId.ENABLE_DND_MODE -> SystemActionCategory.VOLUME
+            SystemActionId.DISABLE_DND_MODE -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_UNMUTE -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_MUTE -> SystemActionCategory.VOLUME
+            SystemActionId.VOLUME_TOGGLE_MUTE -> SystemActionCategory.VOLUME
+
+            SystemActionId.EXPAND_NOTIFICATION_DRAWER -> SystemActionCategory.STATUS_BAR
+            SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> SystemActionCategory.STATUS_BAR
+            SystemActionId.EXPAND_QUICK_SETTINGS -> SystemActionCategory.STATUS_BAR
+            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER -> SystemActionCategory.STATUS_BAR
+            SystemActionId.COLLAPSE_STATUS_BAR -> SystemActionCategory.STATUS_BAR
+
+            SystemActionId.PAUSE_MEDIA -> SystemActionCategory.MEDIA
+            SystemActionId.PAUSE_MEDIA_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.PLAY_MEDIA -> SystemActionCategory.MEDIA
+            SystemActionId.PLAY_MEDIA_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.PLAY_PAUSE_MEDIA -> SystemActionCategory.MEDIA
+            SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.NEXT_TRACK -> SystemActionCategory.MEDIA
+            SystemActionId.NEXT_TRACK_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.PREVIOUS_TRACK -> SystemActionCategory.MEDIA
+            SystemActionId.PREVIOUS_TRACK_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.FAST_FORWARD -> SystemActionCategory.MEDIA
+            SystemActionId.FAST_FORWARD_PACKAGE -> SystemActionCategory.MEDIA
+            SystemActionId.REWIND -> SystemActionCategory.MEDIA
+            SystemActionId.REWIND_PACKAGE -> SystemActionCategory.MEDIA
+
+            SystemActionId.GO_BACK -> SystemActionCategory.NAVIGATION
+            SystemActionId.GO_HOME -> SystemActionCategory.NAVIGATION
+            SystemActionId.OPEN_RECENTS -> SystemActionCategory.NAVIGATION
+            SystemActionId.TOGGLE_SPLIT_SCREEN -> SystemActionCategory.NAVIGATION
+            SystemActionId.GO_LAST_APP -> SystemActionCategory.NAVIGATION
+            SystemActionId.OPEN_MENU -> SystemActionCategory.NAVIGATION
+
+            SystemActionId.TOGGLE_FLASHLIGHT -> SystemActionCategory.FLASHLIGHT
+            SystemActionId.ENABLE_FLASHLIGHT -> SystemActionCategory.FLASHLIGHT
+            SystemActionId.DISABLE_FLASHLIGHT -> SystemActionCategory.FLASHLIGHT
+
+            SystemActionId.ENABLE_NFC -> SystemActionCategory.NFC
+            SystemActionId.DISABLE_NFC -> SystemActionCategory.NFC
+            SystemActionId.TOGGLE_NFC -> SystemActionCategory.NFC
+
+            SystemActionId.MOVE_CURSOR_TO_END -> SystemActionCategory.KEYBOARD
+            SystemActionId.TOGGLE_KEYBOARD -> SystemActionCategory.KEYBOARD
+            SystemActionId.SHOW_KEYBOARD -> SystemActionCategory.KEYBOARD
+            SystemActionId.HIDE_KEYBOARD -> SystemActionCategory.KEYBOARD
+            SystemActionId.SHOW_KEYBOARD_PICKER -> SystemActionCategory.KEYBOARD
+            SystemActionId.SHOW_KEYBOARD_PICKER_ROOT -> SystemActionCategory.KEYBOARD
+            SystemActionId.TEXT_CUT -> SystemActionCategory.KEYBOARD
+            SystemActionId.TEXT_COPY -> SystemActionCategory.KEYBOARD
+            SystemActionId.TEXT_PASTE -> SystemActionCategory.KEYBOARD
+            SystemActionId.SELECT_WORD_AT_CURSOR -> SystemActionCategory.KEYBOARD
+            SystemActionId.SWITCH_KEYBOARD -> SystemActionCategory.KEYBOARD
+
+            SystemActionId.TOGGLE_AIRPLANE_MODE -> SystemActionCategory.AIRPLANE_MODE
+            SystemActionId.ENABLE_AIRPLANE_MODE -> SystemActionCategory.AIRPLANE_MODE
+            SystemActionId.DISABLE_AIRPLANE_MODE -> SystemActionCategory.AIRPLANE_MODE
+
+            SystemActionId.SCREENSHOT -> SystemActionCategory.OTHER
+            SystemActionId.SCREENSHOT_ROOT -> SystemActionCategory.OTHER
+            SystemActionId.OPEN_VOICE_ASSISTANT -> SystemActionCategory.OTHER
+            SystemActionId.OPEN_DEVICE_ASSISTANT -> SystemActionCategory.OTHER
+            SystemActionId.OPEN_CAMERA -> SystemActionCategory.OTHER
+            SystemActionId.LOCK_DEVICE -> SystemActionCategory.OTHER
+            SystemActionId.LOCK_DEVICE_ROOT -> SystemActionCategory.OTHER
+            SystemActionId.POWER_ON_OFF_DEVICE -> SystemActionCategory.OTHER
+            SystemActionId.SECURE_LOCK_DEVICE -> SystemActionCategory.OTHER
+            SystemActionId.CONSUME_KEY_EVENT -> SystemActionCategory.OTHER
+            SystemActionId.OPEN_SETTINGS -> SystemActionCategory.OTHER
+            SystemActionId.SHOW_POWER_MENU -> SystemActionCategory.OTHER
+        }
 
     @StringRes
-    fun getTitle(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int =
-        when (action.id) {
+    fun getTitle(id: SystemActionId): Int =
+        when (id) {
             SystemActionId.TOGGLE_WIFI -> R.string.action_toggle_wifi
             SystemActionId.ENABLE_WIFI -> R.string.action_enable_wifi
             SystemActionId.DISABLE_WIFI -> R.string.action_disable_wifi
@@ -241,8 +353,8 @@ object SystemActionUtils {
         }
 
     @DrawableRes
-    fun getIcon(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int? =
-        when (action.id) {
+    fun getIcon(id: SystemActionId): Int? =
+        when (id) {
             SystemActionId.TOGGLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.ENABLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.DISABLE_WIFI -> R.drawable.ic_outline_wifi_off_24
@@ -284,7 +396,7 @@ object SystemActionUtils {
             SystemActionId.EXPAND_NOTIFICATION_DRAWER -> null
             SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> null
             SystemActionId.EXPAND_QUICK_SETTINGS -> null
-            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER ->null
+            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER -> null
             SystemActionId.COLLAPSE_STATUS_BAR -> null
             SystemActionId.PAUSE_MEDIA -> R.drawable.ic_outline_pause_24
             SystemActionId.PAUSE_MEDIA_PACKAGE -> R.drawable.ic_outline_pause_24
@@ -321,7 +433,7 @@ object SystemActionUtils {
             SystemActionId.TEXT_CUT -> R.drawable.ic_content_cut
             SystemActionId.TEXT_COPY -> R.drawable.ic_content_copy
             SystemActionId.TEXT_PASTE -> R.drawable.ic_content_paste
-            SystemActionId.SELECT_WORD_AT_CURSOR ->null
+            SystemActionId.SELECT_WORD_AT_CURSOR -> null
             SystemActionId.SWITCH_KEYBOARD -> R.drawable.ic_outline_keyboard_24
             SystemActionId.TOGGLE_AIRPLANE_MODE -> R.drawable.ic_outline_airplanemode_active_24
             SystemActionId.ENABLE_AIRPLANE_MODE -> R.drawable.ic_outline_airplanemode_active_24
@@ -340,8 +452,8 @@ object SystemActionUtils {
             SystemActionId.SHOW_POWER_MENU -> R.drawable.ic_outline_power_settings_new_24
         }
 
-    fun getMinApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
-        return when (action.id) {
+    fun getMinApi(id: SystemActionId): Int {
+        return when (id) {
             SystemActionId.TOGGLE_SPLIT_SCREEN -> Build.VERSION_CODES.N
             SystemActionId.GO_LAST_APP -> Build.VERSION_CODES.N
 
@@ -393,16 +505,16 @@ object SystemActionUtils {
         }
     }
 
-    fun getMaxApi(action: io.github.sds100.keymapper.domain.actions.SystemAction): Int {
-        return when (action.id) {
+    fun getMaxApi(id: SystemActionId): Int {
+        return when (id) {
             SystemActionId.SHOW_KEYBOARD_PICKER -> Build.VERSION_CODES.P
 
             else -> Constants.MAX_API
         }
     }
 
-    fun getRequiredSystemFeatures(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
-        return when (action.id) {
+    fun getRequiredSystemFeatures(id: SystemActionId): List<String> {
+        return when (id) {
             SystemActionId.SECURE_LOCK_DEVICE
             -> listOf(PackageManager.FEATURE_DEVICE_ADMIN)
 
@@ -420,8 +532,8 @@ object SystemActionUtils {
         }
     }
 
-    fun getRequiredPermissions(action: io.github.sds100.keymapper.domain.actions.SystemAction): List<String> {
-        when (action.id) {
+    fun getRequiredPermissions(id: SystemActionId): List<String> {
+        when (id) {
             SystemActionId.TOGGLE_WIFI,
             SystemActionId.ENABLE_WIFI,
             SystemActionId.DISABLE_WIFI,
@@ -441,7 +553,7 @@ object SystemActionUtils {
             SystemActionId.PREVIOUS_TRACK_PACKAGE,
             SystemActionId.FAST_FORWARD_PACKAGE,
             SystemActionId.REWIND_PACKAGE,
-            -> Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE
+            -> return listOf(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
 
             SystemActionId.VOLUME_UP,
             SystemActionId.VOLUME_DOWN,
@@ -457,7 +569,7 @@ object SystemActionUtils {
             SystemActionId.TOGGLE_DND_MODE,
             SystemActionId.DISABLE_DND_MODE,
             SystemActionId.ENABLE_DND_MODE,
-            -> Manifest.permission.ACCESS_NOTIFICATION_POLICY
+            -> return listOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
 
             SystemActionId.TOGGLE_AUTO_ROTATE,
             SystemActionId.ENABLE_AUTO_ROTATE,
@@ -466,24 +578,24 @@ object SystemActionUtils {
             SystemActionId.LANDSCAPE_MODE,
             SystemActionId.SWITCH_ORIENTATION,
             SystemActionId.CYCLE_ROTATIONS,
-            -> Manifest.permission.WRITE_SETTINGS
+            -> return listOf(Manifest.permission.WRITE_SETTINGS)
 
             SystemActionId.TOGGLE_AUTO_BRIGHTNESS,
             SystemActionId.ENABLE_AUTO_BRIGHTNESS,
             SystemActionId.DISABLE_AUTO_BRIGHTNESS,
             SystemActionId.INCREASE_BRIGHTNESS,
             SystemActionId.DECREASE_BRIGHTNESS,
-            -> Manifest.permission.WRITE_SETTINGS
+            -> return listOf(Manifest.permission.WRITE_SETTINGS)
 
             SystemActionId.TOGGLE_FLASHLIGHT,
             SystemActionId.ENABLE_FLASHLIGHT,
             SystemActionId.DISABLE_FLASHLIGHT,
-            -> Manifest.permission.CAMERA
+            -> return listOf(Manifest.permission.CAMERA)
 
             SystemActionId.ENABLE_NFC,
             SystemActionId.DISABLE_NFC,
             SystemActionId.TOGGLE_NFC,
-            -> Constants.PERMISSION_ROOT
+            -> return listOf(Constants.PERMISSION_ROOT)
 
             SystemActionId.SHOW_KEYBOARD_PICKER ->
                 if (Build.VERSION.SDK_INT in arrayOf(
@@ -491,15 +603,11 @@ object SystemActionUtils {
                         Build.VERSION_CODES.P
                     )
                 ) {
-                    arrayOf(Constants.PERMISSION_ROOT)
-                } else {
-                    emptyArray()
+                    return listOf(Constants.PERMISSION_ROOT)
                 }
 
             SystemActionId.SWITCH_KEYBOARD -> if (!KeyboardUtils.CAN_ACCESSIBILITY_SERVICE_SWITCH_KEYBOARD) {
-                arrayOf(Manifest.permission.WRITE_SECURE_SETTINGS)
-            } else {
-                emptyArray()
+                return listOf(Manifest.permission.WRITE_SECURE_SETTINGS)
             }
 
             SystemActionId.TOGGLE_AIRPLANE_MODE,
@@ -508,19 +616,14 @@ object SystemActionUtils {
             -> Constants.PERMISSION_ROOT
 
             SystemActionId.SCREENSHOT -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                arrayOf(Constants.PERMISSION_ROOT)
-            } else {
-                emptyArray()
+                return listOf(Constants.PERMISSION_ROOT)
             }
-
             SystemActionId.LOCK_DEVICE -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                arrayOf(Constants.PERMISSION_ROOT)
-            } else {
-                emptyArray()
+                return listOf(Constants.PERMISSION_ROOT)
             }
 
-            SystemActionId.SECURE_LOCK_DEVICE -> arrayOf(Manifest.permission.BIND_DEVICE_ADMIN)
-            SystemActionId.POWER_ON_OFF_DEVICE -> arrayOf(Constants.PERMISSION_ROOT)
+            SystemActionId.SECURE_LOCK_DEVICE -> return listOf(Manifest.permission.BIND_DEVICE_ADMIN)
+            SystemActionId.POWER_ON_OFF_DEVICE -> return listOf(Constants.PERMISSION_ROOT)
         }
 
         return emptyList()

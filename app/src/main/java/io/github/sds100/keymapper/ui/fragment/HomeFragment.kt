@@ -28,7 +28,6 @@ import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
@@ -350,20 +349,14 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleScope.launchWhenResumed {
-            homeViewModel.state.collectLatest { state ->
-                if (state.multiSelecting) {
-                    appBar.replaceMenu(R.menu.menu_multi_select)
-                } else {
-                    appBar.replaceMenu(R.menu.menu_home)
-                }
-
-                if (state.showQuickStartGuideTapTarget) {
+            homeViewModel.onboardingState.collectLatest {
+                if (it.showQuickStartGuideTapTarget) {
                     QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
                         homeViewModel.approvedQuickStartGuideTapTarget()
                     }
                 }
 
-                if (state.showWhatsNew) {
+                if (it.showWhatsNew) {
                     val direction = NavAppDirections.actionGlobalOnlineFileFragment(
                         R.string.whats_new,
                         R.string.url_changelog
@@ -376,9 +369,24 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleScope.launchWhenResumed {
+            homeViewModel.tabsState.collectLatest {
+                binding.viewPager.isUserInputEnabled = it.enableViewPagerSwiping
+            }
+        }
+
+        viewLifecycleScope.launchWhenResumed {
+            homeViewModel.appBarState.collectLatest {
+                if (it == HomeAppBarState.MULTI_SELECTING) {
+                    binding.appBar.replaceMenu(R.menu.menu_multi_select)
+                } else {
+                    binding.appBar.replaceMenu(R.menu.menu_home)
+                }
+            }
+        }
+
+        viewLifecycleScope.launchWhenResumed {
             homeViewModel.navigateToCreateKeymapScreen.collectLatest {
-                val direction =
-                    HomeFragmentDirections.actionToConfigKeymap(ConfigKeymapViewModel.NEW_KEYMAP_ID)
+                val direction = HomeFragmentDirections.actionToConfigKeymap()
                 findNavController().navigate(direction)
             }
         }
@@ -386,6 +394,12 @@ class HomeFragment : Fragment() {
         viewLifecycleScope.launchWhenResumed {
             homeViewModel.showMenu.collectLatest {
                 findNavController().navigate(R.id.action_global_menuFragment)
+            }
+        }
+
+        viewLifecycleScope.launchWhenResumed {
+            homeViewModel.closeKeyMapper.collectLatest {
+                requireActivity().finish()
             }
         }
     }

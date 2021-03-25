@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.usecases
 
-import io.github.sds100.keymapper.domain.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.adapter.BluetoothMonitor
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.PrefDelegate

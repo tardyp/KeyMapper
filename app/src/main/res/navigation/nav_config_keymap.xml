@@ -12,8 +12,10 @@
         tools:layout="@layout/fragment_config_mapping">
 
         <argument
-            android:name="keymapId"
-            app:argType="long" />
+            android:name="keymapUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
 
         <action
             android:id="@+id/action_config_keymap_fragment_to_actionOptionsFragment"

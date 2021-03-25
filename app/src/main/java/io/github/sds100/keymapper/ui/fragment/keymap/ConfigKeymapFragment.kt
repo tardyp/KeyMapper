@@ -32,7 +32,13 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
         //only load the keymap if opening this fragment for the first time
         if (savedInstanceState == null) {
-            viewModel.loadKeymap(args.keymapId)
+            args.keymapUid.let {
+                if (it == null) {
+                    viewModel.loadNewKeymap()
+                } else {
+                    viewModel.loadKeymap(it)
+                }
+            }
         }
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->

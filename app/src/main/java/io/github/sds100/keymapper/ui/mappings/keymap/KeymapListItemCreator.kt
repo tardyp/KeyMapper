@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.models.ifIsAllowed
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
@@ -20,7 +21,7 @@ import io.github.sds100.keymapper.util.KeyEventUtils
  * Created by sds100 on 19/03/2021.
  */
 class KeymapListItemCreator(
-    private val getActionError: GetActionErrorUseCase,
+    getActionError: GetActionErrorUseCase,
     actionUiHelper: ActionUiHelper<KeymapAction>,
     constraintUiHelper: ConstraintUiHelper,
     getConstraintErrorUseCase: GetConstraintErrorUseCase,
@@ -33,11 +34,7 @@ class KeymapListItemCreator(
     resourceProvider
 ) {
 
-    fun map(
-        keymap: KeyMap,
-        isSelected: Boolean,
-        isSelectable: Boolean
-    ): KeymapListItemModel {
+    fun map(keymap: KeyMap): KeymapListItem.KeymapUiState {
         val midDot = getString(R.string.middot)
 
         val triggerDescription = buildString {
@@ -90,12 +87,14 @@ class KeymapListItemCreator(
             }
         }
 
+        val chipList = getChipList(keymap.actionList, keymap.constraintList, keymap.constraintMode)
+
         val extraInfo = buildString {
             if (!keymap.isEnabled) {
                 append(getString(R.string.disabled))
             }
 
-            if (keymap.actionList.any { getActionError.getError(it.data) != null }) {
+            if (chipList.any { it is ChipUi.Error }) {
                 if (this.isNotEmpty()) {
                     append(" $midDot ")
                 }
@@ -120,13 +119,11 @@ class KeymapListItemCreator(
             }
         }
 
-        return KeymapListItemModel(
+        return KeymapListItem.KeymapUiState(
             uid = keymap.uid,
-            chipList = getChipList(keymap.actionList, keymap.constraintList, keymap.constraintMode),
+            chipList = chipList,
             triggerDescription = triggerDescription,
             optionsDescription = optionsDescription,
-            isSelectable = isSelectable,
-            isSelected = isSelected,
             extraInfo = extraInfo,
         )
     }

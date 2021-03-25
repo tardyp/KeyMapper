@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
@@ -13,15 +12,16 @@ import io.github.sds100.keymapper.keymap
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemModel
+import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.util.*
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/02/2020.
  */
-class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
+class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
         InjectorUtils.provideHomeViewModel(requireContext())
@@ -44,14 +44,10 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
 //            )
         }
 
-    private val controller = KeymapController()
-
-    override val listItems: Flow<ListUiState<KeymapListItemModel>>
+    override val listItems: Flow<ListUiState<KeymapListItem>>
         get() = viewModel.state
 
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
-        binding.epoxyRecyclerView.adapter = controller.adapter
-
         viewLifecycleScope.launchWhenResumed {
             viewModel.launchConfigKeymap.collectLatest {
                 val direction = HomeFragmentDirections.actionToConfigKeymap(it)
@@ -62,38 +58,30 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItemModel>() {
 
     override fun populateList(
         recyclerView: EpoxyRecyclerView,
-        listItems: List<KeymapListItemModel>
+        listItems: List<KeymapListItem>
     ) {
-        controller.keymapList = listItems
-    }
-
-    override fun rebuildUiState() = viewModel.rebuildUiState()
-
-    inner class KeymapController : EpoxyController() {
-        var keymapList: List<KeymapListItemModel> = listOf()
-            set(value) {
-                field = value
-                requestModelBuild()
-            }
-
-        override fun buildModels() {
-            keymapList.forEach {
+        recyclerView.withModels {
+            listItems.forEach {
                 keymap {
-                    id(it.uid)
-                    model(it)
+                    id(it.keymapUiState.uid)
+                    keymapUiState(it.keymapUiState)
+
+                    selectionState(it.selectionUiState)
 
                     onChipClick(viewModel)
 
                     onCardClick { _ ->
-                        viewModel.onKeymapCardClick(it.uid)
+                        viewModel.onKeymapCardClick(it.keymapUiState.uid)
                     }
 
                     onCardLongClick { _ ->
-                        viewModel.onKeymapCardLongClick(it.uid)
+                        viewModel.onKeymapCardLongClick(it.keymapUiState.uid)
                         true
                     }
                 }
             }
         }
     }
+
+    override fun rebuildUiState() = viewModel.rebuildUiState()
 }

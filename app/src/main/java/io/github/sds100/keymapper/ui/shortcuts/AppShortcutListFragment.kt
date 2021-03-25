@@ -14,13 +14,13 @@ import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
+import io.github.sds100.keymapper.ui.onDialogResponse
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import splitties.toast.toast
-import timber.log.Timber
 
 /**
  * Created by sds100 on 29/03/2020.
@@ -65,19 +65,11 @@ class AppShortcutListFragment : SimpleRecyclerViewFragment<AppShortcutListItem>(
         }
 
         viewLifecycleScope.launchWhenResumed {
-            viewModel.createAppShortcutName.collectLatest {
-                Timber.e("collect")
-                val name = requireContext().editTextStringAlertDialogFlow(
-                    viewLifecycleOwner,
-                    str(R.string.dialog_title_create_shortcut_title),
-                    allowEmpty = false
+            viewModel.showDialog.collectLatest {
+                viewModel.onDialogResponse(
+                    it.key,
+                    it.ui.show(this@AppShortcutListFragment)
                 )
-                Timber.e("cancel")
-                Timber.e(name.toString())
-
-                name ?: return@collectLatest
-
-                viewModel.onCreateAppShortcutName(name)
             }
         }
     }

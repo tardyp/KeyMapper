@@ -62,8 +62,16 @@ class ActionListItemCreator<A : Action>(
 
         return ActionListItem(
             id = action.uid,
-            tintType = icon?.tintType ?: TintType.ERROR,
-            icon = icon?.drawable ?: getDrawable(R.drawable.ic_baseline_error_outline_24),
+            tintType = if (error != null) {
+                TintType.ERROR
+            } else {
+                icon?.tintType ?: TintType.NONE
+            },
+            icon = if (error != null) {
+                getDrawable(R.drawable.ic_baseline_error_outline_24)
+            } else {
+                icon?.drawable
+            },
             title = title,
             extraInfo = extraInfo,
             errorMessage = error?.getFullMessage(this),

@@ -8,8 +8,11 @@ import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.util.KeyboardUtils
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.domain.ime.ImeInfo
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.result.success
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
@@ -29,8 +32,7 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
 
             when (intent.action) {
                 Intent.ACTION_INPUT_METHOD_CHANGED -> {
-                    chosenImePackageName.value =
-                        KeyboardUtils.getChosenInputMethodPackageName(ctx).valueOrNull()
+                    chosenIme.value = getChosenIme()
                 }
             }
         }
@@ -38,9 +40,7 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
 
     private val ctx = context.applicationContext
 
-    override val chosenImePackageName = MutableStateFlow(
-        getChosenInputMethodPackageName().valueOrNull()
-    )
+    override val chosenIme = MutableStateFlow<ImeInfo?>(getChosenIme())
 
     private val inputMethodManager: InputMethodManager
         get() = ctx.getSystemService()!!
@@ -67,11 +67,17 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
     }
 
     override fun isImeChosen(imeId: String): Boolean {
-        return getChosenImeId() == imeId
+        return chosenIme.value?.id == imeId
     }
 
     override fun chooseIme(imeId: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun getEnabledInputMethods(): List<ImeInfo> {
+        return inputMethodManager.enabledInputMethodList.map {
+            ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString())
+        }
     }
 
     override fun getImeId(packageName: String): Result<String> {
@@ -109,10 +115,12 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
             .map { it.split(';')[0] }
     }
 
-    private fun getChosenInputMethodPackageName(): Result<String> {
+    private fun getChosenIme(): ImeInfo {
         val chosenImeId = getChosenImeId()
 
-        return getImePackageName(chosenImeId)
+        return inputMethodManager.inputMethodList
+            .single { it.id == chosenImeId }
+            .let { ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString()) }
     }
 
     private fun getChosenImeId(): String {

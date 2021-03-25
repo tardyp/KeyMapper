@@ -96,7 +96,7 @@ class DefaultKeymapRepository internal constructor(
 
     override fun enableKeymapById(vararg id: Long) {
         coroutineScope.launch {
-            keymapDao.enableKeymapById(*id)
+//            keymapDao.enableKeymapById(*id)
 
             requestBackup()
         }
@@ -104,7 +104,7 @@ class DefaultKeymapRepository internal constructor(
 
     override fun disableKeymapById(vararg id: Long) {
         coroutineScope.launch {
-            keymapDao.disableKeymapById(*id)
+//            keymapDao.disableKeymapById(*id)
 
             requestBackup()
         }
@@ -112,7 +112,7 @@ class DefaultKeymapRepository internal constructor(
 
     override fun deleteKeymap(vararg id: Long) {
         coroutineScope.launch {
-            keymapDao.deleteById(*id)
+//            keymapDao.deleteById(*id)
 
             requestBackup()
         }

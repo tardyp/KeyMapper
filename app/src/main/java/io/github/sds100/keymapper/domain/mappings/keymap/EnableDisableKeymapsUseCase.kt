@@ -7,12 +7,12 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 class EnableDisableKeymapsUseCaseImpl(
     private val repository: KeymapRepository,
 ) : EnableDisableKeymapsUseCase {
-    override fun enable(vararg id: Long) {
-        repository.enableById(*id)
+    override fun enable(vararg uid: String) {
+        repository.enableById(*uid)
     }
 
-    override fun disable(vararg id: Long) {
-        repository.disableById(*id)
+    override fun disable(vararg uid: String) {
+        repository.disableById(*uid)
     }
 
     override fun enableAll() {
@@ -25,8 +25,8 @@ class EnableDisableKeymapsUseCaseImpl(
 }
 
 interface EnableDisableKeymapsUseCase {
-    fun enable(vararg id: Long)
-    fun disable(vararg id: Long)
+    fun enable(vararg uid: String)
+    fun disable(vararg uid: String)
 
     fun enableAll()
     fun disableAll()
