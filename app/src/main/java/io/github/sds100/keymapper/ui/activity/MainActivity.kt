@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        keyActionTypeViewModel.keyEvent.value = event
+        event?.let { keyActionTypeViewModel.onKeyDown(it.keyCode) }
 
         return super.onKeyUp(keyCode, event)
     }

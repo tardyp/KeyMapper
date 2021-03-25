@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentKeyActionTypeBinding
 import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.viewLifecycleScope
 
 /**
  * Created by sds100 on 30/03/2020.
@@ -53,16 +52,13 @@ class KeyActionTypeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleScope.launchWhenResumed {
-            binding.viewModel = viewModel
+        binding.viewModel = viewModel
 
-            viewModel.clearKey()
+        viewModel.clearKey()
 
-            binding.setOnDoneClick {
-                setFragmentResult(REQUEST_KEY,
-                    bundleOf(EXTRA_KEYCODE to viewModel.keyEvent.value?.keyCode))
-                findNavController().navigateUp()
-            }
+        binding.setOnDoneClick {
+            setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_KEYCODE to viewModel.keyCode.value))
+            findNavController().navigateUp()
         }
     }
 
