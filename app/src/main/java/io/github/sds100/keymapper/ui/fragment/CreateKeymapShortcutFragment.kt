@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
@@ -12,7 +14,6 @@ import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
-import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -64,27 +65,11 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
                 is EnableAccessibilityServicePrompt ->
                     binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
 
-                is BuildKeymapListModels -> viewLifecycleScope.launchWhenResumed {
+                is BuildKeymapListModels -> viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                     viewModel.setModelList(buildModelList(event))
                 }
 
-                is CreateKeymapShortcutEvent -> viewLifecycleScope.launch {
-//                    val shortcutInfo = KeymapShortcutUtils.createShortcut(
-//                        requireContext(),
-//                        viewLifecycleOwner,
-//                        event.uuid,
-//                        event.actionList,
-//                        event.deviceInfoList,
-//                        event.showDeviceDescriptors
-//                    )
-//
-//                    ShortcutManagerCompat.createShortcutResultIntent(requireContext(), shortcutInfo)
-//                        .apply {
-//                            requireActivity().setResult(Activity.RESULT_OK, this)
-//                            requireActivity().finish()
-//                        }
-                    //TODO
-                }
+                is CreateKeymapShortcutEvent -> TODO()
             }
         })
     }

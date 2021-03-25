@@ -81,7 +81,7 @@ class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
     ).apply {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val model = TabFragmentModel(R.string.action_type_tap_coordinate, null) {
-                TapCoordinateActionTypeFragment()
+                PickDisplayCoordinateFragment()
             }
 
             add(5, model)

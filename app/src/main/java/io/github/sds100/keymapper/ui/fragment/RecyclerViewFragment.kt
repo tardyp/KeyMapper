@@ -11,6 +11,8 @@ import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.savedstate.SavedStateRegistry
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -18,7 +20,6 @@ import com.google.android.material.bottomappbar.BottomAppBar
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.observeCurrentDestinationLiveData
-import io.github.sds100.keymapper.util.viewLifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -109,7 +110,7 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             listItems.collectLatest { state ->
                 when (state) {
                     ListUiState.Empty -> {

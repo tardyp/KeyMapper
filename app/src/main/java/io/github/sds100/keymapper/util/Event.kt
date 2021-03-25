@@ -53,7 +53,6 @@ class ChooseBluetoothDevice : Event()
 class OpenUrl(val url: String) : Event()
 class OpenUrlRes(@StringRes val url: Int) : Event()
 class CloseDialog : Event()
-class SelectScreenshot : Event()
 class ChooseKeycode : Event()
 
 //TODO delete

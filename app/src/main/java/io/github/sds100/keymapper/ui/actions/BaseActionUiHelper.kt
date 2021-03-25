@@ -208,15 +208,15 @@ abstract class BaseActionUiHelper<A>(
 
         is PhoneCallAction -> getString(R.string.action_type_phone_call, action.number).success()
 
-        is TapCoordinateAction -> if (action.description != null) {
-            getString(
-                R.string.description_tap_coordinate_with_description,
-                arrayOf(action.x, action.y, action.description)
-            ).success()
-        } else {
+        is TapCoordinateAction -> if (action.description.isNullOrBlank()) {
             getString(
                 R.string.description_tap_coordinate_default,
                 arrayOf(action.x, action.y)
+            ).success()
+        } else {
+            getString(
+                R.string.description_tap_coordinate_with_description,
+                arrayOf(action.x, action.y, action.description)
             ).success()
         }
 

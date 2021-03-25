@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.AppShortcutListItem
@@ -58,13 +60,13 @@ class AppShortcutListFragment : SimpleRecyclerViewFragment<AppShortcutListItem>(
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         super.subscribeUi(binding)
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.returnResult.collectLatest {
                 returnResult(EXTRA_RESULT to Json.encodeToString(it))
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.showDialog.collectLatest {
                 viewModel.onDialogResponse(
                     it.key,

@@ -10,6 +10,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.checkbox
@@ -84,7 +86,7 @@ class ConfigKeyEventFragment : Fragment() {
         })
 
         viewModel.modifierKeyModels.observe(viewLifecycleOwner, { models ->
-            viewLifecycleScope.launchWhenResumed {
+            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 binding.epoxyRecyclerViewModifiers.withModels {
                     models.forEach {
                         checkbox {
@@ -120,7 +122,7 @@ class ConfigKeyEventFragment : Fragment() {
         })
 
         viewModel.deviceInfoModels.observe(viewLifecycleOwner, { models ->
-            viewLifecycleScope.launchWhenResumed {
+            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 ArrayAdapter<String>(
                     requireContext(),
                     R.layout.dropdown_menu_popup_item,

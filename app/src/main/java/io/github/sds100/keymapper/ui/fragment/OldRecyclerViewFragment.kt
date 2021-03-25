@@ -11,6 +11,8 @@ import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.savedstate.SavedStateRegistry
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -86,7 +88,7 @@ abstract class OldRecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment(
                 when (model) {
                     is Empty -> {
 
-                        viewLifecycleScope.launchWhenResumed {
+                        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                             populateList(binding, null)
                         }
 
@@ -96,7 +98,7 @@ abstract class OldRecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment(
                     is Data -> {
                         modelState.viewState.loading()
 
-                        viewLifecycleScope.launchWhenResumed {
+                        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                             populateList(binding, model.data)
 
                             modelState.viewState.populated()

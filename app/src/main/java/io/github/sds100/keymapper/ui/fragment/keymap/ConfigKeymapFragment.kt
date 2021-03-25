@@ -3,6 +3,8 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
@@ -64,7 +66,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.createLauncherShortcutLabel.collectLatest {
                 val label = requireContext().editTextStringAlertDialog(
                     viewLifecycleOwner,

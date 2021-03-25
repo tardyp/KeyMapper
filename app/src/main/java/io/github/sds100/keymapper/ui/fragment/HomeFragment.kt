@@ -12,7 +12,9 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
@@ -36,7 +38,6 @@ import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -267,15 +268,13 @@ class HomeFragment : Fragment() {
             }
 
             setEnableImeService {
-                viewLifecycleScope.launchWhenResumed {
+                viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
 
                     KeyboardUtils.enableCompatibleInputMethods(requireContext())
 
-                    viewLifecycleScope.launch {
-                        delay(3000)
+                    delay(3000)
 
-                        updateStatusLayouts()
-                    }
+                    updateStatusLayouts()
                 }
             }
 
@@ -336,7 +335,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            viewLifecycleScope.launchWhenResumed {
+            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 homeViewModel.fixFailure.collectLatest {
                     coordinatorLayout.showFixErrorSnackBar(
                         requireContext(),
@@ -348,7 +347,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.onboardingState.collectLatest {
                 if (it.showQuickStartGuideTapTarget) {
                     QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
@@ -368,13 +367,13 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.tabsState.collectLatest {
                 binding.viewPager.isUserInputEnabled = it.enableViewPagerSwiping
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.appBarState.collectLatest {
                 if (it == HomeAppBarState.MULTI_SELECTING) {
                     binding.appBar.replaceMenu(R.menu.menu_multi_select)
@@ -384,20 +383,20 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.navigateToCreateKeymapScreen.collectLatest {
                 val direction = HomeFragmentDirections.actionToConfigKeymap()
                 findNavController().navigate(direction)
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.showMenu.collectLatest {
                 findNavController().navigate(R.id.action_global_menuFragment)
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.closeKeyMapper.collectLatest {
                 requireActivity().finish()
             }

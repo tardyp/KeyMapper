@@ -3,6 +3,8 @@ package io.github.sds100.keymapper.ui.fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
@@ -20,7 +22,6 @@ import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.actions.ActionListItem
-import io.github.sds100.keymapper.util.viewLifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -64,7 +65,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 //            openActionOptionsFragment(it)
 //        })
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             actionListViewModel.chooseAction.collectLatest {
                 val direction =
                     NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)

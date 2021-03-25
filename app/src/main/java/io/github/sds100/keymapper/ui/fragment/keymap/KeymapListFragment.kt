@@ -2,6 +2,8 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
@@ -48,7 +50,8 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
         get() = viewModel.state
 
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
-        viewLifecycleScope.launchWhenResumed {
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.launchConfigKeymap.collectLatest {
                 val direction = HomeFragmentDirections.actionToConfigKeymap(it)
                 findNavController().navigate(direction)

@@ -1,6 +1,8 @@
 package io.github.sds100.keymapper.ui.utils
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.checkbox
 import io.github.sds100.keymapper.domain.utils.Defaultable
@@ -8,7 +10,6 @@ import io.github.sds100.keymapper.slider
 import io.github.sds100.keymapper.ui.CheckBoxListItem
 import io.github.sds100.keymapper.ui.SliderListItem
 import io.github.sds100.keymapper.util.editTextNumberAlertDialog
-import io.github.sds100.keymapper.util.viewLifecycleScope
 
 /**
  * Created by sds100 on 20/03/2021.
@@ -54,7 +55,7 @@ fun EpoxyController.configuredSlider(
             }
 
             onSliderValueClickListener { _ ->
-                viewLifecycleScope.launchWhenResumed {
+                viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                     val newValue = requireContext().editTextNumberAlertDialog(
                         viewLifecycleOwner,
                         hint = model.label,

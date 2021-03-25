@@ -7,15 +7,13 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.util.Converter" />
-
-        <variable
-            name="onDoneClick"
-            type="View.OnClickListener" />
-
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.TapCoordinateActionTypeViewModel" />
+            type="io.github.sds100.keymapper.data.viewmodel.PickDisplayCoordinateViewModel" />
+
+        <variable
+            name="onSelectScreenshotClick"
+            type="View.OnClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,7 +52,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="@={Converter.intToString(viewModel.x)}"
+                        android:onTextChanged="@{(string, start, before, count) -> viewModel.setX(string.toString())}"
+                        android:text="@{viewModel.xString}"
                         tools:text="241" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -78,7 +77,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="@={Converter.intToString(viewModel.y)}"
+                        android:onTextChanged="@{(string, start, before, count) -> viewModel.setY(string.toString())}"
+                        android:text="@{viewModel.yString}"
                         tools:text="241" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -101,8 +101,8 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:onClick="@{() -> viewModel.selectScreenshot()}"
-                    android:text="Select screenshot"
+                    android:onClick="@{onSelectScreenshotClick}"
+                    android:text="@string/button_pick_coordinate_select_screenshot"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -132,8 +132,8 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:enabled='@{viewModel.isValid() ? true : false}'
-            android:onClick="@{onDoneClick}"
+            android:enabled='@{viewModel.isDoneButtonEnabled()}'
+            android:onClick="@{(v) -> viewModel.onDoneClick()}"
             android:text="@string/button_done"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

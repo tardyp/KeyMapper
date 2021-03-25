@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import com.github.appintro.AppIntro2
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
@@ -182,7 +184,7 @@ class BatteryOptimisationSlide : AppIntroScrollableFragment() {
     override fun onResume() {
         super.onResume()
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             invalidate()
         }
     }

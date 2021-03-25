@@ -116,10 +116,10 @@ class ChooseActionFragment : Fragment() {
             KeyEventAction(keyCode)
         }
 
-        createActionOnResult(TapCoordinateActionTypeFragment.REQUEST_KEY) {
-            val x = it.getInt(TapCoordinateActionTypeFragment.EXTRA_X)
-            val y = it.getInt(TapCoordinateActionTypeFragment.EXTRA_Y)
-            val description = it.getString(TapCoordinateActionTypeFragment.EXTRA_DESCRIPTION)
+        createActionOnResult(PickDisplayCoordinateFragment.REQUEST_KEY) {
+            val x = it.getInt(PickDisplayCoordinateFragment.EXTRA_X)
+            val y = it.getInt(PickDisplayCoordinateFragment.EXTRA_Y)
+            val description = it.getString(PickDisplayCoordinateFragment.EXTRA_DESCRIPTION)
 
             TapCoordinateAction(x, y, description)
         }

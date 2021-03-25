@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
@@ -19,7 +21,10 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerViewModel
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.FragmentInfo
+import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.collectWhenStarted
+import io.github.sds100.keymapper.util.str
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -78,7 +83,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                 }
             }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             triggerViewModel.state.collectLatest { state ->
                 if (state.showParallelTriggerOrderExplanation
                     && parallelTriggerOrderDialog != null

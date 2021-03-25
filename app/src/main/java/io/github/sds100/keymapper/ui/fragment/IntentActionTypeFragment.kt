@@ -13,6 +13,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.R
@@ -158,7 +160,7 @@ class IntentActionTypeFragment : Fragment() {
 
         viewModel.eventStream.observe(viewLifecycleOwner, { event ->
             when (event) {
-                is BuildIntentExtraListItemModels -> viewLifecycleScope.launchWhenResumed {
+                is BuildIntentExtraListItemModels -> viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                     val models = event.extraModels.map { it.toListItemModel() }
                     viewModel.setListItemModels(models)
                 }
@@ -175,7 +177,7 @@ class IntentActionTypeFragment : Fragment() {
 
     private fun subscribeExtrasList() {
         viewModel.extrasListItemModels.observe(viewLifecycleOwner, { state ->
-            viewLifecycleScope.launchWhenResumed {
+            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 binding.epoxyRecyclerViewExtras.withModels {
 
                     val models = if (state is Data) {

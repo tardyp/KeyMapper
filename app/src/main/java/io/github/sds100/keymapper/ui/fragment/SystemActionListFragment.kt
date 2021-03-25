@@ -1,6 +1,8 @@
 package io.github.sds100.keymapper.ui.fragment
 
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
@@ -54,7 +56,7 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         super.subscribeUi(binding)
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.state.collectLatest { state ->
                 binding.caption = if (state.showUnsupportedActionsMessage) {
                     str(R.string.your_device_doesnt_support_some_actions)
@@ -64,7 +66,7 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.showDialog.collectLatest {
                 viewModel.onDialogResponse(
                     it.key,
@@ -73,7 +75,7 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.returnResult.collectLatest {
                 returnResult(EXTRA_SYSTEM_ACTION to Json.encodeToString(it))
             }

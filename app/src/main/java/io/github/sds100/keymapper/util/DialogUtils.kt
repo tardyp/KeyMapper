@@ -173,7 +173,7 @@ suspend fun Context.editTextStringAlertDialogFlow(
 
     alertDialog.show()
 
-    lifecycleOwner.lifecycleScope.launchWhenResumed {
+    lifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
         text.collectLatest {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                 if (allowEmpty) {

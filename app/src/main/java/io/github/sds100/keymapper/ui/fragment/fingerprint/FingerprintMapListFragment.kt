@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
@@ -100,7 +102,7 @@ class FingerprintMapListFragment
             {
                 when (it) {
                     is BuildFingerprintMapModels -> {
-                        viewLifecycleScope.launchWhenResumed {
+                        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                             //TODO
 //                            viewModel.setModels(buildModels(it))
                         }

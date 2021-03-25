@@ -2,8 +2,10 @@ package io.github.sds100.keymapper.util
 
 import android.content.Context
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.databinding.ViewDataBinding
 import androidx.navigation.NavController
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.ui.SnackBarUi
 import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.RecoverableError
@@ -40,5 +42,17 @@ fun CoordinatorLayout.showFixErrorSnackBar(
         }
 
         show()
+    }
+}
+
+fun ViewDataBinding.showSnackBar(snackBarUi: SnackBarUi) {
+    if (snackBarUi.long) {
+        root.longSnack(snackBarUi.title) {
+            show()
+        }
+    } else {
+        root.snack(snackBarUi.title) {
+            show()
+        }
     }
 }

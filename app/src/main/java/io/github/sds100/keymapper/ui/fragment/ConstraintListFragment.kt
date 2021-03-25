@@ -2,13 +2,14 @@ package io.github.sds100.keymapper.ui.fragment
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.constraint
 import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
-import io.github.sds100.keymapper.util.viewLifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -47,7 +48,7 @@ abstract class ConstraintListFragment
 //            findNavController().navigate(direction) //TODO
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             constraintListViewModel.showToast.collectLatest {
                 toast(it)
             }

@@ -103,8 +103,10 @@ object InjectorUtils {
         return UrlActionTypeViewModel.Factory()
     }
 
-    fun provideTapCoordinateActionTypeViewModel(): TapCoordinateActionTypeViewModel.Factory {
-        return TapCoordinateActionTypeViewModel.Factory()
+    fun provideTapCoordinateActionTypeViewModel(context: Context): PickDisplayCoordinateViewModel.Factory {
+        return PickDisplayCoordinateViewModel.Factory(
+            ServiceLocator.resourceProvider(context)
+        )
     }
 
     fun provideSystemActionListViewModel(context: Context): SystemActionListViewModel.Factory {

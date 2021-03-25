@@ -9,6 +9,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
@@ -93,7 +95,7 @@ abstract class ConfigMappingFragment : Fragment() {
             tab.text = tabTitleRes?.let { str(it) }
         }.attach()
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             binding.invalidateHelpMenuItemVisibility(
                 fragmentInfoList,
                 binding.viewPager.currentItem
@@ -141,13 +143,13 @@ abstract class ConfigMappingFragment : Fragment() {
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.enableAccessibilityServicePrompt.collectLatest {
                 binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
             }
         }
 
-        viewLifecycleScope.launchWhenResumed {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.fixError.collectLatest {
                 binding.coordinatorLayout.showFixErrorSnackBar(
                     requireContext(),
