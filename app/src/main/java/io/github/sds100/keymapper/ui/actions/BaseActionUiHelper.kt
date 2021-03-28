@@ -33,47 +33,44 @@ abstract class BaseActionUiHelper<A>(
         is OpenAppShortcutAction -> Success(action.shortcutTitle)
 
         is KeyEventAction -> {
-            val key = if (action.keyCode > KeyEvent.getMaxKeyCode()) {
+            val keyCodeString = if (action.keyCode > KeyEvent.getMaxKeyCode()) {
                 "Key Code ${action.keyCode}"
             } else {
                 KeyEvent.keyCodeToString(action.keyCode)
             }
 
-            val metaStateString = buildString {
+            //only a key code can be inputted through the shell
+            if (action.useShell) {
+                getString(R.string.description_keyevent_through_shell, keyCodeString).success()
 
-                KeyEventUtils.MODIFIER_LABELS.entries.forEach {
-                    val modifier = it.key
-                    val labelRes = it.value
+            } else {
 
-                    if (action.metaState.hasFlag(modifier)) {
-                        append("${getString(labelRes)} + ")
+                val metaStateString = buildString {
+
+                    KeyEventUtils.MODIFIER_LABELS.entries.forEach {
+                        val modifier = it.key
+                        val labelRes = it.value
+
+                        if (action.metaState.hasFlag(modifier)) {
+                            append("${getString(labelRes)} + ")
+                        }
                     }
                 }
-            }
 
-            val title = if (action.device != null) {
+                val title = if (action.device != null) {
 
-                val strRes = if (action.useShell) {
-                    R.string.description_keyevent_from_device_through_shell
+                    getString(
+                        R.string.description_keyevent_from_device,
+                        arrayOf(metaStateString, keyCodeString, action.device.name)
+                    )
                 } else {
-                    R.string.description_keyevent_from_device
+                    getString(
+                        R.string.description_keyevent,
+                        args = arrayOf(metaStateString, keyCodeString)
+                    )
                 }
-
-                getString(
-                    strRes,
-                    arrayOf(metaStateString, key, action.device.name)
-                )
-            } else {
-                val strRes = if (action.useShell) {
-                    R.string.description_keyevent_through_shell
-                } else {
-                    R.string.description_keyevent
-                }
-
-                getString(strRes, args = arrayOf(metaStateString, key))
+                Success(title)
             }
-
-            Success(title)
         }
 
         is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action.id)))

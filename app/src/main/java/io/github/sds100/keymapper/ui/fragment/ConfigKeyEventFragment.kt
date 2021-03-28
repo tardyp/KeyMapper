@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
@@ -16,9 +15,10 @@ import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.checkbox
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
-import io.github.sds100.keymapper.databinding.FragmentKeyeventActionTypeBinding
+import io.github.sds100.keymapper.databinding.FragmentConfigKeyEventBinding
+import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.getFullMessage
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 30/03/2020.
@@ -27,11 +27,7 @@ import io.github.sds100.keymapper.util.result.getFullMessage
 class ConfigKeyEventFragment : Fragment() {
     companion object {
         const val REQUEST_KEY = "request_key_event"
-        const val EXTRA_KEYCODE = "extra_keycode"
-        const val EXTRA_META_STATE = "extra_meta_state"
-        const val EXTRA_USE_SHELL = "extra_use_shell"
-        const val EXTRA_DEVICE_DESCRIPTOR = "extra_device_descriptor"
-        const val EXTRA_DEVICE_NAME = "extra_device_name"
+        const val EXTRA_RESULT = "extra_result"
     }
 
     private val viewModel: ConfigKeyEventViewModel by activityViewModels {
@@ -41,8 +37,8 @@ class ConfigKeyEventFragment : Fragment() {
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
      */
-    private var _binding: FragmentKeyeventActionTypeBinding? = null
-    val binding: FragmentKeyeventActionTypeBinding
+    private var _binding: FragmentConfigKeyEventBinding? = null
+    val binding: FragmentConfigKeyEventBinding
         get() = _binding!!
 
     override fun onCreateView(
@@ -50,7 +46,7 @@ class ConfigKeyEventFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        FragmentKeyeventActionTypeBinding.inflate(inflater, container, false).apply {
+        FragmentConfigKeyEventBinding.inflate(inflater, container, false).apply {
 
             lifecycleOwner = viewLifecycleOwner
             _binding = this
@@ -64,65 +60,38 @@ class ConfigKeyEventFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        binding.setOnDoneClick {
-            setFragmentResult(REQUEST_KEY,
-                bundleOf(
-                    EXTRA_KEYCODE to viewModel.keyCode.value?.toInt(),
-                    EXTRA_META_STATE to viewModel.metaState.value,
-                    EXTRA_USE_SHELL to viewModel.useShell.value
-                ).apply {
-                    viewModel.chosenDevice.value?.let {
-                        putString(EXTRA_DEVICE_DESCRIPTOR, it.descriptor)
-                        putString(EXTRA_DEVICE_NAME, it.name)
-                    }
-                }
-            )
-
-            findNavController().navigateUp()
+        binding.setOnChooseKeyCodeClick {
+            findNavController().navigate(ChooseActionFragmentDirections.actionChooseActionFragmentToKeycodeListFragment())
         }
 
-        viewModel.failure.observe(viewLifecycleOwner, {
-            binding.textInputLayoutKeyCode.error = it?.getFullMessage(requireContext())
-        })
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.returnResult.collectLatest {
+                setFragmentResult(REQUEST_KEY,
+                    Bundle().apply {
+                        putJsonSerializable(EXTRA_RESULT, it)
+                    }
+                )
 
-        viewModel.modifierKeyModels.observe(viewLifecycleOwner, { models ->
-            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+                findNavController().navigateUp()
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.state.collectLatest { state ->
                 binding.epoxyRecyclerViewModifiers.withModels {
-                    models.forEach {
+                    state.modifierListItems.forEach {
                         checkbox {
                             id(it.id)
-                            primaryText(str(it.label))
+                            primaryText(it.label)
                             isChecked(it.isChecked)
 
-                            onCheckedChange { view, isChecked ->
-                                viewModel.setModifierKey(it.id.toInt(), isChecked)
+                            onCheckedChange { _, isChecked ->
+                                viewModel.setModifierKeyChecked(it.id.toInt(), isChecked)
                             }
                         }
                     }
                 }
-            }
-        })
 
-        viewModel.chosenDevice.observe(viewLifecycleOwner, {
-            val text: String = TODO()
-
-            binding.dropdownDeviceId.setText(text, false)
-        })
-
-        viewModel.eventStream.observe(viewLifecycleOwner, {
-            when (it) {
-                is ChooseKeycode -> {
-                    val direction = ChooseActionFragmentDirections
-                        .actionChooseActionFragmentToKeycodeListFragment()
-
-                    findNavController().navigate(direction)
-                }
-
-            }
-        })
-
-        viewModel.deviceInfoModels.observe(viewLifecycleOwner, { models ->
-            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 ArrayAdapter<String>(
                     requireContext(),
                     R.layout.dropdown_menu_popup_item,
@@ -131,19 +100,16 @@ class ConfigKeyEventFragment : Fragment() {
                     clear()
                     add(str(R.string.from_no_device))
 
-                    models.forEach {
-                        //TODO fix
-//                        if (viewModel.showDeviceDescriptors) {
-//                            add("${it.name} ${it.descriptor.substring(0..4)}")
-//                        } else {
-//                            add(it.name)
-//                        }
+                    state.deviceListItems.forEach {
+                        add(it.name)
                     }
 
                     binding.dropdownDeviceId.setAdapter(this)
                 }
+
+                binding.textInputLayoutKeyCode.error = state.keyCodeErrorMessage
             }
-        })
+        }
 
         binding.dropdownDeviceId.apply {
             //set the default value
@@ -180,6 +146,12 @@ class ConfigKeyEventFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.rebuildUiState()
     }
 
     override fun onDestroyView() {

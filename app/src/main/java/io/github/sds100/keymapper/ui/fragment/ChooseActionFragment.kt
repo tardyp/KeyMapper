@@ -20,8 +20,8 @@ import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.devices.DeviceInfo
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
+import io.github.sds100.keymapper.ui.keyevent.ConfigKeyEventResult
 import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
 import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
 import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutResult
@@ -78,20 +78,12 @@ class ChooseActionFragment : Fragment() {
         }
 
         createActionOnResult(ConfigKeyEventFragment.REQUEST_KEY) { bundle ->
-            val keyCode = bundle.getInt(ConfigKeyEventFragment.EXTRA_KEYCODE)
-            val metaState = bundle.getInt(ConfigKeyEventFragment.EXTRA_META_STATE)
-            val deviceDescriptor =
-                bundle.getString(ConfigKeyEventFragment.EXTRA_DEVICE_DESCRIPTOR)
-            val deviceName = bundle.getString(ConfigKeyEventFragment.EXTRA_DEVICE_NAME)
-            val useShell = bundle.getBoolean(ConfigKeyEventFragment.EXTRA_USE_SHELL)
+            val result =
+                bundle.getJsonSerializable<ConfigKeyEventResult>(ConfigKeyEventFragment.EXTRA_RESULT)
 
-            val device: DeviceInfo? = if (deviceDescriptor != null && deviceName != null) {
-                DeviceInfo(deviceDescriptor, deviceName)
-            } else {
-                null
-            }
+            result!!
 
-            KeyEventAction(keyCode, metaState, useShell, device)
+            KeyEventAction(result.keyCode, result.metaState, result.useShell, result.device)
         }
 
         createActionOnResult(TextBlockActionTypeFragment.REQUEST_KEY) {
@@ -146,7 +138,7 @@ class ChooseActionFragment : Fragment() {
             }
 
             result.getInt(KeyCodeListFragment.EXTRA_KEYCODE).let {
-                keyEventViewModel.keyCode.value = it.toString()
+                keyEventViewModel.setKeyCode(it)
             }
         }
 

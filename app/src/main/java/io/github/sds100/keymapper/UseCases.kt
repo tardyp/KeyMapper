@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
-import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCaseImpl
+import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
@@ -46,7 +46,7 @@ object UseCases {
 
     fun onboarding(ctx: Context) = OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
 
-    fun showDeviceInfo(ctx: Context) = ShowDeviceInfoUseCaseImpl(
+    fun getInputDevices(ctx: Context) = GetInputDevicesUseCaseImpl(
         ServiceLocator.deviceInfoRepository(ctx),
         ServiceLocator.preferenceRepository(ctx),
         ServiceLocator.externalDeviceAdapter(ctx)

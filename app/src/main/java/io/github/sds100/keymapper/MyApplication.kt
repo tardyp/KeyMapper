@@ -45,7 +45,7 @@ class MyApplication : MultiDexApplication(),
     }
 
     val inputMethodAdapter by lazy { AndroidInputMethodAdapter(this) }
-    val externalDeviceAdapter by lazy { AndroidExternalDeviceAdapter(this) }
+    val externalDeviceAdapter by lazy { AndroidExternalInputDeviceAdapter(this) }
     val cameraAdapter by lazy { AndroidCameraAdapter(this) }
     val permissionAdapter by lazy {
         AndroidPermissionAdapter(

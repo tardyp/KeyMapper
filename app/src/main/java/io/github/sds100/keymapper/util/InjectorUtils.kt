@@ -83,7 +83,8 @@ object InjectorUtils {
         context: Context
     ): ConfigKeyEventViewModel.Factory {
         return ConfigKeyEventViewModel.Factory(
-            UseCases.showDeviceInfo(context)
+            UseCases.getInputDevices(context),
+            ServiceLocator.resourceProvider(context)
         )
     }
 
@@ -154,7 +155,7 @@ object InjectorUtils {
     fun provideFingerprintMapListViewModel(context: Context): FingerprintMapListViewModel.Factory {
         return FingerprintMapListViewModel.Factory(
             ServiceLocator.fingerprintMapRepository(context),
-            UseCases.showDeviceInfo(context),
+            UseCases.getInputDevices(context),
             ListFingerprintMapsUseCase(ServiceLocator.preferenceRepository(context))
         )
     }
@@ -186,7 +187,7 @@ object InjectorUtils {
             UseCases.testAction(ctx),
             UseCases.onboarding(ctx),
             UseCases.recordTrigger(ctx),
-            UseCases.showDeviceInfo(ctx),
+            UseCases.getInputDevices(ctx),
             UseCases.keymapActionUiHelper(ctx),
             constraintUiHelper(ctx),
             UseCases.createKeymapShortcut(ctx),

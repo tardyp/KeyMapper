@@ -208,7 +208,7 @@ object ServiceLocator {
         return (context.applicationContext as MyApplication).inputMethodAdapter
     }
 
-    fun externalDeviceAdapter(context: Context): ExternalDeviceAdapter {
+    fun externalDeviceAdapter(context: Context): ExternalInputDeviceAdapter {
         return (context.applicationContext as MyApplication).externalDeviceAdapter
     }
 
