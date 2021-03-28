@@ -4,7 +4,6 @@ import android.content.Context
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.data.viewmodel.*
-import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.ime.GetEnabledInputMethodsUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
@@ -113,7 +112,7 @@ object InjectorUtils {
     fun provideSystemActionListViewModel(context: Context): SystemActionListViewModel.Factory {
         return SystemActionListViewModel.Factory(
             ServiceLocator.resourceProvider(context),
-            IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(context)),
+            UseCases.isSystemActionSupported(context),
             GetEnabledInputMethodsUseCaseImpl(ServiceLocator.inputMethodAdapter(context)),
             GetPackagesUseCaseImpl(ServiceLocator.packageManagerAdapter(context)),
             AndroidAppUiAdapter(context.packageManager)
@@ -123,7 +122,10 @@ object InjectorUtils {
     fun provideUnsupportedActionListViewModel(
         context: Context
     ): UnsupportedActionListViewModel.Factory {
-        return UnsupportedActionListViewModel.Factory(ServiceLocator.systemActionRepository(context))
+        return UnsupportedActionListViewModel.Factory(
+            UseCases.isSystemActionSupported(context),
+            ServiceLocator.resourceProvider(context)
+        )
     }
 
     fun provideKeymapActionOptionsViewModel(): KeymapActionOptionsViewModel.Factory {

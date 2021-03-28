@@ -2,6 +2,7 @@ package io.github.sds100.keymapper
 
 import android.content.Context
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
+import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
@@ -77,4 +78,7 @@ object UseCases {
         ServiceLocator.resourceProvider(ctx),
         keymapActionUiHelper(ctx)
     )
+
+    fun isSystemActionSupported(ctx: Context) =
+        IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(ctx))
 }

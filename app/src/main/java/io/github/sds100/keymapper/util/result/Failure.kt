@@ -29,11 +29,11 @@ fun Error.getFullMessage(ctx: Context) = when (this) {
     is Error.NoActionData -> ctx.str(R.string.error_no_action_data)
     is Error.SdkVersionTooLow -> ctx.str(
         R.string.error_sdk_version_too_low,
-        BuildUtils.getSdkVersionName(sdkVersion)
+        BuildUtils.getSdkVersionName(minSdk)
     )
     is Error.SdkVersionTooHigh -> ctx.str(
         R.string.error_sdk_version_too_high,
-        BuildUtils.getSdkVersionName(sdkVersion)
+        BuildUtils.getSdkVersionName(maxSdk)
     )
     is Error.FeatureUnavailable -> ctx.str(R.string.error_feature_not_available, feature)
     is Error.SystemActionNotFound -> ctx.str(R.string.error_system_action_not_found, id)
@@ -83,11 +83,11 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.NoActionData -> resourceProvider.getString(R.string.error_no_action_data)
     is Error.SdkVersionTooLow -> resourceProvider.getString(
         R.string.error_sdk_version_too_low,
-        BuildUtils.getSdkVersionName(sdkVersion)
+        BuildUtils.getSdkVersionName(minSdk)
     )
     is Error.SdkVersionTooHigh -> resourceProvider.getString(
         R.string.error_sdk_version_too_high,
-        BuildUtils.getSdkVersionName(sdkVersion)
+        BuildUtils.getSdkVersionName(maxSdk)
     )
     is Error.FeatureUnavailable -> resourceProvider.getString(
         R.string.error_feature_not_available,

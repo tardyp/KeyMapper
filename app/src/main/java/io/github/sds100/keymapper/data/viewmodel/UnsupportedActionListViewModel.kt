@@ -1,59 +1,92 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import android.os.Build
-import androidx.lifecycle.*
-import io.github.sds100.keymapper.data.model.UnsupportedSystemActionListItemModel
-import io.github.sds100.keymapper.data.repository.SystemActionRepository
-import io.github.sds100.keymapper.util.Loading
-import io.github.sds100.keymapper.util.ViewLoading
-import io.github.sds100.keymapper.util.ViewState
-import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.getDataState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.data.model.UnsupportedActionListItem
+import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCase
+import io.github.sds100.keymapper.domain.actions.SystemActionId
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.util.SystemActionUtils
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.getFullMessage
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 31/03/2020.
  */
 class UnsupportedActionListViewModel(
-    private val repository: SystemActionRepository
-) : ViewModel(), ModelState<List<UnsupportedSystemActionListItemModel>> {
+    private val isSystemActionSupported: IsSystemActionSupportedUseCase,
+    resourceProvider: ResourceProvider
+) : ViewModel(), ResourceProvider by resourceProvider {
 
-    val isTapCoordinateActionSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-
-    private val _model = liveData {
-        emit(Loading())
-
-        val unsupportedActions = withContext(viewModelScope.coroutineContext + Dispatchers.Default) {
-            repository.unsupportedSystemActions.map {
-                val systemAction = it.key
-                val failure = it.value
-
-                UnsupportedSystemActionListItemModel(systemAction.id,
-                    systemAction.descriptionRes,
-                    systemAction.iconRes,
-                    failure
-                )
-            }.getDataState()
-        }
-
-        emit(unsupportedActions)
+    companion object {
+        private val isTapCoordinateActionSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
     }
 
-    override val model = _model
-    override val viewState = MutableLiveData<ViewState>(ViewLoading())
+    private val _state =
+        MutableStateFlow<ListUiState<UnsupportedActionListItem>>(ListUiState.Loading)
+    val state = _state.asStateFlow()
 
-    override fun rebuildModels() {
-        TODO("Not yet implemented")
+    private val rebuildUiState = MutableSharedFlow<Unit>()
+
+    init {
+        viewModelScope.launch {
+            combine(rebuildUiState) {}.collectLatest {
+
+                val unsupportedSystemActionsWithReasons = SystemActionId.values()
+                    .map { it to isSystemActionSupported.invoke(it) }
+                    .filter { it.second != null }
+
+                _state.value = sequence {
+                    if (!isTapCoordinateActionSupported) {
+                        yield(
+                            UnsupportedActionListItem(
+                                id = "tap_coordinate_action",
+                                description = getString(R.string.action_type_tap_coordinate),
+                                icon = getDrawable(R.drawable.ic_outline_touch_app_24),
+                                reason = Error.SdkVersionTooLow(Build.VERSION_CODES.N)
+                                    .getFullMessage(this@UnsupportedActionListViewModel)
+                            )
+                        )
+                    }
+
+                    unsupportedSystemActionsWithReasons.forEach { (id, reason) ->
+                        yield(
+                            UnsupportedActionListItem(
+                                id.toString(),
+                                description = getString(SystemActionUtils.getTitle(id)),
+                                icon = SystemActionUtils.getIcon(id)?.let { getDrawable(it) },
+                                reason = reason!!.getFullMessage(this@UnsupportedActionListViewModel)
+                            )
+                        )
+                    }
+                }.toList().createListState()
+            }
+        }
+    }
+
+    fun rebuildUiState() {
+        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val systemActionRepository: SystemActionRepository
+        private val isSystemActionSupported: IsSystemActionSupportedUseCase,
+        private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return UnsupportedActionListViewModel(systemActionRepository) as T
+            return UnsupportedActionListViewModel(
+                isSystemActionSupported,
+                resourceProvider
+            ) as T
         }
     }
 }
