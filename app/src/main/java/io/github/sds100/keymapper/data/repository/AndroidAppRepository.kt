@@ -23,8 +23,7 @@ class AndroidAppRepository(private val packageManager: PackageManager) : AppRepo
             .filter {
                 it.icon
                 (packageManager.getLaunchIntentForPackage(it.packageName) != null
-                    || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                    && packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null))
+                    || packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null)
             }
     }
 

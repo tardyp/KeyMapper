@@ -11,10 +11,8 @@ import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.RecoverableError
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 22/11/20.
@@ -61,7 +59,9 @@ class ActionListViewModel<A : Action>(
                 actionList
             }.collectLatest { actionList ->
                 when (actionList) {
-                    is State.Data -> _state.value = buildModels(actionList.data).createListState()
+                    is State.Data -> _state.value = withContext(Dispatchers.Default) {
+                        buildModels(actionList.data).createListState()
+                    }
 
                     is State.Loading -> _state.value = ListUiState.Loading
                 }
@@ -74,7 +74,7 @@ class ActionListViewModel<A : Action>(
     fun removeAction(uid: String) = configActions.removeAction(uid)
 
     fun onModelClick(uid: String) {
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.Default) {
             configActions.actionList.first().ifIsData { data ->
                 val actionData = data.singleOrNull { it.uid == uid }?.data ?: return@launch
 

@@ -12,10 +12,8 @@ import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.util.UserResponse
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 29/11/20.
@@ -54,7 +52,9 @@ class TriggerOptionsViewModel(
             combine(rebuildUiState, useCase.state) { _, configState ->
                 configState
             }.collectLatest {
-                _state.value = buildUiState(it)
+                _state.value = withContext(Dispatchers.Default){
+                    buildUiState(it)
+                }
             }
         }
     }

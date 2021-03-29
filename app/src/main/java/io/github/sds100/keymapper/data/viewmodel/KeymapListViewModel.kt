@@ -60,8 +60,7 @@ class KeymapListViewModel internal constructor(
             ) { _, keymapList, _ ->
                 keymapList
             }.collectLatest { keymapList ->
-                keymapStateListFlow.value = ListUiState.Loading
-
+                //don't show progress bar because when swiping between tabs the recycler view will flash
                 keymapStateListFlow.value = withContext(Dispatchers.Default) {
                     keymapList.map { modelCreator.map(it) }.createListState()
                 }

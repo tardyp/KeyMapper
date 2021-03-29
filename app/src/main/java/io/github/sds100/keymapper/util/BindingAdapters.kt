@@ -11,12 +11,15 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
+import com.airbnb.epoxy.EpoxyRecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.chipButton
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
@@ -24,6 +27,7 @@ import io.github.sds100.keymapper.ui.view.SquareImageButton
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.list_item_status.view.*
+import splitties.systemservices.layoutInflater
 
 /**
  * Created by sds100 on 25/01/2020.
@@ -171,86 +175,76 @@ fun SquareImageButton.openUrlOnClick(url: Int?) {
     }
 }
 
-@BindingAdapter("app:chipUiModels", "app:onChipClickCallback", requireAll = true)
-fun ChipGroup.setChipUiModels(
+fun EpoxyRecyclerView.setChipUiModels(
     models: List<ChipUi>,
-    onClick: OnChipClickCallback
+    callback: OnChipClickCallback
 ) {
-    removeAllViews()
-
-    models.forEach { model ->
-        when (model) {
-            is ChipUi.Error -> addView(context.errorChipButton(model, onClick))
-            is ChipUi.Normal -> addView(context.normalChipButton(model))
-            is ChipUi.Transparent -> addView(context.transparentChipButton(model))
+    withModels {
+        models.forEach { model ->
+            if (model is ChipUi.Normal) {
+                chipButton {
+                    id(model.id)
+                    model(model)
+                }
+            }
         }
     }
 }
 
-private fun Context.normalChipButton(
-    chipUi: ChipUi.Normal
-) = baseChipButton().apply {
-    isEnabled = false
-
-    this.text = chipUi.text
-    this.icon = chipUi.icon?.drawable
-    this.iconTint = chipUi.icon?.tintType?.toColorStateList(context)
-    setBackgroundColor(styledColor(R.attr.colorSurface))
-}
-
-private fun Context.transparentChipButton(
-    chipUi: ChipUi.Transparent
-) = baseChipButton().apply {
-    isEnabled = false
-
-    this.text = chipUi.text
-    setBackgroundColor(styledColor(R.attr.colorSurface))
-}
-
-private fun Context.errorChipButton(
-    model: ChipUi.Error,
+@BindingAdapter("app:chipUiModels", "app:onChipClickCallback", requireAll = true)
+fun ChipGroup.setChipUiModels(
+    models: List<ChipUi>,
     callback: OnChipClickCallback
-) = baseChipButton().apply {
-    isEnabled = true
-    icon = context.drawable(R.drawable.ic_outline_error_outline_64)
-    setBackgroundColor(color(R.color.cardTintRed))
-    iconTint = styledColorSL(R.attr.colorError)
+) {
+    removeAllViews()
 
-    text = model.text
-    setOnClickListener { callback.onChipClick(model) }
+    val colorTintError by lazy { styledColorSL(R.attr.colorError) }
+    val colorOnSurface by lazy { styledColorSL(R.attr.colorOnSurface) }
+
+    models.forEach { model ->
+        when (model) {
+            is ChipUi.Error -> {
+                MaterialButton(context, null, R.attr.errorChipButtonStyle).apply {
+                    id = View.generateViewId()
+
+                    text = model.text
+                    setOnClickListener { callback.onChipClick(model) }
+                    addView(this)
+                }
+            }
+
+            is ChipUi.Normal -> {
+                MaterialButton(context, null, R.attr.normalChipButtonStyle).apply {
+                    id = View.generateViewId()
+
+                    this.text = model.text
+                    this.icon = model.icon?.drawable
+
+                    if (model.icon != null) {
+                        this.iconTint = when (model.icon.tintType) {
+                            TintType.NONE -> null
+                            TintType.ON_SURFACE -> colorOnSurface
+                            TintType.ERROR -> colorTintError
+                        }
+                    }
+
+                    addView(this)
+                }
+            }
+
+            is ChipUi.Transparent -> {
+                MaterialButton(context, null, R.attr.transparentChipButtonStyle).apply {
+                    id = View.generateViewId()
+
+                    text = model.text
+                    addView(this)
+                }
+            }
+        }
+    }
 }
 
-private fun Context.baseChipButton() =
-    MaterialButton(this, null, R.attr.materialButtonOutlinedStyle).apply {
-        id = View.generateViewId()
-        setTextColor(styledColorSL(R.attr.colorOnSurface))
-
-        shapeAppearanceModel = ShapeAppearanceModel.builder(
-            context,
-            R.style.ShapeAppearanceOverlay_MaterialComponents_Chip,
-            R.style.ShapeAppearanceOverlay_MaterialComponents_Chip
-        ).build()
-
-        TextViewCompat.setTextAppearance(this, R.style.TextAppearance_MaterialComponents_Body2)
-        isAllCaps = false
-
-        isClickable = false
-        isCheckable = false
-        isFocusable = false
-
-        setTextColor(styledColor(R.attr.colorOnSurface))
-
-        iconSize = resources.getDimensionPixelSize(R.dimen.button_chip_icon_size)
-    }
-
-private fun TintType.toColorStateList(ctx: Context): ColorStateList? =
-    when (this) {
-        TintType.NONE -> null
-        TintType.ON_SURFACE -> ctx.styledColorSL(R.attr.colorOnSurface)
-        TintType.ERROR -> ctx.styledColorSL(R.attr.colorError)
-    }
-
-private fun TintType.toColor(ctx: Context): Int? =
+fun TintType.toColor(ctx: Context): Int? =
     when (this) {
         TintType.NONE -> null
         TintType.ON_SURFACE -> ctx.styledColor(R.attr.colorOnSurface)

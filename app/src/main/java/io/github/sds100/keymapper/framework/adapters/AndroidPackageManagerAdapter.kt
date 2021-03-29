@@ -31,8 +31,7 @@ class AndroidPackageManagerAdapter(
             packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
                 val canBeLaunched =
                     (packageManager.getLaunchIntentForPackage(it.packageName) != null
-                        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                        && packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null))
+                        || packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null)
 
                 PackageInfo(it.packageName, canBeLaunched)
             }.let { installedPackages.value = State.Data(it) }

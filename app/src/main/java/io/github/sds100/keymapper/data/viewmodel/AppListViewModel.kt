@@ -96,7 +96,7 @@ class AppListViewModel internal constructor(
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
-    private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> = flow {
+    private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> =flow {
         forEach {
             combine(
                 appUiAdapter.getAppName(it.packageName),
@@ -111,7 +111,9 @@ class AppListViewModel internal constructor(
                 emit(model)
             }.catch { }.collect()
         }
-    }.toList().sortedBy { it.appName.toLowerCase(Locale.getDefault()) }
+    }.flowOn(Dispatchers.Default)
+        .toList()
+        .sortedBy { it.appName.toLowerCase(Locale.getDefault()) }
 
     class Factory(
         private val appUiAdapter: AppUiAdapter,

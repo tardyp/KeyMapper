@@ -26,8 +26,8 @@ sealed class TapTarget(
         @IdRes viewId: Int,
         promptFocal: PromptFocal = CirclePromptFocal(),
         onSuccessfulFinish: () -> Unit
-    ) {
-        MaterialTapTargetPrompt.Builder(fragment).apply {
+    ): MaterialTapTargetPrompt? {
+        return MaterialTapTargetPrompt.Builder(fragment).apply {
             setTarget(viewId)
 
             focalColour = fragment.color(android.R.color.transparent)
@@ -43,9 +43,7 @@ sealed class TapTarget(
                     onSuccessfulFinish.invoke()
                 }
             }
-
-            show()
-        }
+        }.show()
     }
 }
 

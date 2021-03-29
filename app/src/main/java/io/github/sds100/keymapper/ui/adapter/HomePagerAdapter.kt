@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.ui.adapter
 
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.github.sds100.keymapper.ui.fragment.fingerprint.FingerprintMapListFragment
 import io.github.sds100.keymapper.ui.fragment.keymap.KeymapListFragment

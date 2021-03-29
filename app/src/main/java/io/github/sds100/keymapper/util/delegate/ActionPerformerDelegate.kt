@@ -86,11 +86,7 @@ class ActionPerformerDelegate(
                     val packageName = action.data
 
                     val leanbackIntent =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            packageManager.getLeanbackLaunchIntentForPackage(packageName)
-                        } else {
-                            null
-                        }
+                        packageManager.getLeanbackLaunchIntentForPackage(packageName)
 
                     val normalIntent = packageManager.getLaunchIntentForPackage(packageName)
 
@@ -520,101 +516,95 @@ class ActionPerformerDelegate(
                 OldSystemAction.SCREENSHOT_ROOT -> ScreenshotUtils.takeScreenshotRoot()
 
                 else -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        when (id) {
-                            OldSystemAction.TEXT_CUT ->
-                                rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_CUT)
+                    when (id) {
+                        OldSystemAction.TEXT_CUT ->
+                            rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_CUT)
 
-                            OldSystemAction.TEXT_COPY ->
-                                rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_COPY)
+                        OldSystemAction.TEXT_COPY ->
+                            rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_COPY)
 
-                            OldSystemAction.TEXT_PASTE ->
-                                rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_PASTE)
+                        OldSystemAction.TEXT_PASTE ->
+                            rootNode.performActionOnFocusedNode(AccessibilityNodeInfo.ACTION_PASTE)
 
-                            OldSystemAction.SELECT_WORD_AT_CURSOR -> {
-                                rootNode.focusedNode {
-                                    it ?: return@focusedNode
+                        OldSystemAction.SELECT_WORD_AT_CURSOR -> {
+                            rootNode.focusedNode {
+                                it ?: return@focusedNode
 
-                                    //it is the cursor position if they both return the same value
-                                    if (it.textSelectionStart == it.textSelectionEnd) {
-                                        val cursorPosition = it.textSelectionStart
+                                //it is the cursor position if they both return the same value
+                                if (it.textSelectionStart == it.textSelectionEnd) {
+                                    val cursorPosition = it.textSelectionStart
 
-                                        val wordBoundary =
-                                            it.text.toString().getWordBoundaries(cursorPosition)
-                                                ?: return@focusedNode
+                                    val wordBoundary =
+                                        it.text.toString().getWordBoundaries(cursorPosition)
+                                            ?: return@focusedNode
 
-                                        val bundle = bundleOf(
-                                            AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT
-                                                to wordBoundary.first,
+                                    val bundle = bundleOf(
+                                        AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT
+                                            to wordBoundary.first,
 
-                                            //The index of the cursor is the index of the last char in the word + 1
-                                            AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT
-                                                to wordBoundary.second + 1
-                                        )
+                                        //The index of the cursor is the index of the last char in the word + 1
+                                        AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT
+                                            to wordBoundary.second + 1
+                                    )
 
-                                        it.performAction(
-                                            AccessibilityNodeInfo.ACTION_SET_SELECTION,
-                                            bundle
-                                        )
-                                    }
+                                    it.performAction(
+                                        AccessibilityNodeInfo.ACTION_SET_SELECTION,
+                                        bundle
+                                    )
                                 }
                             }
                         }
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        when (id) {
-                            OldSystemAction.PAUSE_MEDIA -> MediaUtils.pauseMediaPlayback(this)
-                            OldSystemAction.PLAY_MEDIA -> MediaUtils.playMedia(this)
-                            OldSystemAction.PLAY_PAUSE_MEDIA -> MediaUtils.playPauseMediaPlayback(
-                                this
-                            )
-                            OldSystemAction.NEXT_TRACK -> MediaUtils.nextTrack(this)
-                            OldSystemAction.PREVIOUS_TRACK -> MediaUtils.previousTrack(this)
-                            OldSystemAction.FAST_FORWARD -> MediaUtils.fastForward(this)
-                            OldSystemAction.REWIND -> MediaUtils.rewind(this)
-                        }
+                    when (id) {
+                        OldSystemAction.PAUSE_MEDIA -> MediaUtils.pauseMediaPlayback(this)
+                        OldSystemAction.PLAY_MEDIA -> MediaUtils.playMedia(this)
+                        OldSystemAction.PLAY_PAUSE_MEDIA -> MediaUtils.playPauseMediaPlayback(
+                            this
+                        )
+                        OldSystemAction.NEXT_TRACK -> MediaUtils.nextTrack(this)
+                        OldSystemAction.PREVIOUS_TRACK -> MediaUtils.previousTrack(this)
+                        OldSystemAction.FAST_FORWARD -> MediaUtils.fastForward(this)
+                        OldSystemAction.REWIND -> MediaUtils.rewind(this)
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        when (id) {
-                            OldSystemAction.SHOW_POWER_MENU ->
-                                performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
+                    when (id) {
+                        OldSystemAction.SHOW_POWER_MENU ->
+                            performGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
 
-                            OldSystemAction.PLAY_MEDIA_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.playMediaForPackage(ctx, it)
-                                }
+                        OldSystemAction.PLAY_MEDIA_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.playMediaForPackage(ctx, it)
                             }
-                            OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.playPauseMediaPlaybackForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.playPauseMediaPlaybackForPackage(ctx, it)
                             }
-                            OldSystemAction.PAUSE_MEDIA_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.pauseMediaForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.PAUSE_MEDIA_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.pauseMediaForPackage(ctx, it)
                             }
-                            OldSystemAction.NEXT_TRACK_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.nextTrackForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.NEXT_TRACK_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.nextTrackForPackage(ctx, it)
                             }
-                            OldSystemAction.PREVIOUS_TRACK_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.previousTrackForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.PREVIOUS_TRACK_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.previousTrackForPackage(ctx, it)
                             }
-                            OldSystemAction.FAST_FORWARD_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.fastForwardForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.FAST_FORWARD_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.fastForwardForPackage(ctx, it)
                             }
-                            OldSystemAction.REWIND_PACKAGE -> {
-                                action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
-                                    MediaUtils.rewindForPackage(ctx, it)
-                                }
+                        }
+                        OldSystemAction.REWIND_PACKAGE -> {
+                            action.extras.getData(ActionEntity.EXTRA_PACKAGE_NAME).onSuccess {
+                                MediaUtils.rewindForPackage(ctx, it)
                             }
                         }
                     }

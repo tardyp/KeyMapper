@@ -58,11 +58,11 @@ class HomeViewModel(
         onboarding.showQuickStartGuideHint
     ) { showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint ->
         HomeOnboardingState(showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeOnboardingState())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, HomeOnboardingState())
 
     val statusLayoutState = settings.hideHomeScreenAlerts.map { hide ->
         HomeStatusLayoutState(isVisible = !hide)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, HomeStatusLayoutState(isVisible = true))
+    }.stateIn(viewModelScope, SharingStarted.Lazily, HomeStatusLayoutState(isVisible = true))
 
     val selectionCountViewState = multiSelectProvider.state.map {
         when (it) {

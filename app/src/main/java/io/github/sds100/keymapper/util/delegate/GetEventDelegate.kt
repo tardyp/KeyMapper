@@ -25,7 +25,7 @@ class GetEventDelegate(
 ) {
 
     companion object {
-        private const val REGEX_GET_DEVICE_LOCATION = "\\/.*(?=:)"
+        private const val REGEX_GET_DEVICE_LOCATION = "/.*(?=:)"
         private const val REGEX_KEY_EVENT_ACTION = "(?<= )(DOWN|UP)"
 
         fun canDetectKeyWhenScreenOff(keyCode: Int): Boolean{

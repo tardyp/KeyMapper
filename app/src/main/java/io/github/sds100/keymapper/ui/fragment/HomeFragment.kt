@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.Manifest
 import android.content.*
 import android.os.Build
 import android.os.Bundle
@@ -21,6 +20,8 @@ import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.material.bottomappbar.BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
+import com.google.android.material.bottomappbar.BottomAppBar.FAB_ALIGNMENT_MODE_END
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.data.model.ChooseAppStoreModel
@@ -41,9 +42,10 @@ import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
-import splitties.systemservices.powerManager
 import splitties.toast.longToast
 import splitties.toast.toast
+import timber.log.Timber
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -122,6 +124,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private var quickStartGuideTapTarget: MaterialTapTargetPrompt? = null
     private lateinit var recoverFailureDelegate: RecoverFailureDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -348,10 +351,33 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.appBarState.collectLatest {
+                if (it == HomeAppBarState.MULTI_SELECTING) {
+                    binding.appBar.setFabAlignmentModeAndReplaceMenu(
+                        FAB_ALIGNMENT_MODE_END,
+                        R.menu.menu_multi_select
+                    )
+                } else {
+                    binding.appBar.setFabAlignmentModeAndReplaceMenu(
+                        FAB_ALIGNMENT_MODE_CENTER,
+                        R.menu.menu_home
+                    )
+                }
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.onboardingState.collectLatest {
                 if (it.showQuickStartGuideTapTarget) {
-                    QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
-                        homeViewModel.approvedQuickStartGuideTapTarget()
+                    if (quickStartGuideTapTarget?.state != MaterialTapTargetPrompt.STATE_REVEALED) {
+                        quickStartGuideTapTarget?.dismiss()
+
+                        delay(500)
+
+                        quickStartGuideTapTarget =
+                            QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
+                                homeViewModel.approvedQuickStartGuideTapTarget()
+                            }
                     }
                 }
 
@@ -370,16 +396,6 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.tabsState.collectLatest {
                 binding.viewPager.isUserInputEnabled = it.enableViewPagerSwiping
-            }
-        }
-
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            homeViewModel.appBarState.collectLatest {
-                if (it == HomeAppBarState.MULTI_SELECTING) {
-                    binding.appBar.replaceMenu(R.menu.menu_multi_select)
-                } else {
-                    binding.appBar.replaceMenu(R.menu.menu_home)
-                }
             }
         }
 
@@ -436,18 +452,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateStatusLayouts() {
-        if (AccessibilityUtils.isServiceEnabled(requireContext())) {
-            accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
-
-        } else {
-            accessibilityServiceStatusState.value = StatusLayout.State.ERROR
-        }
-
-        if (PermissionUtils.haveWriteSecureSettingsPermission(requireContext())) {
-            writeSettingsStatusState.value = StatusLayout.State.POSITIVE
-        } else {
-            writeSettingsStatusState.value = StatusLayout.State.WARN
-        }
+//        if (AccessibilityUtils.isServiceEnabled(requireContext())) {
+//            accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
+//
+//        } else {
+//            accessibilityServiceStatusState.value = StatusLayout.State.ERROR
+//        }
+//
+//        if (PermissionUtils.haveWriteSecureSettingsPermission(requireContext())) {
+//            writeSettingsStatusState.value = StatusLayout.State.POSITIVE
+//        } else {
+//            writeSettingsStatusState.value = StatusLayout.State.WARN
+//        }
 
 //        if (KeyboardUtils.isCompatibleImeEnabled()) {
 //            imeServiceStatusState.value = StatusLayout.State.POSITIVE
@@ -467,48 +483,48 @@ class HomeFragment : Fragment() {
 //            imeServiceStatusState.value = StatusLayout.State.WARN
 //        } //TODO
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (PermissionUtils.isPermissionGranted(
-                    requireContext(),
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
-                )
-            ) {
-
-                dndAccessStatusState.value = StatusLayout.State.POSITIVE
-            } else {
-                dndAccessStatusState.value = StatusLayout.State.WARN
-            }
-
-            if (powerManager.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME)) {
-                batteryOptimisationState.value = StatusLayout.State.POSITIVE
-            } else {
-                batteryOptimisationState.value = StatusLayout.State.WARN
-            }
-        }
-
-        val states = listOf(
-            accessibilityServiceStatusState,
-            writeSettingsStatusState,
-            imeServiceStatusState,
-            dndAccessStatusState,
-            batteryOptimisationState
-        )
-
-        when {
-            states.all { it.value == StatusLayout.State.POSITIVE } -> {
-                expandedHeader.value = false
-                collapsedStatusState.value = StatusLayout.State.POSITIVE
-            }
-
-            states.any { it.value == StatusLayout.State.ERROR } -> {
-                expandedHeader.value = true
-                collapsedStatusState.value = StatusLayout.State.ERROR
-            }
-
-            states.any { it.value == StatusLayout.State.WARN } -> {
-                expandedHeader.value = false
-                collapsedStatusState.value = StatusLayout.State.WARN
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (PermissionUtils.isPermissionGranted(
+//                    requireContext(),
+//                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
+//                )
+//            ) {
+//
+//                dndAccessStatusState.value = StatusLayout.State.POSITIVE
+//            } else {
+//                dndAccessStatusState.value = StatusLayout.State.WARN
+//            }
+//
+//            if (powerManager.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME)) {
+//                batteryOptimisationState.value = StatusLayout.State.POSITIVE
+//            } else {
+//                batteryOptimisationState.value = StatusLayout.State.WARN
+//            }
+//        }
+//
+//        val states = listOf(
+//            accessibilityServiceStatusState,
+//            writeSettingsStatusState,
+//            imeServiceStatusState,
+//            dndAccessStatusState,
+//            batteryOptimisationState
+//        )
+//
+//        when {
+//            states.all { it.value == StatusLayout.State.POSITIVE } -> {
+//                expandedHeader.value = false
+//                collapsedStatusState.value = StatusLayout.State.POSITIVE
+//            }
+//
+//            states.any { it.value == StatusLayout.State.ERROR } -> {
+//                expandedHeader.value = true
+//                collapsedStatusState.value = StatusLayout.State.ERROR
+//            }
+//
+//            states.any { it.value == StatusLayout.State.WARN } -> {
+//                expandedHeader.value = false
+//                collapsedStatusState.value = StatusLayout.State.WARN
+//            }
+//        }
     }
 }
