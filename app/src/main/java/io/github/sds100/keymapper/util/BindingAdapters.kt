@@ -11,15 +11,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
-import com.airbnb.epoxy.EpoxyRecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.chipButton
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
@@ -27,7 +23,6 @@ import io.github.sds100.keymapper.ui.view.SquareImageButton
 import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.list_item_status.view.*
-import splitties.systemservices.layoutInflater
 
 /**
  * Created by sds100 on 25/01/2020.
@@ -172,22 +167,6 @@ fun SquareImageButton.openUrlOnClick(url: Int?) {
 
     setOnClickListener {
         UrlUtils.openUrl(context, context.str(url))
-    }
-}
-
-fun EpoxyRecyclerView.setChipUiModels(
-    models: List<ChipUi>,
-    callback: OnChipClickCallback
-) {
-    withModels {
-        models.forEach { model ->
-            if (model is ChipUi.Normal) {
-                chipButton {
-                    id(model.id)
-                    model(model)
-                }
-            }
-        }
     }
 }
 

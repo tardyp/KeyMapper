@@ -9,6 +9,7 @@ import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDevi
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
+import io.github.sds100.keymapper.domain.permissions.IsPermissionGrantedUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
@@ -81,4 +82,7 @@ object UseCases {
 
     fun isSystemActionSupported(ctx: Context) =
         IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(ctx))
+
+    fun isPermissionGranted(ctx: Context) =
+        IsPermissionGrantedUseCaseImpl(ServiceLocator.permissionAdapter(ctx))
 }

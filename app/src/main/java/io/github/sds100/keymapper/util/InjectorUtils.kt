@@ -194,6 +194,7 @@ object InjectorUtils {
             constraintUiHelper(ctx),
             UseCases.createKeymapShortcut(ctx),
             UseCases.isRequestShortcutSupported(ctx),
+            UseCases.isPermissionGranted(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }

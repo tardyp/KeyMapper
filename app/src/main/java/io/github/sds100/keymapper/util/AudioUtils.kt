@@ -56,6 +56,7 @@ object AudioUtils {
                      @AdjustMode adjustMode: Int,
                      showVolumeUi: Boolean = false) {
 
+        //TODO replace with try catch for dnd access exception
         if (PermissionUtils.isPermissionGranted(ctx, Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
 
             val audioManager = ctx.applicationContext.getSystemService(Context.AUDIO_SERVICE)
@@ -76,6 +77,7 @@ object AudioUtils {
                              showVolumeUi: Boolean = false,
                              @StreamType streamType: Int) {
 
+        //TODO replace with try catch for dnd access exception
         if (PermissionUtils.isPermissionGranted(ctx, Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
             val audioManager = ctx.applicationContext.getSystemService(Context.AUDIO_SERVICE)
                 as AudioManager

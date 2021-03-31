@@ -151,12 +151,8 @@ abstract class ConfigMappingFragment : Fragment() {
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.fixError.collectLatest {
-                binding.coordinatorLayout.showFixErrorSnackBar(
-                    requireContext(),
-                    it,
-                    recoverFailureDelegate,
-                    findNavController()
-                )
+                //don't show snackbar here
+                recoverFailureDelegate.recover(requireContext(), it, findNavController())
             }
         }
     }

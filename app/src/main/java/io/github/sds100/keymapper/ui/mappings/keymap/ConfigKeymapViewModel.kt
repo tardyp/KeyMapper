@@ -16,6 +16,7 @@ import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
+import io.github.sds100.keymapper.domain.permissions.IsPermissionGrantedUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
@@ -29,7 +30,6 @@ import io.github.sds100.keymapper.ui.shortcuts.CreateKeymapShortcutUseCase
 import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
-import io.github.sds100.keymapper.util.result.RecoverableError
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -55,6 +55,7 @@ class ConfigKeymapViewModel(
     constraintUiHelper: ConstraintUiHelper,
     private val createKeymapShortcut: CreateKeymapShortcutUseCase,
     areShortcutsSupported: IsRequestShortcutSupported,
+    isPermissionGranted: IsPermissionGrantedUseCase,
     resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
 
@@ -79,6 +80,7 @@ class ConfigKeymapViewModel(
         recordTriggerUseCase,
         showDeviceInfoUseCase,
         areShortcutsSupported,
+        isPermissionGranted,
         resourceProvider
     )
 
@@ -97,7 +99,12 @@ class ConfigKeymapViewModel(
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
-    override val fixError = MutableSharedFlow<RecoverableError>()
+    override val fixError = merge(
+        triggerViewModel.fixError,
+        actionListViewModel.fixError,
+        constraintListViewModel.fixError
+    ).shareIn(viewModelScope, SharingStarted.Eagerly)
+
     override val enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
@@ -108,12 +115,6 @@ class ConfigKeymapViewModel(
                 buildUiState(configState)
             }.collectLatest {
                 state.value = it
-            }
-        }
-
-        viewModelScope.launch {
-            merge(actionListViewModel.fixError, constraintListViewModel.fixError).collectLatest {
-                fixError.emit(it)
             }
         }
 
@@ -215,6 +216,7 @@ class ConfigKeymapViewModel(
         private val constraintUiHelper: ConstraintUiHelper,
         private val createKeymapShortcut: CreateKeymapShortcutUseCase,
         private val isRequestShortcutSupported: IsRequestShortcutSupported,
+        private val isPermissionGranted: IsPermissionGrantedUseCase,
         private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
@@ -237,6 +239,7 @@ class ConfigKeymapViewModel(
                 constraintUiHelper,
                 createKeymapShortcut,
                 isRequestShortcutSupported,
+                isPermissionGranted,
                 resourceProvider
             ) as T
     }

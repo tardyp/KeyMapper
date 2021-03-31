@@ -16,6 +16,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
+import io.github.sds100.keymapper.error
 import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
@@ -69,7 +70,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     override fun subscribeUi(binding: FragmentTriggerBinding) {
         binding.viewModel = triggerViewModel
 
-        binding.epoxyRecyclerView.adapter = triggerKeyController.adapter
+        binding.recyclerViewTriggerKeys.adapter = triggerKeyController.adapter
 
         triggerViewModel.showEnableCapsLockKeyboardLayoutPrompt
             .collectWhenStarted(viewLifecycleOwner) {
@@ -118,6 +119,19 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                 }
 
                 binding.enableTriggerKeyDragging(triggerKeyController)
+
+                binding.recyclerViewError.withModels {
+                    state.errorListItems.forEach {
+                        error {
+                            id(it.id)
+                            model(it)
+
+                            onFixClick { _ ->
+                                triggerViewModel.fixError(it.id)
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -133,7 +147,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
         triggerKeyController.modelList = listItems
     }
 
-    override fun getRecyclerView(binding: FragmentTriggerBinding) = binding.epoxyRecyclerView
+    override fun getRecyclerView(binding: FragmentTriggerBinding) = binding.recyclerViewTriggerKeys
     override fun getProgressBar(binding: FragmentTriggerBinding) = binding.progressBar
     override fun getEmptyListPlaceHolder(binding: FragmentTriggerBinding) =
         binding.emptyListPlaceHolder
@@ -195,7 +209,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
 
     private fun FragmentTriggerBinding.enableTriggerKeyDragging(controller: EpoxyController): ItemTouchHelper {
         return EpoxyTouchHelper.initDragging(controller)
-            .withRecyclerView(epoxyRecyclerView)
+            .withRecyclerView(recyclerViewTriggerKeys)
             .forVerticalList()
             .withTarget(TriggerKeyBindingModel_::class.java)
             .andCallbacks(object : EpoxyTouchHelper.DragCallbacks<TriggerKeyBindingModel_>() {

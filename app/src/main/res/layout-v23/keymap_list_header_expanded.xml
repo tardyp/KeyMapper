@@ -99,7 +99,7 @@
             app:onFixClick="@{grantDndAccess}"
             app:showFixButton="@{true}"
             app:statusLayoutState="@{dndAccessStatusState}"
-            app:warningText="@{@string/error_dnd_access_not_granted}" />
+            app:warningText="@{@string/dnd_access_granted}" />
 
         <io.github.sds100.keymapper.ui.view.StatusLayout
             android:layout_width="match_parent"

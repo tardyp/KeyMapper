@@ -39,8 +39,7 @@ data class KeymapTrigger(
     val options = KeymapTriggerOptions(
         vibrate = Option(
             value = vibrate,
-            isAllowed = (keys.size == 1 || (mode is TriggerMode.Parallel))
-                && keys.getOrNull(0)?.clickType == ClickType.LONG_PRESS
+            isAllowed = true
         ),
 
         vibrateDuration = Option(

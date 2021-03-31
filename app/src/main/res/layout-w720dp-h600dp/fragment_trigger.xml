@@ -21,6 +21,18 @@
         android:layout_marginTop="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <com.airbnb.epoxy.EpoxyRecyclerView
+            android:id="@+id/recyclerViewError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="1"
+            tools:listitem="@layout/list_item_error" />
+
         <FrameLayout
             android:id="@+id/listLayout"
             android:layout_width="match_parent"
@@ -29,10 +41,10 @@
             app:layout_constraintBottom_toTopOf="@id/radioGroupParallelTriggerClickType"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/recyclerViewError">
 
             <com.airbnb.epoxy.EpoxyRecyclerView
-                android:id="@+id/epoxyRecyclerView"
+                android:id="@+id/recyclerViewTriggerKeys"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
