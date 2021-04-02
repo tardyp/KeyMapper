@@ -2,8 +2,8 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapListUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
-import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.ListUiState
@@ -15,12 +15,13 @@ import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
+import io.github.sds100.keymapper.util.result.RecoverableError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class KeymapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,
-    private val useCase: ListKeymapsUseCase,
+    private val getKeymapList: GetKeymapListUseCase,
     private val getActionError: GetActionErrorUseCase,
     actionUiHelper: ActionUiHelper<KeymapAction>,
     constraintUiHelper: ConstraintUiHelper,
@@ -46,6 +47,9 @@ class KeymapListViewModel internal constructor(
     private val _launchConfigKeymap = MutableSharedFlow<String>()
     val launchConfigKeymap = _launchConfigKeymap.asSharedFlow()
 
+    private val _fixError = MutableSharedFlow<RecoverableError>()
+    val fixError = _fixError.asSharedFlow()
+
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
@@ -55,7 +59,7 @@ class KeymapListViewModel internal constructor(
         coroutineScope.launch {
             combine(
                 rebuildUiState,
-                useCase.keymapList,
+                getKeymapList.keymapList,
                 getActionError.invalidateErrors
             ) { _, keymapList, _ ->
                 keymapList
@@ -133,7 +137,21 @@ class KeymapListViewModel internal constructor(
     }
 
     override fun onChipClick(chipModel: ChipUi) {
-        TODO("Not yet implemented")
+        if (chipModel is ChipUi.Error) {
+            coroutineScope.launch {
+                val actionUid = chipModel.id
+                val actionData = getKeymapList.keymapList.first()
+                    .flatMap { it.actionDataList }
+                    .singleOrNull { it.uid == actionUid }
+                    ?.data
+                    ?: return@launch
+
+                val error = getActionError.getError(actionData)
+                if (error is RecoverableError) {
+                    _fixError.emit(error)
+                }
+            }
+        }
     }
 
     fun rebuildUiState() {

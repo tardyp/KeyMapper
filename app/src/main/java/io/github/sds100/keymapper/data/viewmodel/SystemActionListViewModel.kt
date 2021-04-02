@@ -1,3 +1,4 @@
+
 package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.annotation.StringRes
@@ -52,11 +53,6 @@ class SystemActionListViewModel(
             ) { query, _ ->
                 query
             }.collectLatest { query ->
-                _state.value = SystemActionListState(
-                    ListUiState.Loading,
-                    state.value.showUnsupportedActionsMessage
-                )
-
                 _state.value = withContext(Dispatchers.Default) {
                     buildState(query)
                 }

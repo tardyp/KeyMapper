@@ -30,7 +30,7 @@ import kotlinx.coroutines.runBlocking
  */
 class HomeViewModel(
     private val onboarding: OnboardingUseCase,
-    listKeymapsUseCase: ListKeymapsUseCase,
+    getKeymapListUseCase: GetKeymapListUseCase,
     private val deleteKeymaps: DeleteKeymapsUseCase,
     private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
     private val duplicateKeymaps: DuplicateKeymapsUseCase,
@@ -53,7 +53,7 @@ class HomeViewModel(
 
     val keymapListViewModel = KeymapListViewModel(
         viewModelScope,
-        listKeymapsUseCase,
+        getKeymapListUseCase,
         getActionError,
         actionUiHelper,
         constraintUiHelper,
@@ -169,9 +169,11 @@ class HomeViewModel(
     private val _closeKeyMapper = MutableSharedFlow<Unit>()
     val closeKeyMapper = _closeKeyMapper.asSharedFlow()
 
-    //TODO this in keymaplistviewmodel and fingerprintmaplistviewmodel
     private val _fixError = MutableSharedFlow<RecoverableError>()
-    val fixError = _fixError.asSharedFlow()
+    val fixError = merge(
+        _fixError,
+        keymapListViewModel.fixError,
+    )
 
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
@@ -259,7 +261,7 @@ class HomeViewModel(
     @Suppress("UNCHECKED_CAST")
     class Factory(
         private val onboardingUseCase: OnboardingUseCase,
-        private val listKeymapsUseCase: ListKeymapsUseCase,
+        private val getKeymapListUseCase: GetKeymapListUseCase,
         private val deleteKeymaps: DeleteKeymapsUseCase,
         private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
         private val duplicateKeymapsUseCase: DuplicateKeymapsUseCase,
@@ -276,7 +278,7 @@ class HomeViewModel(
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return HomeViewModel(
                 onboardingUseCase,
-                listKeymapsUseCase,
+                getKeymapListUseCase,
                 deleteKeymaps,
                 enableDisableKeymaps,
                 duplicateKeymapsUseCase,

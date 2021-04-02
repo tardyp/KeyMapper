@@ -8,9 +8,9 @@ import kotlinx.coroutines.withContext
 /**
  * Created by sds100 on 18/03/2021.
  */
-class ListKeymapsUseCaseImpl(
+class GetKeymapListUseCaseImpl(
     private val repository: KeymapRepository
-) : ListKeymapsUseCase {
+) : GetKeymapListUseCase {
     override val keymapList = repository.keymapList.map { list ->
         withContext(Dispatchers.Default) {
             list.map { KeyMapEntityMapper.fromEntity(it) }
@@ -18,6 +18,6 @@ class ListKeymapsUseCaseImpl(
     }
 }
 
-interface ListKeymapsUseCase {
+interface GetKeymapListUseCase {
     val keymapList: Flow<List<KeyMap>>
 }

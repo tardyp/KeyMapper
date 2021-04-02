@@ -8,8 +8,7 @@ import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseIm
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
-import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
-import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapListUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedImpl
@@ -60,7 +59,7 @@ object UseCases {
     fun recordTrigger(ctx: Context) =
         (ctx.applicationContext as KeyMapperApp).recordTriggerController
 
-    fun listKeymaps(ctx: Context) = ListKeymapsUseCaseImpl(
+    fun listKeymaps(ctx: Context) = GetKeymapListUseCaseImpl(
         ServiceLocator.roomKeymapRepository(ctx)
     )
 

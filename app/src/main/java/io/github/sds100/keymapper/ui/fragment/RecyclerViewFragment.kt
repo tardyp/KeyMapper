@@ -173,10 +173,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     }
 
     private fun setupSearchView(binding: BINDING) {
-        getBottomAppBar(binding) ?: return
-
-        val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
-        searchViewMenuItem.isVisible = isSearchEnabled
 
         if (isSearchEnabled) {
             findNavController().observeCurrentDestinationLiveData<String>(
@@ -185,6 +181,11 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
             ) {
                 onSearchQuery(it)
             }
+
+            getBottomAppBar(binding) ?: return
+
+            val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
+            searchViewMenuItem.isVisible = isSearchEnabled
 
             val searchView = searchViewMenuItem.actionView as SearchView
 
