@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -10,59 +9,9 @@
 
         <import type="com.google.android.material.bottomappbar.BottomAppBar" />
 
-        <import type="io.github.sds100.keymapper.ui.view.StatusLayout.State" />
-
         <import type="io.github.sds100.keymapper.data.viewmodel.HomeAppBarState" />
 
         <import type="androidx.lifecycle.LiveData" />
-
-        <variable
-            name="expanded"
-            type="LiveData&lt;Boolean>" />
-
-        <variable
-            name="collapsedStatusLayoutState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="accessibilityServiceStatusState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="imeServiceStatusState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="dndAccessStatusState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="writeSettingsStatusState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="batteryOptimisationState"
-            type="LiveData&lt;State>" />
-
-        <variable
-            name="enableAccessibilityService"
-            type="View.OnClickListener" />
-
-        <variable
-            name="enableImeService"
-            type="View.OnClickListener" />
-
-        <variable
-            name="grantWriteSecureSettingsPermission"
-            type="View.OnClickListener" />
-
-        <variable
-            name="grantDndAccess"
-            type="View.OnClickListener" />
-
-        <variable
-            name="disableBatteryOptimisation"
-            type="View.OnClickListener" />
 
         <variable
             name="getNewGuiKeyboard"
@@ -89,127 +38,35 @@
             android:layout_marginBottom="?attr/actionBarSize"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <FrameLayout
-                android:id="@+id/headerLayout"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardViewRecyclerViewErrors"
+                style="@style/MyCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{viewModel.statusLayoutState.isVisible ? View.VISIBLE : View.GONE}"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layoutCollapsed"
-                    style="@style/MyCardView"
+                <com.airbnb.epoxy.EpoxyRecyclerView
+                    android:id="@+id/recyclerViewError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:visibility="@{expanded ? View.GONE : View.VISIBLE}"
-                    tools:visibility="visible">
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/list_item_fix_error" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <io.github.sds100.keymapper.ui.view.StatusLayout
-                            android:id="@+id/statusLayout"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            app:errorText="@{@string/error_the_app_wont_work}"
-                            app:fixedText="@{@string/everything_looks_good}"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/buttonExpand"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:showFixButton="@{false}"
-                            app:statusLayoutState="@{collapsedStatusLayoutState}"
-                            app:warningText="@{@string/warning_the_app_will_work}" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/buttonExpand"
-                            android:layout_width="48dp"
-                            android:layout_height="0dp"
-                            android:minHeight="48dp"
-                            android:scaleType="centerInside"
-                            android:tint="?attr/colorOnSurface"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_outline_expand_more_24" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <net.cachapa.expandablelayout.ExpandableLayout
-                    android:id="@+id/expandableLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    tools:el_expanded="true"
-                    tools:visibility="gone">
-
-                    <androidx.core.widget.NestedScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardView"
-                                style="@style/MyCardView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <include
-                                    layout="@layout/keymap_list_header_expanded"
-                                    bind:accessibilityServiceStatusState="@{accessibilityServiceStatusState}"
-                                    bind:enableAccessibilityService="@{enableAccessibilityService}"
-
-                                    bind:enableImeService="@{enableImeService}"
-                                    bind:batteryOptimisationState="@{batteryOptimisationState}"
-
-                                    bind:grantDndAccess="@{grantDndAccess}"
-                                    bind:disableBatteryOptimisation="@{disableBatteryOptimisation}"
-
-                                    bind:grantWriteSecureSettingsPermission="@{grantWriteSecureSettingsPermission}"
-                                    bind:dndAccessStatusState="@{dndAccessStatusState}"
-
-                                    bind:imeServiceStatusState="@{imeServiceStatusState}"
-                                    bind:writeSettingsStatusState="@{writeSettingsStatusState}" />
-
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <FrameLayout
-                                android:id="@+id/buttonCollapse"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <androidx.appcompat.widget.AppCompatImageView
-                                    android:layout_width="48dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="end"
-                                    android:minHeight="48dp"
-                                    android:scaleType="centerInside"
-                                    android:tint="?attr/colorOnSurface"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:srcCompat="@drawable/ic_baseline_expand_less_24" />
-                            </FrameLayout>
-                        </LinearLayout>
-                    </androidx.core.widget.NestedScrollView>
-                </net.cachapa.expandablelayout.ExpandableLayout>
-            </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/layoutNewGuiKeyboardAd"
@@ -217,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:clickable="true"
@@ -225,7 +83,7 @@
                 android:visibility="@{viewModel.onboardingState.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/headerLayout"
+                app:layout_constraintTop_toBottomOf="@+id/cardViewRecyclerViewErrors"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -270,11 +128,11 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
-                        app:drawableStartCompat="@drawable/ic_outline_star_border_24"
                         android:drawablePadding="16dp"
                         android:gravity="center_vertical"
                         android:text="@string/new_gui_keyboard_ad_message"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        app:drawableStartCompat="@drawable/ic_outline_star_border_24"
                         app:drawableTint="@color/warn"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/buttonGetNewGuiKeyboard"
@@ -336,8 +194,8 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
-            android:contentDescription="@string/content_description_fab_new_keymap"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_fab_new_keymap"
             android:onClick="@{() -> viewModel.onFabPressed()}"
             android:src='@{viewModel.appBarState == HomeAppBarState.MULTI_SELECTING ? @drawable/ic_baseline_delete_outline_24 : @drawable/ic_baseline_add_24}'
             app:layout_anchor="@id/appBar" />

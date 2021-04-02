@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.TriggerKeyBindingModel_
 import io.github.sds100.keymapper.databinding.FragmentTriggerBinding
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.error
+import io.github.sds100.keymapper.fixError
 import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
@@ -122,7 +122,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
 
                 binding.recyclerViewError.withModels {
                     state.errorListItems.forEach {
-                        error {
+                        fixError {
                             id(it.id)
                             model(it)
 

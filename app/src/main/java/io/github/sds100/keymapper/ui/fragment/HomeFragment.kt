@@ -3,21 +3,17 @@ package io.github.sds100.keymapper.ui.fragment
 import android.content.*
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
-import androidx.transition.Fade
-import androidx.transition.TransitionManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -30,11 +26,10 @@ import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.databinding.DialogChooseAppStoreBinding
 import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
-import io.github.sds100.keymapper.ui.view.StatusLayout
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -43,9 +38,7 @@ import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
-import splitties.toast.longToast
 import splitties.toast.toast
-import timber.log.Timber
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 
@@ -66,31 +59,6 @@ class HomeFragment : Fragment() {
     private val binding: FragmentHomeBinding
         get() = _binding!!
 
-    private val expandedHeader = MutableLiveData(false)
-    private val collapsedStatusState = MutableLiveData(StatusLayout.State.ERROR)
-    private val accessibilityServiceStatusState = MutableLiveData(StatusLayout.State.ERROR)
-    private val imeServiceStatusState = MutableLiveData(StatusLayout.State.ERROR)
-    private val dndAccessStatusState = MutableLiveData(StatusLayout.State.ERROR)
-    private val writeSettingsStatusState = MutableLiveData(StatusLayout.State.ERROR)
-    private val batteryOptimisationState = MutableLiveData(StatusLayout.State.ERROR)
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent ?: return
-
-            when (intent.action) {
-
-                MyAccessibilityService.ACTION_ON_START -> {
-                    accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
-                }
-
-                MyAccessibilityService.ACTION_ON_STOP -> {
-                    accessibilityServiceStatusState.value = StatusLayout.State.ERROR
-                }
-            }
-        }
-    }
-
     private val backupAllKeymapsLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
             it ?: return@registerForActivityResult
@@ -110,11 +78,6 @@ class HomeFragment : Fragment() {
         InjectorUtils.provideBackupRestoreViewModel(requireContext())
     }
 
-    private val requestAccessNotificationPolicy =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            updateStatusLayouts()
-        }
-
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             if (position == 0) {
@@ -126,26 +89,14 @@ class HomeFragment : Fragment() {
     }
 
     private var quickStartGuideTapTarget: MaterialTapTargetPrompt? = null
-    private lateinit var recoverFailureDelegate: RecoverFailureDelegate
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        IntentFilter().apply {
-            addAction(Intent.ACTION_INPUT_METHOD_CHANGED)
-            addAction(MyAccessibilityService.ACTION_ON_START)
-            addAction(MyAccessibilityService.ACTION_ON_STOP)
-
-            requireContext().registerReceiver(broadcastReceiver, this)
-        }
-    }
+    private lateinit var fixErrorDelegate: FixErrorDelegate
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        recoverFailureDelegate = RecoverFailureDelegate(
+        fixErrorDelegate = FixErrorDelegate(
             "HomeFragment",
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
@@ -250,75 +201,6 @@ class HomeFragment : Fragment() {
                 }
             })
 
-            //TODO move all this to view model
-            expanded = expandedHeader
-            collapsedStatusLayoutState = this@HomeFragment.collapsedStatusState
-            accessibilityServiceStatusState = this@HomeFragment.accessibilityServiceStatusState
-            imeServiceStatusState = this@HomeFragment.imeServiceStatusState
-            dndAccessStatusState = this@HomeFragment.dndAccessStatusState
-            writeSettingsStatusState = this@HomeFragment.writeSettingsStatusState
-            batteryOptimisationState = this@HomeFragment.batteryOptimisationState
-
-            buttonCollapse.setOnClickListener {
-                expandedHeader.value = false
-            }
-
-            layoutCollapsed.setOnClickListener {
-                expandedHeader.value = true
-            }
-
-            setEnableAccessibilityService {
-                AccessibilityUtils.enableService(requireContext())
-            }
-
-            setEnableImeService {
-                viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-
-                    KeyboardUtils.enableCompatibleInputMethods(requireContext())
-
-                    delay(3000)
-
-                    updateStatusLayouts()
-                }
-            }
-
-            setGrantWriteSecureSettingsPermission {
-                PermissionUtils.requestWriteSecureSettingsPermission(
-                    requireContext(),
-                    findNavController()
-                )
-            }
-
-            setGrantDndAccess {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PermissionUtils.requestAccessNotificationPolicy(requestAccessNotificationPolicy)
-                }
-            }
-
-            setDisableBatteryOptimisation {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    try {
-                        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                        startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        longToast(R.string.error_battery_optimisation_activity_not_found)
-                    }
-                }
-            }
-
-            expandedHeader.observe(viewLifecycleOwner, {
-                if (it == true) {
-                    expandableLayout.expand()
-                } else {
-                    expandableLayout.collapse()
-
-                    val transition = Fade()
-                    TransitionManager.beginDelayedTransition(layoutCollapsed, transition)
-                }
-            })
-
-            updateStatusLayouts()
-
             setGetNewGuiKeyboard {
                 requireContext().alertDialog {
                     messageResource = R.string.dialog_message_select_app_store_gui_keyboard
@@ -340,13 +222,8 @@ class HomeFragment : Fragment() {
             }
 
             viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-                homeViewModel.fixFailure.collectLatest {
-                    coordinatorLayout.showFixErrorSnackBar(
-                        requireContext(),
-                        it,
-                        recoverFailureDelegate,
-                        findNavController()
-                    )
+                homeViewModel.fixError.collectLatest {
+                    fixErrorDelegate.recover(requireContext(), it, findNavController())
                 }
             }
         }
@@ -418,14 +295,42 @@ class HomeFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.errorListState.collectLatest { state ->
+                binding.recyclerViewError.isVisible = state.isVisible
+
+                binding.recyclerViewError.withModels {
+                    state.listItems.forEach { listItem ->
+                        if (listItem is TextListItem.Error) {
+                            fixError {
+                                id(listItem.id)
+
+                                model(listItem)
+
+                                onFixClick { _ ->
+                                    homeViewModel.onFixErrorListItemClick(listItem.id)
+                                }
+                            }
+                        }
+
+                        if (listItem is TextListItem.Success) {
+                            success {
+                                id(listItem.id)
+
+                                model(listItem)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
         homeViewModel.rebuildUiState()
-
-        updateStatusLayouts()
 
         if (PackageUtils.isAppInstalled(
                 requireContext(),
@@ -444,88 +349,5 @@ class HomeFragment : Fragment() {
         binding.viewPager.unregisterOnPageChangeCallback(onPageChangeCallback)
         _binding = null
         super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        requireContext().unregisterReceiver(broadcastReceiver)
-
-        super.onDestroy()
-    }
-
-    private fun updateStatusLayouts() {
-//        if (AccessibilityUtils.isServiceEnabled(requireContext())) {
-//            accessibilityServiceStatusState.value = StatusLayout.State.POSITIVE
-//
-//        } else {
-//            accessibilityServiceStatusState.value = StatusLayout.State.ERROR
-//        }
-//
-//        if (PermissionUtils.haveWriteSecureSettingsPermission(requireContext())) {
-//            writeSettingsStatusState.value = StatusLayout.State.POSITIVE
-//        } else {
-//            writeSettingsStatusState.value = StatusLayout.State.WARN
-//        }
-
-//        if (KeyboardUtils.isCompatibleImeEnabled()) {
-//            imeServiceStatusState.value = StatusLayout.State.POSITIVE
-//
-//        } else if (keymapListViewModel.model.value is Data) {
-//
-//            if ((keymapListViewModel.model.value as Data<List<KeymapListItemModel>>)
-//                    .data.any { keymap ->
-//                        keymap.actionList.any { it.error is RecoverableError.NoCompatibleImeEnabled }
-//                    }
-//            ) {
-//
-//                imeServiceStatusState.value = StatusLayout.State.ERROR
-//            }
-//
-//        } else {
-//            imeServiceStatusState.value = StatusLayout.State.WARN
-//        } //TODO
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (PermissionUtils.isPermissionGranted(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_NOTIFICATION_POLICY
-//                )
-//            ) {
-//
-//                dndAccessStatusState.value = StatusLayout.State.POSITIVE
-//            } else {
-//                dndAccessStatusState.value = StatusLayout.State.WARN
-//            }
-//
-//            if (powerManager.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME)) {
-//                batteryOptimisationState.value = StatusLayout.State.POSITIVE
-//            } else {
-//                batteryOptimisationState.value = StatusLayout.State.WARN
-//            }
-//        }
-//
-//        val states = listOf(
-//            accessibilityServiceStatusState,
-//            writeSettingsStatusState,
-//            imeServiceStatusState,
-//            dndAccessStatusState,
-//            batteryOptimisationState
-//        )
-//
-//        when {
-//            states.all { it.value == StatusLayout.State.POSITIVE } -> {
-//                expandedHeader.value = false
-//                collapsedStatusState.value = StatusLayout.State.POSITIVE
-//            }
-//
-//            states.any { it.value == StatusLayout.State.ERROR } -> {
-//                expandedHeader.value = true
-//                collapsedStatusState.value = StatusLayout.State.ERROR
-//            }
-//
-//            states.any { it.value == StatusLayout.State.WARN } -> {
-//                expandedHeader.value = false
-//                collapsedStatusState.value = StatusLayout.State.WARN
-//            }
-//        }
     }
 }

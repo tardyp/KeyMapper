@@ -65,6 +65,7 @@ sealed class RecoverableError : Error() {
     object NoCompatibleImeEnabled : RecoverableError()
     object NoCompatibleImeChosen : RecoverableError()
     object AccessibilityServiceDisabled : RecoverableError()
+    object IsBatteryOptimised: RecoverableError()
 
     data class PermissionDenied(val permission: String) : RecoverableError() {
         companion object {

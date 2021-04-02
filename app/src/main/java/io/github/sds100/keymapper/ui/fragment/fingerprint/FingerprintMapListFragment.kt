@@ -17,7 +17,7 @@ import io.github.sds100.keymapper.ui.fragment.OldRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItemModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import splitties.alertdialog.appcompat.*
 
 /**
@@ -46,7 +46,7 @@ class FingerprintMapListFragment
     override val modelState: ModelState<List<FingerprintMapListItemModel>>
         get() = viewModel
 
-    private lateinit var recoverFailureDelegate: RecoverFailureDelegate
+    private lateinit var fixErrorDelegate: FixErrorDelegate
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +54,7 @@ class FingerprintMapListFragment
         savedInstanceState: Bundle?
     ): View? {
 
-        recoverFailureDelegate = RecoverFailureDelegate(
+        fixErrorDelegate = FixErrorDelegate(
             "FingerprintGestureFragment",
             requireActivity().activityResultRegistry,
             viewLifecycleOwner

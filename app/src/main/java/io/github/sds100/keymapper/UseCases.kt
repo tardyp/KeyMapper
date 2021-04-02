@@ -9,7 +9,10 @@ import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDevi
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.ListKeymapsUseCaseImpl
-import io.github.sds100.keymapper.domain.permissions.IsPermissionGrantedUseCaseImpl
+import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
+import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
+import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCaseImpl
+import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedImpl
 import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
@@ -55,7 +58,7 @@ object UseCases {
     )
 
     fun recordTrigger(ctx: Context) =
-        (ctx.applicationContext as MyApplication).recordTriggerController
+        (ctx.applicationContext as KeyMapperApp).recordTriggerController
 
     fun listKeymaps(ctx: Context) = ListKeymapsUseCaseImpl(
         ServiceLocator.roomKeymapRepository(ctx)
@@ -83,6 +86,12 @@ object UseCases {
     fun isSystemActionSupported(ctx: Context) =
         IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(ctx))
 
-    fun isPermissionGranted(ctx: Context) =
-        IsPermissionGrantedUseCaseImpl(ServiceLocator.permissionAdapter(ctx))
+    fun isDndAccessGranted(ctx: Context) =
+        IsDoNotDisturbAccessGrantedImpl(ServiceLocator.permissionAdapter(ctx))
+
+    fun isBatteryOptimised(ctx: Context) =
+        IsBatteryOptimisedUseCaseImpl(ServiceLocator.powerManagementAdapter(ctx))
+
+    fun isAccessibilityServiceEnabled(ctx: Context) =
+        IsAccessibilityServiceEnabledUseCaseImpl(ServiceLocator.serviceAdapter(ctx))
 }

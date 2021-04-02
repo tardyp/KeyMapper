@@ -1,8 +1,9 @@
-package io.github.sds100.keymapper
+package io.github.sds100.keymapper.ui
 
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.annotation.RequiresApi
+import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.NotificationUtils.CHANNEL_ID_PERSISTENT
@@ -18,17 +19,20 @@ import io.github.sds100.keymapper.util.NotificationUtils.ID_TOGGLE_KEYBOARD
 import io.github.sds100.keymapper.util.NotificationUtils.ID_TOGGLE_KEYMAPS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 24/03/2019.
  */
 
-class NotificationController(
+class NotificationViewModel(
     coroutineScope: CoroutineScope,
     private val manager: INotificationManagerWrapper,
     private val useCase: ManageNotificationsUseCase,
+    private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
     iNotificationController: INotificationController
 ) : INotificationController by iNotificationController {
 
@@ -38,8 +42,9 @@ class NotificationController(
                 useCase.showImePickerNotification,
                 useCase.showToggleKeyboardNotification,
                 useCase.showToggleKeymapsNotification,
-                useCase.keymapsPaused
-            ) { _, _, _, _ ->
+                useCase.keymapsPaused,
+                isServiceEnabled.isEnabled
+            ) { _, _, _, _, _ ->
 
                 invalidateNotifications()
             }.collect()

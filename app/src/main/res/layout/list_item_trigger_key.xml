@@ -34,6 +34,7 @@
             android:id="@+id/imageViewLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:tint="?attr/colorOnSurface"
             android:src="@{model.linkType == TriggerKeyLinkType.ARROW ? @drawable/ic_baseline_arrow_downward_24 : @drawable/ic_baseline_add_24}"
             android:visibility="@{model.linkType == TriggerKeyLinkType.HIDDEN ? View.GONE : View.VISIBLE}"

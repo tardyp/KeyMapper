@@ -10,8 +10,6 @@ import io.github.sds100.keymapper.util.str
  * Created by sds100 on 29/02/2020.
  */
 
-//TODO rename file to Error
-
 //TODO remove
 fun Error.getFullMessage(ctx: Context) = when (this) {
     is RecoverableError.PermissionDenied -> RecoverableError.PermissionDenied.getMessageForPermission(
@@ -132,10 +130,5 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     RecoverableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
     is Error.ImeNotFoundForPackage -> TODO()
-}
-
-fun Error.getBriefMessage(ctx: Context) = when (this) {
-    is RecoverableError.AppNotFound -> ctx.str(R.string.error_app_isnt_installed_brief)
-
-    else -> getFullMessage(ctx)
+    is RecoverableError.IsBatteryOptimised -> resourceProvider.getString(R.string.error_battery_optimisation_enabled)
 }

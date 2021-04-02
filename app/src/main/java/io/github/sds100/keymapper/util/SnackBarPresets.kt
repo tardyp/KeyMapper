@@ -6,7 +6,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.navigation.NavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.SnackBarUi
-import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.RecoverableError
 import io.github.sds100.keymapper.util.result.getFullMessage
@@ -29,7 +29,7 @@ fun CoordinatorLayout.showEnableAccessibilityServiceSnackBar() {
 fun CoordinatorLayout.showFixErrorSnackBar(
     ctx: Context,
     error: Error,
-    recoverFailureDelegate: RecoverFailureDelegate,
+    fixErrorDelegate: FixErrorDelegate,
     navController: NavController
 ) {
     longSnack(error.getFullMessage(context)) {
@@ -37,7 +37,7 @@ fun CoordinatorLayout.showFixErrorSnackBar(
         //only add an action to fix the error if the error can be recovered from
         if (error is RecoverableError) {
             action(R.string.snackbar_fix) {
-                recoverFailureDelegate.recover(ctx, error, navController)
+                fixErrorDelegate.recover(ctx, error, navController)
             }
         }
 

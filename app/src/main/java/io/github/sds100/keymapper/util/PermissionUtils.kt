@@ -21,6 +21,7 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.service.DeviceAdmin
 import splitties.alertdialog.appcompat.*
+import splitties.alertdialog.material.materialAlertDialog
 import splitties.systemservices.devicePolicyManager
 import splitties.systemservices.notificationManager
 import splitties.toast.toast
@@ -36,7 +37,7 @@ object PermissionUtils {
     }
 
     fun requestDeviceAdmin(ctx: Context, launcher: ActivityResultLauncher<Intent>) {
-        ctx.alertDialog {
+        ctx.materialAlertDialog {
 
             messageResource = R.string.enable_device_admin_message
 
@@ -99,7 +100,7 @@ object PermissionUtils {
     }
 
     fun requestRootPermission(ctx: Context, navController: NavController) {
-        ctx.alertDialog {
+        ctx.materialAlertDialog {
             titleResource = R.string.dialog_title_root_prompt
             messageResource = R.string.dialog_message_root_prompt
             setIcon(R.drawable.ic_baseline_warning_24)
@@ -116,7 +117,7 @@ object PermissionUtils {
     }
 
     fun requestWriteSecureSettingsPermission(ctx: Context, navController: NavController) {
-        ctx.alertDialog {
+        ctx.materialAlertDialog {
             messageResource = R.string.dialog_message_write_secure_settings
 
             positiveButton(R.string.pos_grant_write_secure_settings_guide) {

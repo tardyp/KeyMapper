@@ -21,7 +21,7 @@ import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
@@ -44,7 +44,7 @@ abstract class ConfigMappingFragment : Fragment() {
 
     private var onBackPressedDialog: AlertDialog? = null
 
-    private lateinit var recoverFailureDelegate: RecoverFailureDelegate
+    private lateinit var fixErrorDelegate: FixErrorDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +62,7 @@ abstract class ConfigMappingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        recoverFailureDelegate = RecoverFailureDelegate(
+        fixErrorDelegate = FixErrorDelegate(
             "ConfigMappingFragment",
             requireActivity().activityResultRegistry,
             viewLifecycleOwner
@@ -152,7 +152,7 @@ abstract class ConfigMappingFragment : Fragment() {
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.fixError.collectLatest {
                 //don't show snackbar here
-                recoverFailureDelegate.recover(requireContext(), it, findNavController())
+                fixErrorDelegate.recover(requireContext(), it, findNavController())
             }
         }
     }

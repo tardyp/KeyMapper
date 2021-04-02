@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
-import io.github.sds100.keymapper.domain.permissions.IsPermissionGrantedUseCase
+import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
@@ -37,7 +37,7 @@ class TriggerViewModel(
     private val recordTrigger: RecordTriggerUseCase,
     private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
     private val areShortcutsSupported: IsRequestShortcutSupported,
-    private val isPermissionGranted: IsPermissionGrantedUseCase,
+    private val isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
@@ -211,7 +211,7 @@ class TriggerViewModel(
                 if (configState !is State.Data) return@sequence
 
                 if (configState.data.keys.any { it.requiresDndAccessToImitate }) {
-                    if (!isPermissionGranted(Manifest.permission.ACCESS_NOTIFICATION_POLICY)) {
+                    if (!isDndAccessGranted()) {
                         yield(
                             TextListItem.Error(
                                 id = ID_DND_ACCESS_ERROR,

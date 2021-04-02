@@ -8,6 +8,8 @@ import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.framework.adapters.*
+import io.github.sds100.keymapper.ui.INotificationController
+import io.github.sds100.keymapper.ui.NotificationViewModel
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
@@ -19,16 +21,17 @@ import java.io.OutputStream
 /**
  * Created by sds100 on 19/05/2020.
  */
-class MyApplication : MultiDexApplication(),
+class KeyMapperApp : MultiDexApplication(),
     IContentResolver, INotificationManagerWrapper, INotificationController {
     val appCoroutineScope = MainScope()
 
     val notificationController by lazy {
-        NotificationController(
+        NotificationViewModel(
             appCoroutineScope,
             manager = this,
             ManageNotificationsUseCase(ServiceLocator.preferenceRepository(this)),
-            iNotificationController = this
+            iNotificationController = this,
+            isServiceEnabled = UseCases.isAccessibilityServiceEnabled(this)
         )
     }
 
@@ -56,6 +59,7 @@ class MyApplication : MultiDexApplication(),
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
     val launcherShortcutAdapter by lazy { LauncherShortcutAdapterImpl(this) }
+    val powerManagerAdapter by lazy { AndroidPowerManagementAdapter(this) }
 
     val recordTriggerController by lazy {
         RecordTriggerController(appCoroutineScope, serviceAdapter)

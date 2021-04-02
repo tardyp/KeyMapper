@@ -14,9 +14,8 @@ import io.github.sds100.keymapper.domain.adapter.*
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
-import io.github.sds100.keymapper.framework.adapters.LauncherShortcutAdapter
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.framework.adapters.*
+import io.github.sds100.keymapper.ui.NotificationViewModel
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -40,7 +39,7 @@ object ServiceLocator {
         val database = database ?: createDatabase(context.applicationContext)
         keymapRepository = DefaultKeymapRepository(
             database.keymapDao(),
-            (context.applicationContext as MyApplication).appCoroutineScope
+            (context.applicationContext as KeyMapperApp).appCoroutineScope
         )
         return keymapRepository!!
     }
@@ -63,7 +62,7 @@ object ServiceLocator {
 
             return roomKeymapRepository ?: RoomKeymapRepository(
                 dataBase.keymapDao(),
-                (context.applicationContext as MyApplication).appCoroutineScope
+                (context.applicationContext as KeyMapperApp).appCoroutineScope
             ).also {
                 this.roomKeymapRepository = it
             }
@@ -74,7 +73,7 @@ object ServiceLocator {
         val database = database ?: createDatabase(context.applicationContext)
         deviceInfoRepository = RoomDeviceInfoCache(
             database.deviceInfoDao(),
-            (context.applicationContext as MyApplication).appCoroutineScope
+            (context.applicationContext as KeyMapperApp).appCoroutineScope
         )
         return deviceInfoRepository!!
     }
@@ -106,7 +105,7 @@ object ServiceLocator {
 
     private fun createFingerprintMapRepository(context: Context): FingerprintMapRepository {
         val dataStore = dataStoreManager(context).fingerprintGestureDataStore
-        val scope = (context.applicationContext as MyApplication).appCoroutineScope
+        val scope = (context.applicationContext as KeyMapperApp).appCoroutineScope
 
         return fingerprintMapRepository
             ?: DefaultFingerprintMapRepository(dataStore, scope).also {
@@ -176,7 +175,7 @@ object ServiceLocator {
         return preferenceRepository
             ?: DataStorePreferenceRepository(
                 context.applicationContext,
-                (context.applicationContext as MyApplication).appCoroutineScope
+                (context.applicationContext as KeyMapperApp).appCoroutineScope
             ).also {
                 this.preferenceRepository = it
             }
@@ -196,8 +195,8 @@ object ServiceLocator {
             defaultKeymapRepository(context),
             fingerprintMapRepository(context),
             deviceInfoRepository(context),
-            (context.applicationContext as MyApplication).appCoroutineScope,
-            (context.applicationContext as MyApplication),
+            (context.applicationContext as KeyMapperApp).appCoroutineScope,
+            (context.applicationContext as KeyMapperApp),
             BackupRestoreUseCase(preferenceRepository(context))
         ).also {
             this.backupManager = it
@@ -205,55 +204,59 @@ object ServiceLocator {
     }
 
     fun inputMethodAdapter(context: Context): InputMethodAdapter {
-        return (context.applicationContext as MyApplication).inputMethodAdapter
+        return (context.applicationContext as KeyMapperApp).inputMethodAdapter
     }
 
     fun externalDeviceAdapter(context: Context): ExternalInputDeviceAdapter {
-        return (context.applicationContext as MyApplication).externalDeviceAdapter
+        return (context.applicationContext as KeyMapperApp).externalDeviceAdapter
     }
 
     fun bluetoothMonitor(context: Context): BluetoothMonitor {
-        return (context.applicationContext as MyApplication).bluetoothMonitor
+        return (context.applicationContext as KeyMapperApp).bluetoothMonitor
     }
 
-    fun notificationController(context: Context): NotificationController {
-        return (context.applicationContext as MyApplication).notificationController
+    fun notificationController(context: Context): NotificationViewModel {
+        return (context.applicationContext as KeyMapperApp).notificationController
     }
 
     fun resourceProvider(context: Context): ResourceProvider {
-        return (context.applicationContext as MyApplication).resourceProvider
+        return (context.applicationContext as KeyMapperApp).resourceProvider
     }
 
     fun appRepository(context: Context): AppRepository {
-        return (context.applicationContext as MyApplication).appRepository
+        return (context.applicationContext as KeyMapperApp).appRepository
     }
 
     fun appInfoAdapter(context: Context): AppUiAdapter {
-        return (context.applicationContext as MyApplication).appInfoAdapter
+        return (context.applicationContext as KeyMapperApp).appInfoAdapter
     }
 
     fun packageManagerAdapter(context: Context): PackageManagerAdapter {
-        return (context.applicationContext as MyApplication).packageManagerAdapter
+        return (context.applicationContext as KeyMapperApp).packageManagerAdapter
     }
 
     fun cameraAdapter(context: Context): CameraAdapter {
-        return (context.applicationContext as MyApplication).cameraAdapter
+        return (context.applicationContext as KeyMapperApp).cameraAdapter
     }
 
-    fun permissionAdapter(context: Context): PermissionAdapter {
-        return (context.applicationContext as MyApplication).permissionAdapter
+    fun permissionAdapter(context: Context): AndroidPermissionAdapter {
+        return (context.applicationContext as KeyMapperApp).permissionAdapter
     }
 
     fun systemFeatureAdapter(context: Context): SystemFeatureAdapter {
-        return (context.applicationContext as MyApplication).systemFeatureAdapter
+        return (context.applicationContext as KeyMapperApp).systemFeatureAdapter
     }
 
-    fun serviceAdapter(context: Context): ServiceAdapter {
-        return (context.applicationContext as MyApplication).serviceAdapter
+    fun serviceAdapter(context: Context): AccessibilityServiceAdapter {
+        return (context.applicationContext as KeyMapperApp).serviceAdapter
     }
 
     fun launcherShortcutAdapter(context: Context): LauncherShortcutAdapter {
-        return (context.applicationContext as MyApplication).launcherShortcutAdapter
+        return (context.applicationContext as KeyMapperApp).launcherShortcutAdapter
+    }
+
+    fun powerManagementAdapter(context: Context): PowerManagementAdapter {
+        return (context.applicationContext as KeyMapperApp).powerManagerAdapter
     }
 
     @VisibleForTesting

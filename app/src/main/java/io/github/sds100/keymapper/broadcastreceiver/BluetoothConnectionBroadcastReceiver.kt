@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import io.github.sds100.keymapper.MyApplication
+import io.github.sds100.keymapper.KeyMapperApp
 
 /**
  * Created by sds100 on 28/12/2018.
@@ -22,7 +22,7 @@ class BluetoothConnectionBroadcastReceiver : BroadcastReceiver() {
         if (intent.action == BluetoothDevice.ACTION_ACL_CONNECTED ||
             intent.action == BluetoothDevice.ACTION_ACL_DISCONNECTED
         ) {
-            (context.applicationContext as MyApplication).bluetoothMonitor.onReceiveIntent(intent)
+            (context.applicationContext as KeyMapperApp).bluetoothMonitor.onReceiveIntent(intent)
         }
     }
 }

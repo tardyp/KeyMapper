@@ -13,7 +13,7 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.delegate.RecoverFailureDelegate
+import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -32,7 +32,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
     override val modelState: ModelState<List<KeymapListItem>>
         get() = viewModel
 
-    private lateinit var recoverFailureDelegate: RecoverFailureDelegate
+    private lateinit var fixErrorDelegate: FixErrorDelegate
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +40,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
         savedInstanceState: Bundle?
     ): View? {
 
-        recoverFailureDelegate = RecoverFailureDelegate(
+        fixErrorDelegate = FixErrorDelegate(
             "CreateKeymapShortcutFragment",
             requireActivity().activityResultRegistry,
             viewLifecycleOwner

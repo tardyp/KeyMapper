@@ -92,7 +92,10 @@
     <string name="clipboard_label_keymap_uid">Key map UUID</string>
     <string name="check_box_key_event_option_use_shell">Use shell (ROOT only)</string>
 
-    <string name="trigger_error_dnd_access_denied">If you are remapping a volume button you need to give Key Mapper permission to modify the Do Not Disturb mode if you want the buttons to work as expected in Do Not Disturb mode!</string>
+    <string name="trigger_error_dnd_access_denied">If you are remapping a volume button you need to grant Key Mapper permission to modify the Do Not Disturb mode if you want the buttons to work as expected in Do Not Disturb mode!</string>
+    <string name="home_error_is_battery_optimised">Your mappings will stop working randomly! Tap \'Fix\' to fix this.</string>
+    <string name="home_error_accessibility_service_is_disabled">The accessibility service needs to be turned on for your mappings to work!</string>
+    <string name="home_success_accessibility_service_is_enabled">The accessibility service is enabled! Your mappings should work.</string>
 
     <!--  Action descriptions  -->
     <string name="description_open_app">Open %s</string>
@@ -365,6 +368,7 @@
     <string name="dialog_message_enable_physical_keyboard_caps_lock_a_keyboard_layout">You need to choose the \"Caps Lock to camera\" keyboard layout for your keyboard otherwise the Caps Lock key will still lock caps. You can find this setting in your device settings -> Languages and Input -> Physical Keyboard -> Tap on your keyboard -> Set Up Keyboard Layouts. This will remap the Caps Lock key to KEYCODE_CAMERA so Key Mapper can remap it properly.\n\nAfter you\'ve done this you must remove the Caps Lock trigger key and record the Caps Lock key again. It should say \"Camera\" instead of \"Caps Lock\" if you did the steps correctly.</string>
     <string name="dialog_message_select_app_store_gui_keyboard">Where do you want to get the new keyboard?</string>
     <string name="dialog_message_cant_record_trigger"><b>Reboot</b> your device if the "Record trigger" button is counting down and the buttons that you are pressing aren\'t showing up. If your buttons are still not showing up after rebooting then Key Mapper doesn\'t support your buttons. There isn\'t a fix for this.</string>
+    <string name="dialog_message_disable_battery_optimisation">You MUST read this all otherwise you will get frustrated in the future! Tapping \"turn off\" will prevent Android from stopping the app while it is in the background. This is NOT ENOUGH. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com.</string>
 
     <!-- Dialog messages -->
 
@@ -378,6 +382,7 @@
     <string name="pos_grant">Grant</string>
     <string name="pos_join">Join</string>
     <string name="pos_change_location">Change</string>
+    <string name="pos_turn_off">Turn off</string>
 
     <string name="neg_turn_off">Turn off</string>
     <string name="neg_stay_out">Stay out</string>
@@ -387,6 +392,7 @@
 
     <string name="neg_email">Email</string>
     <string name="neutral_discord">Discord</string>
+    <string name="neutral_go_to_dont_kill_my_app">Don\'t Kill My App</string>
 
     <string name="snackbar_cancel">Cancel</string>
     <string name="snackbar_fix">Fix</string>
@@ -567,7 +573,7 @@
     <string name="showcase_note_from_the_developer_description">There is no guarantee that every action will work on your device and that every button can be detected. This is because there are many flavours of Android, and OEMs can break features by accident or intentionally. If something doesn\'t work, please notify the developer and refrain from giving the app a poor rating since the issue is often out of the developer\'s control. =)</string>
 
     <string name="showcase_disable_battery_optimisation_title">Key Mapper may stop working randomly!</string>
-    <string name="showcase_disable_battery_optimisation_message_bad">CRITICAL!!! Tap \"turn off\" to prevent Android from stopping the app while it is in the background. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so it is STRONGLY recommended to turn them off for Key Mapper as well by going to dontkillmyapp.com</string>
+    <string name="showcase_disable_battery_optimisation_message_bad">CRITICAL!!! Tap \"turn off\" to hopefully prevent Android from stopping the app while it is in the background. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com</string>
     <string name="showcase_disable_battery_optimisation_message_good">Stock Android battery optimisation is off. This is not good enough for most devices so go to dontkillmyapp.com for tutorials which show how to turn off even more app-killing features on your device.</string>
     <string name="showcase_disable_battery_optimisation_button_turn_off">Turn off</string>
     <string name="showcase_disable_battery_optimisation_button_dont_kill_my_app">Go to Don\'t Kill My App</string>
@@ -738,8 +744,8 @@
     <string name="error_invalid_number">Invalid number!</string>
     <string name="error_number_too_small">Must be at least %s!</string>
     <string name="error_number_too_big">Must be at most %s!</string>
-    <string name="error_battery_optimisation_enabled">Battery optimisation is turned on! This can randomly stop Key Mapper from working.</string>
-    <string name="error_battery_optimisation_disabled">Battery optimisation is turned off!</string>
+    <string name="error_battery_optimisation_enabled">Battery optimisation is turned on! Turn this off because this can randomly stop Key Mapper from working.</string>
+    <string name="success_battery_optimisation_disabled">Battery optimisation is turned off!</string>
     <string name="error_cant_find_notification_listener_settings">Can\'t find the notification access settings!</string>
     <string name="error_denied_notification_listener_service_permission">Denied notification access permission!</string>
     <string name="error_invalid_intent_extra_value">Invalid!</string>

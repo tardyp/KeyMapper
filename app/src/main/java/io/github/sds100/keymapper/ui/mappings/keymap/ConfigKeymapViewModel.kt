@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.ConfigKeymapTriggerUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
-import io.github.sds100.keymapper.domain.permissions.IsPermissionGrantedUseCase
+import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
@@ -55,7 +55,7 @@ class ConfigKeymapViewModel(
     constraintUiHelper: ConstraintUiHelper,
     private val createKeymapShortcut: CreateKeymapShortcutUseCase,
     areShortcutsSupported: IsRequestShortcutSupported,
-    isPermissionGranted: IsPermissionGrantedUseCase,
+    isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
     resourceProvider: ResourceProvider
 ) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
 
@@ -80,7 +80,7 @@ class ConfigKeymapViewModel(
         recordTriggerUseCase,
         showDeviceInfoUseCase,
         areShortcutsSupported,
-        isPermissionGranted,
+        isDndAccessGranted,
         resourceProvider
     )
 
@@ -216,7 +216,7 @@ class ConfigKeymapViewModel(
         private val constraintUiHelper: ConstraintUiHelper,
         private val createKeymapShortcut: CreateKeymapShortcutUseCase,
         private val isRequestShortcutSupported: IsRequestShortcutSupported,
-        private val isPermissionGranted: IsPermissionGrantedUseCase,
+        private val isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
         private val resourceProvider: ResourceProvider
     ) : ViewModelProvider.Factory {
 
@@ -239,7 +239,7 @@ class ConfigKeymapViewModel(
                 constraintUiHelper,
                 createKeymapShortcut,
                 isRequestShortcutSupported,
-                isPermissionGranted,
+                isDndAccessGranted,
                 resourceProvider
             ) as T
     }

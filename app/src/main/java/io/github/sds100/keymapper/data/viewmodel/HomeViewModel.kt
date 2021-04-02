@@ -7,15 +7,20 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
+import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
+import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCase
 import io.github.sds100.keymapper.domain.settings.GetSettingsUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.ListItem
+import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.MultiSelectProviderImpl
 import io.github.sds100.keymapper.util.result.RecoverableError
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -34,8 +39,15 @@ class HomeViewModel(
     constraintUiHelper: ConstraintUiHelper,
     getConstraintErrorUseCase: GetConstraintErrorUseCase,
     private val settings: GetSettingsUseCase,
+    private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
+    private val isBatteryOptimised: IsBatteryOptimisedUseCase,
     resourceProvider: ResourceProvider
 ) : ViewModel(), ResourceProvider by resourceProvider {
+
+    private companion object {
+        const val ID_ACCESSIBILITY_SERVICE_LIST_ITEM = "accessibility_service"
+        const val ID_BATTERY_OPTIMISATION_LIST_ITEM = "battery_optimised"
+    }
 
     private val multiSelectProvider: MultiSelectProvider = MultiSelectProviderImpl()
 
@@ -59,10 +71,6 @@ class HomeViewModel(
     ) { showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint ->
         HomeOnboardingState(showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint)
     }.stateIn(viewModelScope, SharingStarted.Lazily, HomeOnboardingState())
-
-    val statusLayoutState = settings.hideHomeScreenAlerts.map { hide ->
-        HomeStatusLayoutState(isVisible = !hide)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, HomeStatusLayoutState(isVisible = true))
 
     val selectionCountViewState = multiSelectProvider.state.map {
         when (it) {
@@ -117,6 +125,41 @@ class HomeViewModel(
         HomeAppBarState.NORMAL
     )
 
+    val errorListState = combine(
+        isServiceEnabled.isEnabled,
+        settings.hideHomeScreenAlerts,
+        rebuildState
+    ) { isServiceEnabled, isHidden, _ ->
+        val listItems = sequence {
+            if (isServiceEnabled) {
+                yield(
+                    TextListItem.Success(
+                        ID_ACCESSIBILITY_SERVICE_LIST_ITEM,
+                        getString(R.string.home_success_accessibility_service_is_enabled)
+                    )
+                )
+            } else {
+                yield(
+                    TextListItem.Error(
+                        ID_ACCESSIBILITY_SERVICE_LIST_ITEM,
+                        getString(R.string.home_error_accessibility_service_is_disabled)
+                    )
+                )
+            }
+
+            if (isBatteryOptimised()) {
+                yield(
+                    TextListItem.Error(
+                        ID_BATTERY_OPTIMISATION_LIST_ITEM,
+                        getString(R.string.home_error_is_battery_optimised)
+                    )
+                )
+            } // don't show a success message for this
+        }.toList()
+        HomeErrorListState(listItems, !isHidden)
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, HomeErrorListState(emptyList(), false))
+
     private val _showMenu = MutableSharedFlow<Unit>()
     val showMenu = _showMenu.asSharedFlow()
 
@@ -127,8 +170,8 @@ class HomeViewModel(
     val closeKeyMapper = _closeKeyMapper.asSharedFlow()
 
     //TODO this in keymaplistviewmodel and fingerprintmaplistviewmodel
-    private val _fixFailure = MutableSharedFlow<RecoverableError>()
-    val fixFailure = _fixFailure.asSharedFlow()
+    private val _fixError = MutableSharedFlow<RecoverableError>()
+    val fixError = _fixError.asSharedFlow()
 
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
@@ -200,6 +243,15 @@ class HomeViewModel(
         //TODO
     }
 
+    fun onFixErrorListItemClick(id: String) {
+        viewModelScope.launch {
+            when (id) {
+                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> _fixError.emit(RecoverableError.AccessibilityServiceDisabled)
+                ID_BATTERY_OPTIMISATION_LIST_ITEM -> _fixError.emit(RecoverableError.IsBatteryOptimised)
+            }
+        }
+    }
+
     fun rebuildUiState() {
         runBlocking { rebuildState.emit(Unit) }
     }
@@ -216,7 +268,9 @@ class HomeViewModel(
         private val constraintUiHelper: ConstraintUiHelper,
         private val getConstraintErrorUseCase: GetConstraintErrorUseCase,
         private val resourceProvider: ResourceProvider,
-        private val settingsUseCase: GetSettingsUseCase
+        private val settingsUseCase: GetSettingsUseCase,
+        private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
+        private val isBatteryOptimised: IsBatteryOptimisedUseCase,
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -231,7 +285,9 @@ class HomeViewModel(
                 constraintUiHelper,
                 getConstraintErrorUseCase,
                 settingsUseCase,
-                resourceProvider
+                isServiceEnabled,
+                isBatteryOptimised,
+                resourceProvider,
             ) as T
         }
     }
@@ -257,6 +313,7 @@ data class HomeTabsState(
     val showTabs: Boolean = false,
 )
 
-data class HomeStatusLayoutState(
-    val isVisible: Boolean = true,
+data class HomeErrorListState(
+    val listItems: List<ListItem>,
+    val isVisible: Boolean
 )

@@ -18,7 +18,7 @@ import androidx.lifecycle.*
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
-import io.github.sds100.keymapper.NotificationController
+import io.github.sds100.keymapper.ui.NotificationViewModel
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.*
@@ -63,7 +63,7 @@ class MyAccessibilityService : AccessibilityService(),
         const val ACTION_STOPPED_RECORDING_TRIGGER = "$PACKAGE_NAME.STOPPED_RECORDING_TRIGGER"
         const val ACTION_ON_START = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_START"
         const val ACTION_ON_STOP = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_STOP"
-        const val ACTION_UPDATE_KEYMAP_LIST_CACHE = "$PACKAGE_NAME.UPDATE_KEYMAP_LIST_CACHE"
+        const val ACTION_UPDATE_KEYMAP_LIST_CACHE = "$PACKAGE_NAME.UPDATE_KEYMAP_LIST_CACHE" //TODO just observe it in the repository
         const val ACTION_SEND_EVENT = "$PACKAGE_NAME.ACTION_EVENT"
         const val KEY_EVENT = "$PACKAGE_NAME.EXTRA_EVENT"
 
@@ -193,7 +193,7 @@ class MyAccessibilityService : AccessibilityService(),
     private val isCompatibleImeChosen
         get() = KeyboardUtils.KEY_MAPPER_IME_PACKAGE_LIST.contains(chosenImePackageName)
 
-    private val notificationController: NotificationController
+    private val notificationViewModel: NotificationViewModel
         get() = ServiceLocator.notificationController(this)
 
     private lateinit var controller: AccessibilityServiceController
@@ -224,7 +224,7 @@ class MyAccessibilityService : AccessibilityService(),
             registerReceiver(broadcastReceiver, this)
         }
 
-        notificationController.onEvent(OnAccessibilityServiceStarted)
+        notificationViewModel.onEvent(OnAccessibilityServiceStarted)
         sendPackageBroadcast(ACTION_ON_START)
 
         chosenImePackageName = KeyboardUtils.getChosenInputMethodPackageName(this).valueOrNull()
@@ -269,7 +269,7 @@ class MyAccessibilityService : AccessibilityService(),
             lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         }
 
-        notificationController.onEvent(OnAccessibilityServiceStopped)
+        notificationViewModel.onEvent(OnAccessibilityServiceStopped)
 
         sendPackageBroadcast(ACTION_ON_STOP)
 
@@ -356,7 +356,7 @@ class MyAccessibilityService : AccessibilityService(),
             )
 
             is ShowFingerprintFeatureNotification ->
-                notificationController.onEvent(ShowFingerprintFeatureNotification)
+                notificationViewModel.onEvent(ShowFingerprintFeatureNotification)
 
             is OnStoppedRecordingTrigger ->
                 sendPackageBroadcast(ACTION_STOPPED_RECORDING_TRIGGER)

@@ -17,6 +17,7 @@ import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.firstBlocking
 import splitties.systemservices.devicePolicyManager
 import splitties.systemservices.notificationManager
+import splitties.systemservices.powerManager
 
 /**
  * Created by sds100 on 17/03/2021.
