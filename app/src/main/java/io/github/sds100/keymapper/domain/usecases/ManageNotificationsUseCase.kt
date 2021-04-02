@@ -26,6 +26,6 @@ class ManageNotificationsUseCase(
 
     val showToggleKeymapsNotification by FlowPrefDelegate(
         Keys.showToggleKeymapsNotification,
-        false
+        true
     )
 }

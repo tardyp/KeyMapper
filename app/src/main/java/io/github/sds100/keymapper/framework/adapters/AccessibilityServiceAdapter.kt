@@ -1,16 +1,12 @@
 package io.github.sds100.keymapper.framework.adapters
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.database.ContentObserver
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.provider.Settings
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
+import io.github.sds100.keymapper.framework.JobSchedulerHelper
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
@@ -23,6 +19,7 @@ import io.github.sds100.keymapper.util.sendPackageBroadcast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -55,16 +52,21 @@ class AccessibilityServiceAdapter(context: Context, coroutineScope: CoroutineSco
     }
 
     init {
-        val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean, uri: Uri?) {
-                super.onChange(selfChange, uri)
+        //use job scheduler because there is there is a much shorter delay when the app is in the background
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            JobSchedulerHelper.observeEnabledAccessibilityServices(ctx)
+        } else {
+            val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+            val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean, uri: Uri?) {
+                    super.onChange(selfChange, uri)
 
-                isEnabled.value = getIsEnabled()
+                    isEnabled.value = getIsEnabled()
+                }
             }
-        }
 
-        ctx.contentResolver.registerContentObserver(uri, false, observer)
+            ctx.contentResolver.registerContentObserver(uri, false, observer)
+        }
 
         IntentFilter().apply {
             addAction(MyAccessibilityService.ACTION_SEND_EVENT)
