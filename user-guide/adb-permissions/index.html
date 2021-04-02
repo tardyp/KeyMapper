@@ -560,7 +560,7 @@ For Debug builds (the app icon with a yellow square) the package name is <code>i
 <h2 id="enabling-the-accessibility-service">Enabling the Accessibility Service<a class="headerlink" href="#enabling-the-accessibility-service" title="Permanent link">&para;</a></h2>
 <p>You may wish to enable Key Mapper's accessibility service using ADB if you cannot do so in-app due to manufacturer constraints.</p>
 <p>To add Key Mapper to the List of the enabled accessibility providers, type or paste in a terminal:</p>
-<div class="highlight"><pre><span></span><code>adb shell settings put secure android.permission.ENABLED_ACCESSIBILITY_SERVICES io.github.sds100.keymapper/io.github.sds100.keymapper.service.MyAccessibilityService
+<div class="highlight"><pre><span></span><code>adb shell settings put secure enabled_accessibility_services io.github.sds100.keymapper/io.github.sds100.keymapper.service.MyAccessibilityService
 </code></pre></div>
                 
               
