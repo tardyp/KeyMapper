@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -35,22 +35,22 @@ class GetActionErrorUseCaseImpl(
     override fun getError(action: ActionData): Error? {
         if (action.requiresImeToPerform()) {
             if (!keyMapperImeManager.isCompatibleImeEnabled()) {
-                return RecoverableError.NoCompatibleImeEnabled
+                return FixableError.NoCompatibleImeEnabled
             }
 
             if (!keyMapperImeManager.isCompatibleImeChosen()) {
-                return RecoverableError.NoCompatibleImeChosen
+                return FixableError.NoCompatibleImeChosen
             }
         }
 
         when (action) {
             is OpenAppAction -> {
                 if (!packageManager.isAppEnabled(action.packageName)) {
-                    return RecoverableError.AppDisabled(action.packageName)
+                    return FixableError.AppDisabled(action.packageName)
                 }
 
                 if (!packageManager.isAppInstalled(action.packageName)) {
-                    return RecoverableError.AppNotFound(action.packageName)
+                    return FixableError.AppNotFound(action.packageName)
                 }
             }
 
@@ -58,11 +58,11 @@ class GetActionErrorUseCaseImpl(
                 action.packageName ?: return null
 
                 if (!packageManager.isAppEnabled(action.packageName)) {
-                    return RecoverableError.AppDisabled(action.packageName)
+                    return FixableError.AppDisabled(action.packageName)
                 }
 
                 if (!packageManager.isAppInstalled(action.packageName)) {
-                    return RecoverableError.AppNotFound(action.packageName)
+                    return FixableError.AppNotFound(action.packageName)
                 }
             }
 
@@ -71,7 +71,7 @@ class GetActionErrorUseCaseImpl(
                     action.useShell
                     && !permissionAdapter.isGranted(Constants.PERMISSION_ROOT)
                 ) {
-                    RecoverableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                    FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
                 }
 
             is TapCoordinateAction ->
@@ -81,7 +81,7 @@ class GetActionErrorUseCaseImpl(
 
             is PhoneCallAction ->
                 if (!permissionAdapter.isGranted(Manifest.permission.CALL_PHONE)) {
-                    return RecoverableError.PermissionDenied(Manifest.permission.CALL_PHONE)
+                    return FixableError.PermissionDenied(Manifest.permission.CALL_PHONE)
                 }
 
             is SystemAction -> return action.getError()
@@ -97,7 +97,7 @@ class GetActionErrorUseCaseImpl(
 
         SystemActionUtils.getRequiredPermissions(this.id).forEach { permission ->
             if (!permissionAdapter.isGranted(permission)) {
-                return RecoverableError.PermissionDenied(permission)
+                return FixableError.PermissionDenied(permission)
             }
         }
 

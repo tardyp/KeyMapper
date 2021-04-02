@@ -15,6 +15,7 @@ import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
 
 class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
+    //TODO move this to a view model similar to HomeTabs
     val tabFragmentCreators: List<TabFragmentModel> = mutableListOf(
         TabFragmentModel(R.string.action_type_title_application, AppListFragment.SEARCH_STATE_KEY) {
             AppListFragment().apply {

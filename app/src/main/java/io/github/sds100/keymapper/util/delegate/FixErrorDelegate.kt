@@ -15,9 +15,8 @@ import androidx.navigation.NavController
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import splitties.alertdialog.appcompat.*
-import splitties.alertdialog.material.backgroundInsetBottom
 import splitties.alertdialog.material.materialAlertDialog
 import splitties.toast.longToast
 
@@ -54,9 +53,9 @@ class FixErrorDelegate(
             }
         }
 
-    fun recover(ctx: Context, failure: RecoverableError, navController: NavController) {
+    fun recover(ctx: Context, failure: FixableError, navController: NavController) {
         when (failure) {
-            is RecoverableError.PermissionDenied -> {
+            is FixableError.PermissionDenied -> {
                 when (failure.permission) {
                     Manifest.permission.WRITE_SETTINGS ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -108,9 +107,9 @@ class FixErrorDelegate(
                 }
             }
 
-            is RecoverableError.AppNotFound -> PackageUtils.viewAppOnline(ctx, failure.packageName)
+            is FixableError.AppNotFound -> PackageUtils.viewAppOnline(ctx, failure.packageName)
 
-            is RecoverableError.AppDisabled -> {
+            is FixableError.AppDisabled -> {
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.parse("package:${failure.packageName}")
                     flags = Intent.FLAG_ACTIVITY_NO_HISTORY
@@ -119,18 +118,18 @@ class FixErrorDelegate(
                 }
             }
 
-            is RecoverableError.NoCompatibleImeEnabled -> KeyboardUtils.enableCompatibleInputMethods(
+            is FixableError.NoCompatibleImeEnabled -> KeyboardUtils.enableCompatibleInputMethods(
                 ctx
             )
-            is RecoverableError.NoCompatibleImeChosen -> KeyboardUtils.chooseCompatibleInputMethod(
+            is FixableError.NoCompatibleImeChosen -> KeyboardUtils.chooseCompatibleInputMethod(
                 ctx
             )
 
-            is RecoverableError.AccessibilityServiceDisabled ->{
+            is FixableError.AccessibilityServiceDisabled ->{
                 AccessibilityUtils.enableService(ctx)
             }
 
-            is RecoverableError.IsBatteryOptimised -> {
+            is FixableError.IsBatteryOptimised -> {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
 
                 ctx.materialAlertDialog {

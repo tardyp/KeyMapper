@@ -6,6 +6,8 @@ import java.io.OutputStream
 /**
  * Created by sds100 on 23/01/21.
  */
+
+//TODO rename as FileAdapter
 interface IContentResolver {
     fun openOutputStream(uriString: String): Result<OutputStream>
 }

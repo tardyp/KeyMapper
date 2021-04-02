@@ -46,7 +46,7 @@ internal class DetectKeymapsUseCaseImpl(preferenceRepository: PreferenceReposito
     )
 }
 
-
+//TODO move to get settings use case
 interface DetectKeymapsUseCase {
     val forceVibrate: Flow<Boolean>
     val defaultVibrateDuration: Flow<Int>

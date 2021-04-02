@@ -33,6 +33,13 @@ data class FingerprintMapEntity(
     val isEnabled: Boolean = true
 ) : Parcelable {
     companion object {
+        const val ID_SWIPE_DOWN = "swipe_down"
+        const val ID_SWIPE_UP = "swipe_up"
+        const val ID_SWIPE_LEFT = "swipe_left"
+        const val ID_SWIPE_RIGHT = "swipe_right"
+
+        val GESTURES = arrayOf(ID_SWIPE_DOWN, ID_SWIPE_UP, ID_SWIPE_LEFT, ID_SWIPE_RIGHT)
+
         const val NAME_VERSION = "db_version" // NEVER EVER CHANGE THIS BECAUSE USED TO DETERMINE HOW TO MIGRATE
 
         //DON'T CHANGE THESE. Used for JSON serialization and parsing.
@@ -78,10 +85,5 @@ data class FingerprintMapEntity(
         const val FLAG_VIBRATE = 1
         const val FLAG_SHOW_TOAST = 2
         const val EXTRA_VIBRATION_DURATION = "extra_vibration_duration"
-
-        val FLAG_LABEL_MAP = mapOf(
-            FLAG_VIBRATE to R.string.flag_vibrate,
-            FLAG_SHOW_TOAST to R.string.flag_show_toast
-        )
     }
 }

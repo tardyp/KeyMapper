@@ -10,7 +10,7 @@ import io.github.sds100.keymapper.ui.actions.ActionListItemCreator
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -38,11 +38,8 @@ class ActionListViewModel<A : Action>(
      */
     val openEditOptions = _openEditOptions.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<RecoverableError>()
+    private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
-
-    private val _enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
-    val enableAccessibilityServicePrompt = _enableAccessibilityServicePrompt.asSharedFlow()
 
     private val _chooseAction = MutableSharedFlow<Unit>()
     val chooseAction = _chooseAction.asSharedFlow()
@@ -80,17 +77,11 @@ class ActionListViewModel<A : Action>(
 
                 actionError.getError(actionData)?.let { error ->
                     when (error) {
-                        is RecoverableError -> _fixError.emit(error)
+                        is FixableError -> _fixError.emit(error)
                         else -> testAction(actionData)
                     }
                 }
             }
-        }
-    }
-
-    fun promptToEnableAccessibilityService() {
-        runBlocking {
-            _enableAccessibilityServicePrompt.emit(Unit)
         }
     }
 

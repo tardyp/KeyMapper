@@ -12,14 +12,14 @@ import io.github.sds100.keymapper.util.str
 
 //TODO remove
 fun Error.getFullMessage(ctx: Context) = when (this) {
-    is RecoverableError.PermissionDenied -> RecoverableError.PermissionDenied.getMessageForPermission(
+    is FixableError.PermissionDenied -> FixableError.PermissionDenied.getMessageForPermission(
         ctx,
         permission
     )
-    is RecoverableError.AppNotFound -> ctx.str(R.string.error_app_isnt_installed, packageName)
-    is RecoverableError.AppDisabled -> ctx.str(R.string.error_app_is_disabled)
-    is RecoverableError.NoCompatibleImeEnabled -> ctx.str(R.string.error_ime_service_disabled)
-    is RecoverableError.NoCompatibleImeChosen -> ctx.str(R.string.error_ime_must_be_chosen)
+    is FixableError.AppNotFound -> ctx.str(R.string.error_app_isnt_installed, packageName)
+    is FixableError.AppDisabled -> ctx.str(R.string.error_app_is_disabled)
+    is FixableError.NoCompatibleImeEnabled -> ctx.str(R.string.error_ime_service_disabled)
+    is FixableError.NoCompatibleImeChosen -> ctx.str(R.string.error_ime_must_be_chosen)
     is Error.OptionsNotRequired -> ctx.str(R.string.error_options_not_required)
     is Error.SystemFeatureNotSupported -> ctx.str(R.string.error_feature_not_available, feature)
     is Error.ConstraintNotFound -> ctx.str(R.string.error_constraint_not_found)
@@ -59,18 +59,18 @@ fun Error.getFullMessage(ctx: Context) = when (this) {
 }
 
 fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
-    is RecoverableError.PermissionDenied ->
-        RecoverableError.PermissionDenied.getMessageForPermission(
+    is FixableError.PermissionDenied ->
+        FixableError.PermissionDenied.getMessageForPermission(
             resourceProvider,
             permission
         )
-    is RecoverableError.AppNotFound -> resourceProvider.getString(
+    is FixableError.AppNotFound -> resourceProvider.getString(
         R.string.error_app_isnt_installed,
         packageName
     )
-    is RecoverableError.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
-    is RecoverableError.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
-    is RecoverableError.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
+    is FixableError.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
+    is FixableError.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
+    is FixableError.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
     is Error.OptionsNotRequired -> resourceProvider.getString(R.string.error_options_not_required)
     is Error.SystemFeatureNotSupported -> resourceProvider.getString(
         R.string.error_feature_not_available,
@@ -127,8 +127,8 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     Error.NoMediaSessions -> TODO()
     Error.NoVoiceAssistant -> TODO()
     is Error.UnknownFileLocation -> TODO()
-    RecoverableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
+    FixableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
     is Error.ImeNotFoundForPackage -> TODO()
-    is RecoverableError.IsBatteryOptimised -> resourceProvider.getString(R.string.error_battery_optimisation_enabled)
+    is FixableError.IsBatteryOptimised -> resourceProvider.getString(R.string.error_battery_optimisation_enabled)
 }

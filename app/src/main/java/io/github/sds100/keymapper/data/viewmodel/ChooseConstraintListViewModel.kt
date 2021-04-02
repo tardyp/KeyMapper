@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.util.delegate.ModelState
  * Created by sds100 on 21/03/2020.
  */
 
+//TODO
 class ChooseConstraintListViewModel(
     private val supportedConstraints: List<String>
 ) : ViewModel(), ModelState<Map<Int, List<ChooseConstraintListItemModel>>> {

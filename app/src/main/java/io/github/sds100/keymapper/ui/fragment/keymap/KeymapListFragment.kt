@@ -11,7 +11,9 @@ import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.keymap
+import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
@@ -64,21 +66,25 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
         listItems: List<KeymapListItem>
     ) {
         recyclerView.withModels {
-            listItems.forEach {
+            listItems.forEach { listItem ->
                 keymap {
-                    id(it.keymapUiState.uid)
-                    keymapUiState(it.keymapUiState)
+                    id(listItem.keymapUiState.uid)
+                    keymapUiState(listItem.keymapUiState)
 
-                    selectionState(it.selectionUiState)
+                    selectionState(listItem.selectionUiState)
 
-                    onChipClick(viewModel)
+                    onChipClick(object : OnChipClickCallback {
+                        override fun onChipClick(chipModel: ChipUi) {
+                            viewModel.onChipClick(listItem.keymapUiState.uid, chipModel)
+                        }
+                    })
 
                     onCardClick { _ ->
-                        viewModel.onKeymapCardClick(it.keymapUiState.uid)
+                        viewModel.onKeymapCardClick(listItem.keymapUiState.uid)
                     }
 
                     onCardLongClick { _ ->
-                        viewModel.onKeymapCardLongClick(it.keymapUiState.uid)
+                        viewModel.onKeymapCardLongClick(listItem.keymapUiState.uid)
                         true
                     }
                 }

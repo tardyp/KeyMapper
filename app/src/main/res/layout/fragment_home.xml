@@ -18,10 +18,6 @@
             type="View.OnClickListener" />
 
         <variable
-            name="isFingerprintGestureDetectionAvailable"
-            type="Boolean" />
-
-        <variable
             name="viewModel"
             type="io.github.sds100.keymapper.data.viewmodel.HomeViewModel" />
     </data>

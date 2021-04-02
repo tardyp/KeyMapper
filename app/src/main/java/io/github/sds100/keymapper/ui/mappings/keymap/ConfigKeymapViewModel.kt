@@ -38,6 +38,12 @@ import kotlinx.coroutines.runBlocking
  * Created by sds100 on 22/11/20.
  */
 
+/*
+TODO
+- move classes in data, domain and ui into individual feature packages
+- dont have individual use cases for modifying key maps. Create functions in ConfigKeymap object
+ */
+
 class ConfigKeymapViewModel(
     private val save: SaveKeymapUseCase,
     private val get: GetKeymapUseCase,
@@ -57,7 +63,8 @@ class ConfigKeymapViewModel(
     areShortcutsSupported: IsRequestShortcutSupported,
     isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
+) : ViewModel(), ConfigMappingViewModel,
+    ResourceProvider by resourceProvider {
 
     companion object {
         private const val STATE_KEY = "config_keymap"
@@ -103,9 +110,7 @@ class ConfigKeymapViewModel(
         triggerViewModel.fixError,
         actionListViewModel.fixError,
         constraintListViewModel.fixError
-    ).shareIn(viewModelScope, SharingStarted.Eagerly)
-
-    override val enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
+    )
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -115,15 +120,6 @@ class ConfigKeymapViewModel(
                 buildUiState(configState)
             }.collectLatest {
                 state.value = it
-            }
-        }
-
-        viewModelScope.launch {
-            merge(
-                actionListViewModel.enableAccessibilityServicePrompt,
-                triggerViewModel.enableAccessibilityServicePrompt
-            ).collectLatest {
-                enableAccessibilityServicePrompt.emit(it)
             }
         }
 

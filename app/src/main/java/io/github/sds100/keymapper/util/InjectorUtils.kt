@@ -5,10 +5,7 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.domain.ime.GetEnabledInputMethodsUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.packages.GetPackagesUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
@@ -154,14 +151,6 @@ object InjectorUtils {
         )
     }
 
-    fun provideFingerprintMapListViewModel(context: Context): FingerprintMapListViewModel.Factory {
-        return FingerprintMapListViewModel.Factory(
-            ServiceLocator.fingerprintMapRepository(context),
-            UseCases.getInputDevices(context),
-            ListFingerprintMapsUseCase(ServiceLocator.preferenceRepository(context))
-        )
-    }
-
     fun provideMenuFragmentViewModel(context: Context): MenuFragmentViewModel.Factory {
         return MenuFragmentViewModel.Factory(
             ServiceLocator.defaultKeymapRepository(context),
@@ -209,7 +198,9 @@ object InjectorUtils {
             GetFingerprintMapUseCaseImpl(ServiceLocator.fingerprintMapRepository(ctx)),
             configUseCase,
             configUseCase.configActions,
+            configUseCase.configConstraints,
             UseCases.getActionError(ctx),
+            UseCases.getConstraintError(ctx),
             UseCases.testAction(ctx),
             fingerprintActionUiHelper(ctx),
             constraintUiHelper(ctx),
@@ -230,17 +221,21 @@ object InjectorUtils {
         return HomeViewModel.Factory(
             UseCases.onboarding(ctx),
             UseCases.listKeymaps(ctx),
+            UseCases.getFingerprintMap(ctx),
+            EnableDisableFingerprintMapsUseCaseImpl(ServiceLocator.fingerprintMapRepository(ctx)),
             DeleteKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             EnableDisableKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             DuplicateKeymapsUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             UseCases.getActionError(ctx),
             UseCases.keymapActionUiHelper(ctx),
+            UseCases.fingerprintMapActionUiHelper(ctx),
             constraintUiHelper(ctx),
             UseCases.getConstraintError(ctx),
-            ServiceLocator.resourceProvider(ctx),
             UseCases.getSettings(ctx),
             UseCases.isAccessibilityServiceEnabled(ctx),
-            UseCases.isBatteryOptimised(ctx)
+            UseCases.isBatteryOptimised(ctx),
+            ServiceLocator.resourceProvider(ctx),
+            AreFingerprintGesturesSupportedUseCaseImpl(ServiceLocator.preferenceRepository(ctx)),
         )
     }
 
@@ -306,7 +301,11 @@ object InjectorUtils {
             performActionsUseCase = PerformActionsUseCaseImpl(preferenceRepository),
             onboarding = UseCases.onboarding(service),
             fingerprintMapRepository = ServiceLocator.fingerprintMapRepository(service),
-            keymapRepository = ServiceLocator.defaultKeymapRepository(service)
+            keymapRepository = ServiceLocator.defaultKeymapRepository(service),
+            areFingerprintGesturesSupported = AreFingerprintGesturesSupportedUseCaseImpl(
+                ServiceLocator.preferenceRepository(service)
+            ),
+            preferenceRepository = ServiceLocator.preferenceRepository(service)
         )
     }
 }

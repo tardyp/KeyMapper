@@ -13,12 +13,13 @@ import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
 import io.github.sds100.keymapper.util.ViewPopulated
 import io.github.sds100.keymapper.util.requiresDndAccessToImitate
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -39,10 +40,11 @@ class TriggerViewModel(
     private val areShortcutsSupported: IsRequestShortcutSupported,
     private val isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider {
+) : ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
 
     private companion object {
-        const val ID_DND_ACCESS_ERROR = "id_dnd_access_status"
+        const val ID_DND_ACCESS_ERROR_LIST_ITEM = "id_dnd_access_status"
+        const val KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG = "enable_accessibility_service"
     }
 
     val optionsViewModel = TriggerOptionsViewModel(
@@ -52,9 +54,6 @@ class TriggerViewModel(
         areShortcutsSupported,
         resourceProvider,
     )
-
-    private val _enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
-    val enableAccessibilityServicePrompt = _enableAccessibilityServicePrompt.asSharedFlow()
 
     //TODO dialog that prompts the user to restart the accessibility service if failing to record a trigger too many times
     //TODO dialogs
@@ -73,7 +72,7 @@ class TriggerViewModel(
     private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
     val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<RecoverableError>()
+    private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
 
     private val _state = MutableStateFlow(
@@ -165,7 +164,14 @@ class TriggerViewModel(
         when (recordTrigger.state.value) {
             is RecordTriggerState.CountingDown -> recordTrigger.stopRecording()
             RecordTriggerState.Stopped -> recordTrigger.startRecording().onFailure {
-                runBlocking { _enableAccessibilityServicePrompt.emit(Unit) }
+                val snackBar = DialogUi.SnackBar(
+                    title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
+                    actionText = getString(R.string.pos_turn_on)
+                )
+
+                runBlocking {
+                    showDialog(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
+                }
             }
         }
     }
@@ -179,9 +185,9 @@ class TriggerViewModel(
     fun fixError(listItemId: String) {
         coroutineScope.launch {
             when (listItemId) {
-                ID_DND_ACCESS_ERROR -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ID_DND_ACCESS_ERROR_LIST_ITEM -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val error =
-                        RecoverableError.PermissionDenied(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
+                        FixableError.PermissionDenied(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
                     _fixError.emit(error)
                 }
             }
@@ -214,7 +220,7 @@ class TriggerViewModel(
                     if (!isDndAccessGranted()) {
                         yield(
                             TextListItem.Error(
-                                id = ID_DND_ACCESS_ERROR,
+                                id = ID_DND_ACCESS_ERROR_LIST_ITEM,
                                 text = getString(R.string.trigger_error_dnd_access_denied),
                             )
                         )

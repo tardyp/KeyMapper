@@ -19,7 +19,6 @@ import io.github.sds100.keymapper.domain.usecases.IBackupRestoreUseCase
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -28,6 +27,8 @@ import java.io.OutputStream
 /**
  * Created by sds100 on 23/01/21.
  */
+
+//TODO ensure is singleton. create use cases for view models to interact with this
 class BackupManager(
     private val keymapRepository: BackupRestoreUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,
@@ -51,10 +52,10 @@ class BackupManager(
         private const val NAME_FINGERPRINT_SWIPE_RIGHT = "fingerprint_swipe_right"
 
         private val GESTURE_ID_TO_JSON_KEY_MAP = mapOf(
-            FingerprintMapUtils.SWIPE_DOWN to NAME_FINGERPRINT_SWIPE_DOWN,
-            FingerprintMapUtils.SWIPE_UP to NAME_FINGERPRINT_SWIPE_UP,
-            FingerprintMapUtils.SWIPE_LEFT to NAME_FINGERPRINT_SWIPE_LEFT,
-            FingerprintMapUtils.SWIPE_RIGHT to NAME_FINGERPRINT_SWIPE_RIGHT,
+            FingerprintMapEntity.ID_SWIPE_DOWN to NAME_FINGERPRINT_SWIPE_DOWN,
+            FingerprintMapEntity.ID_SWIPE_UP to NAME_FINGERPRINT_SWIPE_UP,
+            FingerprintMapEntity.ID_SWIPE_LEFT to NAME_FINGERPRINT_SWIPE_LEFT,
+            FingerprintMapEntity.ID_SWIPE_RIGHT to NAME_FINGERPRINT_SWIPE_RIGHT,
         )
     }
 
@@ -64,20 +65,20 @@ class BackupManager(
     private val gson = Gson()
 
     init {
-        fingerprintMapRepository.requestAutomaticBackup.observeForever {
-            coroutineScope.launch(dispatchers.default()) {
-                doAutomaticBackup(keymapRepository.getKeymaps(), it.model)
-            }
-        }
-
-        keymapRepository.requestAutomaticBackup.observeForever { event ->
-            coroutineScope.launch(dispatchers.default()) {
-                val fingerprintMaps =
-                    fingerprintMapRepository.fingerprintGestureMaps.first()
-
-                doAutomaticBackup(event.model, fingerprintMaps)
-            }
-        }
+//        fingerprintMapRepository.requestAutomaticBackup.observeForever {
+//            coroutineScope.launch(dispatchers.default()) {
+//                doAutomaticBackup(keymapRepository.getKeymaps(), it.model)
+//            }
+//        }
+//
+//        keymapRepository.requestAutomaticBackup.observeForever { event ->
+//            coroutineScope.launch(dispatchers.default()) {
+//                val fingerprintMaps = fingerprintMapRepository.fingerprintGestureMaps.first()
+//
+//                doAutomaticBackup(event.model, fingerprintMaps)
+//            }
+//        }
+        //TODO
     }
 
     override fun backupKeymaps(outputStream: OutputStream, keymapIds: List<Long>) {
@@ -180,7 +181,7 @@ class BackupManager(
 
         deviceInfoRepository.insertDeviceInfo(*deviceInfoList.toTypedArray())
 
-        FingerprintMapUtils.GESTURES.forEach { gestureId ->
+        FingerprintMapEntity.GESTURES.forEach { gestureId ->
             val element by rootElement.byNullableObject(GESTURE_ID_TO_JSON_KEY_MAP[gestureId])
 
             element ?: return@forEach
@@ -260,7 +261,10 @@ class BackupManager(
 
     private suspend fun doAutomaticBackup(
         keymaps: List<KeyMapEntity>,
-        fingerprintMaps: Map<String, FingerprintMapEntity>
+        fingerprintSwipeDown: FingerprintMapEntity,
+        fingerprintSwipeUp: FingerprintMapEntity,
+        fingerprintSwipeLeft: FingerprintMapEntity,
+        fingerprintSwipeRight: FingerprintMapEntity
     ) {
 
         if (!shouldBackupAutomatically()) return
@@ -275,10 +279,10 @@ class BackupManager(
                 backupAsync(
                     it,
                     keymaps,
-                    fingerprintMaps[FingerprintMapUtils.SWIPE_DOWN],
-                    fingerprintMaps[FingerprintMapUtils.SWIPE_UP],
-                    fingerprintMaps[FingerprintMapUtils.SWIPE_LEFT],
-                    fingerprintMaps[FingerprintMapUtils.SWIPE_RIGHT]
+                    fingerprintSwipeDown,
+                    fingerprintSwipeUp,
+                    fingerprintSwipeLeft,
+                    fingerprintSwipeRight
                 ).await()
             }
 

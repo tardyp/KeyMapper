@@ -108,7 +108,7 @@ object ServiceLocator {
         val scope = (context.applicationContext as KeyMapperApp).appCoroutineScope
 
         return fingerprintMapRepository
-            ?: DefaultFingerprintMapRepository(dataStore, scope).also {
+            ?: DataStoreFingerprintMapRepository(dataStore, scope).also {
                 this.fingerprintMapRepository = it
             }
     }

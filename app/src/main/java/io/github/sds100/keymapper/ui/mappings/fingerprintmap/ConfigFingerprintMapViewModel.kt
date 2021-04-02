@@ -10,16 +10,20 @@ import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ConfigActionsUseCase
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
+import io.github.sds100.keymapper.domain.constraints.ConfigConstraintsUseCase
+import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.ui.DialogViewModel
+import io.github.sds100.keymapper.ui.DialogViewModelImpl
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.util.result.RecoverableError
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -35,15 +39,18 @@ class ConfigFingerprintMapViewModel(
     private val get: GetFingerprintMapUseCase,
     private val configUseCase: ConfigFingerprintMapUseCase,
     configActions: ConfigActionsUseCase<FingerprintMapAction>,
+    configConstraints: ConfigConstraintsUseCase,
     getActionError: GetActionErrorUseCase,
+    getConstraintError: GetConstraintErrorUseCase,
     testAction: TestActionUseCase,
     actionUiHelper: ActionUiHelper<FingerprintMapAction>,
     constraintUiHelper: ConstraintUiHelper,
     resourceProvider: ResourceProvider
-) : ViewModel(), ConfigMappingViewModel {
+) : ViewModel(), ConfigMappingViewModel, DialogViewModel by DialogViewModelImpl() {
 
     companion object {
-        private const val STATE_KEY = "config_fingerprint_map"
+        private const val STATE_KEY_MAP = "config_fingerprint_map"
+        private const val STATE_KEY_ID = "config_fingerprint_map_id"
     }
 
     val actionListViewModel = ActionListViewModel(
@@ -55,16 +62,23 @@ class ConfigFingerprintMapViewModel(
         resourceProvider
     )
 
-    val constraintListViewModel: ConstraintListViewModel = TODO()
+    val constraintListViewModel = ConstraintListViewModel(
+        viewModelScope,
+        configConstraints,
+        constraintUiHelper,
+        getConstraintError,
+        resourceProvider
+    )
 
     override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
 
     override fun setEnabled(enabled: Boolean) = configUseCase.setEnabled(enabled)
 
-    override val fixError = MutableSharedFlow<RecoverableError>()
-    override val enableAccessibilityServicePrompt = MutableSharedFlow<Unit>()
+    override val fixError = merge(actionListViewModel.fixError, constraintListViewModel.fixError)
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
+
+    private lateinit var id: FingerprintMapId
 
     init {
         viewModelScope.launch {
@@ -75,39 +89,39 @@ class ConfigFingerprintMapViewModel(
             }
         }
 
-        viewModelScope.launch {
-            merge(actionListViewModel.fixError, constraintListViewModel.fixError).collectLatest {
-                fixError.emit(it)
-            }
-        }
-
-        viewModelScope.launch {
-            merge(actionListViewModel.enableAccessibilityServicePrompt).collectLatest {
-                enableAccessibilityServicePrompt.emit(it)
-            }
-        }
-
         runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
-    override fun save() = configUseCase.getFingerprintMap().ifIsData { save(it) }
+    override fun save() = configUseCase.getFingerprintMap().ifIsData { save.invoke(id, it) }
 
     override fun saveState(outState: Bundle) {
         configUseCase.getFingerprintMap().ifIsData {
-            outState.putString(STATE_KEY, Json.encodeToString(it))
+            outState.putString(STATE_KEY_MAP, Json.encodeToString(it))
+            outState.putString(STATE_KEY_ID, Json.encodeToString(id))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun restoreState(state: Bundle) {
-        state.getJsonSerializable<FingerprintMap>(STATE_KEY)?.let {
+        state.getJsonSerializable<FingerprintMap>(STATE_KEY_MAP)?.let {
             configUseCase.setFingerprintMap(it)
+        }
+
+        state.getJsonSerializable<FingerprintMapId>(STATE_KEY_ID)?.let {
+            id = it
         }
     }
 
     fun loadFingerprintMap(id: FingerprintMapId) {
         viewModelScope.launch {
-            configUseCase.setFingerprintMap(get(id))
+            val map = when (id) {
+                FingerprintMapId.SWIPE_DOWN -> get.swipeDown
+                FingerprintMapId.SWIPE_UP -> get.swipeUp
+                FingerprintMapId.SWIPE_LEFT -> get.swipeLeft
+                FingerprintMapId.SWIPE_RIGHT -> get.swipeRight
+            }.first()
+
+            configUseCase.setFingerprintMap(map)
         }
     }
 
@@ -129,9 +143,11 @@ class ConfigFingerprintMapViewModel(
     class Factory(
         private val save: SaveFingerprintMapUseCase,
         private val get: GetFingerprintMapUseCase,
-        private val config: ConfigFingerprintMapUseCase,
+        private val configUseCase: ConfigFingerprintMapUseCase,
         private val configActions: ConfigActionsUseCase<FingerprintMapAction>,
+        private val configConstraints: ConfigConstraintsUseCase,
         private val getActionError: GetActionErrorUseCase,
+        private val getConstraintError: GetConstraintErrorUseCase,
         private val testAction: TestActionUseCase,
         private val actionUiHelper: ActionUiHelper<FingerprintMapAction>,
         private val constraintUiHelper: ConstraintUiHelper,
@@ -143,9 +159,11 @@ class ConfigFingerprintMapViewModel(
             ConfigFingerprintMapViewModel(
                 save,
                 get,
-                config,
+                configUseCase,
                 configActions,
+                configConstraints,
                 getActionError,
+                getConstraintError,
                 testAction,
                 actionUiHelper,
                 constraintUiHelper,

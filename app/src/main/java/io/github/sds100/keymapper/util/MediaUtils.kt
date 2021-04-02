@@ -113,6 +113,6 @@ object MediaUtils {
             return Success(mediaSessionManager.getActiveSessions(component))
         }
 
-        return RecoverableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+        return FixableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
     }
 }

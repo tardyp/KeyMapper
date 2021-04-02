@@ -63,7 +63,9 @@ class PickDisplayCoordinateViewModel(
                 && displaySize.x != newBitmap.height)
         ) {
             viewModelScope.launch {
-                _showSnackBar.emit(SnackBarUi(getString(R.string.toast_incorrect_screenshot_resolution)))
+                _showSnackBar.emit(
+                    SnackBarUi(getString(R.string.toast_incorrect_screenshot_resolution))
+                )
             }
 
             return

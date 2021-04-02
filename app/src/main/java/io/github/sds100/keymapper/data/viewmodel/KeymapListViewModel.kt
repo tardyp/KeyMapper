@@ -8,14 +8,13 @@ import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
-import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -28,7 +27,7 @@ class KeymapListViewModel internal constructor(
     getConstraintErrorUseCase: GetConstraintErrorUseCase,
     resourceProvider: ResourceProvider,
     private val multiSelectProvider: MultiSelectProvider
-) : OnChipClickCallback {
+) {
 
     private val modelCreator = KeymapListItemCreator(
         getActionError,
@@ -47,7 +46,7 @@ class KeymapListViewModel internal constructor(
     private val _launchConfigKeymap = MutableSharedFlow<String>()
     val launchConfigKeymap = _launchConfigKeymap.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<RecoverableError>()
+    private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
@@ -136,18 +135,19 @@ class KeymapListViewModel internal constructor(
         }
     }
 
-    override fun onChipClick(chipModel: ChipUi) {
+    fun onChipClick(keymapUid: String, chipModel: ChipUi) {
         if (chipModel is ChipUi.Error) {
             coroutineScope.launch {
                 val actionUid = chipModel.id
                 val actionData = getKeymapList.keymapList.first()
-                    .flatMap { it.actionDataList }
-                    .singleOrNull { it.uid == actionUid }
+                    .singleOrNull { keyMap -> keyMap.uid == keymapUid }
+                    ?.actionList
+                    ?.singleOrNull { action -> action.uid == actionUid }
                     ?.data
                     ?: return@launch
 
                 val error = getActionError.getError(actionData)
-                if (error is RecoverableError) {
+                if (error is FixableError) {
                     _fixError.emit(error)
                 }
             }

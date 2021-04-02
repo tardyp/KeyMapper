@@ -12,24 +12,14 @@ import kotlinx.coroutines.flow.Flow
 interface FingerprintMapRepository {
     val requestAutomaticBackup: LiveData<BackupRequest<Map<String, FingerprintMapEntity>>>
 
-    //TODO remove these and replace with get()
     val swipeDown: Flow<FingerprintMapEntity>
     val swipeUp: Flow<FingerprintMapEntity>
     val swipeLeft: Flow<FingerprintMapEntity>
     val swipeRight: Flow<FingerprintMapEntity>
 
-    suspend fun get(id: FingerprintMapId): FingerprintMapEntity
+    fun set(id: String, map: FingerprintMapEntity)
 
-    val fingerprintGestureMaps: Flow<Map<String, FingerprintMapEntity>>
-    val fingerprintGesturesAvailable: Flow<Boolean?>
-
-    fun setFingerprintGesturesAvailable(available: Boolean)
-    fun restore(id: FingerprintMapId, fingerprintMapJson: String)
-
-    fun updateGesture(
-        id: FingerprintMapId,
-        block: (old: FingerprintMapEntity) -> FingerprintMapEntity
-    )
+    fun restore(id: String, fingerprintMapJson: String)
 
     fun reset()
 }

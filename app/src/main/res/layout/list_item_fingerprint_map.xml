@@ -21,7 +21,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItemModel" />
+            type="io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItem" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

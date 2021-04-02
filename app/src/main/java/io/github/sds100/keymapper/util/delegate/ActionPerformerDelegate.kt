@@ -101,13 +101,13 @@ class ActionPerformerDelegate(
 
                             //if the app is disabled, show an error message because it won't open
                             if (!appInfo.enabled) {
-                                RecoverableError.AppDisabled(packageName)
+                                FixableError.AppDisabled(packageName)
                             }
 
                             Success(packageName)
 
                         } catch (e: Exception) {
-                            RecoverableError.AppNotFound(packageName)
+                            FixableError.AppNotFound(packageName)
                         }.onFailure {
                             toast(it.getFullMessage(this))
                         }

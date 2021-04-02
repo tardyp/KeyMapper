@@ -23,6 +23,7 @@ import io.github.sds100.keymapper.util.delegate.ModelState
 /**
  * Created by sds100 on 22/02/2020.
  */
+//TODO delete
 abstract class OldRecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
 
     companion object {

@@ -4,6 +4,12 @@ package io.github.sds100.keymapper.ui.dialogs
  * Created by sds100 on 23/03/2021.
  */
 sealed class DialogUi<RESPONSE : DialogResponse> {
+
+    data class SnackBar(val title: String, val long: Boolean = false, val actionText: String?
+    ) : DialogUi<SnackBarActionResponse>()
+
+    object SnackBarActionResponse : DialogResponse
+
     data class OkMessage(val message: String) : DialogUi<OkResponse>()
     object OkResponse : DialogResponse
 

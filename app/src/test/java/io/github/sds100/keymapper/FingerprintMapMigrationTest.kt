@@ -7,14 +7,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.repository.DefaultFingerprintMapRepository
+import io.github.sds100.keymapper.data.repository.DataStoreFingerprintMapRepository
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.util.FakeDataStore
 import io.github.sds100.keymapper.util.JsonTestUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
@@ -51,7 +50,7 @@ class FingerprintMapMigrationTest {
     fun init() {
         Dispatchers.setMain(testDispatcher)
         dataStore = FakeDataStore()
-        repository = DefaultFingerprintMapRepository(dataStore, coroutineScope)
+        repository = DataStoreFingerprintMapRepository(dataStore, coroutineScope)
     }
 
     @After

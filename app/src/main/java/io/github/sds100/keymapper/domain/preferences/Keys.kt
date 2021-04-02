@@ -48,4 +48,7 @@ internal object Keys {
         preferencesKey<Int>("last_installed_version_accessibility_service")
 
     val shownQuickStartGuideHint = preferencesKey<Boolean>("tap_target_quick_start_guide")
+
+    val fingerprintGesturesAvailable =
+        preferencesKey<Boolean>("fingerprint_gestures_available")
 }

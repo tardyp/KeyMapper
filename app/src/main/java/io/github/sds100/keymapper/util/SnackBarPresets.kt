@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.SnackBarUi
 import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import splitties.snackbar.action
 import splitties.snackbar.longSnack
@@ -35,7 +35,7 @@ fun CoordinatorLayout.showFixErrorSnackBar(
     longSnack(error.getFullMessage(context)) {
 
         //only add an action to fix the error if the error can be recovered from
-        if (error is RecoverableError) {
+        if (error is FixableError) {
             action(R.string.snackbar_fix) {
                 fixErrorDelegate.recover(ctx, error, navController)
             }

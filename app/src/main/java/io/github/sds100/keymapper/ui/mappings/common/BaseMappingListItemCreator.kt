@@ -71,18 +71,25 @@ abstract class BaseMappingListItemCreator<A : Action>(
                         }
                     }
 
-                    yield(
-                        ChipUi.Normal(
-                            id = action.uid,
-                            text = chipText,
-                            icon = icon
-                        )
-                    )
+                    val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)
+                    yield(chip)
                 }
 
-                error != null -> yield(
-                    ChipUi.Error(action.uid, error.getFullMessage(this@BaseMappingListItemCreator))
-                )
+                error != null -> {
+                    val chip = if (error is FixableError) {
+                        ChipUi.FixableError(
+                            action.uid,
+                            error.getFullMessage(this@BaseMappingListItemCreator)
+                        )
+                    } else {
+                        ChipUi.Error(
+                            action.uid,
+                            error.getFullMessage(this@BaseMappingListItemCreator)
+                        )
+                    }
+
+                    yield(chip)
+                }
             }
         }
 
@@ -119,10 +126,17 @@ abstract class BaseMappingListItemCreator<A : Action>(
                     icon = icon
                 )
             } else {
-                ChipUi.Error(
-                    constraint.toString(),
-                    error.getFullMessage(this@BaseMappingListItemCreator)
-                )
+                if (error is FixableError) {
+                    ChipUi.FixableError(
+                        constraint.uid,
+                        error.getFullMessage(this@BaseMappingListItemCreator)
+                    )
+                } else {
+                    ChipUi.Error(
+                        constraint.uid,
+                        error.getFullMessage(this@BaseMappingListItemCreator)
+                    )
+                }
             }
 
             yield(chip)

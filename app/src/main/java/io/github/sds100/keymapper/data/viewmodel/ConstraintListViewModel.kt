@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.ui.constraints.ConstraintListItemCreator
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -35,7 +35,7 @@ class ConstraintListViewModel(
     private val _showToast = MutableSharedFlow<String>()
     val showToast = _showToast.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<RecoverableError>()
+    private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
 
     private val _state = MutableStateFlow(buildState(State.Loading))
@@ -82,7 +82,7 @@ class ConstraintListViewModel(
             useCase.state.firstOrNull()?.ifIsData { state ->
                 val error = getError(state.list.singleOrNull { it.uid == id } ?: return@launch)
 
-                if (error is RecoverableError) {
+                if (error is FixableError) {
                     _fixError.emit(error)
                 }
             }

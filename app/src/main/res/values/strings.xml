@@ -369,7 +369,7 @@
     <string name="dialog_message_select_app_store_gui_keyboard">Where do you want to get the new keyboard?</string>
     <string name="dialog_message_cant_record_trigger"><b>Reboot</b> your device if the "Record trigger" button is counting down and the buttons that you are pressing aren\'t showing up. If your buttons are still not showing up after rebooting then Key Mapper doesn\'t support your buttons. There isn\'t a fix for this.</string>
     <string name="dialog_message_disable_battery_optimisation">You MUST read this all otherwise you will get frustrated in the future! Tapping \"turn off\" will prevent Android from stopping the app while it is in the background. This is NOT ENOUGH. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com.</string>
-
+    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
     <!-- Dialog messages -->
 
     <!-- Dialog buttons -->
@@ -383,6 +383,7 @@
     <string name="pos_join">Join</string>
     <string name="pos_change_location">Change</string>
     <string name="pos_turn_off">Turn off</string>
+    <string name="pos_turn_on">Turn on</string>
 
     <string name="neg_turn_off">Turn off</string>
     <string name="neg_stay_out">Stay out</string>

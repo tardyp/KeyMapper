@@ -7,6 +7,9 @@ import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
 import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapListUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
@@ -15,6 +18,7 @@ import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGranted
 import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
+import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapActionUiHelper
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapActionUiHelper
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeymapShortcutUseCaseImpl
 import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupportedImpl
@@ -26,6 +30,14 @@ object UseCases {
 
     fun keymapActionUiHelper(ctx: Context): ActionUiHelper<KeymapAction> {
         return KeymapActionUiHelper(
+            ServiceLocator.appInfoAdapter(ctx),
+            ServiceLocator.inputMethodAdapter(ctx),
+            ServiceLocator.resourceProvider(ctx)
+        )
+    }
+
+    fun fingerprintMapActionUiHelper(ctx: Context): ActionUiHelper<FingerprintMapAction> {
+        return FingerprintMapActionUiHelper(
             ServiceLocator.appInfoAdapter(ctx),
             ServiceLocator.inputMethodAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
@@ -67,6 +79,10 @@ object UseCases {
         IsConstraintSupportedByDeviceUseCaseImpl(
             ServiceLocator.systemFeatureAdapter(ctx)
         )
+
+    fun getFingerprintMap(ctx: Context) = GetFingerprintMapUseCaseImpl(
+        ServiceLocator.fingerprintMapRepository(ctx)
+    )
 
     fun getSettings(ctx: Context) = GetSettingsUseCaseImpl(
         ServiceLocator.preferenceRepository(ctx)

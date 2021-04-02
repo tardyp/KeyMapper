@@ -48,10 +48,6 @@ class HomeFragment : Fragment() {
         InjectorUtils.provideHomeViewModel(requireContext())
     }
 
-    private val fingerprintMapListViewModel: FingerprintMapListViewModel by activityViewModels {
-        InjectorUtils.provideFingerprintMapListViewModel(requireContext())
-    }
-
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
      */
@@ -114,132 +110,123 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.apply {
+        binding.viewModel = this@HomeFragment.homeViewModel
 
-            viewModel = this@HomeFragment.homeViewModel
+        val pagerAdapter = HomePagerAdapter(this@HomeFragment)
+        //set the initial tabs so that the current tab is remembered on rotate
+        pagerAdapter.invalidateFragments(homeViewModel.tabsState.value.tabs)
 
-            val pagerAdapter = HomePagerAdapter(
-                this@HomeFragment,
-                fingerprintMapListViewModel.fingerprintGesturesAvailable.value ?: false
-            )
+        viewPager.adapter = pagerAdapter
 
-            viewPager.adapter = pagerAdapter
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = strArray(R.array.home_tab_titles)[position]
+        }.apply {
+            attach()
+        }
 
-            fingerprintMapListViewModel.fingerprintGesturesAvailable.observe(viewLifecycleOwner, {
-                pagerAdapter.invalidateFragments(it ?: false)
-                isFingerprintGestureDetectionAvailable = it ?: false
-            })
+        viewPager.registerOnPageChangeCallback(onPageChangeCallback)
 
-            TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                tab.text = strArray(R.array.home_tab_titles)[position]
-            }.apply {
-                attach()
-            }
-
-            viewPager.registerOnPageChangeCallback(onPageChangeCallback)
-
-            appBar.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.action_help -> {
-                        UrlUtils.launchCustomTab(
-                            requireContext(),
-                            str(R.string.url_quick_start_guide)
-                        )
-                        true
-                    }
-
-                    R.id.action_seed_database -> {
-                        val request = OneTimeWorkRequestBuilder<SeedDatabaseWorker>().build()
-                        WorkManager.getInstance(requireContext()).enqueue(request)
-                        true
-                    }
-
-                    R.id.action_select_all -> {
-                        homeViewModel.onSelectAllClick()
-                        true
-                    }
-
-                    R.id.action_enable -> {
-                        homeViewModel.onEnableSelectedKeymapsClick()
-                        true
-                    }
-
-                    R.id.action_disable -> {
-                        homeViewModel.onDisableSelectedKeymapsClick()
-                        true
-                    }
-
-                    R.id.action_duplicate_keymap -> {
-                        homeViewModel.onDuplicateSelectedKeymapsClick()
-                        true
-                    }
-
-                    R.id.action_backup -> {
-                        homeViewModel.onBackupSelectedKeymapsClick()
-                        true
-                    }
-
-                    else -> false
+        appBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_help -> {
+                    UrlUtils.launchCustomTab(
+                        requireContext(),
+                        str(R.string.url_quick_start_guide)
+                    )
+                    true
                 }
-            }
 
-            requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-                homeViewModel.onBackPressed()
-            }
-
-            appBar.setNavigationOnClickListener {
-                homeViewModel.onAppBarNavigationButtonClick()
-            }
-
-            backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
-                when (it) {
-                    is MessageEvent -> toast(it.textRes)
-                    is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
-                    is RequestRestore -> restoreLauncher.launch(FileUtils.MIME_TYPE_ALL)
-                    is RequestBackupAll ->
-                        backupAllKeymapsLauncher.launch(BackupUtils.createFileName())
+                R.id.action_seed_database -> {
+                    val request = OneTimeWorkRequestBuilder<SeedDatabaseWorker>().build()
+                    WorkManager.getInstance(requireContext()).enqueue(request)
+                    true
                 }
-            })
 
-            setGetNewGuiKeyboard {
-                requireContext().alertDialog {
-                    messageResource = R.string.dialog_message_select_app_store_gui_keyboard
-
-                    DialogChooseAppStoreBinding.inflate(layoutInflater).apply {
-                        model = ChooseAppStoreModel(
-                            playStoreLink = str(R.string.url_play_store_keymapper_gui_keyboard),
-                            githubLink = str(R.string.url_github_keymapper_gui_keyboard),
-                            fdroidLink = str(R.string.url_fdroid_keymapper_gui_keyboard)
-                        )
-
-                        setView(this.root)
-                    }
-
-                    cancelButton()
-
-                    show()
+                R.id.action_select_all -> {
+                    homeViewModel.onSelectAllClick()
+                    true
                 }
+
+                R.id.action_enable -> {
+                    homeViewModel.onEnableSelectedKeymapsClick()
+                    true
+                }
+
+                R.id.action_disable -> {
+                    homeViewModel.onDisableSelectedKeymapsClick()
+                    true
+                }
+
+                R.id.action_duplicate_keymap -> {
+                    homeViewModel.onDuplicateSelectedKeymapsClick()
+                    true
+                }
+
+                R.id.action_backup -> {
+                    homeViewModel.onBackupSelectedKeymapsClick()
+                    true
+                }
+
+                else -> false
             }
+        }
 
-            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-                homeViewModel.fixError.collectLatest {
-                    fixErrorDelegate.recover(requireContext(), it, findNavController())
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            homeViewModel.onBackPressed()
+        }
+
+        appBar.setNavigationOnClickListener {
+            homeViewModel.onAppBarNavigationButtonClick()
+        }
+
+        backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
+            when (it) {
+                is MessageEvent -> toast(it.textRes)
+                is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
+                is RequestRestore -> restoreLauncher.launch(FileUtils.MIME_TYPE_ALL)
+                is RequestBackupAll ->
+                    backupAllKeymapsLauncher.launch(BackupUtils.createFileName())
+            }
+        })
+
+        binding.setGetNewGuiKeyboard {
+            requireContext().alertDialog {
+                messageResource = R.string.dialog_message_select_app_store_gui_keyboard
+
+                DialogChooseAppStoreBinding.inflate(layoutInflater).apply {
+                    model = ChooseAppStoreModel(
+                        playStoreLink = str(R.string.url_play_store_keymapper_gui_keyboard),
+                        githubLink = str(R.string.url_github_keymapper_gui_keyboard),
+                        fdroidLink = str(R.string.url_fdroid_keymapper_gui_keyboard)
+                    )
+
+                    setView(this.root)
                 }
+
+                cancelButton()
+
+                show()
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.fixError.collectLatest {
+                fixErrorDelegate.recover(requireContext(), it, findNavController())
             }
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.appBarState.collectLatest {
+                /*
+                Do not use setFabAlignmentModeAndReplaceMenu because then there is big jank.
+                 */
                 if (it == HomeAppBarState.MULTI_SELECTING) {
-                    binding.appBar.setFabAlignmentModeAndReplaceMenu(
-                        FAB_ALIGNMENT_MODE_END,
-                        R.menu.menu_multi_select
-                    )
+                    binding.appBar.fabAlignmentMode = FAB_ALIGNMENT_MODE_END
+                    binding.appBar.replaceMenu(R.menu.menu_multi_select)
+
                 } else {
-                    binding.appBar.setFabAlignmentModeAndReplaceMenu(
-                        FAB_ALIGNMENT_MODE_CENTER,
-                        R.menu.menu_home
-                    )
+                    binding.appBar.fabAlignmentMode = FAB_ALIGNMENT_MODE_CENTER
+                    binding.appBar.replaceMenu(R.menu.menu_home)
                 }
             }
         }
@@ -272,8 +259,9 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            homeViewModel.tabsState.collectLatest {
-                binding.viewPager.isUserInputEnabled = it.enableViewPagerSwiping
+            homeViewModel.tabsState.collectLatest { state ->
+                pagerAdapter.invalidateFragments(state.tabs)
+                binding.viewPager.isUserInputEnabled = state.enableViewPagerSwiping
             }
         }
 

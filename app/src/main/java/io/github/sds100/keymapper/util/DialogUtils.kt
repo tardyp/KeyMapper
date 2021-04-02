@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.SeekBarListItemModel
@@ -18,6 +19,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
+import splitties.snackbar.action
+import splitties.snackbar.longSnack
+import splitties.snackbar.snack
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,14 +29,21 @@ import kotlin.coroutines.suspendCoroutine
  * Created by sds100 on 30/03/2020.
  */
 
-suspend fun DialogUi<*>.show(fragment: Fragment): DialogResponse {
+suspend fun DialogUi<*>.show(
+    fragment: Fragment,
+    coordinatorLayout: CoordinatorLayout? = null
+): DialogResponse {
     val lifecycleOwner = fragment.viewLifecycleOwner
     val ctx = fragment.requireContext()
 
-    return show(lifecycleOwner, ctx)
+    return show(lifecycleOwner, ctx, coordinatorLayout)
 }
 
-suspend fun DialogUi<*>.show(lifecycleOwner: LifecycleOwner, ctx: Context): DialogResponse {
+suspend fun DialogUi<*>.show(
+    lifecycleOwner: LifecycleOwner,
+    ctx: Context,
+    coordinatorLayout: CoordinatorLayout? = null
+): DialogResponse {
     return when (this) {
         is DialogUi.OkMessage -> ctx.okDialog(lifecycleOwner, this.message)
         is DialogUi.Text ->
@@ -43,6 +54,28 @@ suspend fun DialogUi<*>.show(lifecycleOwner: LifecycleOwner, ctx: Context): Dial
             )
         is DialogUi.MultiChoice<*> -> ctx.multiChoiceDialog(lifecycleOwner, this.items)
         is DialogUi.SingleChoice<*> -> ctx.singleChoiceDialog(lifecycleOwner, this.items)
+        is DialogUi.SnackBar -> suspendCancellableCoroutine { continuation ->
+
+            require(coordinatorLayout != null)
+
+            if (long) {
+                coordinatorLayout.longSnack(this.title) {
+                    if (actionText != null) {
+                        action(actionText) {
+                            continuation.resume(DialogUi.SnackBarActionResponse)
+                        }
+                    }
+                }
+            } else {
+                coordinatorLayout.snack(this.title) {
+                    if (actionText != null) {
+                        action(actionText) {
+                            continuation.resume(DialogUi.SnackBarActionResponse)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

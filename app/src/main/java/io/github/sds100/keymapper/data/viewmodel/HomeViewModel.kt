@@ -6,6 +6,10 @@ import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.EnableDisableFingerprintMapsUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
 import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCase
@@ -16,10 +20,11 @@ import io.github.sds100.keymapper.ui.ListItem
 import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.ui.home.HomeTab
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.MultiSelectProviderImpl
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,17 +36,21 @@ import kotlinx.coroutines.runBlocking
 class HomeViewModel(
     private val onboarding: OnboardingUseCase,
     getKeymapListUseCase: GetKeymapListUseCase,
+    getFingerprintMapUseCase: GetFingerprintMapUseCase,
+    enableDisableFingerprintMaps: EnableDisableFingerprintMapsUseCase,
     private val deleteKeymaps: DeleteKeymapsUseCase,
     private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
     private val duplicateKeymaps: DuplicateKeymapsUseCase,
     getActionError: GetActionErrorUseCase,
-    actionUiHelper: ActionUiHelper<KeymapAction>,
+    keymapActionUiHelper: ActionUiHelper<KeymapAction>,
+    fingerprintMapActionUiHelper: ActionUiHelper<FingerprintMapAction>,
     constraintUiHelper: ConstraintUiHelper,
     getConstraintErrorUseCase: GetConstraintErrorUseCase,
     private val settings: GetSettingsUseCase,
     private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
     private val isBatteryOptimised: IsBatteryOptimisedUseCase,
-    resourceProvider: ResourceProvider
+    resourceProvider: ResourceProvider,
+    private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
     private companion object {
@@ -55,11 +64,22 @@ class HomeViewModel(
         viewModelScope,
         getKeymapListUseCase,
         getActionError,
-        actionUiHelper,
+        keymapActionUiHelper,
         constraintUiHelper,
         getConstraintErrorUseCase,
         resourceProvider,
         multiSelectProvider
+    )
+
+    val fingerprintMapListViewModel = FingerprintMapListViewModel(
+        viewModelScope,
+        getFingerprintMapUseCase,
+        enableDisableFingerprintMaps,
+        getActionError,
+        fingerprintMapActionUiHelper,
+        constraintUiHelper,
+        getConstraintErrorUseCase,
+        resourceProvider
     )
 
     private val rebuildState = MutableSharedFlow<Unit>()
@@ -92,26 +112,41 @@ class HomeViewModel(
         )
     )
 
-    val tabsState = multiSelectProvider.state.map {
-        when (it) {
-            SelectionState.NotSelecting ->
-                HomeTabsState(
-                    enableViewPagerSwiping = true,
-                    showTabs = true
-                )
-            is SelectionState.Selecting -> HomeTabsState(
-                enableViewPagerSwiping = false,
-                showTabs = true
+    val tabsState =
+        combine(
+            multiSelectProvider.state,
+            areFingerprintGesturesSupported.isSupported
+        ) { selectionState, areFingerprintGesturesSupported ->
+
+            val tabs = sequence {
+                yield(HomeTab.KEY_EVENTS)
+
+                if (areFingerprintGesturesSupported) {
+                    yield(HomeTab.FINGERPRINT_MAPS)
+                }
+            }.toSet()
+
+            val showTabs = when {
+                tabs.isEmpty() -> false
+                selectionState is SelectionState.Selecting -> false
+                else -> true
+            }
+
+            HomeTabsState(
+                enableViewPagerSwiping = showTabs,
+                showTabs = showTabs,
+                tabs = tabs
             )
-        }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        HomeTabsState(
-            enableViewPagerSwiping = true,
-            showTabs = true
+
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            HomeTabsState(
+                enableViewPagerSwiping = false,
+                showTabs = false,
+                emptySet()
+            )
         )
-    )
 
     val appBarState = multiSelectProvider.state.map {
         when (it) {
@@ -169,10 +204,11 @@ class HomeViewModel(
     private val _closeKeyMapper = MutableSharedFlow<Unit>()
     val closeKeyMapper = _closeKeyMapper.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<RecoverableError>()
+    private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = merge(
         _fixError,
         keymapListViewModel.fixError,
+        fingerprintMapListViewModel.fixError
     )
 
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
@@ -248,8 +284,8 @@ class HomeViewModel(
     fun onFixErrorListItemClick(id: String) {
         viewModelScope.launch {
             when (id) {
-                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> _fixError.emit(RecoverableError.AccessibilityServiceDisabled)
-                ID_BATTERY_OPTIMISATION_LIST_ITEM -> _fixError.emit(RecoverableError.IsBatteryOptimised)
+                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> _fixError.emit(FixableError.AccessibilityServiceDisabled)
+                ID_BATTERY_OPTIMISATION_LIST_ITEM -> _fixError.emit(FixableError.IsBatteryOptimised)
             }
         }
     }
@@ -260,36 +296,44 @@ class HomeViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val onboardingUseCase: OnboardingUseCase,
+        private val onboarding: OnboardingUseCase,
         private val getKeymapListUseCase: GetKeymapListUseCase,
+        private val getFingerprintMapUseCase: GetFingerprintMapUseCase,
+        private val enableDisableFingerprintMaps: EnableDisableFingerprintMapsUseCase,
         private val deleteKeymaps: DeleteKeymapsUseCase,
         private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
-        private val duplicateKeymapsUseCase: DuplicateKeymapsUseCase,
+        private val duplicateKeymaps: DuplicateKeymapsUseCase,
         private val getActionError: GetActionErrorUseCase,
         private val keymapActionUiHelper: ActionUiHelper<KeymapAction>,
+        private val fingerprintMapActionUiHelper: ActionUiHelper<FingerprintMapAction>,
         private val constraintUiHelper: ConstraintUiHelper,
         private val getConstraintErrorUseCase: GetConstraintErrorUseCase,
-        private val resourceProvider: ResourceProvider,
-        private val settingsUseCase: GetSettingsUseCase,
+        private val settings: GetSettingsUseCase,
         private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
         private val isBatteryOptimised: IsBatteryOptimisedUseCase,
+        private val resourceProvider: ResourceProvider,
+        private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return HomeViewModel(
-                onboardingUseCase,
+                onboarding,
                 getKeymapListUseCase,
+                getFingerprintMapUseCase,
+                enableDisableFingerprintMaps,
                 deleteKeymaps,
                 enableDisableKeymaps,
-                duplicateKeymapsUseCase,
+                duplicateKeymaps,
                 getActionError,
                 keymapActionUiHelper,
+                fingerprintMapActionUiHelper,
                 constraintUiHelper,
                 getConstraintErrorUseCase,
-                settingsUseCase,
+                settings,
                 isServiceEnabled,
                 isBatteryOptimised,
                 resourceProvider,
+                areFingerprintGesturesSupported
             ) as T
         }
     }
@@ -313,6 +357,7 @@ data class HomeOnboardingState(
 data class HomeTabsState(
     val enableViewPagerSwiping: Boolean = true,
     val showTabs: Boolean = false,
+    val tabs: Set<HomeTab>
 )
 
 data class HomeErrorListState(

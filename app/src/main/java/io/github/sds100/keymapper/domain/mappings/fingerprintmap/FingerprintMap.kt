@@ -15,7 +15,6 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class FingerprintMap(
-    val id: FingerprintMapId,
     val actionDataList: List<FingerprintMapActionData> = emptyList(),
     val constraintList: Set<Constraint> = emptySet(),
     val constraintMode: ConstraintMode = ConstraintMode.AND,
@@ -80,21 +79,42 @@ data class FingerprintMap(
     }.toList()
 }
 
+object FingerprintMapIdEntityMapper {
+    fun toEntity(id: FingerprintMapId): String {
+        return when (id) {
+            FingerprintMapId.SWIPE_DOWN -> FingerprintMapEntity.ID_SWIPE_DOWN
+            FingerprintMapId.SWIPE_UP -> FingerprintMapEntity.ID_SWIPE_UP
+            FingerprintMapId.SWIPE_LEFT -> FingerprintMapEntity.ID_SWIPE_LEFT
+            FingerprintMapId.SWIPE_RIGHT -> FingerprintMapEntity.ID_SWIPE_RIGHT
+        }
+    }
+
+    fun fromEntity(id: String): FingerprintMapId {
+        return when (id) {
+            FingerprintMapEntity.ID_SWIPE_DOWN -> FingerprintMapId.SWIPE_DOWN
+            FingerprintMapEntity.ID_SWIPE_UP -> FingerprintMapId.SWIPE_UP
+            FingerprintMapEntity.ID_SWIPE_LEFT -> FingerprintMapId.SWIPE_LEFT
+            FingerprintMapEntity.ID_SWIPE_RIGHT -> FingerprintMapId.SWIPE_RIGHT
+
+            else -> throw IllegalArgumentException("Don't know how to get fingerprint map with id $id")
+        }
+    }
+}
+
 object FingerprintMapEntityMapper {
     fun fromEntity(
-        id: FingerprintMapId,
         entity: FingerprintMapEntity,
     ): FingerprintMap {
         val actionList = entity.actionList
             .map { FingerprintMapActionEntityMapper.fromEntity(it) }
         return FingerprintMap(
-            id = id,
             actionDataList = actionList,
-            TODO()
+            //TODO
         )
     }
 
     fun toEntity(model: FingerprintMap): FingerprintMapEntity {
+        FingerprintMapEntity.ID_SWIPE_DOWN
         TODO()
     }
 }

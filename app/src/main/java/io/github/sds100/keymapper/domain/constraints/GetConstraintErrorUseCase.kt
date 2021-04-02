@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 
 /**
  * Created by sds100 on 20/03/2021.
@@ -29,7 +29,7 @@ class GetConstraintErrorUseCaseImpl(
 
             is Constraint.AppPlayingMedia -> {
                 if (!permissionAdapter.isGranted(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)) {
-                    return RecoverableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+                    return FixableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
                 }
 
                 return getAppError(constraint.packageName)
@@ -39,14 +39,14 @@ class GetConstraintErrorUseCaseImpl(
             Constraint.OrientationLandscape,
             Constraint.OrientationPortrait ->
                 if (!permissionAdapter.isGranted(Manifest.permission.WRITE_SETTINGS)) {
-                    return RecoverableError.PermissionDenied(Manifest.permission.WRITE_SETTINGS)
+                    return FixableError.PermissionDenied(Manifest.permission.WRITE_SETTINGS)
                 }
 
 
             Constraint.ScreenOff,
             Constraint.ScreenOn -> {
                 if (!permissionAdapter.isGranted(Constants.PERMISSION_ROOT)) {
-                    return RecoverableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                    return FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
                 }
             }
         }
@@ -56,11 +56,11 @@ class GetConstraintErrorUseCaseImpl(
 
     private fun getAppError(packageName: String): Error? {
         if (!packageManager.isAppEnabled(packageName)) {
-            return RecoverableError.AppDisabled(packageName)
+            return FixableError.AppDisabled(packageName)
         }
 
         if (!packageManager.isAppInstalled(packageName)) {
-            return RecoverableError.AppNotFound(packageName)
+            return FixableError.AppNotFound(packageName)
         }
 
         return null

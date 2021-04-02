@@ -14,5 +14,7 @@ sealed class ChipUi {
 
     data class Error(override val id: String, val text: String) : ChipUi()
 
+    data class FixableError(override val id: String, val text: String) : ChipUi()
+
     data class Transparent(override val id: String, val text: String) : ChipUi()
 }

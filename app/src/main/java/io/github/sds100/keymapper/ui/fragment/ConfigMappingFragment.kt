@@ -144,12 +144,6 @@ abstract class ConfigMappingFragment : Fragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.enableAccessibilityServicePrompt.collectLatest {
-                binding.coordinatorLayout.showEnableAccessibilityServiceSnackBar()
-            }
-        }
-
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.fixError.collectLatest {
                 //don't show snackbar here
                 fixErrorDelegate.recover(requireContext(), it, findNavController())

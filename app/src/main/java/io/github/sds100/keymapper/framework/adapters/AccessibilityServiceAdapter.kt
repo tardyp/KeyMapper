@@ -12,16 +12,14 @@ import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.AccessibilityUtils
 import io.github.sds100.keymapper.util.Event
-import io.github.sds100.keymapper.util.result.RecoverableError
+import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import io.github.sds100.keymapper.util.sendPackageBroadcast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.
@@ -77,7 +75,7 @@ class AccessibilityServiceAdapter(context: Context, coroutineScope: CoroutineSco
     override fun send(event: Event): Result<Unit> {
 
         if (!AccessibilityUtils.isServiceEnabled(ctx)) {
-            return RecoverableError.AccessibilityServiceDisabled
+            return FixableError.AccessibilityServiceDisabled
         }
 
         val bundle = Bundle().apply {

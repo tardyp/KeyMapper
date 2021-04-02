@@ -59,15 +59,15 @@ sealed class Error : Result<Nothing>() {
     data class ImeNotFoundForPackage(val packageName: String) : Error()
 }
 
-sealed class RecoverableError : Error() {
-    data class AppNotFound(val packageName: String) : RecoverableError()
-    data class AppDisabled(val packageName: String) : RecoverableError()
-    object NoCompatibleImeEnabled : RecoverableError()
-    object NoCompatibleImeChosen : RecoverableError()
-    object AccessibilityServiceDisabled : RecoverableError()
-    object IsBatteryOptimised: RecoverableError()
+sealed class FixableError : Error() {
+    data class AppNotFound(val packageName: String) : FixableError()
+    data class AppDisabled(val packageName: String) : FixableError()
+    object NoCompatibleImeEnabled : FixableError()
+    object NoCompatibleImeChosen : FixableError()
+    object AccessibilityServiceDisabled : FixableError()
+    object IsBatteryOptimised: FixableError()
 
-    data class PermissionDenied(val permission: String) : RecoverableError() {
+    data class PermissionDenied(val permission: String) : FixableError() {
         companion object {
             //TODO remove
             fun getMessageForPermission(ctx: Context, permission: String): String {
@@ -109,16 +109,6 @@ sealed class RecoverableError : Error() {
                 return resourceProvider.getString(resId)
             }
         }
-    }
-}
-
-fun <T1, T2> combineOnSuccess(
-    result1: Result<T1>,
-    result2: Result<T2>,
-    onSuccess: (value1: T1, value2: T2) -> Unit
-) {
-    if (result1 is Success && result2 is Success) {
-        onSuccess.invoke(result1.value, result2.value)
     }
 }
 

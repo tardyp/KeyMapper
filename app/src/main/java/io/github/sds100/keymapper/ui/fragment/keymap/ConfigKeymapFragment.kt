@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.onDialogResponse
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.collectLatest
@@ -75,6 +76,15 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
                 ) ?: return@collectLatest
 
                 viewModel.createLauncherShortcut(label)
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.triggerViewModel.showDialog.collectLatest {
+                viewModel.triggerViewModel.onDialogResponse(
+                    it.key,
+                    it.ui.show(this@ConfigKeymapFragment, binding.coordinatorLayout)
+                )
             }
         }
     }

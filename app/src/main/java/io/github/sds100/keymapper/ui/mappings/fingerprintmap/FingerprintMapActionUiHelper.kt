@@ -23,7 +23,7 @@ class FingerprintMapActionUiHelper(
 
     override fun getOptionLabels(action: FingerprintMapAction) = sequence {
         action.options.delayBeforeNextAction.apply {
-            if (isAllowed && value != null) {
+            if (isAllowed) {
                 yield(getString(R.string.action_title_wait, value))
             }
         }

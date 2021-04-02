@@ -5,6 +5,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +37,9 @@ class AppIntroActivity : AppIntro2() {
         InjectorUtils.provideAppIntroViewModel(this)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -235,16 +239,17 @@ class FingerprintGestureSupportSlide : AppIntroScrollableFragment() {
         binding.apply {
             backgroundColor = color(R.color.orange)
 
-            ServiceLocator.fingerprintMapRepository(requireContext()).fingerprintGesturesAvailable
-                .collectWhenResumed(viewLifecycleOwner) { available ->
-                    when (available) {
-                        true -> gesturesSupportedLayout()
-                        false -> gesturesUnsupportedLayout()
-                        null -> supportedUnknownLayout()
-                    }
-
-                    viewLoaded()
-                }
+            //TODO create view model for appintroactivity
+//            ServiceLocator.fingerprintMapRepository(requireContext()).fingerprintGesturesAvailable
+//                .collectWhenResumed(viewLifecycleOwner) { available ->
+//                    when (available) {
+//                        true -> gesturesSupportedLayout()
+//                        false -> gesturesUnsupportedLayout()
+//                        null -> supportedUnknownLayout()
+//                    }
+//
+//                    viewLoaded()
+//                }
         }
     }
 

@@ -13,6 +13,9 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.GlobalKeymapUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
+import io.github.sds100.keymapper.domain.preferences.Keys
+import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.DetectKeymapsUseCase
 import io.github.sds100.keymapper.domain.usecases.GetKeymapsPausedUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
@@ -23,6 +26,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import splitties.bitflags.hasFlag
 import splitties.toast.toast
 import timber.log.Timber
@@ -41,7 +45,9 @@ class AccessibilityServiceController(
     private val detectKeymapsUseCase: DetectKeymapsUseCase,
     private val performActionsUseCase: PerformActionsUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,
-    private val keymapRepository: GlobalKeymapUseCase
+    private val keymapRepository: GlobalKeymapUseCase,
+    private val preferenceRepository: PreferenceRepository,
+    private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
 ) : FingerprintGestureDetectionState by fingerprintGestureDetectionState,
     LifecycleOwner by lifecycleOwner {
 
@@ -317,23 +323,15 @@ class AccessibilityServiceController(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun observeFingerprintMaps() {
-        fingerprintMapRepository.fingerprintGestureMaps.collectWhenStarted(this, { maps ->
-            fingerprintGestureMapController.fingerprintMaps = maps
-
-            invalidateFingerprintGestureDetection()
-        })
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun invalidateFingerprintGestureDetection() {
-        fingerprintGestureMapController.fingerprintMaps.let { maps ->
-            if (maps.any { it.value.isEnabled && it.value.actionList.isNotEmpty() }
-                && !getKeymapsPaused().firstBlocking()) {
-                requestFingerprintGestureDetection()
-            } else {
-                denyFingerprintGestureDetection()
-            }
-        }
+        //TODO
+//        fingerprintMapRepository.fingerprintGestureMaps.collectWhenStarted(this, { maps ->
+//            fingerprintGestureMapController.setFingerprintMaps() = maps
+//
+//            if (maps.any { it.value.isEnabled && it.value.actionList.isNotEmpty() } && !getKeymapsPaused().firstBlocking()) {
+//                requestFingerprintGestureDetection()
+//            } else {
+//                denyFingerprintGestureDetection()
+//            }        })
     }
 
     private fun checkFingerprintGesturesAvailability() {
@@ -344,9 +342,8 @@ class AccessibilityServiceController(
             /* Don't update whether fingerprint gesture detection is supported if it has
             * been supported at some point. Just in case the fingerprint reader is being
             * used while this is called. */
-            if (fingerprintMapRepository.fingerprintGesturesAvailable.firstBlocking() != true) {
-                fingerprintMapRepository
-                    .setFingerprintGesturesAvailable(isGestureDetectionAvailable)
+            if (!areFingerprintGesturesSupported.isSupported.firstBlocking()) {
+                preferenceRepository.set(Keys.fingerprintGesturesAvailable, isGestureDetectionAvailable)
             }
         }
 

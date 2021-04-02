@@ -23,7 +23,7 @@ class FingerprintConstraintListFragment : ConstraintListFragment() {
 
     private val viewModel: ConfigFingerprintMapViewModel
         by navGraphViewModels(R.id.nav_config_fingerprint_map) {
-            InjectorUtils.provideFingerprintMapListViewModel(requireContext())
+            InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
         }
 
     override val constraintListViewModel: ConstraintListViewModel

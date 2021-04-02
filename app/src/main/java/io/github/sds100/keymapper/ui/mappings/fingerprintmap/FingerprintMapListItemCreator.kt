@@ -30,8 +30,8 @@ class FingerprintMapListItemCreator(
     resourceProvider
 ) {
 
-    fun map(fingerprintMap: FingerprintMap): FingerprintMapListItemModel {
-        val header = when (fingerprintMap.id) {
+    fun map(id: FingerprintMapId, fingerprintMap: FingerprintMap): FingerprintMapListItem {
+        val header = when (id) {
             FingerprintMapId.SWIPE_DOWN -> getString(R.string.header_fingerprint_gesture_down)
             FingerprintMapId.SWIPE_UP -> getString(R.string.header_fingerprint_gesture_up)
             FingerprintMapId.SWIPE_LEFT -> getString(R.string.header_fingerprint_gesture_left)
@@ -72,8 +72,8 @@ class FingerprintMapListItemCreator(
             }
         }
 
-        return FingerprintMapListItemModel(
-            id = fingerprintMap.id,
+        return FingerprintMapListItem(
+            id = id,
             header = header,
             chipList = getChipList(
                 fingerprintMap.actionList,

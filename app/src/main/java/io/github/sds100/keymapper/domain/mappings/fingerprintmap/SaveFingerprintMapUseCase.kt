@@ -9,14 +9,14 @@ import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 class SaveFingerprintMapUseCaseImpl(
     private val repository: FingerprintMapRepository
 ) : SaveFingerprintMapUseCase {
-    override fun invoke(fingerprintMap: FingerprintMap) =
-        repository.updateGesture(fingerprintMap.id) {
-            FingerprintMapEntityMapper.toEntity(
-                fingerprintMap
-            )
-        }
+    override fun invoke(id: FingerprintMapId, fingerprintMap: FingerprintMap) {
+        repository.set(
+            FingerprintMapIdEntityMapper.toEntity(id),
+            FingerprintMapEntityMapper.toEntity(fingerprintMap)
+        )
+    }
 }
 
 interface SaveFingerprintMapUseCase {
-    operator fun invoke(fingerprintMap: FingerprintMap)
+    operator fun invoke(id: FingerprintMapId, fingerprintMap: FingerprintMap)
 }

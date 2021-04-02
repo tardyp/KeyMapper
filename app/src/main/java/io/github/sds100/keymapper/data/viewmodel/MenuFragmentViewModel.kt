@@ -34,23 +34,24 @@ class MenuFragmentViewModel(
     fun enableAll() {
         keymapUseCase.enableAll()
 
-        FingerprintMapUtils.GESTURES.forEach { gestureId ->
+//        FingerprintMapUtils.GESTURES.forEach { gestureId ->
             //TODO
 //            fingerprintMapRepository.updateGesture(gestureId) {
 //                it.copy(isEnabled = true)
 //            }
-        }
+//        }
     }
 
     fun disableAll() {
+        //TODO move this a use case called EnableDisableMappingsUseCase
         keymapUseCase.disableAll()
 
-        FingerprintMapUtils.GESTURES.forEach { gestureId ->
+//        FingerprintMapUtils.GESTURES.forEach { gestureId ->
             //TODO
 //            fingerprintMapRepository.updateGesture(gestureId) {
 //                it.copy(isEnabled = false)
 //            }
-        }
+//        }
     }
 
     fun chooseKeyboard() = run { _eventStream.value = ChooseKeyboard() }

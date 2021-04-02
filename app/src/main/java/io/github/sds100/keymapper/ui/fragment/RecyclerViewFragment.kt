@@ -22,6 +22,7 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.observeCurrentDestinationLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 /**
  * Created by sds100 on 22/02/2020.

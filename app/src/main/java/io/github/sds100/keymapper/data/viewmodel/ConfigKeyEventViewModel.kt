@@ -30,59 +30,9 @@ class ConfigKeyEventViewModel(
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
     private val keyCode = MutableStateFlow<Result<Int>>(Error.CantBeEmpty)
-
-    val keyCodeErrorMessage: StateFlow<String?> = keyCode.map {
-        it.errorOrNull()?.getFullMessage(this)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
-
-    val keyCodeLabel: StateFlow<String> = keyCode.map { result ->
-        result.handle(
-            onSuccess = {
-                if (it > KeyEvent.getMaxKeyCode()) {
-                    "Key Code $it"
-                } else {
-                    KeyEvent.keyCodeToString(it)
-                }
-            },
-            onError = { "" }
-        )
-    }.stateIn(viewModelScope, SharingStarted.Lazily, "")
-
-    val showKeyCodeLabel: StateFlow<Boolean> = keyCode
-        .map { it.isSuccess }
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
-
-    val isDoneButtonEnabled: StateFlow<Boolean> = keyCode
-        .map { it.isSuccess }
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
-
     private val chosenDevice = MutableStateFlow<DeviceInfo?>(null)
-    val chosenDeviceName: StateFlow<String?> = chosenDevice
-        .map { it?.name ?: "" }
-        .stateIn(viewModelScope, SharingStarted.Lazily, "")
-
     private val useShell = MutableStateFlow(false)
-    val isUseShellChecked = useShell.asStateFlow()
-
-    val isDevicePickerShown: StateFlow<Boolean> = useShell
-        .map { !it }
-        .stateIn(viewModelScope, SharingStarted.Lazily, true)
-
     private val metaState = MutableStateFlow(0)
-
-    val isModifierListShown: StateFlow<Boolean> = useShell
-        .map { !it }
-        .stateIn(viewModelScope, SharingStarted.Lazily, true)
-
-    val modifierKeyModels = metaState.map { metaState ->
-        KeyEventUtils.MODIFIER_LABELS.map { (modifier, label) ->
-            CheckBoxListItem(
-                id = modifier.toString(),
-                label = getString(label),
-                isChecked = metaState.hasFlag(modifier)
-            )
-        }
-    }
 
     private val _state = MutableStateFlow(
         buildUiState(
