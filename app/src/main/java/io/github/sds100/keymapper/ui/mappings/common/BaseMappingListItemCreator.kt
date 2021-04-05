@@ -2,12 +2,9 @@ package io.github.sds100.keymapper.ui.mappings.common
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.Action
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
-import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
-import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.common.*
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
@@ -17,92 +14,77 @@ import io.github.sds100.keymapper.util.result.*
 /**
  * Created by sds100 on 18/03/2021.
  */
-abstract class BaseMappingListItemCreator<A : Action>(
-    private val getActionError: GetActionErrorUseCase,
-    private val actionUiHelper: ActionUiHelper<A>,
-    private val getConstraintError: GetConstraintErrorUseCase,
-    private val constraintUiHelper: ConstraintUiHelper,
+abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
+    private val displayMapping: DisplaySimpleMappingUseCase,
+    private val actionUiHelper: ActionUiHelper<M, A>,
     private val resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
-    fun getChipList(
-        actionList: List<A>,
-        constraintList: Set<Constraint>,
-        constraintMode: ConstraintMode
-    ): List<ChipUi> = sequence {
+    private val constraintUiHelper = ConstraintUiHelper(displayMapping, resourceProvider)
+
+    fun getChipList(mapping: M): List<ChipUi> = sequence {
         val midDot = getString(R.string.middot)
 
-        actionList.forEach { action ->
-            var title: String? = null
-            var icon: IconInfo? = null
+        mapping.actionList.forEach { action ->
+            val title: String = if (action.multiplier != null) {
+                "${action.multiplier}x ${actionUiHelper.getTitle(action.data)}"
+            } else {
+                actionUiHelper.getTitle(action.data)
+            }
 
-            val error: Error? = actionUiHelper.getTitle(action.data)
-                .onSuccess {
-                    if (action.multiplier.isAllowed && action.multiplier.value is Defaultable.Custom) {
-                        val multiplier = (action.multiplier.value as Defaultable.Custom<Int>).data
-                        title = "${multiplier}x $it"
-                    } else {
-                        title = it
-                    }
-                }
-                .then { actionUiHelper.getIcon(action.data) }.onSuccess { icon = it }
-                .errorOrNull() ?: getActionError.getError(action.data)
+            val icon: IconInfo? = actionUiHelper.getIcon(action.data)
 
-            when {
-                title != null && error == null -> {
-                    val chipText = buildString {
+            val error: Error? = displayMapping.getActionError(action.data)
 
-                        append(title)
+            if (error == null) {
+                val chipText = buildString {
 
-                        actionUiHelper.getOptionLabels(action).forEachIndexed { index, label ->
-                            append(" $midDot ")
+                    append(title)
 
-                            append(label)
+                    actionUiHelper.getOptionLabels(mapping, action).forEachIndexed { index, label ->
+                        append(" $midDot ")
 
-                            action.delayBeforeNextAction.apply {
-                                if (isAllowed && value is Defaultable.Custom) {
-                                    if (this@buildString.isNotBlank()) {
-                                        append(" $midDot ")
-                                    }
+                        append(label)
 
-                                    append(getString(R.string.action_title_wait, value.data))
-                                }
+                        if (mapping.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
+                            if (this@buildString.isNotBlank()) {
+                                append(" $midDot ")
                             }
+
+                            append(getString(R.string.action_title_wait, action.delayBeforeNextAction!!))
                         }
                     }
-
-                    val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)
-                    yield(chip)
                 }
 
-                error != null -> {
-                    val chip = if (error is FixableError) {
-                        ChipUi.FixableError(
-                            action.uid,
-                            error.getFullMessage(this@BaseMappingListItemCreator)
-                        )
-                    } else {
-                        ChipUi.Error(
-                            action.uid,
-                            error.getFullMessage(this@BaseMappingListItemCreator)
-                        )
-                    }
-
-                    yield(chip)
+                val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)
+                yield(chip)
+            } else {
+                val chip = if (error is FixableError) {
+                    ChipUi.FixableError(
+                        action.uid,
+                        error.getFullMessage(this@BaseMappingListItemCreator)
+                    )
+                } else {
+                    ChipUi.Error(
+                        action.uid,
+                        error.getFullMessage(this@BaseMappingListItemCreator)
+                    )
                 }
+
+                yield(chip)
             }
         }
 
-        if (actionList.isNotEmpty() && constraintList.isNotEmpty()) {
+        if (mapping.actionList.isNotEmpty() && mapping.constraintState.constraints.isNotEmpty()) {
             yield(ChipUi.Transparent("while", text = getString(R.string.chip_while)))
         }
 
-        val constraintSeparatorText = when (constraintMode) {
+        val constraintSeparatorText = when (mapping.constraintState.mode) {
             ConstraintMode.AND -> getString(R.string.constraint_mode_and)
             ConstraintMode.OR -> getString(R.string.constraint_mode_or)
         }
 
-        constraintList.forEachIndexed { index, constraint ->
+        mapping.constraintState.constraints.forEachIndexed { index, constraint ->
             if (index != 0) {
                 yield(
                     ChipUi.Transparent(
@@ -113,11 +95,8 @@ abstract class BaseMappingListItemCreator<A : Action>(
             }
 
             val text: String = constraintUiHelper.getTitle(constraint)
-            var icon: IconInfo? = null
-
-            val error: Error? = constraintUiHelper.getIcon(constraint)
-                .onSuccess { icon = it }
-                .errorOrNull() ?: getConstraintError.invoke(constraint)
+            val icon: IconInfo? = constraintUiHelper.getIcon(constraint)
+            val error: Error? = displayMapping.getConstraintError(constraint)
 
             val chip: ChipUi = if (error == null) {
                 ChipUi.Normal(

@@ -3,46 +3,42 @@ package io.github.sds100.keymapper.ui.constraints
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.utils.Orientation
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.util.TintType
-import io.github.sds100.keymapper.util.firstBlocking
 import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.handle
 import io.github.sds100.keymapper.util.result.success
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 18/03/2021.
  */
 
-class ConstraintUiHelperImpl(
-    private val appUiAdapter: AppUiAdapter,
+class ConstraintUiHelper(
+    displayConstraintUseCase: DisplayConstraintUseCase,
     resourceProvider: ResourceProvider
-) : ConstraintUiHelper, ResourceProvider by resourceProvider {
+) : DisplayConstraintUseCase by displayConstraintUseCase, ResourceProvider by resourceProvider {
 
-    override fun getTitle(constraint: Constraint): String = when (constraint) {
+    fun getTitle(constraint: Constraint): String = when (constraint) {
         is Constraint.AppInForeground ->
-            appUiAdapter.getAppName(constraint.packageName).map { appName ->
-                getString(R.string.constraint_app_foreground_description, appName)
-            }.catch {
-                getString(R.string.constraint_choose_app_foreground)
-            }.firstBlocking()
+            getAppName(constraint.packageName).handle(
+                onSuccess = { getString(R.string.constraint_app_foreground_description, it) },
+                onError = { getString(R.string.constraint_choose_app_foreground) }
+            )
 
-        is Constraint.AppNotInForeground ->
-            appUiAdapter.getAppName(constraint.packageName).map { appName ->
-                getString(R.string.constraint_app_not_foreground_description, appName)
-            }.catch {
-                getString(R.string.constraint_choose_app_not_foreground)
-            }.firstBlocking()
+            is Constraint.AppNotInForeground ->
+                getAppName(constraint.packageName).handle(
+                    onSuccess = { getString(R.string.constraint_app_not_foreground_description, it) },
+                    onError = { getString(R.string.constraint_choose_app_not_foreground) }
+                )
 
         is Constraint.AppPlayingMedia ->
-            appUiAdapter.getAppName(constraint.packageName).map { appName ->
-                getString(R.string.constraint_app_playing_media_description, appName)
-            }.catch {
-                getString(R.string.constraint_choose_app_playing_media)
-            }.firstBlocking()
+            getAppName(constraint.packageName).handle(
+                onSuccess = { getString(R.string.constraint_app_playing_media_description, it) },
+                onError = { getString(R.string.constraint_choose_app_playing_media) }
+            )
 
         is Constraint.BtDeviceConnected ->
             getString(
@@ -80,19 +76,19 @@ class ConstraintUiHelperImpl(
             getString(R.string.constraint_screen_on_description)
     }
 
-    override fun getIcon(constraint: Constraint): Result<IconInfo> = when (constraint) {
-        is Constraint.AppInForeground -> TODO()
-        is Constraint.AppNotInForeground -> TODO()
-        is Constraint.AppPlayingMedia -> TODO()
+    fun getIcon(constraint: Constraint): IconInfo? = when (constraint) {
+        is Constraint.AppInForeground -> getAppIconInfo(constraint.packageName)
+        is Constraint.AppNotInForeground -> getAppIconInfo(constraint.packageName)
+        is Constraint.AppPlayingMedia -> getAppIconInfo(constraint.packageName)
         is Constraint.BtDeviceConnected -> IconInfo(
             drawable = getDrawable(R.drawable.ic_outline_bluetooth_connected_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
 
         is Constraint.BtDeviceDisconnected -> IconInfo(
             drawable = getDrawable(R.drawable.ic_outline_bluetooth_disabled_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
 
         is Constraint.OrientationCustom -> {
             val resId = when (constraint.orientation) {
@@ -105,38 +101,34 @@ class ConstraintUiHelperImpl(
             IconInfo(
                 drawable = getDrawable(resId),
                 tintType = TintType.ON_SURFACE
-            ).success()
+            )
         }
 
         Constraint.OrientationLandscape -> IconInfo(
             drawable = getDrawable(R.drawable.ic_outline_stay_current_landscape_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
 
         Constraint.OrientationPortrait -> IconInfo(
             drawable = getDrawable(R.drawable.ic_outline_stay_current_portrait_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
 
         Constraint.ScreenOff -> IconInfo(
             drawable = getDrawable(R.drawable.ic_outline_stay_current_portrait_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
 
         Constraint.ScreenOn -> IconInfo(
             drawable = getDrawable(R.drawable.ic_baseline_mobile_off_24),
             tintType = TintType.ON_SURFACE
-        ).success()
+        )
     }
 
-    private fun getAppIcon(packageName: String): IconInfo {
-        return appUiAdapter.getAppIcon(packageName).map {
-            IconInfo(it, TintType.NONE)
-        }.firstBlocking()
+    private fun getAppIconInfo(packageName: String): IconInfo? {
+        return getAppIcon(packageName).handle(
+            onSuccess = { IconInfo(it, TintType.NONE) },
+            onError = { null }
+        )
     }
-}
-
-interface ConstraintUiHelper {
-    fun getTitle(constraint: Constraint): String
-    fun getIcon(constraint: Constraint): Result<IconInfo>
 }

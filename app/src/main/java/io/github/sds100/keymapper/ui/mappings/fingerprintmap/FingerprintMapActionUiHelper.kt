@@ -1,10 +1,10 @@
 package io.github.sds100.keymapper.ui.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
 import io.github.sds100.keymapper.ui.actions.BaseActionUiHelper
 
 /**
@@ -12,32 +12,21 @@ import io.github.sds100.keymapper.ui.actions.BaseActionUiHelper
  */
 
 class FingerprintMapActionUiHelper(
-    appUiAdapter: AppUiAdapter,
-    inputMethodAdapter: InputMethodAdapter,
+    displayActionUseCase: DisplayActionUseCase,
     resourceProvider: ResourceProvider
-) : BaseActionUiHelper<FingerprintMapAction>(
-    appUiAdapter,
-    inputMethodAdapter,
+) : BaseActionUiHelper<FingerprintMap, FingerprintMapAction>(
+    displayActionUseCase,
     resourceProvider
 ) {
 
-    override fun getOptionLabels(action: FingerprintMapAction) = sequence {
-        action.options.delayBeforeNextAction.apply {
-            if (isAllowed) {
-                yield(getString(R.string.action_title_wait, value))
-            }
+    override fun getOptionLabels(mapping: FingerprintMap, action: FingerprintMapAction): List<String> = sequence {
+
+        if (action.isRepeatingUntilSwipedAgainAllowed() && action.repeatUntilSwipedAgain) {
+            yield(getString(R.string.flag_repeat_until_swiped_again))
         }
 
-        action.options.repeatUntilSwipedAgain.apply {
-            if (isAllowed && value) {
-                yield(getString(R.string.flag_repeat_until_swiped_again))
-            }
-        }
-
-        action.options.holdDownUntilSwipedAgain.apply {
-            if (isAllowed && value) {
-                yield(getString(R.string.flag_hold_down_until_swiped_again))
-            }
+         if (action.isHoldingDownUntilSwipedAgainAllowed() && action.holdDownUntilSwipedAgain) {
+            yield(getString(R.string.flag_hold_down_until_swiped_again))
         }
 
     }.toList()

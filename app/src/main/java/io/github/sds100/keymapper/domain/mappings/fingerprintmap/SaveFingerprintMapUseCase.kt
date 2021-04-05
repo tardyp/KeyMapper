@@ -10,7 +10,7 @@ class SaveFingerprintMapUseCaseImpl(
     private val repository: FingerprintMapRepository
 ) : SaveFingerprintMapUseCase {
     override fun invoke(id: FingerprintMapId, fingerprintMap: FingerprintMap) {
-        repository.set(
+        repository.update(
             FingerprintMapIdEntityMapper.toEntity(id),
             FingerprintMapEntityMapper.toEntity(fingerprintMap)
         )

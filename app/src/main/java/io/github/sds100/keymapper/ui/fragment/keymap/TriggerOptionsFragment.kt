@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerOptionsViewModel
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredSlider
@@ -30,12 +30,12 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
         { TriggerOptionsFragment() }
     )
 
-    private val configKeymapViewModel: ConfigKeymapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
-        InjectorUtils.provideConfigKeymapViewModel(requireContext())
+    private val configKeyMapViewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
+        InjectorUtils.provideConfigKeyMapViewModel(requireContext())
     }
 
     private val viewModel: TriggerOptionsViewModel
-        get() = configKeymapViewModel.triggerViewModel.optionsViewModel
+        get() = configKeyMapViewModel.triggerViewModel.optionsViewModel
 
     override var isAppBarVisible = false
 
@@ -70,7 +70,7 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
                         onCopyClick { _ ->
                             val clipData = ClipData.newPlainText(
                                 str(R.string.clipboard_label_keymap_uid),
-                                listItem.keymapUid
+                                listItem.keyMapUid
                             )
 
                             clipboardManager.setPrimaryClip(clipData)
@@ -79,7 +79,7 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
                         }
 
                         onCreateLauncherShortcutClick { _ ->
-                            configKeymapViewModel.createLauncherShortcut()
+                            viewModel.createLauncherShortcut()
                         }
 
                         openIntentGuide { _ ->

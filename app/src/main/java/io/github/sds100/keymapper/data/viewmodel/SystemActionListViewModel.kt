@@ -1,4 +1,3 @@
-
 package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.annotation.StringRes
@@ -7,30 +6,29 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.actions.CreateSystemActionUseCase
 import io.github.sds100.keymapper.data.model.SystemActionListItem
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.ime.GetEnabledInputMethodsUseCase
-import io.github.sds100.keymapper.domain.packages.GetPackagesUseCase
 import io.github.sds100.keymapper.domain.utils.*
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.containsQuery
+import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 31/03/2020.
  */
+
+//TODO create a single use case for "creating a system action".
 class SystemActionListViewModel(
+    private val useCase: CreateSystemActionUseCase,
     resourceProvider: ResourceProvider,
-    private val isSystemActionSupported: IsSystemActionSupportedUseCase,
-    private val getInputMethods: GetEnabledInputMethodsUseCase,
-    private val getInstalledPackages: GetPackagesUseCase,
-    private val appUiAdapter: AppUiAdapter
 ) : ViewModel(), ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
 
     val searchQuery = MutableStateFlow<String?>(null)
@@ -42,8 +40,6 @@ class SystemActionListViewModel(
 
     private val _returnResult = MutableSharedFlow<SystemAction>()
     val returnResult = _returnResult.asSharedFlow()
-
-    private var createSystemActionJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -61,19 +57,18 @@ class SystemActionListViewModel(
     }
 
     fun onSystemActionClick(id: SystemActionId) {
-        createSystemActionJob?.cancel()
-
-        createSystemActionJob = viewModelScope.launch {
+        viewModelScope.launch {
             showMessageForSystemAction(id)
 
             when (id) {
                 SystemActionId.SWITCH_KEYBOARD -> {
-                    val inputMethods = getInputMethods()
+                    val inputMethods = useCase.getInputMethods()
                     val items = inputMethods.map {
                         it.id to it.label
                     }
 
-                    val imeId = showDialog("choose_ime", DialogUi.SingleChoice(items)).item
+                    val imeId = showDialog("choose_ime", DialogUi.SingleChoice(items))?.item
+                        ?: return@launch
                     val imeName = inputMethods.single { it.id == imeId }.label
 
                     _returnResult.emit(SwitchKeyboardSystemAction(imeId, imeName))
@@ -87,21 +82,23 @@ class SystemActionListViewModel(
                 SystemActionId.FAST_FORWARD_PACKAGE,
                 SystemActionId.REWIND_PACKAGE,
                 -> {
-                    val items = withContext(Dispatchers.Default) {
-                        val packages = getInstalledPackages.installedPackages.first {
-                            it is State.Data
-                        } as State.Data
+                    val items: List<Pair<String, String>> = withContext(Dispatchers.Default) {
+                        val packages = useCase.getInstalledPackages()
 
-                        packages.data
-                            .filter { it.canBeLaunched }
-                            .map {
-                                it.packageName to appUiAdapter.getAppName(it.packageName).first()
+                        return@withContext packages
+                            .filter { app -> app.canBeLaunched }
+                            .mapNotNull { app ->
+                                val appName = useCase.getAppName(app.packageName).valueOrNull()
+                                    ?: return@mapNotNull null
+
+                                app.packageName to appName
                             }
                             .sortedBy { it.second }
                     }
 
                     val packageName =
-                        showDialog("choose_package", DialogUi.SingleChoice(items)).item
+                        showDialog("choose_package", DialogUi.SingleChoice(items))?.item
+                            ?: return@launch
 
                     val action = when (id) {
                         SystemActionId.PAUSE_MEDIA_PACKAGE ->
@@ -129,7 +126,8 @@ class SystemActionListViewModel(
                     val items = VolumeStream.values()
                         .map { it to getString(VolumeStreamUtils.getLabel(it)) }
 
-                    val stream = showDialog("pick_volume_stream", DialogUi.SingleChoice(items)).item
+                    val stream = showDialog("pick_volume_stream", DialogUi.SingleChoice(items))
+                        ?.item ?: return@launch
 
                     val action = when (id) {
                         SystemActionId.VOLUME_INCREASE_STREAM ->
@@ -149,7 +147,8 @@ class SystemActionListViewModel(
                         .map { it to getString(RingerModeUtils.getLabel(it)) }
 
                     val ringerMode =
-                        showDialog("pick_ringer_mode", DialogUi.SingleChoice(items)).item
+                        showDialog("pick_ringer_mode", DialogUi.SingleChoice(items))?.item
+                            ?: return@launch
 
                     _returnResult.emit(ChangeRingerModeSystemAction(ringerMode))
                 }
@@ -160,7 +159,8 @@ class SystemActionListViewModel(
                     val items = DndMode.values()
                         .map { it to getString(DndModeUtils.getLabel(it)) }
 
-                    val dndMode = showDialog("pick_dnd_mode", DialogUi.SingleChoice(items)).item
+                    val dndMode = showDialog("pick_dnd_mode", DialogUi.SingleChoice(items))?.item
+                        ?: return@launch
 
                     val action = when (id) {
                         SystemActionId.TOGGLE_DND_MODE ->
@@ -180,7 +180,8 @@ class SystemActionListViewModel(
                         .map { it to getString(OrientationUtils.getLabel(it)) }
 
                     val orientations =
-                        showDialog("pick_orientations", DialogUi.MultiChoice(items)).items
+                        showDialog("pick_orientations", DialogUi.MultiChoice(items))?.items
+                            ?: return@launch
 
                     _returnResult.emit(CycleRotationsSystemAction(orientations))
                 }
@@ -192,7 +193,8 @@ class SystemActionListViewModel(
                         it to getString(CameraLensUtils.getLabel(it))
                     }
 
-                    val lens = showDialog("pick_lens", DialogUi.SingleChoice(items)).item
+                    val lens = showDialog("pick_lens", DialogUi.SingleChoice(items))?.item
+                        ?: return@launch
 
                     val action = when (id) {
                         SystemActionId.TOGGLE_FLASHLIGHT -> FlashlightSystemAction.Toggle(lens)
@@ -211,12 +213,6 @@ class SystemActionListViewModel(
 
     fun rebuildUiState() {
         runBlocking { rebuildUiState.emit(Unit) }
-    }
-
-    override fun onCleared() {
-        createSystemActionJob?.cancel()
-        createSystemActionJob = null
-        super.onCleared()
     }
 
     private suspend fun showMessageForSystemAction(id: SystemActionId) {
@@ -256,7 +252,7 @@ class SystemActionListViewModel(
                 val childrenListItems = mutableListOf<SystemActionListItem>()
 
                 for (systemActionId in children) {
-                    if (isSystemActionSupported.invoke(systemActionId) != null) {
+                    if (useCase.isSupported(systemActionId) != null) {
                         unsupportedActions = true
                         continue
                     }
@@ -302,23 +298,13 @@ class SystemActionListViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
+        private val useCase: CreateSystemActionUseCase,
         private val resourceProvider: ResourceProvider,
-        private val isSystemActionSupported: IsSystemActionSupportedUseCase,
-        private val getInputMethods: GetEnabledInputMethodsUseCase,
-        private val getInstalledPackages: GetPackagesUseCase,
-        private val appUiAdapter: AppUiAdapter
-
     ) :
         ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return SystemActionListViewModel(
-                resourceProvider,
-                isSystemActionSupported,
-                getInputMethods,
-                getInstalledPackages,
-                appUiAdapter
-            ) as T
+            return SystemActionListViewModel(useCase, resourceProvider) as T
         }
     }
 }

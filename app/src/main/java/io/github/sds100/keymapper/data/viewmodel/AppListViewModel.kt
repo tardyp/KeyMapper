@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.data.model.AppListItem
-import io.github.sds100.keymapper.domain.packages.GetPackagesUseCase
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.mapData
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
+import io.github.sds100.keymapper.packages.DisplayAppsUseCase
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.filterByQuery
+import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,9 +21,10 @@ import java.util.*
 /**
  * Created by sds100 on 27/01/2020.
  */
+
+//TODO rename as ChooseAppViewModel
 class AppListViewModel internal constructor(
-    private val appUiAdapter: AppUiAdapter,
-    getPackages: GetPackagesUseCase
+    private val useCase: DisplayAppsUseCase,
 ) : ViewModel() {
 
     val searchQuery = MutableStateFlow<String?>(null)
@@ -44,7 +45,7 @@ class AppListViewModel internal constructor(
     init {
         viewModelScope.launch {
             combine(
-                getPackages.installedPackages,
+                useCase.installedPackages,
                 showHiddenApps,
                 searchQuery,
                 rebuildUiState
@@ -96,33 +97,30 @@ class AppListViewModel internal constructor(
         runBlocking { rebuildUiState.emit(Unit) }
     }
 
-    private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> =flow {
+    private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> = flow {
         forEach {
-            combine(
-                appUiAdapter.getAppName(it.packageName),
-                appUiAdapter.getAppIcon(it.packageName)
-            ) { name, icon ->
-                val model = AppListItem(
-                    packageName = it.packageName,
-                    appName = name,
-                    icon = icon
-                )
+            val name = useCase.getAppName(it.packageName).valueOrNull() ?: return@forEach
+            val icon = useCase.getAppIcon(it.packageName).valueOrNull() ?: return@forEach
 
-                emit(model)
-            }.catch { }.collect()
+            val listItem = AppListItem(
+                packageName = it.packageName,
+                appName = name,
+                icon = icon
+            )
+
+            emit(listItem)
         }
     }.flowOn(Dispatchers.Default)
         .toList()
         .sortedBy { it.appName.toLowerCase(Locale.getDefault()) }
 
     class Factory(
-        private val appUiAdapter: AppUiAdapter,
-        private val getPackages: GetPackagesUseCase
+        private val useCase: DisplayAppsUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            AppListViewModel(appUiAdapter, getPackages) as T
+            AppListViewModel(useCase) as T
     }
 }
 

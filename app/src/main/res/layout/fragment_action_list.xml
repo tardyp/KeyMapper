@@ -12,8 +12,8 @@
         <import type="io.github.sds100.keymapper.ui.ListUiState" />
 
         <variable
-            name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.ActionListViewModel" />
+            name="onAddActionClick"
+            type="View.OnClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,7 +74,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
-            android:onClick="@{() -> viewModel.onAddActionClick()}"
+            android:onClick="@{onAddActionClick}"
             android:text="@string/button_add_action"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

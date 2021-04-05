@@ -6,4 +6,4 @@ import io.github.sds100.keymapper.util.TintType
 /**
  * Created by sds100 on 18/03/2021.
  */
-data class IconInfo(val drawable: Drawable?, val tintType: TintType)
+data class IconInfo(val drawable: Drawable, val tintType: TintType)

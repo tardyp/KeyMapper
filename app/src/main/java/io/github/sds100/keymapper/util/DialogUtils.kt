@@ -16,12 +16,15 @@ import io.github.sds100.keymapper.ui.dialogs.DialogResponse
 import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
 import splitties.snackbar.action
 import splitties.snackbar.longSnack
+import splitties.snackbar.onDismiss
 import splitties.snackbar.snack
+import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -32,7 +35,7 @@ import kotlin.coroutines.suspendCoroutine
 suspend fun DialogUi<*>.show(
     fragment: Fragment,
     coordinatorLayout: CoordinatorLayout? = null
-): DialogResponse {
+): DialogResponse? {
     val lifecycleOwner = fragment.viewLifecycleOwner
     val ctx = fragment.requireContext()
 
@@ -43,18 +46,19 @@ suspend fun DialogUi<*>.show(
     lifecycleOwner: LifecycleOwner,
     ctx: Context,
     coordinatorLayout: CoordinatorLayout? = null
-): DialogResponse {
+): DialogResponse? {
+
     return when (this) {
         is DialogUi.OkMessage -> ctx.okDialog(lifecycleOwner, this.message)
         is DialogUi.Text ->
-            ctx.editTextStringAlertDialogFlow(
+            ctx.editTextStringAlertDialog(
                 lifecycleOwner,
                 this.hint,
                 this.allowEmpty
             )
         is DialogUi.MultiChoice<*> -> ctx.multiChoiceDialog(lifecycleOwner, this.items)
         is DialogUi.SingleChoice<*> -> ctx.singleChoiceDialog(lifecycleOwner, this.items)
-        is DialogUi.SnackBar -> suspendCancellableCoroutine { continuation ->
+        is DialogUi.SnackBar -> suspendCancellableCoroutine<DialogUi.SnackBarActionResponse?> { continuation ->
 
             require(coordinatorLayout != null)
 
@@ -82,7 +86,7 @@ suspend fun DialogUi<*>.show(
 suspend fun <ID> Context.multiChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<DialogUi.MultiChoiceResponse<ID>> { continuation ->
+) = suspendCancellableCoroutine<DialogUi.MultiChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         val checkedItems = BooleanArray(items.size) { false }
 
@@ -116,7 +120,7 @@ suspend fun <ID> Context.multiChoiceDialog(
 suspend fun <ID> Context.singleChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<DialogUi.SingleChoiceResponse<ID>> { continuation ->
+) = suspendCancellableCoroutine<DialogUi.SingleChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         setItems(
             items.map { it.second }.toTypedArray(),
@@ -130,64 +134,16 @@ suspend fun <ID> Context.singleChoiceDialog(
     }
 }
 
-//TODO delete
 suspend fun Context.editTextStringAlertDialog(
     lifecycleOwner: LifecycleOwner,
     hint: String,
     allowEmpty: Boolean = false
-) = suspendCoroutine<String?> { continuation ->
-    alertDialog {
-        val inflater = LayoutInflater.from(this@editTextStringAlertDialog)
-
-        DialogEdittextStringBinding.inflate(inflater).apply {
-            val text = MutableStateFlow("")
-
-            setHint(hint)
-            setText(text)
-            setAllowEmpty(allowEmpty)
-
-            setView(this.root)
-
-            okButton {
-                continuation.resume(text.value)
-            }
-
-            cancelButton()
-
-            show().apply {
-                lifecycleOwner.lifecycle.coroutineScope.launchWhenResumed {
-                    text.collectLatest {
-                        getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                            if (allowEmpty) {
-                                true
-                            } else {
-                                it.isNotBlank()
-                            }
-                    }
-                }
-            }
-
-            onDismiss {
-                continuation.resume(null)
-            }
-
-            setOnCancelListener {
-                continuation.resume(null)
-            }
-        }
-    }
-}
-
-suspend fun Context.editTextStringAlertDialogFlow(
-    lifecycleOwner: LifecycleOwner,
-    hint: String,
-    allowEmpty: Boolean = false
-) = suspendCancellableCoroutine<DialogUi.TextResponse> { continuation ->
+) = suspendCancellableCoroutine<DialogUi.TextResponse?> { continuation ->
 
     val text = MutableStateFlow("")
 
     val alertDialog = materialAlertDialog {
-        val inflater = LayoutInflater.from(this@editTextStringAlertDialogFlow)
+        val inflater = LayoutInflater.from(this@editTextStringAlertDialog)
 
         DialogEdittextStringBinding.inflate(inflater).apply {
             setHint(hint)
@@ -226,7 +182,7 @@ suspend fun Context.editTextNumberAlertDialog(
     hint: String,
     min: Int? = null,
     max: Int? = null
-) = suspendCoroutine<Int> {
+) = suspendCancellableCoroutine<Int?> { continuation ->
 
     fun isValid(text: String?): Result<Int> {
         if (text.isNullOrBlank()) {
@@ -254,32 +210,35 @@ suspend fun Context.editTextNumberAlertDialog(
         }
     }
 
-    alertDialog {
+    val text = MutableStateFlow("")
+
+    materialAlertDialog {
         val inflater = LayoutInflater.from(this@editTextNumberAlertDialog)
         DialogEdittextNumberBinding.inflate(inflater).apply {
-            val text = MutableLiveData("")
 
             setHint(hint)
             setText(text)
 
             setView(this.root)
 
-            okButton { _ ->
+            okButton {
                 isValid(text.value).onSuccess { num ->
-                    it.resume(num)
+                    continuation.resume(num)
                 }
             }
 
             cancelButton()
 
-            show().apply {
-                text.observe(lifecycleOwner, {
-                    val result = isValid(it)
+            val alertDialog = show()
 
-                    getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = result.isSuccess
+            alertDialog.dismissOnDestroy(lifecycleOwner)
 
-                    textInputLayout.error = result.errorOrNull()?.getFullMessage(context)
-                })
+            lifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+                text.map { isValid(it) }
+                    .collectLatest { isValid ->
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isValid.isSuccess
+                        textInputLayout.error = isValid.errorOrNull()?.getFullMessage(context)
+                    }
             }
         }
     }
@@ -288,7 +247,7 @@ suspend fun Context.editTextNumberAlertDialog(
 suspend fun Context.okDialog(
     lifecycleOwner: LifecycleOwner,
     message: String
-) = suspendCancellableCoroutine<DialogUi.OkResponse> { continuation ->
+) = suspendCancellableCoroutine<DialogUi.OkResponse?> { continuation ->
 
     val alertDialog = materialAlertDialog {
 
@@ -318,7 +277,7 @@ suspend fun Context.seekBarAlertDialog(
     lifecycleOwner: LifecycleOwner,
     seekBarListItemModel: SeekBarListItemModel
 ) = suspendCoroutine<Int> {
-    alertDialog {
+    materialAlertDialog {
         val inflater = LayoutInflater.from(this@seekBarAlertDialog)
         DialogSeekbarListBinding.inflate(inflater).apply {
 

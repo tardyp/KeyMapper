@@ -94,10 +94,11 @@ class BackupManager(
         coroutineScope.launch(dispatchers.default()) {
             val result = backupAsync(
                 outputStream,
-                fingerprintSwipeDown = fingerprintMapRepository.swipeDown.firstOrNull(),
-                fingerprintSwipeUp = fingerprintMapRepository.swipeUp.firstOrNull(),
-                fingerprintSwipeLeft = fingerprintMapRepository.swipeLeft.firstOrNull(),
-                fingerprintSwipeRight = fingerprintMapRepository.swipeRight.firstOrNull()
+                keymapList = emptyList(),
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeDown,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeUp,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeLeft,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeRight
             ).await()
 
             _eventStream.value = BackupResult(result)
@@ -111,10 +112,10 @@ class BackupManager(
             val result = backupAsync(
                 outputStream,
                 keymaps,
-                fingerprintMapRepository.swipeDown.firstOrNull(),
-                fingerprintMapRepository.swipeUp.firstOrNull(),
-                fingerprintMapRepository.swipeLeft.firstOrNull(),
-                fingerprintMapRepository.swipeRight.firstOrNull()
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeDown,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeUp,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeLeft,
+                fingerprintMapRepository.fingerprintMaps.firstOrNull()?.swipeRight
             )
                 .await()
 

@@ -36,7 +36,6 @@ class KeyMapperApp : MultiDexApplication(),
     }
 
     val appRepository by lazy { AndroidAppRepository(packageManager) }
-    val appInfoAdapter by lazy { AndroidAppUiAdapter(packageManager) }
     val resourceProvider by lazy { ResourceProviderImpl(this) }
 
     val bluetoothMonitor by lazy { AndroidBluetoothMonitor(appCoroutineScope) }
@@ -58,7 +57,7 @@ class KeyMapperApp : MultiDexApplication(),
     }
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
-    val launcherShortcutAdapter by lazy { LauncherShortcutAdapterImpl(this) }
+    val appShortcutAdapter by lazy { AndroidAppShortcutAdapter(this) }
     val powerManagerAdapter by lazy { AndroidPowerManagementAdapter(this) }
 
     val recordTriggerController by lazy {

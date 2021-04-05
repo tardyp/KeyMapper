@@ -1,18 +1,15 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
+import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
-import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
-import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
-import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.Defaultable
+import io.github.sds100.keymapper.mappings.common.Mapping
 import io.github.sds100.keymapper.util.delegate.KeymapDetectionDelegate
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import java.util.*
 
 /**
@@ -23,103 +20,80 @@ import java.util.*
 data class KeyMap(
     val dbId: Long? = null,
     val uid: String = UUID.randomUUID().toString(),
-    val trigger: KeymapTrigger = KeymapTrigger(),
-    val actionDataList: List<KeymapActionData> = emptyList(),
-    val constraintList: Set<Constraint> = emptySet(),
-    val constraintMode: ConstraintMode = ConstraintMode.AND,
-    val isEnabled: Boolean = true
-) {
+    val trigger: KeyMapTrigger = KeyMapTrigger(),
+    override val actionList: List<KeyMapAction> = emptyList(),
+    override val constraintState: ConstraintState = ConstraintState(),
+    override val isEnabled: Boolean = true
+) : Mapping<KeyMapAction> {
 
-    @Transient
-    val actionList: List<KeymapAction> = actionDataList.map {
-        val options = KeymapActionOptions(
-            repeat = Option(
-                value = it.repeat,
-                isAllowed = KeymapDetectionDelegate.performActionOnDown(trigger)
-            ),
+    fun isRepeatingActionsAllowed(): Boolean {
+        return KeymapDetectionDelegate.performActionOnDown(trigger)
+    }
 
-            holdDown = Option(
-                value = it.holdDown,
-                isAllowed = KeymapDetectionDelegate.performActionOnDown(trigger)
-                    && it.data.canBeHeldDown()
-            ),
+    fun isChangingActionRepeatRateAllowed(action: KeyMapAction): Boolean{
+        return action.repeat
+    }
 
-            multiplier = Option(
-                value = Defaultable.create(it.multiplier),
-                isAllowed = true
-            ),
+    fun isChangingActionRepeatDelayAllowed(action: KeyMapAction): Boolean{
+        return action.repeat
+    }
 
-            holdDownDuration = Option(
-                value = Defaultable.create(it.holdDownDuration),
-                isAllowed = it.repeat && it.holdDown
-            ),
+    fun isHoldingDownActionAllowed(action: KeyMapAction): Boolean {
+        return KeymapDetectionDelegate.performActionOnDown(trigger) && action.data.canBeHeldDown()
+    }
 
-            repeatRate = Option(
-                value = Defaultable.create(it.repeatRate),
-                isAllowed = it.repeat
-            ),
+    fun isHoldingDownActionBeforeRepeatingAllowed(action: KeyMapAction): Boolean {
+        return action.repeat && action.holdDown
+    }
 
-            repeatDelay = Option(
-                value = Defaultable.create(it.repeatDelay),
-                isAllowed = it.repeat
-            ),
+    fun isStopRepeatingActionWhenTriggerPressedAgainAllowed(action: KeyMapAction): Boolean {
+        return action.repeat
+    }
 
-            stopRepeating = Option(
-                value = it.stopRepeating,
-                isAllowed = it.repeat
-            ),
-
-            stopHoldDown = Option(
-                value = Defaultable.create(it.stopHoldDown),
-                isAllowed = it.holdDown && !it.repeat
-            ),
-
-            delayBeforeNextAction = Option(
-                value = Defaultable.create(it.delayBeforeNextAction),
-                isAllowed = actionDataList.isNotEmpty()
-            )
-        )
-
-        KeymapAction(it.uid, it.data, options)
-    }.toList()
+    fun isStopHoldingDownActionWhenTriggerPressedAgainAllowed(action: KeyMapAction): Boolean {
+        return action.holdDown && !action.repeat
+    }
 }
 
 object KeyMapEntityMapper {
     fun fromEntity(entity: KeyMapEntity): KeyMap {
         val actionList = sequence {
             entity.actionList.forEach { entity ->
-                KeymapActionDataEntityMapper.fromEntity(entity)?.let { yield(it) }
+                KeymapActionEntityMapper.fromEntity(entity)?.let { yield(it) }
             }
         }.toList()
+
+        val constraintList =
+            entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }.toSet()
+
+        val constraintMode = ConstraintModeEntityMapper.fromEntity(entity.constraintMode)
 
         return KeyMap(
             dbId = entity.id,
             uid = entity.uid,
             trigger = KeymapTriggerEntityMapper.fromEntity(entity.trigger),
-            actionDataList = actionList,
-            constraintList = entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }
-                .toSet(),
-            constraintMode = ConstraintModeEntityMapper.fromEntity(entity.constraintMode),
+            actionList = actionList,
+            constraintState = ConstraintState(constraintList, constraintMode),
             isEnabled = entity.isEnabled
         )
     }
 
-    fun toEntity(keymap: KeyMap, dbId: Long): KeyMapEntity {
+    fun toEntity(keyMap: KeyMap, dbId: Long): KeyMapEntity {
 
-        val actionEntityList = sequence {
-            keymap.actionList.forEach { action ->
-                KeymapActionDataEntityMapper.toEntity(action)?.let { yield(it) }
-            }
-        }.toList()
+        val actionEntityList = KeymapActionEntityMapper.toEntity(keyMap)
 
         return KeyMapEntity(
             id = dbId,
-            trigger = KeymapTriggerEntityMapper.toEntity(keymap.trigger),
+            trigger = KeymapTriggerEntityMapper.toEntity(keyMap.trigger),
             actionList = actionEntityList,
-            constraintList = keymap.constraintList.map { ConstraintEntityMapper.toEntity(it) },
-            constraintMode = ConstraintModeEntityMapper.toEntity(keymap.constraintMode),
-            isEnabled = keymap.isEnabled,
-            uid = keymap.uid
+            constraintList = keyMap.constraintState.constraints.map {
+                ConstraintEntityMapper.toEntity(
+                    it
+                )
+            },
+            constraintMode = ConstraintModeEntityMapper.toEntity(keyMap.constraintState.mode),
+            isEnabled = keyMap.isEnabled,
+            uid = keyMap.uid
         )
     }
 }

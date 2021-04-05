@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.ui
 data class TriggerFromOtherAppsListItem(
     override val id: String,
     val isEnabled: Boolean,
-    val keymapUid: String,
+    val keyMapUid: String,
     val label: String,
-    val areLauncherShortcutsSupported: Boolean
+    val showCreateLauncherShortcutButton: Boolean
 ) : ListItem

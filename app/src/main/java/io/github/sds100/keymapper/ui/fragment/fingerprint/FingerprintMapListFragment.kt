@@ -88,6 +88,10 @@ class FingerprintMapListFragment :
 
                     model(listItem)
 
+                    onEnabledSwitchChangeListener { _, isChecked ->
+                        viewModel.onEnabledSwitchChange(listItem.id, isChecked)
+                    }
+
                     onChipClick(object : OnChipClickCallback {
                         override fun onChipClick(chipModel: ChipUi) {
                             viewModel.onChipClick(listItem.id, chipModel)

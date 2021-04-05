@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.onDialogResponse
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
@@ -26,8 +26,8 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
     private val args by navArgs<ConfigKeymapFragmentArgs>()
 
-    override val viewModel: ConfigKeymapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
-        InjectorUtils.provideConfigKeymapViewModel(requireContext())
+    override val viewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
+        InjectorUtils.provideConfigKeyMapViewModel(requireContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +46,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
-                viewModel.constraintListViewModel.addConstraint(it)
+                viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
         }
 
@@ -68,20 +68,17 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.createLauncherShortcutLabel.collectLatest {
-                val label = requireContext().editTextStringAlertDialog(
-                    viewLifecycleOwner,
-                    hint = str(R.string.hint_shortcut_name),
-                    allowEmpty = false
-                ) ?: return@collectLatest
-
-                viewModel.createLauncherShortcut(label)
+            viewModel.triggerViewModel.showDialog.collectLatest {
+                viewModel.triggerViewModel.onDialogResponse(
+                    it.key,
+                    it.ui.show(this@ConfigKeymapFragment, binding.coordinatorLayout)
+                )
             }
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.triggerViewModel.showDialog.collectLatest {
-                viewModel.triggerViewModel.onDialogResponse(
+            viewModel.triggerViewModel.optionsViewModel.showDialog.collectLatest {
+                viewModel.triggerViewModel.optionsViewModel.onDialogResponse(
                     it.key,
                     it.ui.show(this@ConfigKeymapFragment, binding.coordinatorLayout)
                 )

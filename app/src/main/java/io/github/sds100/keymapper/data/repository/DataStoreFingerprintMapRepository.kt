@@ -17,14 +17,13 @@ import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityGroup
 import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.MigrationUtils
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 17/11/20.
@@ -55,52 +54,51 @@ class DataStoreFingerprintMapRepository(
 
     private val jsonParser = JsonParser()
 
-    override val swipeDown: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
-        prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN)
-    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
+    override val fingerprintMaps: Flow<FingerprintMapEntityGroup> = dataStore.data.map { prefs ->
+        val group = FingerprintMapEntityGroup(
+            swipeDown = prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN),
+            swipeUp = prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP),
+            swipeLeft = prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT),
+            swipeRight = prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT),
+        )
 
-    override val swipeUp: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
-        prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP)
-    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
-
-    override val swipeLeft: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
-        prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT)
-    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
-
-    override val swipeRight: Flow<FingerprintMapEntity> = dataStore.data.map { prefs ->
-        prefs.getGesture(PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT)
-    }.dropWhile { it.version < FingerprintMapEntity.CURRENT_VERSION }
+        group
+    }.dropWhile { group ->
+        group.swipeDown.version < FingerprintMapEntity.CURRENT_VERSION
+            || group.swipeUp.version < FingerprintMapEntity.CURRENT_VERSION
+            || group.swipeLeft.version < FingerprintMapEntity.CURRENT_VERSION
+            || group.swipeRight.version < FingerprintMapEntity.CURRENT_VERSION
+    }
 
     override val requestAutomaticBackup =
         MutableLiveData<BackupRequest<Map<String, FingerprintMapEntity>>>()
 
     override fun restore(id: String, fingerprintMapJson: String) {
-        coroutineScope.launch {
-            val rootElement = jsonParser.parse(fingerprintMapJson)
-            val initialVersion =
-                rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt
-                    ?: 0
+        //TODO
+//            val rootElement = jsonParser.parse(fingerprintMapJson)
+//            val initialVersion =
+//                rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt
+//                    ?: 0
+//
+//            val migratedJson = MigrationUtils.migrate(
+//                gson,
+//                MIGRATIONS,
+//                initialVersion,
+//                fingerprintMapJson,
+//                FingerprintMapEntity.CURRENT_VERSION
+//            )
 
-            val migratedJson = MigrationUtils.migrate(
-                gson,
-                MIGRATIONS,
-                initialVersion,
-                fingerprintMapJson,
-                FingerprintMapEntity.CURRENT_VERSION
-            )
 
-
-            //TODO
-//            setGesture(id, migratedJson)
-        }
+        //TODO
+//            setGesture(id, migratedJson)    }
     }
 
-    override fun set(id: String, map: FingerprintMapEntity) {
+    override fun update(id: String, fingerprintMap: FingerprintMapEntity) {
         coroutineScope.launch {
             dataStore.edit { prefs ->
                 val key = PREF_KEYS_MAP[id]!!
 
-                prefs[key] = gson.toJson(map)
+                prefs[key] = gson.toJson(fingerprintMap)
             }
 
             requestBackup()
@@ -113,6 +111,60 @@ class DataStoreFingerprintMapRepository(
                 PreferenceKeys.ALL_SWIPE_KEYS.forEach {
                     prefs.remove(it)
                 }
+            }
+        }
+    }
+
+    override fun enableFingerprintMap(id: String) {
+        coroutineScope.launch {
+            val fingerprintMap = fingerprintMaps.firstOrNull()?.get(id) ?: return@launch
+            update(id, fingerprintMap.copy(isEnabled = true))
+        }
+    }
+
+    override fun disableFingerprintMap(id: String) {
+        coroutineScope.launch {
+            val fingerprintMap = fingerprintMaps.firstOrNull()?.get(id) ?: return@launch
+            update(id, fingerprintMap.copy(isEnabled = false))
+        }
+    }
+
+    override fun enableAll() {
+        coroutineScope.launch {
+            val group = fingerprintMaps.firstOrNull()?: return@launch
+
+            val newGroup = group.copy(
+                swipeDown = group.swipeDown.copy(isEnabled = true),
+                swipeUp = group.swipeUp.copy(isEnabled = true),
+                swipeLeft = group.swipeLeft.copy(isEnabled = true),
+                swipeRight = group.swipeRight.copy(isEnabled = true),
+            )
+
+            dataStore.edit { prefs ->
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] = gson.toJson(newGroup.swipeDown)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] = gson.toJson(newGroup.swipeUp)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] = gson.toJson(newGroup.swipeLeft)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] = gson.toJson(newGroup.swipeRight)
+            }
+        }
+    }
+
+    override fun disableAll() {
+        coroutineScope.launch {
+            val group = fingerprintMaps.firstOrNull()?: return@launch
+
+            val newGroup = group.copy(
+                swipeDown = group.swipeDown.copy(isEnabled = false),
+                swipeUp = group.swipeUp.copy(isEnabled = false),
+                swipeLeft = group.swipeLeft.copy(isEnabled = false),
+                swipeRight = group.swipeRight.copy(isEnabled = false),
+            )
+
+            dataStore.edit { prefs ->
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] = gson.toJson(newGroup.swipeDown)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] = gson.toJson(newGroup.swipeUp)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] = gson.toJson(newGroup.swipeLeft)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] = gson.toJson(newGroup.swipeRight)
             }
         }
     }
@@ -160,6 +212,16 @@ class DataStoreFingerprintMapRepository(
         }
 
         return gson.fromJson(migratedJson)
+    }
+
+    private fun FingerprintMapEntityGroup.get(id: String): FingerprintMapEntity {
+        return when (id) {
+            FingerprintMapEntity.ID_SWIPE_DOWN -> swipeDown
+            FingerprintMapEntity.ID_SWIPE_UP -> swipeUp
+            FingerprintMapEntity.ID_SWIPE_LEFT -> swipeLeft
+            FingerprintMapEntity.ID_SWIPE_RIGHT -> swipeRight
+            else -> throw IllegalArgumentException("Don't know how to get fingerprint map for id $id")
+        }
     }
 
     private object PreferenceKeys {

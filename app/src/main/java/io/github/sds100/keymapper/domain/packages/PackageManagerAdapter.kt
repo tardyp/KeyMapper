@@ -1,6 +1,8 @@
 package io.github.sds100.keymapper.domain.packages
 
+import android.graphics.drawable.Drawable
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -8,6 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 interface PackageManagerAdapter {
     val installedPackages: StateFlow<State<List<PackageInfo>>>
+
+    fun getAppName(packageName: String): Result<String>
+    fun getAppIcon(packageName: String): Result<Drawable>
     fun isAppEnabled(packageName: String): Boolean
     fun isAppInstalled(packageName: String): Boolean
 

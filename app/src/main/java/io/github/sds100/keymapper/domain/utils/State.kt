@@ -8,6 +8,13 @@ sealed class State<out T> {
     object Loading : State<Nothing>()
 }
 
+fun <T> State<T>.dataOrNull(): T? {
+    return when (this) {
+        is State.Data -> this.data
+        State.Loading -> null
+    }
+}
+
 inline fun <T, O> State<T>.mapData(block: (data: T) -> O): State<O> = when (this) {
     is State.Loading -> State.Loading
     is State.Data -> State.Data(block.invoke(this.data))

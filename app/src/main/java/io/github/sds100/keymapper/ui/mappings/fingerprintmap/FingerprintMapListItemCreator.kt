@@ -1,36 +1,26 @@
 package io.github.sds100.keymapper.ui.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapOptions
-import io.github.sds100.keymapper.domain.models.ifIsAllowed
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.ui.actions.ActionUiHelper
-import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
+import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
 
 /**
  * Created by sds100 on 19/03/2021.
  */
 class FingerprintMapListItemCreator(
-    private val getActionError: GetActionErrorUseCase,
-    actionUiHelper: ActionUiHelper<FingerprintMapAction>,
-    constraintUiHelper: ConstraintUiHelper,
-    getConstraintErrorUseCase: GetConstraintErrorUseCase,
+    private val  display: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
-) : BaseMappingListItemCreator<FingerprintMapAction>(
-    getActionError,
-    actionUiHelper,
-    getConstraintErrorUseCase,
-    constraintUiHelper,
+) : BaseMappingListItemCreator<FingerprintMap, FingerprintMapAction>(
+    display,
+    FingerprintMapActionUiHelper(display, resourceProvider),
     resourceProvider
 ) {
 
-    fun map(id: FingerprintMapId, fingerprintMap: FingerprintMap): FingerprintMapListItem {
+    fun create(id: FingerprintMapId, fingerprintMap: FingerprintMap): FingerprintMapListItem {
         val header = when (id) {
             FingerprintMapId.SWIPE_DOWN -> getString(R.string.header_fingerprint_gesture_down)
             FingerprintMapId.SWIPE_UP -> getString(R.string.header_fingerprint_gesture_up)
@@ -41,7 +31,7 @@ class FingerprintMapListItemCreator(
         val midDot = getString(R.string.middot)
 
         val optionsDescription = buildString {
-            getOptionLabels(fingerprintMap.options).forEachIndexed { index, label ->
+            getOptionLabels(fingerprintMap).forEachIndexed { index, label ->
                 if (index != 0) {
                     append(" $midDot ")
                 }
@@ -55,7 +45,7 @@ class FingerprintMapListItemCreator(
                 append(getString(R.string.disabled))
             }
 
-            if (fingerprintMap.actionList.any { getActionError.getError(it.data) != null }) {
+            if (fingerprintMap.actionList.any { display.getActionError(it.data) != null }) {
                 if (this.isNotEmpty()) {
                     append(" $midDot ")
                 }
@@ -75,30 +65,22 @@ class FingerprintMapListItemCreator(
         return FingerprintMapListItem(
             id = id,
             header = header,
-            chipList = getChipList(
-                fingerprintMap.actionList,
-                fingerprintMap.constraintList,
-                fingerprintMap.constraintMode
-            ),
+            chipList = getChipList(fingerprintMap),
             optionsDescription = optionsDescription,
             isEnabled = fingerprintMap.isEnabled,
             extraInfo = extraInfo
         )
     }
 
-    private fun getOptionLabels(options: FingerprintMapOptions): List<String> {
+    private fun getOptionLabels(fingerprintMap: FingerprintMap): List<String> {
         val labels = mutableListOf<String>()
 
-        options.vibrate.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_vibrate))
-            }
+        if (fingerprintMap.isVibrateAllowed() && fingerprintMap.vibrate) {
+            labels.add(getString(R.string.flag_vibrate))
         }
 
-        options.showToast.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_show_toast))
-            }
+        if (fingerprintMap.showToast) {
+            labels.add(getString(R.string.flag_show_toast))
         }
 
         return labels

@@ -20,7 +20,7 @@ import io.github.sds100.keymapper.fixError
 import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.TriggerViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
@@ -49,8 +49,8 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     )
 
     private val triggerViewModel: TriggerViewModel by lazy {
-        navGraphViewModels<ConfigKeymapViewModel>(R.id.nav_config_keymap) {
-            InjectorUtils.provideConfigKeymapViewModel(requireContext())
+        navGraphViewModels<ConfigKeyMapViewModel>(R.id.nav_config_keymap) {
+            InjectorUtils.provideConfigKeyMapViewModel(requireContext())
         }.value.triggerViewModel
     }
 

@@ -1,13 +1,16 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
+import io.github.sds100.keymapper.constraints.ConstraintState
+import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
-import io.github.sds100.keymapper.domain.actions.canBeHeldDown
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.domain.constraints.ConstraintMode
-import io.github.sds100.keymapper.domain.models.Option
-import io.github.sds100.keymapper.domain.utils.Defaultable
+import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
+import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
+import io.github.sds100.keymapper.mappings.common.Mapping
+import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import splitties.bitflags.hasFlag
+import splitties.bitflags.withFlag
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -15,68 +18,21 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class FingerprintMap(
-    val actionDataList: List<FingerprintMapActionData> = emptyList(),
-    val constraintList: Set<Constraint> = emptySet(),
-    val constraintMode: ConstraintMode = ConstraintMode.AND,
-    val isEnabled: Boolean = true,
-    private val vibrate: Boolean = false,
-    private val vibrateDuration: Int? = null,
-    private val showToast: Boolean = false
-) {
-    @Transient
-    val options = FingerprintMapOptions(
-        vibrate = Option(
-            value = vibrate,
-            isAllowed = true
-        ),
+    override val actionList: List<FingerprintMapAction> = emptyList(),
+    override val constraintState: ConstraintState = ConstraintState(),
+    override val isEnabled: Boolean = true,
+    val vibrate: Boolean = false,
+    val vibrateDuration: Int? = null,
+    val showToast: Boolean = false
+) : Mapping<FingerprintMapAction> {
 
-        vibrateDuration = Option(
-            value = Defaultable.create(vibrateDuration),
-            isAllowed = vibrate
-        ),
+    fun isVibrateAllowed(): Boolean {
+        return true
+    }
 
-        showToast = Option(
-            value = showToast,
-            isAllowed = true
-        )
-    )
-
-    @Transient
-    val actionList: List<FingerprintMapAction> = actionDataList.map {
-        val options = FingerprintMapActionOptions(
-            delayBeforeNextAction = Option(
-                value = Defaultable.create(it.delayBeforeNextAction),
-                isAllowed = actionDataList.isNotEmpty()
-            ),
-
-            multiplier = Option(
-                value = Defaultable.create(it.multiplier),
-                true
-            ),
-
-            repeatUntilSwipedAgain = Option(
-                value = it.repeatUntilSwipedAgain,
-                isAllowed = true
-            ),
-
-            repeatRate = Option(
-                value = Defaultable.create(it.repeatRate),
-                isAllowed = it.repeatUntilSwipedAgain
-            ),
-
-            holdDownUntilSwipedAgain = Option(
-                value = it.holdDownUntilSwipedAgain,
-                isAllowed = it.data.canBeHeldDown()
-            ),
-
-            holdDownDuration = Option(
-                value = Defaultable.create(it.holdDownDuration),
-                isAllowed = it.holdDownUntilSwipedAgain
-            )
-        )
-
-        FingerprintMapAction(it.uid, it.data, options)
-    }.toList()
+    fun isChangingVibrationDurationAllowed(): Boolean {
+        return vibrate
+    }
 }
 
 object FingerprintMapIdEntityMapper {
@@ -105,16 +61,49 @@ object FingerprintMapEntityMapper {
     fun fromEntity(
         entity: FingerprintMapEntity,
     ): FingerprintMap {
-        val actionList = entity.actionList
-            .map { FingerprintMapActionEntityMapper.fromEntity(it) }
+        val actionList = entity.actionList.map { FingerprintMapActionEntityMapper.fromEntity(it) }
+
+        val constraintList =
+            entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }.toSet()
+
+        val constraintMode = ConstraintModeEntityMapper.fromEntity(entity.constraintMode)
+
         return FingerprintMap(
-            actionDataList = actionList,
-            //TODO
+            actionList = actionList,
+            constraintState = ConstraintState(constraintList, constraintMode),
+            isEnabled = entity.isEnabled,
+            vibrate = entity.flags.hasFlag(FingerprintMapEntity.FLAG_VIBRATE),
+            vibrateDuration = entity.extras.getData(FingerprintMapEntity.EXTRA_VIBRATION_DURATION)
+                .valueOrNull()?.toIntOrNull(),
+            showToast = entity.flags.hasFlag(FingerprintMapEntity.FLAG_SHOW_TOAST)
         )
     }
 
     fun toEntity(model: FingerprintMap): FingerprintMapEntity {
-        FingerprintMapEntity.ID_SWIPE_DOWN
-        TODO()
+        val extras: List<Extra> = sequence {
+            if (model.isChangingVibrationDurationAllowed() && model.vibrateDuration != null) {
+                yield(Extra(FingerprintMapEntity.EXTRA_VIBRATION_DURATION, model.vibrateDuration.toString()))
+            }
+        }.toList()
+
+        var flags = 0
+
+        if (model.isVibrateAllowed() && model.vibrate) {
+            flags = flags.withFlag(FingerprintMapEntity.FLAG_VIBRATE)
+        }
+
+        if (model.showToast) {
+            flags = flags.withFlag(FingerprintMapEntity.FLAG_SHOW_TOAST)
+        }
+
+        return FingerprintMapEntity(
+            version = FingerprintMapEntity.CURRENT_VERSION,
+            actionList = model.actionList.map { FingerprintMapActionEntityMapper.toEntity(it) },
+            constraintList = model.constraintState.constraints.map { ConstraintEntityMapper.toEntity(it) },
+            constraintMode = ConstraintModeEntityMapper.toEntity(model.constraintState.mode),
+            extras = extras,
+            flags = flags,
+            isEnabled = model.isEnabled
+        )
     }
 }

@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.combine
 /**
  * Created by sds100 on 15/02/2021.
  */
+
+//TODO delete
 class GetActionErrorUseCaseImpl(
     private val packageManager: PackageManagerAdapter,
     private val inputMethodAdapter: InputMethodAdapter,

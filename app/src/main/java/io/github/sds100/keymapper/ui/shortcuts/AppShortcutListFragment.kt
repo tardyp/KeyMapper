@@ -10,7 +10,7 @@ import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.AppShortcutListItem
-import io.github.sds100.keymapper.data.viewmodel.AppShortcutListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ChooseAppShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.simple
@@ -39,7 +39,7 @@ class AppShortcutListFragment : SimpleRecyclerViewFragment<AppShortcutListItem>(
     override var requestKey: String? = REQUEST_KEY
     override var searchStateKey: String? = SEARCH_STATE_KEY
 
-    private val viewModel: AppShortcutListViewModel by activityViewModels {
+    private val viewModel: ChooseAppShortcutViewModel by activityViewModels {
         InjectorUtils.provideAppShortcutListViewModel(requireContext())
     }
 

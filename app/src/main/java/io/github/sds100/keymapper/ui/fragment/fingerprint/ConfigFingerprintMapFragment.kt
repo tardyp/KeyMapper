@@ -45,7 +45,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
 
         setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
-                viewModel.constraintListViewModel.addConstraint(it)
+                viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
         }
 

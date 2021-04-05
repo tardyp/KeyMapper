@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.constraint
-import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
@@ -25,10 +25,10 @@ abstract class ConstraintListFragment
         const val CHOOSE_CONSTRAINT_REQUEST_KEY = "request_choose_constraint"
     }
 
-    abstract val constraintListViewModel: ConstraintListViewModel
+    abstract val configConstraintsViewModel: ConfigConstraintsViewModel
 
     override val listItems: Flow<ListUiState<ConstraintListItem>>
-        get() = constraintListViewModel.state.map { it.constraintList }
+        get() = configConstraintsViewModel.state.map { it.constraintList }
 
     override fun bind(
         inflater: LayoutInflater,
@@ -38,7 +38,7 @@ abstract class ConstraintListFragment
     }
 
     override fun subscribeUi(binding: FragmentConstraintListBinding) {
-        binding.viewModel = constraintListViewModel
+        binding.viewModel = configConstraintsViewModel
 
         binding.setOnAddConstraintClick {
 //            val direction = NavAppDirections.actionGlobalChooseConstraint(
@@ -49,7 +49,7 @@ abstract class ConstraintListFragment
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            constraintListViewModel.showToast.collectLatest {
+            configConstraintsViewModel.showToast.collectLatest {
                 toast(it)
             }
         }
@@ -64,18 +64,18 @@ abstract class ConstraintListFragment
                 constraint {
                     model(model)
                     onCardClick { _ ->
-                        constraintListViewModel.onListItemClick(model.id)
+                        configConstraintsViewModel.onListItemClick(model.id)
                     }
 
                     onRemoveClick { _ ->
-                        constraintListViewModel.onRemoveConstraintClick(model.id)
+                        configConstraintsViewModel.onRemoveConstraintClick(model.id)
                     }
                 }
             }
         }
     }
 
-    override fun rebuildUiState() = constraintListViewModel.rebuildUiState()
+    override fun rebuildUiState() = configConstraintsViewModel.rebuildUiState()
     override fun getRecyclerView(binding: FragmentConstraintListBinding) = binding.epoxyRecyclerView
     override fun getProgressBar(binding: FragmentConstraintListBinding) = binding.progressBar
     override fun getEmptyListPlaceHolder(binding: FragmentConstraintListBinding) =

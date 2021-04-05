@@ -10,6 +10,6 @@ import io.github.sds100.keymapper.domain.utils.Defaultable
 interface Action {
     val uid: String
     val data: ActionData
-    val multiplier: Option<Defaultable<Int>>
-    val delayBeforeNextAction: Option<Defaultable<Int>>
+    val multiplier: Int?
+    val delayBeforeNextAction: Int?
 }

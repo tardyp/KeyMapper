@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.data.db.IDataStoreManager
 import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repository.*
 import io.github.sds100.keymapper.domain.adapter.*
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
@@ -98,8 +99,7 @@ object ServiceLocator {
 
     fun fingerprintMapRepository(context: Context): FingerprintMapRepository {
         synchronized(this) {
-            return fingerprintMapRepository
-                ?: createFingerprintMapRepository(context)
+            return fingerprintMapRepository ?: createFingerprintMapRepository(context)
         }
     }
 
@@ -227,10 +227,6 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).appRepository
     }
 
-    fun appInfoAdapter(context: Context): AppUiAdapter {
-        return (context.applicationContext as KeyMapperApp).appInfoAdapter
-    }
-
     fun packageManagerAdapter(context: Context): PackageManagerAdapter {
         return (context.applicationContext as KeyMapperApp).packageManagerAdapter
     }
@@ -251,8 +247,8 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).serviceAdapter
     }
 
-    fun launcherShortcutAdapter(context: Context): LauncherShortcutAdapter {
-        return (context.applicationContext as KeyMapperApp).launcherShortcutAdapter
+    fun appShortcutAdapter(context: Context): AppShortcutAdapter {
+        return (context.applicationContext as KeyMapperApp).appShortcutAdapter
     }
 
     fun powerManagementAdapter(context: Context): PowerManagementAdapter {

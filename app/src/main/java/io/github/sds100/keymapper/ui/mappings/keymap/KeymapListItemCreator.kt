@@ -4,34 +4,29 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
 import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapAction
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTrigger
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.models.ifIsAllowed
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
 import io.github.sds100.keymapper.util.KeyEventUtils
-import timber.log.Timber
 
 /**
  * Created by sds100 on 19/03/2021.
  */
 class KeymapListItemCreator(
-    getActionError: GetActionErrorUseCase,
-    actionUiHelper: ActionUiHelper<KeymapAction>,
-    constraintUiHelper: ConstraintUiHelper,
-    getConstraintErrorUseCase: GetConstraintErrorUseCase,
+    private val displayMapping: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
-) : BaseMappingListItemCreator<KeymapAction>(
-    getActionError,
-    actionUiHelper,
-    getConstraintErrorUseCase,
-    constraintUiHelper,
+) : BaseMappingListItemCreator<KeyMap, KeyMapAction>(
+    displayMapping,
+    KeyMapActionUiHelper(displayMapping, resourceProvider),
     resourceProvider
 ) {
 
@@ -88,7 +83,7 @@ class KeymapListItemCreator(
             }
         }
 
-        val chipList = getChipList(keymap.actionList, keymap.constraintList, keymap.constraintMode)
+        val chipList = getChipList(keymap)
 
         val extraInfo = buildString {
             if (!keymap.isEnabled) {
@@ -129,37 +124,27 @@ class KeymapListItemCreator(
         )
     }
 
-    private fun getTriggerOptionLabels(trigger: KeymapTrigger): List<String> {
+    private fun getTriggerOptionLabels(trigger: KeyMapTrigger): List<String> {
         val labels = mutableListOf<String>()
 
-        trigger.options.vibrate.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_vibrate))
-            }
+        if (trigger.isVibrateAllowed() && trigger.vibrate){
+            labels.add(getString(R.string.flag_vibrate))
         }
 
-        trigger.options.longPressDoubleVibration.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_long_press_double_vibration))
-            }
+        if (trigger.isLongPressDoubleVibrationAllowed() && trigger.longPressDoubleVibration){
+            labels.add(getString(R.string.flag_long_press_double_vibration))
         }
 
-        trigger.options.screenOffTrigger.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_detect_triggers_screen_off))
-            }
+        if (trigger.isDetectingWhenScreenOffAllowed() && trigger.screenOffTrigger){
+            labels.add(getString(R.string.flag_detect_triggers_screen_off))
         }
 
-        trigger.options.triggerFromOtherApps.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_trigger_from_other_apps))
-            }
+        if (trigger.triggerFromOtherApps){
+            labels.add(getString(R.string.flag_trigger_from_other_apps))
         }
 
-        trigger.options.showToast.ifIsAllowed {
-            if (it) {
-                labels.add(getString(R.string.flag_show_toast))
-            }
+        if (trigger.showToast){
+            labels.add(getString(R.string.flag_show_toast))
         }
 
         return labels

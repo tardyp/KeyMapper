@@ -5,54 +5,54 @@ import android.os.Build
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
-import io.github.sds100.keymapper.domain.devices.ShowDeviceInfoUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
-import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
-import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupported
+import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
+import io.github.sds100.keymapper.util.KeyEventUtils
 import io.github.sds100.keymapper.util.ViewPopulated
-import io.github.sds100.keymapper.util.requiresDndAccessToImitate
 import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 /**
  * Created by sds100 on 24/11/20.
  */
 
+//TODO rename as ConfigKeymapTriggerViewModel
 class TriggerViewModel(
     private val coroutineScope: CoroutineScope,
-    private val onboardingUseCase: OnboardingUseCase,
-    private val useCase: ConfigKeymapTriggerUseCase,
-    private val listItemMapper: TriggerKeyListItemMapper,
+    private val onboarding: OnboardingUseCase,
+    private val config: ConfigKeyMapUseCase,
     private val recordTrigger: RecordTriggerUseCase,
-    private val showDeviceInfoUseCase: ShowDeviceInfoUseCase,
-    private val areShortcutsSupported: IsRequestShortcutSupported,
-    private val isDndAccessGranted: IsDoNotDisturbAccessGrantedUseCase,
+    private val createKeyMapShortcut: CreateKeyMapShortcutUseCase,
+    private val displayKeyMap: DisplayKeyMapUseCase,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
 
     private companion object {
-        const val ID_DND_ACCESS_ERROR_LIST_ITEM = "id_dnd_access_status"
         const val KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG = "enable_accessibility_service"
     }
 
     val optionsViewModel = TriggerOptionsViewModel(
         coroutineScope,
-        onboardingUseCase,
-        useCase,
-        areShortcutsSupported,
-        resourceProvider,
+        onboarding,
+        config,
+        createKeyMapShortcut,
+        resourceProvider
     )
 
     //TODO dialog that prompts the user to restart the accessibility service if failing to record a trigger too many times
@@ -62,11 +62,11 @@ class TriggerViewModel(
         _showEnableCapsLockKeyboardLayoutPrompt.asSharedFlow()
 
     fun approvedParallelTriggerOrderExplanation() {
-        onboardingUseCase.shownParallelTriggerOrderExplanation = true
+        onboarding.shownParallelTriggerOrderExplanation = true
     }
 
     fun approvedSequenceTriggerExplanation() {
-        onboardingUseCase.shownSequenceTriggerExplanation = true
+        onboarding.shownSequenceTriggerExplanation = true
     }
 
     private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
@@ -89,17 +89,17 @@ class TriggerViewModel(
                 _showEnableCapsLockKeyboardLayoutPrompt.emit(Unit)
             }
 
-            useCase.addTriggerKey(it.keyCode, it.device)
+            config.addTriggerKey(it.keyCode, it.device)
         }.launchIn(coroutineScope)
 
         //TODO dialogs
         coroutineScope.launch {
             combine(
                 rebuildUiState,
-                useCase.state,
+                config.mapping,
                 recordTrigger.state
             ) { _, configState, recordTriggerState ->
-                UiBuilder(configState, recordTriggerState)
+                UiBuilder(configState.mapData { it.trigger }, recordTriggerState)
             }.collectLatest {
                 _state.value = it.build()
             }
@@ -108,33 +108,33 @@ class TriggerViewModel(
 
     fun setParallelTriggerModeChecked(checked: Boolean) {
         if (checked) {
-            useCase.setParallelTriggerMode()
+            config.setParallelTriggerMode()
         }
     }
 
     fun setSequenceTriggerModeChecked(checked: Boolean) {
         if (checked) {
-            useCase.setSequenceTriggerMode()
+            config.setSequenceTriggerMode()
         }
     }
 
     fun setShortPressButtonChecked(checked: Boolean) {
         if (checked) {
-            useCase.setParallelTriggerShortPress()
+            config.setParallelTriggerShortPress()
         }
     }
 
     fun setLongPressButtonChecked(checked: Boolean) {
         if (checked) {
-            useCase.setParallelTriggerLongPress()
+            config.setParallelTriggerLongPress()
         }
     }
 
     fun setTriggerKeyDevice(uid: String, device: TriggerKeyDevice) =
-        useCase.setTriggerKeyDevice(uid, device)
+        config.setTriggerKeyDevice(uid, device)
 
-    fun onRemoveKeyClick(uid: String) = useCase.removeTriggerKey(uid)
-    fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = useCase.moveTriggerKey(fromIndex, toIndex)
+    fun onRemoveKeyClick(uid: String) = config.removeTriggerKey(uid)
+    fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = config.moveTriggerKey(fromIndex, toIndex)
 
     fun onTriggerKeyOptionsClick(id: String) {
 //        TODO()
@@ -146,31 +146,34 @@ class TriggerViewModel(
 
     fun onChooseDeviceClick(keyUid: String) {
         coroutineScope.launch {
-            val externalDevices = showDeviceInfoUseCase.getAll().map {
-                TriggerKeyDevice.External(it.descriptor, it.name)
-            }
-
-            val devices = sequence {
-                yield(TriggerKeyDevice.Internal)
-                yield(TriggerKeyDevice.Any)
-                yieldAll(externalDevices)
-            }.toList()
+            val devices = config.getAvailableTriggerKeyDevices()
 
             _showChooseDeviceDialog.emit(ChooseTriggerKeyDeviceModel(keyUid, devices))
         }
     }
 
     fun onRecordTriggerButtonClick() {
-        when (recordTrigger.state.value) {
-            is RecordTriggerState.CountingDown -> recordTrigger.stopRecording()
-            RecordTriggerState.Stopped -> recordTrigger.startRecording().onFailure {
-                val snackBar = DialogUi.SnackBar(
-                    title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
-                    actionText = getString(R.string.pos_turn_on)
-                )
+        coroutineScope.launch {
+            val recordTriggerState = recordTrigger.state.firstOrNull()
 
-                runBlocking {
-                    showDialog(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
+            when (recordTriggerState) {
+                is RecordTriggerState.CountingDown -> recordTrigger.stopRecording()
+                RecordTriggerState.Stopped -> {
+                    val recordResult = recordTrigger.startRecording()
+
+                    if (recordResult is FixableError.AccessibilityServiceDisabled) {
+
+                        val snackBar = DialogUi.SnackBar(
+                            title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
+                            actionText = getString(R.string.pos_turn_on)
+                        )
+
+                        val response = showDialog(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
+
+                        if (response != null) {
+                            _fixError.emit(recordResult)
+                        }
+                    }
                 }
             }
         }
@@ -184,8 +187,8 @@ class TriggerViewModel(
 
     fun fixError(listItemId: String) {
         coroutineScope.launch {
-            when (listItemId) {
-                ID_DND_ACCESS_ERROR_LIST_ITEM -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            when (KeyMapTriggerError.valueOf(listItemId)) {
+                KeyMapTriggerError.DND_ACCESS_DENIED -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val error =
                         FixableError.PermissionDenied(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
                     _fixError.emit(error)
@@ -194,12 +197,53 @@ class TriggerViewModel(
         }
     }
 
+    fun createListItems(trigger: KeyMapTrigger): List<TriggerKeyListItem> =
+        trigger.keys.mapIndexed { index, key ->
+            val extraInfo = buildString {
+                append(getDeviceName(key.device))
+
+                if (!key.consumeKeyEvent) {
+                    val midDot = getString(R.string.middot)
+                    append(" $midDot ${getString(R.string.flag_dont_override_default_action)}")
+                }
+            }
+
+            val clickTypeString = when (key.clickType) {
+                ClickType.SHORT_PRESS -> null
+                ClickType.LONG_PRESS -> getString(R.string.clicktype_long_press)
+                ClickType.DOUBLE_PRESS -> getString(R.string.clicktype_double_press)
+            }
+
+            val linkDrawable = when {
+                trigger.mode is TriggerMode.Parallel && index < trigger.keys.lastIndex -> TriggerKeyLinkType.PLUS
+                trigger.mode is TriggerMode.Sequence && index < trigger.keys.lastIndex -> TriggerKeyLinkType.ARROW
+                else -> TriggerKeyLinkType.HIDDEN
+            }
+
+            TriggerKeyListItem(
+                id = key.uid,
+                keyCode = key.keyCode,
+                name = KeyEventUtils.keycodeToString(key.keyCode),
+                clickTypeString = clickTypeString,
+                extraInfo = extraInfo,
+                linkType = linkDrawable,
+                isDragDropEnabled = trigger.keys.size > 1
+            )
+        }
+
+    private fun getDeviceName(device: TriggerKeyDevice): String =
+        when (device) {
+            is TriggerKeyDevice.Internal -> getString(R.string.this_device)
+            is TriggerKeyDevice.Any -> getString(R.string.any_device)
+            is TriggerKeyDevice.External -> device.name
+        }
+
     /**
      * Use this object to create the ui state instead of a function because it allows one to combine
      * multiple flows and then only finish collecting the *latest* combination of those flows.
      */
     private inner class UiBuilder(
-        private val configState: State<ConfigKeymapTriggerState>,
+        private val triggerState: State<KeyMapTrigger>,
         private val recordTriggerState: RecordTriggerState
     ) {
         val recordTriggerButtonText by lazy {
@@ -213,50 +257,45 @@ class TriggerViewModel(
         }
 
         val errorListItems: List<TextListItem.Error> by lazy {
-            sequence {
-                if (configState !is State.Data) return@sequence
+            if (triggerState !is State.Data) return@lazy emptyList()
 
-                if (configState.data.keys.any { it.requiresDndAccessToImitate }) {
-                    if (!isDndAccessGranted()) {
-                        yield(
-                            TextListItem.Error(
-                                id = ID_DND_ACCESS_ERROR_LIST_ITEM,
-                                text = getString(R.string.trigger_error_dnd_access_denied),
-                            )
-                        )
-                    }
+            displayKeyMap.getTriggerError(triggerState.data).map { error ->
+                when (error) {
+                    KeyMapTriggerError.DND_ACCESS_DENIED -> TextListItem.Error(
+                        id = error.toString(),
+                        text = getString(R.string.trigger_error_dnd_access_denied),
+                    )
                 }
-            }.toList()
+            }
         }
 
-        fun build(): TriggerUiState = when (configState) {
-            is State.Data -> loadedState(configState.data)
+        fun build(): TriggerUiState = when (triggerState) {
+            is State.Data -> loadedState(triggerState.data)
             is State.Loading -> loadingState()
         }
 
-        private fun loadedState(config: ConfigKeymapTriggerState) = TriggerUiState(
-            triggerKeyListItems =
-            listItemMapper.map(config.keys, config.mode).createListState(),
+        private fun loadedState(trigger: KeyMapTrigger) = TriggerUiState(
+            triggerKeyListItems = createListItems(trigger).createListState(),
 
             recordTriggerButtonText = recordTriggerButtonText,
 
-            clickTypeRadioButtonsVisible = config.mode is TriggerMode.Parallel,
+            clickTypeRadioButtonsVisible = trigger.mode is TriggerMode.Parallel,
 
             shortPressButtonChecked =
-            config.mode is TriggerMode.Parallel && config.mode.clickType == ClickType.SHORT_PRESS,
+            trigger.mode is TriggerMode.Parallel && trigger.mode.clickType == ClickType.SHORT_PRESS,
             longPressButtonChecked =
-            config.mode is TriggerMode.Parallel && config.mode.clickType == ClickType.LONG_PRESS,
+            trigger.mode is TriggerMode.Parallel && trigger.mode.clickType == ClickType.LONG_PRESS,
 
-            triggerModeButtonsEnabled = config.keys.size > 1,
-            parallelTriggerModeButtonChecked = config.mode is TriggerMode.Parallel,
-            sequenceTriggerModeButtonChecked = config.mode is TriggerMode.Sequence,
+            triggerModeButtonsEnabled = trigger.keys.size > 1,
+            parallelTriggerModeButtonChecked = trigger.mode is TriggerMode.Parallel,
+            sequenceTriggerModeButtonChecked = trigger.mode is TriggerMode.Sequence,
 
-            showSequenceTriggerExplanation = config.mode is TriggerMode.Sequence
-                && !onboardingUseCase.shownSequenceTriggerExplanation,
+            showSequenceTriggerExplanation = trigger.mode is TriggerMode.Sequence
+                && !onboarding.shownSequenceTriggerExplanation,
 
-            showParallelTriggerOrderExplanation = config.mode is TriggerMode.Parallel
-                && config.keys.size > 1
-                && !onboardingUseCase.shownParallelTriggerOrderExplanation,
+            showParallelTriggerOrderExplanation = trigger.mode is TriggerMode.Parallel
+                && trigger.keys.size > 1
+                && !onboarding.shownParallelTriggerOrderExplanation,
 
             errorListItems = errorListItems
         )

@@ -4,10 +4,7 @@ import io.github.sds100.keymapper.ui.dialogs.DialogResponse
 import io.github.sds100.keymapper.ui.dialogs.DialogResponseEvent
 import io.github.sds100.keymapper.ui.dialogs.DialogUi
 import io.github.sds100.keymapper.ui.dialogs.ShowDialogEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -39,23 +36,22 @@ interface DialogViewModel {
     fun onDialogResponse(event: DialogResponseEvent)
 }
 
-fun DialogViewModel.onDialogResponse(key: String, response: DialogResponse) {
+fun DialogViewModel.onDialogResponse(key: String, response: DialogResponse?) {
     onDialogResponse(DialogResponseEvent(key, response))
 }
 
 suspend inline fun <reified R : DialogResponse> DialogViewModel.showDialog(
     key: String,
-    ui: DialogUi<R>,
-    onResponse: (R) -> Unit
-) {
-    onResponse(showDialog(key, ui))
-}
-
-suspend inline fun <reified R : DialogResponse> DialogViewModel.showDialog(
-    key: String,
     ui: DialogUi<R>
-): R {
+): R? {
     showDialog(ShowDialogEvent(key, ui))
 
-    return dialogResponse.first { it.response is R && it.key == key }.response as R
+    /*
+    This ensures only one job for a dialog is active at once by cancelling previous jobs when a new
+    dialog is shown with the same key
+     */
+    return merge(
+        showDialog.dropWhile { it.key != key }.map { null },
+        dialogResponse.dropWhile { it.response !is R? && it.key != key }.map { it.response }
+    ).first() as R?
 }

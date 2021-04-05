@@ -2,10 +2,13 @@ package io.github.sds100.keymapper.framework.adapters
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
+import android.graphics.drawable.Drawable
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.success
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -57,5 +60,28 @@ class AndroidPackageManagerAdapter(
 
     override fun isVoiceAssistantInstalled(): Boolean {
         TODO("Not yet implemented")
+    }
+
+    override fun getAppName(packageName: String): Result<String> {
+        try {
+            return packageManager
+                .getApplicationInfo(packageName, 0)
+                .loadLabel(packageManager)
+                .toString()
+                .success()
+        } catch (e: PackageManager.NameNotFoundException) {
+            return FixableError.AppNotFound(packageName)
+        }
+    }
+
+    override fun getAppIcon(packageName: String): Result<Drawable> {
+        try {
+            return packageManager
+                .getApplicationInfo(packageName, 0)
+                .loadIcon(packageManager)
+                .success()
+        } catch (e: PackageManager.NameNotFoundException) {
+            return FixableError.AppNotFound(packageName)
+        }
     }
 }

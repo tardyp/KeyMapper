@@ -59,6 +59,7 @@ sealed class Error : Result<Nothing>() {
     data class ImeNotFoundForPackage(val packageName: String) : Error()
 }
 
+//TODO move all this to Error. have extension function to check if it is fixable
 sealed class FixableError : Error() {
     data class AppNotFound(val packageName: String) : FixableError()
     data class AppDisabled(val packageName: String) : FixableError()
@@ -67,6 +68,7 @@ sealed class FixableError : Error() {
     object AccessibilityServiceDisabled : FixableError()
     object IsBatteryOptimised: FixableError()
 
+    //TODO create a separate sub class for each permission
     data class PermissionDenied(val permission: String) : FixableError() {
         companion object {
             //TODO remove

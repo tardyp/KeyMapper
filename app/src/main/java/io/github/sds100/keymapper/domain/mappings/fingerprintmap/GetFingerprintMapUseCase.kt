@@ -12,11 +12,11 @@ class GetFingerprintMapUseCaseImpl(
     repository: FingerprintMapRepository,
 ) : GetFingerprintMapUseCase {
 
-    override val swipeDown = repository.swipeDown.map { FingerprintMapEntityMapper.fromEntity(it) }
-    override val swipeUp = repository.swipeUp.map { FingerprintMapEntityMapper.fromEntity(it) }
-    override val swipeLeft = repository.swipeLeft.map { FingerprintMapEntityMapper.fromEntity(it) }
+    override val swipeDown = repository.fingerprintMaps.map { FingerprintMapEntityMapper.fromEntity(it.swipeDown) }
+    override val swipeUp = repository.fingerprintMaps.map { FingerprintMapEntityMapper.fromEntity(it.swipeUp) }
+    override val swipeLeft = repository.fingerprintMaps.map { FingerprintMapEntityMapper.fromEntity(it.swipeLeft) }
     override val swipeRight =
-        repository.swipeRight.map { FingerprintMapEntityMapper.fromEntity(it) }
+        repository.fingerprintMaps.map { FingerprintMapEntityMapper.fromEntity(it.swipeRight) }
 }
 
 interface GetFingerprintMapUseCase {

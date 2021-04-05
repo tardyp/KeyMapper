@@ -20,11 +20,11 @@ import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
+import io.github.sds100.keymapper.packages.ChooseAppShortcutResult
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
 import io.github.sds100.keymapper.ui.keyevent.ConfigKeyEventResult
 import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
 import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
-import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutResult
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*

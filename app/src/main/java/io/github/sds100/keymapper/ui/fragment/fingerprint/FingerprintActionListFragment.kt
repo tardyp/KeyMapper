@@ -5,6 +5,7 @@ import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.ui.fragment.ActionListFragment
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
@@ -30,7 +31,7 @@ class FingerprintActionListFragment :
         InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
     }
 
-    override val actionListViewModel: ActionListViewModel<FingerprintMapAction>
+    override val actionListViewModel: ActionListViewModel<FingerprintMapAction, FingerprintMap>
         get() = viewModel.actionListViewModel
 
     override fun openActionOptionsFragment(options: FingerprintActionOptions) {

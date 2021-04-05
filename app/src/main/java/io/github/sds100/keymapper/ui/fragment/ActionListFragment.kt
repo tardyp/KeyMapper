@@ -35,7 +35,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
     }
 
-    abstract val actionListViewModel: ActionListViewModel<A>
+    abstract val actionListViewModel: ActionListViewModel<A, *>
 
     override val listItems: Flow<ListUiState<ActionListItem>>
         get() = actionListViewModel.state
@@ -56,8 +56,6 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
     }
 
     override fun subscribeUi(binding: FragmentActionListBinding) {
-        binding.viewModel = actionListViewModel
-
         binding.epoxyRecyclerView.adapter = actionListController.adapter
 
 //        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
@@ -65,12 +63,10 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 //            openActionOptionsFragment(it)
 //        })
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            actionListViewModel.chooseAction.collectLatest {
-                val direction =
-                    NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
-                findNavController().navigate(direction)
-            }
+        binding.setOnAddActionClick {
+            val direction =
+                NavAppDirections.actionGlobalChooseActionFragment(CHOOSE_ACTION_REQUEST_KEY)
+            findNavController().navigate(direction)
         }
     }
 
@@ -132,7 +128,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
                     state(it)
 
                     onRemoveClick { _ ->
-                        actionListViewModel.removeAction(it.id)
+                        actionListViewModel.onRemoveClick(it.id)
                     }
 
                     onMoreClick { _ ->

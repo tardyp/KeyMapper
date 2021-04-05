@@ -9,6 +9,8 @@ import splitties.bitflags.hasFlag
  * Created by sds100 on 02/03/2020.
  */
 
+//TODO remove this file
+
 val TriggerEntity.triggerFromOtherApps: Boolean
     get() = flags.hasFlag(TriggerEntity.TRIGGER_FLAG_FROM_OTHER_APPS)
 
@@ -17,6 +19,3 @@ val TriggerEntity.showToast: Boolean
 
 val TriggerEntity.vibrate: Boolean
     get() = flags.hasFlag(TriggerEntity.TRIGGER_FLAG_VIBRATE)
-
-val TriggerKey.requiresDndAccessToImitate: Boolean
-    get() = this.keyCode in arrayOf(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP)

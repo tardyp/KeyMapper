@@ -3,34 +3,37 @@ package io.github.sds100.keymapper.ui.actions
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.framework.adapters.AppUiAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
+import io.github.sds100.keymapper.mappings.common.Mapping
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.utils.*
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.*
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import io.github.sds100.keymapper.util.IntentTarget
+import io.github.sds100.keymapper.util.KeyEventUtils
+import io.github.sds100.keymapper.util.SystemActionUtils
+import io.github.sds100.keymapper.util.TintType
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.handle
 import splitties.bitflags.hasFlag
 
 /**
  * Created by sds100 on 18/03/2021.
  */
 
-abstract class BaseActionUiHelper<A>(
-    private val appUiAdapter: AppUiAdapter,
-    private val inputMethodAdapter: InputMethodAdapter,
+abstract class BaseActionUiHelper<MAPPING: Mapping<A>,A: Action>(
+    displayActionUseCase: DisplayActionUseCase,
     resourceProvider: ResourceProvider
-) : ActionUiHelper<A>, ResourceProvider by resourceProvider {
+) : ActionUiHelper<MAPPING, A>, ResourceProvider by resourceProvider,
+    DisplayActionUseCase by displayActionUseCase {
 
-    override fun getTitle(action: ActionData): Result<String> = when (action) {
+    override fun getTitle(action: ActionData): String = when (action) {
         is OpenAppAction ->
-            appUiAdapter.getAppName(action.packageName).map { appName ->
-                Success(getString(R.string.description_open_app, appName))
-            }.firstBlocking()
+            getAppName(action.packageName).handle(
+                onSuccess = { getString(R.string.description_open_app, it) },
+                onError = { getString(R.string.description_open_app, action.packageName) }
+            )
 
-        is OpenAppShortcutAction -> Success(action.shortcutTitle)
+        is OpenAppShortcutAction -> action.shortcutTitle
 
         is KeyEventAction -> {
             val keyCodeString = if (action.keyCode > KeyEvent.getMaxKeyCode()) {
@@ -41,7 +44,7 @@ abstract class BaseActionUiHelper<A>(
 
             //only a key code can be inputted through the shell
             if (action.useShell) {
-                getString(R.string.description_keyevent_through_shell, keyCodeString).success()
+                getString(R.string.description_keyevent_through_shell, keyCodeString)
 
             } else {
 
@@ -57,7 +60,7 @@ abstract class BaseActionUiHelper<A>(
                     }
                 }
 
-                val title = if (action.device != null) {
+                if (action.device != null) {
 
                     getString(
                         R.string.description_keyevent_from_device,
@@ -69,11 +72,10 @@ abstract class BaseActionUiHelper<A>(
                         args = arrayOf(metaStateString, keyCodeString)
                     )
                 }
-                Success(title)
             }
         }
 
-        is SimpleSystemAction -> Success(getString(SystemActionUtils.getTitle(action.id)))
+        is SimpleSystemAction -> getString(SystemActionUtils.getTitle(action.id))
 
         is ChangeDndModeSystemAction -> {
             val dndModeString = getString(DndModeUtils.getLabel(action.dndMode))
@@ -91,13 +93,13 @@ abstract class BaseActionUiHelper<A>(
                     R.string.action_enable_dnd_mode_formatted,
                     dndModeString
                 )
-            }.success()
+            }
         }
 
         is ChangeRingerModeSystemAction -> {
             val ringerModeString = getString(RingerModeUtils.getLabel(action.ringerMode))
 
-            getString(R.string.action_change_ringer_mode_formatted, ringerModeString).success()
+            getString(R.string.action_change_ringer_mode_formatted, ringerModeString)
         }
 
         is VolumeSystemAction -> {
@@ -132,36 +134,38 @@ abstract class BaseActionUiHelper<A>(
                 "$string $midDot ${getString(R.string.flag_show_volume_dialog)}"
             } else {
                 string
-            }.success()
+            }
         }
 
         is ControlMediaForAppSystemAction ->
-            appUiAdapter.getAppName(action.packageName).map { appName ->
-                val resId = when (action) {
-                    is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package_formatted
-                    is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package_formatted
-                    is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package_formatted
-                    is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package_formatted
-                    is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package_formatted
-                    is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package_formatted
-                    is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package_formatted
+            getAppName(action.packageName).handle(
+                onSuccess = { appName ->
+                    val resId = when (action) {
+                        is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package_formatted
+                        is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package_formatted
+                        is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package_formatted
+                        is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package_formatted
+                        is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package_formatted
+                        is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package_formatted
+                        is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package_formatted
+                    }
+
+                    getString(resId, appName)
+                },
+                onError = {
+                    val resId = when (action) {
+                        is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package
+                        is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package
+                        is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package
+                        is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package
+                        is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package
+                        is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package
+                        is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package
+                    }
+
+                    getString(resId)
                 }
-
-                getString(resId, appName).success()
-
-            }.catch {
-                val resId = when (action) {
-                    is ControlMediaForAppSystemAction.Play -> R.string.action_play_media_package
-                    is ControlMediaForAppSystemAction.FastForward -> R.string.action_fast_forward_package
-                    is ControlMediaForAppSystemAction.NextTrack -> R.string.action_next_track_package
-                    is ControlMediaForAppSystemAction.Pause -> R.string.action_pause_media_package
-                    is ControlMediaForAppSystemAction.PlayPause -> R.string.action_play_pause_media_package
-                    is ControlMediaForAppSystemAction.PreviousTrack -> R.string.action_previous_track_package
-                    is ControlMediaForAppSystemAction.Rewind -> R.string.action_rewind_package
-                }
-
-                getString(resId).success()
-            }.firstBlocking()
+            )
 
         is CycleRotationsSystemAction -> {
             val orientationStrings = action.orientations.map {
@@ -171,7 +175,7 @@ abstract class BaseActionUiHelper<A>(
             getString(
                 R.string.action_cycle_rotations_formatted,
                 orientationStrings.joinToString()
-            ).success()
+            )
         }
 
         is FlashlightSystemAction -> {
@@ -183,16 +187,15 @@ abstract class BaseActionUiHelper<A>(
 
             val lensString = getString(CameraLensUtils.getLabel(action.lens))
 
-            getString(resId, lensString).success()
+            getString(resId, lensString)
         }
 
-        is SwitchKeyboardSystemAction -> inputMethodAdapter.getLabel(action.imeId).then {
-            getString(R.string.action_switch_keyboard_formatted, it).success()
-        }.otherwise {
-            getString(R.string.action_switch_keyboard_formatted, action.savedImeName).success()
-        }
+        is SwitchKeyboardSystemAction -> getInputMethodLabel(action.imeId).handle(
+            onSuccess = { getString(R.string.action_switch_keyboard_formatted, it) },
+            onError = { getString(R.string.action_switch_keyboard_formatted, action.savedImeName) }
+        )
 
-        is CorruptAction -> Error.CorruptActionError
+        is CorruptAction -> ""
         is IntentAction -> {
             val resId = when (action.target) {
                 IntentTarget.ACTIVITY -> R.string.action_title_intent_start_activity
@@ -200,76 +203,77 @@ abstract class BaseActionUiHelper<A>(
                 IntentTarget.SERVICE -> R.string.action_title_intent_start_service
             }
 
-            getString(resId, action.description).success()
+            getString(resId, action.description)
         }
 
-        is PhoneCallAction -> getString(R.string.action_type_phone_call, action.number).success()
+        is PhoneCallAction -> getString(R.string.action_type_phone_call, action.number)
 
         is TapCoordinateAction -> if (action.description.isNullOrBlank()) {
             getString(
                 R.string.description_tap_coordinate_default,
                 arrayOf(action.x, action.y)
-            ).success()
+            )
         } else {
             getString(
                 R.string.description_tap_coordinate_with_description,
                 arrayOf(action.x, action.y, action.description)
-            ).success()
+            )
         }
 
-        is TextAction -> getString(R.string.description_text_block, action.text).success()
-        is UrlAction -> getString(R.string.description_url, action.url).success()
+        is TextAction -> getString(R.string.description_text_block, action.text)
+        is UrlAction -> getString(R.string.description_url, action.url)
     }
 
-    override fun getIcon(action: ActionData): Result<IconInfo> = when (action) {
-        CorruptAction -> Error.CorruptActionError
+    override fun getIcon(action: ActionData): IconInfo? = when (action) {
+        CorruptAction -> null
 
-        is KeyEventAction -> IconInfo(
-            drawable = null,
-            tintType = TintType.NONE
-        ).success()
+        is KeyEventAction -> null
 
-        is OpenAppAction -> appUiAdapter.getAppIcon(action.packageName).map {
-            IconInfo(it, TintType.NONE).success()
-        }.firstBlocking()
+        is OpenAppAction ->
+            getAppIcon(action.packageName).handle(
+                onSuccess = { IconInfo(it, TintType.NONE) },
+                onError = { null }
+            )
 
         is OpenAppShortcutAction -> {
             if (action.packageName.isNullOrBlank()) {
-                IconInfo(null, TintType.NONE).success()
+                null
             } else {
-                appUiAdapter.getAppIcon(action.packageName).map {
-                    IconInfo(it, TintType.NONE).success()
-                }.firstBlocking()
+                getAppIcon(action.packageName).handle(
+                    onSuccess = { IconInfo(it, TintType.NONE) },
+                    onError = { null }
+                )
             }
         }
 
-        is SystemAction -> IconInfo(
-            SystemActionUtils.getIcon(action.id)?.let { getDrawable(it) },
-            TintType.ON_SURFACE
-        ).success()
+        is SystemAction ->
+            SystemActionUtils.getIcon(action.id)?.let {
+                IconInfo(getDrawable(it), TintType.ON_SURFACE)
+            }
 
-        is IntentAction -> IconInfo(
-            drawable = null,
-            tintType = TintType.NONE
-        ).success()
+        is IntentAction -> null
 
-        is PhoneCallAction -> IconInfo(
-            getDrawable(R.drawable.ic_outline_call_24),
-            tintType = TintType.ON_SURFACE
-        ).success()
+        is PhoneCallAction ->
+            IconInfo(
+                getDrawable(R.drawable.ic_outline_call_24),
+                tintType = TintType.ON_SURFACE
+            )
 
         is TapCoordinateAction -> IconInfo(
             getDrawable(R.drawable.ic_outline_touch_app_24),
             TintType.ON_SURFACE
-        ).success()
+        )
 
-        is TextAction -> IconInfo(null, TintType.NONE).success()
-        is UrlAction -> IconInfo(null, TintType.NONE).success()
+        is TextAction -> null
+        is UrlAction -> null
     }
+
+    override fun getError(action: ActionData): Error? = getActionError(action)
 }
 
-interface ActionUiHelper<A> {
-    fun getTitle(action: ActionData): Result<String>
-    fun getOptionLabels(action: A): List<String>
-    fun getIcon(action: ActionData): Result<IconInfo>
+interface ActionUiHelper<MAPPING: Mapping<A>, A: Action> {
+    fun getTitle(action: ActionData): String
+    fun getOptionLabels(mapping: MAPPING, action: A): List<String>
+    fun getIcon(action: ActionData): IconInfo?
+    fun getError(action: ActionData): Error?
 }

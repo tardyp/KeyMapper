@@ -103,13 +103,15 @@ class PickDisplayCoordinateViewModel(
             val x = x.value ?: return@launch
             val y = y.value ?: return@launch
 
-            val description: String = showDialog(
+            val response  = showDialog(
                 "coordinate_description",
                 DialogUi.Text(
                     getString(R.string.hint_tap_coordinate_title),
                     allowEmpty = true
                 )
-            ).text
+            )?: return@launch
+
+            val description = response.text
 
             _returnResult.emit(PickCoordinateResult(x, y, description))
         }

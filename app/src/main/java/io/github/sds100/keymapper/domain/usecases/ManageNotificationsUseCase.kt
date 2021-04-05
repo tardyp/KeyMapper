@@ -7,6 +7,8 @@ import io.github.sds100.keymapper.domain.utils.FlowPrefDelegate
 /**
  * Created by sds100 on 14/02/21.
  */
+
+//TODO add isaccessibilityserviceenabled method
 class ManageNotificationsUseCase(
     preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository {

@@ -4,22 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.EnableDisableFingerprintMapsUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.*
-import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCase
-import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCase
-import io.github.sds100.keymapper.domain.settings.GetSettingsUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.home.HomeScreenUseCase
 import io.github.sds100.keymapper.ui.ListItem
 import io.github.sds100.keymapper.ui.TextListItem
-import io.github.sds100.keymapper.ui.actions.ActionUiHelper
-import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.ui.home.HomeTab
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
@@ -34,23 +23,9 @@ import kotlinx.coroutines.runBlocking
  * Created by sds100 on 18/01/21.
  */
 class HomeViewModel(
+    private val useCase: HomeScreenUseCase,
     private val onboarding: OnboardingUseCase,
-    getKeymapListUseCase: GetKeymapListUseCase,
-    getFingerprintMapUseCase: GetFingerprintMapUseCase,
-    enableDisableFingerprintMaps: EnableDisableFingerprintMapsUseCase,
-    private val deleteKeymaps: DeleteKeymapsUseCase,
-    private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
-    private val duplicateKeymaps: DuplicateKeymapsUseCase,
-    getActionError: GetActionErrorUseCase,
-    keymapActionUiHelper: ActionUiHelper<KeymapAction>,
-    fingerprintMapActionUiHelper: ActionUiHelper<FingerprintMapAction>,
-    constraintUiHelper: ConstraintUiHelper,
-    getConstraintErrorUseCase: GetConstraintErrorUseCase,
-    private val settings: GetSettingsUseCase,
-    private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
-    private val isBatteryOptimised: IsBatteryOptimisedUseCase,
     resourceProvider: ResourceProvider,
-    private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
     private companion object {
@@ -62,23 +37,14 @@ class HomeViewModel(
 
     val keymapListViewModel = KeymapListViewModel(
         viewModelScope,
-        getKeymapListUseCase,
-        getActionError,
-        keymapActionUiHelper,
-        constraintUiHelper,
-        getConstraintErrorUseCase,
+        useCase,
         resourceProvider,
         multiSelectProvider
     )
 
     val fingerprintMapListViewModel = FingerprintMapListViewModel(
         viewModelScope,
-        getFingerprintMapUseCase,
-        enableDisableFingerprintMaps,
-        getActionError,
-        fingerprintMapActionUiHelper,
-        constraintUiHelper,
-        getConstraintErrorUseCase,
+        useCase,
         resourceProvider
     )
 
@@ -115,7 +81,7 @@ class HomeViewModel(
     val tabsState =
         combine(
             multiSelectProvider.state,
-            areFingerprintGesturesSupported.isSupported
+            useCase.areFingerprintGesturesSupported
         ) { selectionState, areFingerprintGesturesSupported ->
 
             val tabs = sequence {
@@ -161,8 +127,8 @@ class HomeViewModel(
     )
 
     val errorListState = combine(
-        isServiceEnabled.isEnabled,
-        settings.hideHomeScreenAlerts,
+        useCase.isAccessibilityServiceEnabled,
+        useCase.hideHomeScreenAlerts,
         rebuildState
     ) { isServiceEnabled, isHidden, _ ->
         val listItems = sequence {
@@ -182,7 +148,7 @@ class HomeViewModel(
                 )
             }
 
-            if (isBatteryOptimised()) {
+            if (useCase.isBatteryOptimised()) {
                 yield(
                     TextListItem.Error(
                         ID_BATTERY_OPTIMISATION_LIST_ITEM,
@@ -242,7 +208,7 @@ class HomeViewModel(
             if (multiSelectProvider.state.value is SelectionState.Selecting) {
                 multiSelectProvider.state.value.apply {
                     if (this is SelectionState.Selecting) {
-                        deleteKeymaps.invoke(*selectedIds.toTypedArray())
+                        useCase.deleteKeyMap(*selectedIds.toTypedArray())
                     }
                 }
                 multiSelectProvider.stopSelecting()
@@ -259,21 +225,21 @@ class HomeViewModel(
     fun onEnableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            enableDisableKeymaps.enable(*selectedIds.toTypedArray())
+            useCase.enableKeyMap(*selectedIds.toTypedArray())
         }
     }
 
     fun onDisableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            enableDisableKeymaps.disable(*selectedIds.toTypedArray())
+            useCase.disableKeyMap(*selectedIds.toTypedArray())
         }
     }
 
     fun onDuplicateSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            duplicateKeymaps.invoke(*selectedIds.toTypedArray())
+            useCase.duplicateKeyMap(*selectedIds.toTypedArray())
         }
     }
 
@@ -296,45 +262,13 @@ class HomeViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
+        private val useCase: HomeScreenUseCase,
         private val onboarding: OnboardingUseCase,
-        private val getKeymapListUseCase: GetKeymapListUseCase,
-        private val getFingerprintMapUseCase: GetFingerprintMapUseCase,
-        private val enableDisableFingerprintMaps: EnableDisableFingerprintMapsUseCase,
-        private val deleteKeymaps: DeleteKeymapsUseCase,
-        private val enableDisableKeymaps: EnableDisableKeymapsUseCase,
-        private val duplicateKeymaps: DuplicateKeymapsUseCase,
-        private val getActionError: GetActionErrorUseCase,
-        private val keymapActionUiHelper: ActionUiHelper<KeymapAction>,
-        private val fingerprintMapActionUiHelper: ActionUiHelper<FingerprintMapAction>,
-        private val constraintUiHelper: ConstraintUiHelper,
-        private val getConstraintErrorUseCase: GetConstraintErrorUseCase,
-        private val settings: GetSettingsUseCase,
-        private val isServiceEnabled: IsAccessibilityServiceEnabledUseCase,
-        private val isBatteryOptimised: IsBatteryOptimisedUseCase,
         private val resourceProvider: ResourceProvider,
-        private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return HomeViewModel(
-                onboarding,
-                getKeymapListUseCase,
-                getFingerprintMapUseCase,
-                enableDisableFingerprintMaps,
-                deleteKeymaps,
-                enableDisableKeymaps,
-                duplicateKeymaps,
-                getActionError,
-                keymapActionUiHelper,
-                fingerprintMapActionUiHelper,
-                constraintUiHelper,
-                getConstraintErrorUseCase,
-                settings,
-                isServiceEnabled,
-                isBatteryOptimised,
-                resourceProvider,
-                areFingerprintGesturesSupported
-            ) as T
+            return HomeViewModel(useCase, onboarding, resourceProvider) as T
         }
     }
 }

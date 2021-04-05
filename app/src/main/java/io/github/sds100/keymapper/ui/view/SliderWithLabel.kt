@@ -47,10 +47,6 @@ class SliderWithLabel(context: Context,
                 }
             }
         }
-
-        sliderValue.setOnClickListener {
-
-        }
     }
 
     fun applyModel(model: SliderModel) {
@@ -58,8 +54,8 @@ class SliderWithLabel(context: Context,
         val max = model.max
         var stepSize = model.stepSize
 
-        if (model.value is Defaultable.Custom) {
-            if (model.value.data % stepSize != 0 || model.value.data > max) {
+        if (model.value != null) {
+            if (model.value % stepSize != 0 || model.value > max) {
                 stepSize = 1
             }
         }
@@ -77,23 +73,23 @@ class SliderWithLabel(context: Context,
         slider.stepSize = stepSize.toFloat()
         isDefaultStepEnabled = model.isDefaultStepEnabled
 
-        if (model.value is Defaultable.Custom) {
+        if (model.value != null) {
             when {
-                model.value.data > max -> {
+                model.value > max -> {
                     //set the max slider value to a multiple of the step size greater than the value
                     val remainder = if (stepSize == 0) {
                         0
                     } else {
-                        model.value.data % stepSize
+                        model.value % stepSize
                     }
 
-                    slider.valueTo = ((model.value.data + stepSize) - remainder).toFloat()
-                    slider.value = model.value.data.toFloat()
+                    slider.valueTo = ((model.value + stepSize) - remainder).toFloat()
+                    slider.value = model.value.toFloat()
                 }
 
-                model.value.data < min -> slider.value = min.toFloat()
+                model.value < min -> slider.value = min.toFloat()
 
-                else -> slider.value = model.value.data.toFloat()
+                else -> slider.value = model.value.toFloat()
             }
         } else {
             slider.value = defaultStepValue

@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
  * Created by sds100 on 31/03/2021.
  */
 
+//TODO delete
 class IsDoNotDisturbAccessGrantedImpl(
     private val adapter: PermissionAdapter
 ) : IsDoNotDisturbAccessGrantedUseCase {

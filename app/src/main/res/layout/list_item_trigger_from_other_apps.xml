@@ -55,7 +55,7 @@
             android:id="@+id/textViewUid"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{model.keymapUid}"
+            android:text="@{model.keyMapUid}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:visibility="@{model.isEnabled ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toStartOf="@+id/buttonCopyToClipboard"
@@ -83,7 +83,7 @@
             android:layout_marginTop="8dp"
             android:onClick="@{onCreateLauncherShortcutClick}"
             android:text="@string/button_create_keymap_shortcut_in_launcher"
-            android:visibility="@{model.areLauncherShortcutsSupported &amp;&amp; model.isEnabled ? View.VISIBLE : View.GONE}"
+            android:visibility="@{model.showCreateLauncherShortcutButton &amp;&amp; model.isEnabled ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewUid" />

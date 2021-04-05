@@ -2,8 +2,8 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeymapViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConstraintListViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.ui.fragment.ConstraintListFragment
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
@@ -20,11 +20,11 @@ class KeymapConstraintListFragment : ConstraintListFragment() {
 
     override var isAppBarVisible = false
 
-    private val configKeymapViewModel: ConfigKeymapViewModel
+    private val configKeyMapViewModel: ConfigKeyMapViewModel
         by navGraphViewModels(R.id.nav_config_keymap) {
-            InjectorUtils.provideConfigKeymapViewModel(requireContext())
+            InjectorUtils.provideConfigKeyMapViewModel(requireContext())
         }
 
-    override val constraintListViewModel: ConstraintListViewModel
-        get() = configKeymapViewModel.constraintListViewModel
+    override val configConstraintsViewModel: ConfigConstraintsViewModel
+        get() = configKeyMapViewModel.constraintListViewModel
 }

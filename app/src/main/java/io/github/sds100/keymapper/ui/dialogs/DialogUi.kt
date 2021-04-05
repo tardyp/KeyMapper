@@ -3,6 +3,9 @@ package io.github.sds100.keymapper.ui.dialogs
 /**
  * Created by sds100 on 23/03/2021.
  */
+
+//TODO rename as PopupUi and have a subclass to show a toast as well. replace showToast in configconstraintviewmodel with this
+
 sealed class DialogUi<RESPONSE : DialogResponse> {
 
     data class SnackBar(val title: String, val long: Boolean = false, val actionText: String?
