@@ -28,7 +28,6 @@
     <string name="arrow" translatable="false">→</string>
     <string name="plus" translatable="false">+</string>
     <string name="unknown_keycode">Unknown key code: %s</string>
-    <string name="chip_while">while</string>
     <string name="google_app_package_name" translatable="false">com.google.android.googlequicksearchbox</string>
     <string name="on">On</string>
     <string name="off">Off</string>
@@ -51,6 +50,7 @@
     <string name="dont_know_device_name">Don\'t know device name!</string>
     <string name="permission_description_key_mapper_input_method">perform Key Mapper actions that require a keyboard</string>
     <string name="tap_actions_to_fix">Tap actions to fix!</string>
+    <string name="tap_constraints_to_fix">Tap constraints to fix!</string>
     <string name="new_gui_keyboard_ad_message">Get the new Key Mapper keyboard that has an on-screen keyboard!</string>
     <string name="shortcut_label_action">Perform actions</string>
     <string name="hold_down_until_trigger_is_dot_dot_dot">Hold down until trigger is…</string>

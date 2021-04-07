@@ -28,6 +28,7 @@ import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
+import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import io.github.sds100.keymapper.util.result.getFullMessage
@@ -109,6 +110,9 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        homeViewModel.keymapListViewModel.showUserResponseRequests(this, binding)
+        homeViewModel.fingerprintMapListViewModel.showUserResponseRequests(this, binding)
 
         binding.viewModel = this@HomeFragment.homeViewModel
 

@@ -8,7 +8,11 @@
         <import type="android.view.View" />
 
         <variable
-            name="onChipClick"
+            name="onActionChipClick"
+            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+
+        <variable
+            name="onConstraintChipClick"
             type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
 
         <variable
@@ -83,18 +87,56 @@
                 tools:text="Disabled • No Actions • No Triggers"
                 tools:visibility="visible" />
 
+            <TextView
+                android:id="@+id/textViewActionsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/action_list_header"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                android:textStyle="bold"
+                android:visibility="@{model.actionChipList.isEmpty ? View.GONE : View.VISIBLE}"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewExtraInfo" />
+
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupActionsAndConstraints"
+                android:id="@+id/chipGroupActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/ConstraintChipGroup"
+                android:visibility="@{model.actionChipList.isEmpty ? View.GONE : View.VISIBLE}"
+                app:chipUiModels="@{model.actionChipList}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewActionsHeader"
+                app:onChipClickCallback="@{onActionChipClick}"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/textViewConstraintsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/constraint_list_header"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                android:textStyle="bold"
+                android:visibility="@{model.constraintChipList.isEmpty ? View.GONE : View.VISIBLE}"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chipGroupActions" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupConstraints"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:theme="@style/ActionChipGroup"
-                android:visibility="@{model.chipList.isEmpty ? View.GONE : View.VISIBLE}"
-                app:chipUiModels="@{model.chipList}"
+                android:visibility="@{model.constraintChipList.isEmpty ? View.GONE : View.VISIBLE}"
+                app:chipUiModels="@{model.constraintChipList}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textViewExtraInfo"
-                app:layout_goneMarginStart="16dp"
-                app:onChipClickCallback="@{onChipClick}"
+                app:layout_constraintTop_toBottomOf="@+id/textViewConstraintsHeader"
+                app:onChipClickCallback="@{onConstraintChipClick}"
                 tools:visibility="visible" />
 
             <TextView
@@ -108,7 +150,7 @@
                 android:visibility="@{model.hasOptions ? View.VISIBLE : View.GONE}"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chipGroupActionsAndConstraints" />
+                app:layout_constraintTop_toBottomOf="@id/textViewConstraintsHeader" />
 
             <TextView
                 android:id="@+id/textViewSecondary"

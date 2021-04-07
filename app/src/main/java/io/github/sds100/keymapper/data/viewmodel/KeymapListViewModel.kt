@@ -1,29 +1,31 @@
 package io.github.sds100.keymapper.data.viewmodel
 
+import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
-import io.github.sds100.keymapper.ui.ChipUi
-import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.createListState
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
+import io.github.sds100.keymapper.mappings.common.BaseMappingListViewModel
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 class KeymapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
     private val multiSelectProvider: MultiSelectProvider
-) {
+) : BaseMappingListViewModel(coroutineScope, resourceProvider) {
 
     private val listItemCreator = KeymapListItemCreator(useCase, resourceProvider)
 
-    private val _state = MutableStateFlow<ListUiState<KeymapListItem>>(ListUiState.Loading)
+    private val _state = MutableStateFlow<ListUiState<KeyMapListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
 
     /**
@@ -32,26 +34,28 @@ class KeymapListViewModel internal constructor(
     private val _launchConfigKeymap = MutableSharedFlow<String>()
     val launchConfigKeymap = _launchConfigKeymap.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = _fixError.asSharedFlow()
-
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
         val keymapStateListFlow =
-            MutableStateFlow<ListUiState<KeymapListItem.KeymapUiState>>(ListUiState.Loading)
+            MutableStateFlow<ListUiState<KeyMapListItem.KeyMapUiState>>(ListUiState.Loading)
 
         coroutineScope.launch {
             combine(
                 rebuildUiState,
                 useCase.keymapList,
                 useCase.invalidateErrors
-            ) { _, keymapList, _ ->
-                keymapList
-            }.collectLatest { keymapList ->
+            ) { _, keymapListState, _ ->
+                keymapListState
+            }.collectLatest { keymapListState ->
                 //don't show progress bar because when swiping between tabs the recycler view will flash
                 keymapStateListFlow.value = withContext(Dispatchers.Default) {
-                    keymapList.map { listItemCreator.map(it) }.createListState()
+                    when (keymapListState) {
+                        is State.Data -> keymapListState.data.map { listItemCreator.map(it) }
+                            .createListState()
+
+                        State.Loading -> ListUiState.Loading
+                    }
                 }
             }
         }
@@ -81,9 +85,9 @@ class KeymapListViewModel internal constructor(
                                     false
                                 }
 
-                                KeymapListItem(
+                                KeyMapListItem(
                                     keymapUiState,
-                                    KeymapListItem.SelectionUiState(isSelected, isSelectable)
+                                    KeyMapListItem.SelectionUiState(isSelected, isSelectable)
                                 )
                             }.createListState()
                         }
@@ -114,29 +118,8 @@ class KeymapListViewModel internal constructor(
         coroutineScope.launch {
             state.value.apply {
                 if (this is ListUiState.Loaded) {
-                    multiSelectProvider.select(*this.data.map { it.keymapUiState.uid }
+                    multiSelectProvider.select(*this.data.map { it.keyMapUiState.uid }
                         .toTypedArray())
-                }
-            }
-        }
-    }
-
-    //TODO fix for constraints
-    //TODO create separate method for action and constraints
-    fun onChipClick(keymapUid: String, chipModel: ChipUi) {
-        if (chipModel is ChipUi.Error) {
-            coroutineScope.launch {
-                val actionUid = chipModel.id
-                val actionData = useCase.keymapList.first()
-                    .singleOrNull { keyMap -> keyMap.uid == keymapUid }
-                    ?.actionList
-                    ?.singleOrNull { action -> action.uid == actionUid }
-                    ?.data
-                    ?: return@launch
-
-                val error = useCase.getActionError(actionData)
-                if (error is FixableError) {
-                    _fixError.emit(error)
                 }
             }
         }

@@ -16,17 +16,16 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
+import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.util.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 /**
  * Created by sds100 on 22/02/2020.
  */
-class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
+class KeymapListFragment : SimpleRecyclerViewFragment<KeyMapListItem>() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
         InjectorUtils.provideHomeViewModel(requireContext())
@@ -49,7 +48,7 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
 //            )
         }
 
-    override val listItems: Flow<ListUiState<KeymapListItem>>
+    override val listItems: Flow<ListUiState<KeyMapListItem>>
         get() = viewModel.state
 
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
@@ -64,28 +63,34 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeymapListItem>() {
 
     override fun populateList(
         recyclerView: EpoxyRecyclerView,
-        listItems: List<KeymapListItem>
+        listItems: List<KeyMapListItem>
     ) {
         recyclerView.withModels {
             listItems.forEach { listItem ->
                 keymap {
-                    id(listItem.keymapUiState.uid)
-                    keymapUiState(listItem.keymapUiState)
+                    id(listItem.keyMapUiState.uid)
+                    keyMapUiState(listItem.keyMapUiState)
 
                     selectionState(listItem.selectionUiState)
 
-                    onChipClick(object : OnChipClickCallback {
+                    onActionChipClick(object : OnChipClickCallback {
                         override fun onChipClick(chipModel: ChipUi) {
-                            viewModel.onChipClick(listItem.keymapUiState.uid, chipModel)
+                            viewModel.onActionChipClick(chipModel)
+                        }
+                    })
+
+                    onConstraintChipClick(object : OnChipClickCallback {
+                        override fun onChipClick(chipModel: ChipUi) {
+                            viewModel.onConstraintsChipClick(chipModel)
                         }
                     })
 
                     onCardClick { _ ->
-                        viewModel.onKeymapCardClick(listItem.keymapUiState.uid)
+                        viewModel.onKeymapCardClick(listItem.keyMapUiState.uid)
                     }
 
                     onCardLongClick { _ ->
-                        viewModel.onKeymapCardLongClick(listItem.keymapUiState.uid)
+                        viewModel.onKeymapCardLongClick(listItem.keyMapUiState.uid)
                         true
                     }
                 }

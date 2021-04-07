@@ -6,13 +6,14 @@ import io.github.sds100.keymapper.ui.ChipUi
  * Created by sds100 on 28/03/2020.
  */
 
-data class KeymapListItem(
-    val keymapUiState: KeymapUiState,
+data class KeyMapListItem(
+    val keyMapUiState: KeyMapUiState,
     val selectionUiState: SelectionUiState
 ) {
-    data class KeymapUiState(
+    data class KeyMapUiState(
         val uid: String,
-        val chipList: List<ChipUi>,
+        val actionChipList: List<ChipUi>,
+        val constraintChipList: List<ChipUi>,
         val triggerDescription: String,
         val optionsDescription: String,
         val extraInfo: String

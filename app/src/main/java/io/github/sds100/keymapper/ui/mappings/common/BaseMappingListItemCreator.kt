@@ -22,7 +22,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
 
     private val constraintUiHelper = ConstraintUiHelper(displayMapping, resourceProvider)
 
-    fun getChipList(mapping: M): List<ChipUi> = sequence {
+    fun getActionChipList(mapping: M): List<ChipUi> = sequence {
         val midDot = getString(R.string.middot)
 
         mapping.actionList.forEach { action ->
@@ -51,7 +51,12 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
                                 append(" $midDot ")
                             }
 
-                            append(getString(R.string.action_title_wait, action.delayBeforeNextAction!!))
+                            append(
+                                getString(
+                                    R.string.action_title_wait,
+                                    action.delayBeforeNextAction!!
+                                )
+                            )
                         }
                     }
                 }
@@ -62,12 +67,13 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
                 val chip = if (error is FixableError) {
                     ChipUi.FixableError(
                         action.uid,
-                        error.getFullMessage(this@BaseMappingListItemCreator)
+                        title,
+                        error
                     )
                 } else {
                     ChipUi.Error(
                         action.uid,
-                        error.getFullMessage(this@BaseMappingListItemCreator)
+                        title
                     )
                 }
 
@@ -75,10 +81,9 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
             }
         }
 
-        if (mapping.actionList.isNotEmpty() && mapping.constraintState.constraints.isNotEmpty()) {
-            yield(ChipUi.Transparent("while", text = getString(R.string.chip_while)))
-        }
+    }.toList()
 
+    fun getConstraintChipList(mapping: M): List<ChipUi> = sequence {
         val constraintSeparatorText = when (mapping.constraintState.mode) {
             ConstraintMode.AND -> getString(R.string.constraint_mode_and)
             ConstraintMode.OR -> getString(R.string.constraint_mode_or)
@@ -100,7 +105,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
 
             val chip: ChipUi = if (error == null) {
                 ChipUi.Normal(
-                    id = constraint.toString(),
+                    id = constraint.uid,
                     text = text,
                     icon = icon
                 )
@@ -108,18 +113,54 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
                 if (error is FixableError) {
                     ChipUi.FixableError(
                         constraint.uid,
-                        error.getFullMessage(this@BaseMappingListItemCreator)
+                        text,
+                        error
                     )
                 } else {
                     ChipUi.Error(
                         constraint.uid,
-                        error.getFullMessage(this@BaseMappingListItemCreator)
+                        text
                     )
                 }
             }
 
             yield(chip)
         }
-
     }.toList()
+
+    fun createExtraInfoString(
+        mapping: M,
+        actionChipList: List<ChipUi>,
+        constraintChipList: List<ChipUi>
+    ) = buildString {
+        val midDot by lazy { getString(R.string.middot) }
+
+        if (!mapping.isEnabled) {
+            append(getString(R.string.disabled))
+        }
+
+        if (actionChipList.any { it is ChipUi.FixableError }) {
+            if (this.isNotEmpty()) {
+                append(" $midDot ")
+            }
+
+            append(getString(R.string.tap_actions_to_fix))
+        }
+
+        if (constraintChipList.any { it is ChipUi.FixableError }) {
+            if (this.isNotEmpty()) {
+                append(" $midDot ")
+            }
+
+            append(getString(R.string.tap_constraints_to_fix))
+        }
+
+        if (actionChipList.isEmpty()) {
+            if (this.isNotEmpty()) {
+                append(" $midDot ")
+            }
+
+            append(getString(R.string.no_actions))
+        }
+    }
 }

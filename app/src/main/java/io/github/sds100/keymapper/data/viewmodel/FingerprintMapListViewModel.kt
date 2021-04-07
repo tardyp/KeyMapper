@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
+import io.github.sds100.keymapper.mappings.common.BaseMappingListViewModel
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.createListState
@@ -20,15 +21,12 @@ class FingerprintMapListViewModel(
     private val coroutineScope: CoroutineScope,
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
-) {
+)  : BaseMappingListViewModel(coroutineScope, resourceProvider){
 
     private val listItemCreator = FingerprintMapListItemCreator(
         useCase,
         resourceProvider
     )
-
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = _fixError.asSharedFlow()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -61,27 +59,6 @@ class FingerprintMapListViewModel(
 
     fun onResetClick() {
         TODO()
-    }
-
-    fun onChipClick(fingerprintMapId: FingerprintMapId, chipModel: ChipUi) {
-        if (chipModel is ChipUi.Error) {
-            coroutineScope.launch {
-                val actionUid = chipModel.id
-
-                val fingerprintMap = useCase.fingerprintMaps.first().get(fingerprintMapId)
-
-                val actionData = fingerprintMap.actionList
-                    .singleOrNull { it.uid == actionUid }
-                    ?.data
-                    ?: return@launch
-
-                val error = useCase.getActionError(actionData)
-
-                if (error is FixableError) {
-                    _fixError.emit(error)
-                }
-            }
-        }
     }
 
     fun rebuildUiState() {

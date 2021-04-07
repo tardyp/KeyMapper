@@ -121,7 +121,7 @@ dependencies {
     implementation "com.louiscad.splitties:splitties-alertdialog-appcompat:$splitties_version"
     implementation("com.louiscad.splitties:splitties-alertdialog-material:$splitties_version")
     implementation "com.louiscad.splitties:splitties-snackbar:$splitties_version"
-    implementation "com.louiscad.splitties:splitties-systemservices:$splitties_version"
+    implementation "com.louiscad.splitties:splitties-systemservices:$splitties_version" //TODO remove this
     implementation "com.louiscad.splitties:splitties-toast:$splitties_version"
     implementation "com.louiscad.splitties:splitties-mainthread:$splitties_version"
 

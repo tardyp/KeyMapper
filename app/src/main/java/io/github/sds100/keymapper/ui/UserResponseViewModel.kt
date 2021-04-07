@@ -6,12 +6,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.addRepeatingJob
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponseEvent
 import io.github.sds100.keymapper.ui.dialogs.UserResponse
 import io.github.sds100.keymapper.ui.dialogs.UserResponseEvent
 import io.github.sds100.keymapper.ui.utils.SnackBarUtils
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.editTextStringAlertDialog
+import io.github.sds100.keymapper.util.multiChoiceDialog
+import io.github.sds100.keymapper.util.okDialog
+import io.github.sds100.keymapper.util.singleChoiceDialog
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
@@ -58,7 +62,7 @@ suspend inline fun <reified R : UserResponse> UserResponseViewModel.getUserRespo
     This ensures only one job for a dialog is active at once by cancelling previous jobs when a new
     dialog is shown with the same key
      */
-    val response =  merge(
+    val response = merge(
         requestUserResponse.dropWhile { it.key != key }.map { null },
         onUserResponse.dropWhile { it.response !is R? && it.key != key }.map { it.response }
     ).first() as R?
@@ -98,7 +102,12 @@ fun UserResponseViewModel.showUserResponseRequests(
                     ctx.singleChoiceDialog(lifecycleOwner, event.ui.items)
 
                 is RequestUserResponse.SnackBar ->
-                    SnackBarUtils.show(binding.root,event.ui.title, event.ui.actionText, event.ui.long)
+                    SnackBarUtils.show(
+                        binding.root.findViewById(R.id.coordinatorLayout),
+                        event.ui.title,
+                        event.ui.actionText,
+                        event.ui.long
+                    )
 
                 is RequestUserResponse.Text -> ctx.editTextStringAlertDialog(
                     lifecycleOwner,
@@ -107,7 +116,7 @@ fun UserResponseViewModel.showUserResponseRequests(
                 )
             }
 
-            if (!responded){
+            if (!responded) {
                 onUserResponse(event.key, response)
                 responded = true
             }

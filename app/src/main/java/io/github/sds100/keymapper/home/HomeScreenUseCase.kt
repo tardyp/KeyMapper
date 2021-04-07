@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.home
 
 import android.os.Build
-import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.adapter.PowerManagementAdapter
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
@@ -14,8 +13,8 @@ import io.github.sds100.keymapper.domain.mappings.keymap.KeymapRepository
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
-import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityGroup
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import kotlinx.coroutines.Dispatchers
@@ -37,13 +36,14 @@ class HomeScreenUseCaseImpl(
 ) : HomeScreenUseCase,
     DisplayKeyMapUseCase by displayKeyMapUseCase {
 
-    override val keymapList: Flow<List<KeyMap>> = keyMapRepository.keymapList
-        .filter { it is State.Data }
+    override val keymapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList
         .map { state ->
-            require(state is State.Data)
-            state.data.map { KeyMapEntityMapper.fromEntity(it) }
-        }
-        .flowOn(Dispatchers.Default)
+            state.mapData { keymapList ->
+                keymapList.map {
+                    KeyMapEntityMapper.fromEntity(it)
+                }
+            }
+        }.flowOn(Dispatchers.Default)
 
     override val fingerprintMaps: Flow<FingerprintMapGroup> =
         fingerprintMapRepository.fingerprintMaps
@@ -111,7 +111,7 @@ class HomeScreenUseCaseImpl(
 }
 
 interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase {
-    val keymapList: Flow<List<KeyMap>>
+    val keymapList: Flow<State<List<KeyMap>>>
     fun deleteKeyMap(vararg uid: String)
     fun enableKeyMap(vararg uid: String)
     fun disableKeyMap(vararg uid: String)

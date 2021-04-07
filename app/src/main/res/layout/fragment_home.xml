@@ -202,7 +202,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:gravity="center"
             app:backgroundTint="?attr/colorPrimarySurface"
             app:fabAnimationMode="slide"
             app:menu="@menu/menu_home"

@@ -97,9 +97,4 @@ data class KeyMapEntity(
             )
         }
     }
-
-    override fun hashCode() = id.toInt()
-    override fun equals(other: Any?): Boolean {
-        return (other as KeyMapEntity?)?.id == this.id
-    }
 }

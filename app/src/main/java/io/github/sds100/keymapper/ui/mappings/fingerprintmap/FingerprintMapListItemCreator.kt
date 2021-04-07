@@ -41,34 +41,17 @@ class FingerprintMapListItemCreator(
             }
         }
 
-        val chipList = getChipList(fingerprintMap)
 
-        val extraInfo = buildString {
-            if (!fingerprintMap.isEnabled) {
-                append(getString(R.string.disabled))
-            }
+        val actionChipList = getActionChipList(fingerprintMap)
+        val constraintChipList = getConstraintChipList(fingerprintMap)
 
-            if (chipList.any { it is ChipUi.FixableError }) {
-                if (this.isNotEmpty()) {
-                    append(" $midDot ")
-                }
-
-                append(getString(R.string.tap_actions_to_fix))
-            }
-
-            if (fingerprintMap.actionList.isEmpty()) {
-                if (this.isNotEmpty()) {
-                    append(" $midDot ")
-                }
-
-                append(getString(R.string.no_actions))
-            }
-        }
+        val extraInfo = createExtraInfoString(fingerprintMap, actionChipList, constraintChipList)
 
         return FingerprintMapListItem(
             id = id,
             header = header,
-            chipList = chipList,
+            actionChipList = actionChipList,
+            constraintChipList = constraintChipList,
             optionsDescription = optionsDescription,
             isEnabled = fingerprintMap.isEnabled,
             extraInfo = extraInfo

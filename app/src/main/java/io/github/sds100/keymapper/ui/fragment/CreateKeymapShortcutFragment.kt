@@ -10,7 +10,7 @@ import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItem
+import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
 import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
@@ -23,13 +23,13 @@ import splitties.alertdialog.appcompat.positiveButton
  * Created by sds100 on 08/09/20.
  */
 
-class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapListItem>>() {
+class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeyMapListItem>>() {
 
     private val viewModel by activityViewModels<CreateKeymapShortcutViewModel> {
         InjectorUtils.provideCreateActionShortcutViewModel(requireContext())
     }
 
-    override val modelState: ModelState<List<KeymapListItem>>
+    override val modelState: ModelState<List<KeyMapListItem>>
         get() = viewModel
 
     private lateinit var fixErrorDelegate: FixErrorDelegate
@@ -76,7 +76,7 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeymapList
 
     override fun populateList(
         binding: FragmentRecyclerviewBinding,
-        model: List<KeymapListItem>?
+        model: List<KeyMapListItem>?
     ) {
         binding.epoxyRecyclerView.withModels {
             model?.forEach {
