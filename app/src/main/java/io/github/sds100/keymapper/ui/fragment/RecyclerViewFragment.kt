@@ -90,6 +90,15 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
             getRecyclerView(binding).isVisible = true
             getEmptyListPlaceHolder(binding).isVisible = false
 
+            if (searchStateKey != null) {
+                findNavController().observeCurrentDestinationLiveData<String>(
+                    viewLifecycleOwner,
+                    searchStateKey!!
+                ) {
+                    onSearchQuery(it)
+                }
+            }
+
             subscribeUi(binding)
 
             getBottomAppBar(binding)?.let {
@@ -176,7 +185,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         getBottomAppBar(binding) ?: return
 
         val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
-
         searchViewMenuItem ?: return
 
         searchViewMenuItem.isVisible = isSearchEnabled
@@ -184,13 +192,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         val searchView = searchViewMenuItem.actionView as SearchView
 
         searchStateKey ?: return
-
-        findNavController().observeCurrentDestinationLiveData<String>(
-            viewLifecycleOwner,
-            searchStateKey!!
-        ) {
-            onSearchQuery(it)
-        }
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
