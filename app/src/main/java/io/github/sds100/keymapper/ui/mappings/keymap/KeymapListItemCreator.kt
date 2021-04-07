@@ -90,7 +90,9 @@ class KeymapListItemCreator(
                 append(getString(R.string.disabled))
             }
 
-            if (chipList.any { it is ChipUi.Error }) {
+            //TODO create separate list of actions and constraints in list item. show "tap constraints" to fix if constraints have errors.
+            //TODO chips should show the title of the constraint/action and then a snackbar should be shown when they are tapped
+            if (chipList.any { it is ChipUi.FixableError }) {
                 if (this.isNotEmpty()) {
                     append(" $midDot ")
                 }

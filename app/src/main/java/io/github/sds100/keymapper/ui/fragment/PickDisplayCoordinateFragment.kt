@@ -19,7 +19,7 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.data.viewmodel.PickDisplayCoordinateViewModel
 import io.github.sds100.keymapper.databinding.FragmentPickCoordinateBinding
-import io.github.sds100.keymapper.ui.onDialogResponse
+import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.collectLatest
 import splitties.systemservices.windowManager
@@ -105,11 +105,7 @@ class PickDisplayCoordinateFragment : Fragment() {
             )
         })
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.showDialog.collectLatest {
-                viewModel.onDialogResponse(it.key, it.ui.show(this@PickDisplayCoordinateFragment))
-            }
-        }
+        viewModel.showUserResponseRequests(this, binding)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.returnResult.collectLatest {

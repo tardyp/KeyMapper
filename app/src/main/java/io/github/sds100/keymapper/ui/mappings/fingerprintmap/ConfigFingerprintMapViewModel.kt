@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import io.github.sds100.keymapper.constraints.ConstraintUtils
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -13,8 +14,8 @@ import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
-import io.github.sds100.keymapper.ui.DialogViewModel
-import io.github.sds100.keymapper.ui.DialogViewModelImpl
+import io.github.sds100.keymapper.ui.UserResponseViewModel
+import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
@@ -35,7 +36,7 @@ class ConfigFingerprintMapViewModel(
     private val testAction: TestActionUseCase,
     private val display: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), ConfigMappingViewModel, DialogViewModel by DialogViewModelImpl() {
+) : ViewModel(), ConfigMappingViewModel, UserResponseViewModel by UserResponseViewModelImpl() {
 
     companion object {
         private const val STATE_KEY_MAP = "config_fingerprint_map"
@@ -55,6 +56,7 @@ class ConfigFingerprintMapViewModel(
         viewModelScope,
         display,
         config,
+        ConstraintUtils.FINGERPRINT_MAP_ALLOWED_CONSTRAINTS,
         resourceProvider
     )
 
@@ -80,7 +82,7 @@ class ConfigFingerprintMapViewModel(
         runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
-    override fun save() = config.getMapping().ifIsData { save.invoke(id, it) }
+    override fun save() = config.getMapping().ifIsData { save(id, it) }
 
     override fun saveState(outState: Bundle) {
         config.getMapping().ifIsData {

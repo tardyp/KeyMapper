@@ -6,13 +6,14 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapA
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
 
 /**
  * Created by sds100 on 19/03/2021.
  */
 class FingerprintMapListItemCreator(
-    private val  display: DisplaySimpleMappingUseCase,
+    private val display: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
 ) : BaseMappingListItemCreator<FingerprintMap, FingerprintMapAction>(
     display,
@@ -40,12 +41,14 @@ class FingerprintMapListItemCreator(
             }
         }
 
+        val chipList = getChipList(fingerprintMap)
+
         val extraInfo = buildString {
             if (!fingerprintMap.isEnabled) {
                 append(getString(R.string.disabled))
             }
 
-            if (fingerprintMap.actionList.any { display.getActionError(it.data) != null }) {
+            if (chipList.any { it is ChipUi.FixableError }) {
                 if (this.isNotEmpty()) {
                     append(" $midDot ")
                 }
@@ -65,7 +68,7 @@ class FingerprintMapListItemCreator(
         return FingerprintMapListItem(
             id = id,
             header = header,
-            chipList = getChipList(fingerprintMap),
+            chipList = chipList,
             optionsDescription = optionsDescription,
             isEnabled = fingerprintMap.isEnabled,
             extraInfo = extraInfo

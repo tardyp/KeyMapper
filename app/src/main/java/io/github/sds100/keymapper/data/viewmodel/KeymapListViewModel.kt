@@ -12,6 +12,7 @@ import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class KeymapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,

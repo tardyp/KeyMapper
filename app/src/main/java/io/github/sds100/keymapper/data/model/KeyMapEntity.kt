@@ -14,7 +14,6 @@ import java.util.*
  * Created by sds100 on 12/07/2018.
  */
 
-@Parcelize
 @Entity(tableName = KeyMapDao.TABLE_NAME)
 data class KeyMapEntity(
     @SerializedName(NAME_ID)
@@ -33,7 +32,6 @@ data class KeyMapEntity(
     @ColumnInfo(name = KeyMapDao.KEY_CONSTRAINT_LIST)
     val constraintList: List<ConstraintEntity> = listOf(),
 
-    @ConstraintMode
     @SerializedName(NAME_CONSTRAINT_MODE)
     @ColumnInfo(name = KeyMapDao.KEY_CONSTRAINT_MODE)
     val constraintMode: Int = ConstraintEntity.DEFAULT_MODE,
@@ -56,7 +54,7 @@ data class KeyMapEntity(
     @SerializedName(NAME_UID)
     @ColumnInfo(name = KeyMapDao.KEY_UID)
     val uid: String = UUID.randomUUID().toString()
-) : Parcelable {
+)  {
     companion object {
 
         //DON'T CHANGE THESE. Used for JSON serialization and parsing.

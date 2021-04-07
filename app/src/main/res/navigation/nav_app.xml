@@ -77,12 +77,12 @@
         app:popExitAnim="@anim/slide_out_right">
 
         <argument
-            android:name="@string/nav_arg_choose_constraint_request_key"
+            android:name="choose_constraint_request_key"
             app:argType="string" />
 
         <argument
-            android:name="@string/nav_arg_supported_constraint_list"
-            app:argType="string[]" />
+            android:name="supported_constraint_list"
+            app:argType="string" />
     </action>
 
     <include app:graph="@navigation/nav_choose_action" />
@@ -156,4 +156,24 @@
         android:id="@+id/action_global_menuFragment"
         app:destination="@id/menuFragment"
         app:enterAnim="@anim/slide_in_bottom" />
+
+    <fragment
+        android:id="@+id/appListFragment"
+        android:name="io.github.sds100.keymapper.ui.fragment.AppListFragment"
+        android:label="AppListFragment"
+        tools:layout="@layout/fragment_recyclerview" />
+
+    <action
+        android:id="@+id/chooseApp"
+        app:destination="@id/appListFragment" />
+
+    <fragment
+        android:id="@+id/bluetoothDevicesFragment"
+        android:name="io.github.sds100.keymapper.ui.fragment.BluetoothDeviceListFragment"
+        android:label="BlutoothDeviceFragment"
+        tools:layout="@layout/fragment_recyclerview" />
+
+    <action
+        android:id="@+id/chooseBluetoothDevice"
+        app:destination="@+id/bluetoothDevicesFragment" />
 </navigation>

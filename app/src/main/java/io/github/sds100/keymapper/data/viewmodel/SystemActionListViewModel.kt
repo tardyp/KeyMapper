@@ -12,24 +12,22 @@ import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.DialogUi
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.containsQuery
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * Created by sds100 on 31/03/2020.
  */
 
-//TODO create a single use case for "creating a system action".
 class SystemActionListViewModel(
     private val useCase: CreateSystemActionUseCase,
     resourceProvider: ResourceProvider,
-) : ViewModel(), ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
+) : ViewModel(), ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
 
     val searchQuery = MutableStateFlow<String?>(null)
 
@@ -67,7 +65,7 @@ class SystemActionListViewModel(
                         it.id to it.label
                     }
 
-                    val imeId = showDialog("choose_ime", DialogUi.SingleChoice(items))?.item
+                    val imeId = getUserResponse("choose_ime", RequestUserResponse.SingleChoice(items))?.item
                         ?: return@launch
                     val imeName = inputMethods.single { it.id == imeId }.label
 
@@ -97,7 +95,7 @@ class SystemActionListViewModel(
                     }
 
                     val packageName =
-                        showDialog("choose_package", DialogUi.SingleChoice(items))?.item
+                        getUserResponse("choose_package", RequestUserResponse.SingleChoice(items))?.item
                             ?: return@launch
 
                     val action = when (id) {
@@ -126,7 +124,7 @@ class SystemActionListViewModel(
                     val items = VolumeStream.values()
                         .map { it to getString(VolumeStreamUtils.getLabel(it)) }
 
-                    val stream = showDialog("pick_volume_stream", DialogUi.SingleChoice(items))
+                    val stream = getUserResponse("pick_volume_stream", RequestUserResponse.SingleChoice(items))
                         ?.item ?: return@launch
 
                     val action = when (id) {
@@ -147,7 +145,7 @@ class SystemActionListViewModel(
                         .map { it to getString(RingerModeUtils.getLabel(it)) }
 
                     val ringerMode =
-                        showDialog("pick_ringer_mode", DialogUi.SingleChoice(items))?.item
+                        getUserResponse("pick_ringer_mode", RequestUserResponse.SingleChoice(items))?.item
                             ?: return@launch
 
                     _returnResult.emit(ChangeRingerModeSystemAction(ringerMode))
@@ -159,7 +157,7 @@ class SystemActionListViewModel(
                     val items = DndMode.values()
                         .map { it to getString(DndModeUtils.getLabel(it)) }
 
-                    val dndMode = showDialog("pick_dnd_mode", DialogUi.SingleChoice(items))?.item
+                    val dndMode = getUserResponse("pick_dnd_mode", RequestUserResponse.SingleChoice(items))?.item
                         ?: return@launch
 
                     val action = when (id) {
@@ -180,7 +178,7 @@ class SystemActionListViewModel(
                         .map { it to getString(OrientationUtils.getLabel(it)) }
 
                     val orientations =
-                        showDialog("pick_orientations", DialogUi.MultiChoice(items))?.items
+                        getUserResponse("pick_orientations", RequestUserResponse.MultiChoice(items))?.items
                             ?: return@launch
 
                     _returnResult.emit(CycleRotationsSystemAction(orientations))
@@ -193,7 +191,7 @@ class SystemActionListViewModel(
                         it to getString(CameraLensUtils.getLabel(it))
                     }
 
-                    val lens = showDialog("pick_lens", DialogUi.SingleChoice(items))?.item
+                    val lens = getUserResponse("pick_lens", RequestUserResponse.SingleChoice(items))?.item
                         ?: return@launch
 
                     val action = when (id) {
@@ -236,9 +234,9 @@ class SystemActionListViewModel(
         }
 
         if (messageToShow != null) {
-            showDialog(
+            getUserResponse(
                 "show_system_action_message",
-                DialogUi.OkMessage(message = getString(messageToShow))
+                RequestUserResponse.Ok(message = getString(messageToShow))
             )
         }
     }

@@ -5,26 +5,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.data.model.SeekBarListItemModel
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
 import io.github.sds100.keymapper.databinding.DialogSeekbarListBinding
-import io.github.sds100.keymapper.ui.dialogs.DialogResponse
-import io.github.sds100.keymapper.ui.dialogs.DialogUi
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.util.result.*
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
-import splitties.snackbar.action
-import splitties.snackbar.longSnack
-import splitties.snackbar.onDismiss
-import splitties.snackbar.snack
-import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -32,61 +24,10 @@ import kotlin.coroutines.suspendCoroutine
  * Created by sds100 on 30/03/2020.
  */
 
-suspend fun DialogUi<*>.show(
-    fragment: Fragment,
-    coordinatorLayout: CoordinatorLayout? = null
-): DialogResponse? {
-    val lifecycleOwner = fragment.viewLifecycleOwner
-    val ctx = fragment.requireContext()
-
-    return show(lifecycleOwner, ctx, coordinatorLayout)
-}
-
-suspend fun DialogUi<*>.show(
-    lifecycleOwner: LifecycleOwner,
-    ctx: Context,
-    coordinatorLayout: CoordinatorLayout? = null
-): DialogResponse? {
-
-    return when (this) {
-        is DialogUi.OkMessage -> ctx.okDialog(lifecycleOwner, this.message)
-        is DialogUi.Text ->
-            ctx.editTextStringAlertDialog(
-                lifecycleOwner,
-                this.hint,
-                this.allowEmpty
-            )
-        is DialogUi.MultiChoice<*> -> ctx.multiChoiceDialog(lifecycleOwner, this.items)
-        is DialogUi.SingleChoice<*> -> ctx.singleChoiceDialog(lifecycleOwner, this.items)
-        is DialogUi.SnackBar -> suspendCancellableCoroutine<DialogUi.SnackBarActionResponse?> { continuation ->
-
-            require(coordinatorLayout != null)
-
-            if (long) {
-                coordinatorLayout.longSnack(this.title) {
-                    if (actionText != null) {
-                        action(actionText) {
-                            continuation.resume(DialogUi.SnackBarActionResponse)
-                        }
-                    }
-                }
-            } else {
-                coordinatorLayout.snack(this.title) {
-                    if (actionText != null) {
-                        action(actionText) {
-                            continuation.resume(DialogUi.SnackBarActionResponse)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 suspend fun <ID> Context.multiChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<DialogUi.MultiChoiceResponse<ID>?> { continuation ->
+) = suspendCancellableCoroutine<RequestUserResponse.MultiChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         val checkedItems = BooleanArray(items.size) { false }
 
@@ -108,10 +49,11 @@ suspend fun <ID> Context.multiChoiceDialog(
                 }
             }.toList()
 
-            continuation.resume(DialogUi.MultiChoiceResponse(checkedItemIds))
+            continuation.resume(RequestUserResponse.MultiChoiceResponse(checkedItemIds))
         }
 
         show().apply {
+            resumeNullOnDismiss(continuation)
             dismissOnDestroy(lifecycleOwner)
         }
     }
@@ -120,15 +62,16 @@ suspend fun <ID> Context.multiChoiceDialog(
 suspend fun <ID> Context.singleChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<DialogUi.SingleChoiceResponse<ID>?> { continuation ->
+) = suspendCancellableCoroutine<RequestUserResponse.SingleChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         setItems(
             items.map { it.second }.toTypedArray(),
         ) { _, position ->
-            continuation.resume(DialogUi.SingleChoiceResponse(items[position].first))
+            continuation.resume(RequestUserResponse.SingleChoiceResponse(items[position].first))
         }
 
         show().apply {
+            resumeNullOnDismiss(continuation)
             dismissOnDestroy(lifecycleOwner)
         }
     }
@@ -138,7 +81,7 @@ suspend fun Context.editTextStringAlertDialog(
     lifecycleOwner: LifecycleOwner,
     hint: String,
     allowEmpty: Boolean = false
-) = suspendCancellableCoroutine<DialogUi.TextResponse?> { continuation ->
+) = suspendCancellableCoroutine<RequestUserResponse.TextResponse?> { continuation ->
 
     val text = MutableStateFlow("")
 
@@ -154,7 +97,7 @@ suspend fun Context.editTextStringAlertDialog(
         }
 
         okButton {
-            continuation.resume(DialogUi.TextResponse(text.value))
+            continuation.resume(RequestUserResponse.TextResponse(text.value))
         }
 
         cancelButton()
@@ -174,6 +117,7 @@ suspend fun Context.editTextStringAlertDialog(
     }
 
     //this prevents window leak
+    alertDialog.resumeNullOnDismiss(continuation)
     alertDialog.dismissOnDestroy(lifecycleOwner)
 }
 
@@ -231,12 +175,14 @@ suspend fun Context.editTextNumberAlertDialog(
 
             val alertDialog = show()
 
+            alertDialog.resumeNullOnDismiss(continuation)
             alertDialog.dismissOnDestroy(lifecycleOwner)
 
             lifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
                 text.map { isValid(it) }
                     .collectLatest { isValid ->
-                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isValid.isSuccess
+                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                            isValid.isSuccess
                         textInputLayout.error = isValid.errorOrNull()?.getFullMessage(context)
                     }
             }
@@ -247,21 +193,30 @@ suspend fun Context.editTextNumberAlertDialog(
 suspend fun Context.okDialog(
     lifecycleOwner: LifecycleOwner,
     message: String
-) = suspendCancellableCoroutine<DialogUi.OkResponse?> { continuation ->
+) = suspendCancellableCoroutine<RequestUserResponse.OkResponse?> { continuation ->
 
     val alertDialog = materialAlertDialog {
 
         setMessage(message)
 
         okButton {
-            continuation.resume(DialogUi.OkResponse)
+            continuation.resume(RequestUserResponse.OkResponse)
         }
     }
 
     alertDialog.show()
 
     //this prevents window leak
+    alertDialog.resumeNullOnDismiss(continuation)
     alertDialog.dismissOnDestroy(lifecycleOwner)
+}
+
+fun <T> Dialog.resumeNullOnDismiss(continuation: CancellableContinuation<T?>) {
+    setOnDismissListener {
+        if (!continuation.isCompleted) {
+            continuation.resume(null)
+        }
+    }
 }
 
 fun Dialog.dismissOnDestroy(lifecycleOwner: LifecycleOwner) {
@@ -271,46 +226,4 @@ fun Dialog.dismissOnDestroy(lifecycleOwner: LifecycleOwner) {
             dismiss()
         }
     })
-}
-
-suspend fun Context.seekBarAlertDialog(
-    lifecycleOwner: LifecycleOwner,
-    seekBarListItemModel: SeekBarListItemModel
-) = suspendCoroutine<Int> {
-    materialAlertDialog {
-        val inflater = LayoutInflater.from(this@seekBarAlertDialog)
-        DialogSeekbarListBinding.inflate(inflater).apply {
-
-            var result = seekBarListItemModel.initialValue
-
-            model = seekBarListItemModel
-
-            onChangeListener = object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    result = seekBarListItemModel.calculateValue(progress)
-
-                    textViewValue.text = result.toString()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            }
-
-            okButton { _ ->
-                it.resume(result)
-            }
-
-
-            setView(this.root)
-        }
-
-        cancelButton()
-
-        show()
-    }
 }

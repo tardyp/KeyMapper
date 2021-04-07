@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 
 interface AppShortcutAdapter {
-    val installedAppShortcuts: StateFlow<State<List<AppShortcutInfo>>>
+    val installedAppShortcuts: Flow<State<List<AppShortcutInfo>>>
     val areLauncherShortcutsSupported: Boolean
 
     fun createLauncherShortcut(

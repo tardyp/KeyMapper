@@ -7,6 +7,8 @@ import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 /**
  * Created by sds100 on 22/02/2020.
  */
+
+//TODO delete
 abstract class DefaultRecyclerViewFragment<T>
     : OldRecyclerViewFragment<T, FragmentRecyclerviewBinding>() {
 

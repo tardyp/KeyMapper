@@ -5,11 +5,9 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.mappings.keymap.KeymapRepository
 import io.github.sds100.keymapper.domain.utils.State
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -21,9 +19,7 @@ class RoomKeymapRepository(
 ) : KeymapRepository {
     //TODO implement automatic backing up stuff
     override val keymapList: Flow<State<List<KeyMapEntity>>> =
-        dao.getAllFlow()
-            .map { State.Data(it) }
-            .stateIn(coroutineScope, SharingStarted.Eagerly, State.Loading)
+        dao.getAllFlow().map { State.Data(it) }
 
     override fun insert(keymap: KeyMapEntity) {
         coroutineScope.launch {

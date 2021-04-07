@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
+import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
+import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.constraint
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
@@ -13,12 +15,14 @@ import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import splitties.toast.toast
 
 /**
  * Created by sds100 on 29/11/20.
  */
-abstract class ConstraintListFragment
+abstract class ConfigConstraintsFragment
     : RecyclerViewFragment<ConstraintListItem, FragmentConstraintListBinding>() {
 
     companion object {
@@ -41,14 +45,16 @@ abstract class ConstraintListFragment
         binding.viewModel = configConstraintsViewModel
 
         binding.setOnAddConstraintClick {
-//            val direction = NavAppDirections.actionGlobalChooseConstraint(
-//                CHOOSE_CONSTRAINT_REQUEST_KEY,
-//                constraintListViewModel.supportedConstraintList.toTypedArray()
-//            )
-//            findNavController().navigate(direction) //TODO
+            val direction = NavAppDirections.actionGlobalChooseConstraint(
+                CHOOSE_CONSTRAINT_REQUEST_KEY,
+                Json.encodeToString(configConstraintsViewModel.allowedConstraints)
+            )
+
+            findNavController().navigate(direction)
         }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+        //must be on created so that the toast can be shown after a constraint is chosen
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.CREATED) {
             configConstraintsViewModel.showToast.collectLatest {
                 toast(it)
             }
@@ -60,15 +66,16 @@ abstract class ConstraintListFragment
         listItems: List<ConstraintListItem>
     ) {
         recyclerView.withModels {
-            listItems.forEach { model ->
+            listItems.forEach { listItem ->
                 constraint {
-                    model(model)
+                    id(listItem.id)
+                    model(listItem)
                     onCardClick { _ ->
-                        configConstraintsViewModel.onListItemClick(model.id)
+                        configConstraintsViewModel.onListItemClick(listItem.id)
                     }
 
                     onRemoveClick { _ ->
-                        configConstraintsViewModel.onRemoveConstraintClick(model.id)
+                        configConstraintsViewModel.onRemoveConstraintClick(listItem.id)
                     }
                 }
             }

@@ -175,15 +175,13 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="TransparentChipButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.Chip
-        </item>
+    <style name="TransparentChipButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="textAllCaps">false</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
         <item name="android:checkable">false</item>
         <item name="android:clickable">false</item>
         <item name="android:focusable">false</item>
-        <item name="backgroundColor">?attr/colorSurface</item>
+        <item name="android:minWidth">0dp</item>
         <item name="android:enabled">false</item>
         <item name="iconSize">@dimen/button_chip_icon_size</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -199,6 +197,7 @@
         <item name="android:checkable">false</item>
         <item name="android:clickable">false</item>
         <item name="android:focusable">false</item>
+        <item name="android:enabled">false</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
         <item name="iconSize">@dimen/button_chip_icon_size</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -208,6 +207,7 @@
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.Chip
         </item>
         <item name="textAllCaps">false</item>
+        <item name="iconTint">?attr/colorError</item>
         <item name="icon">@drawable/ic_baseline_error_outline_24</item>
         <item name="backgroundTint">@color/cardTintRed</item>
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>

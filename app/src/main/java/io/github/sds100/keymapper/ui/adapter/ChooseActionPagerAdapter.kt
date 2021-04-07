@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.TabFragmentModel
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
-import io.github.sds100.keymapper.ui.shortcuts.AppShortcutListFragment
+import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutFragment
 
 /**
  * Created by sds100 on 26/01/2020.
@@ -23,9 +23,9 @@ class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
             }
         },
         TabFragmentModel(R.string.action_type_title_application_shortcut,
-            AppShortcutListFragment.SEARCH_STATE_KEY) {
+            ChooseAppShortcutFragment.SEARCH_STATE_KEY) {
 
-            AppShortcutListFragment().apply {
+            ChooseAppShortcutFragment().apply {
                 isAppBarVisible = false
             }
         },

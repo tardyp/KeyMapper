@@ -20,6 +20,7 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.

@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
-import io.github.sds100.keymapper.ui.onDialogResponse
+import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -28,7 +28,7 @@ import splitties.toast.toast
  * Created by sds100 on 29/03/2020.
  */
 
-class AppShortcutListFragment : SimpleRecyclerViewFragment<AppShortcutListItem>() {
+class ChooseAppShortcutFragment : SimpleRecyclerViewFragment<AppShortcutListItem>() {
 
     companion object {
         const val REQUEST_KEY = "request_app_shortcut"
@@ -60,20 +60,13 @@ class AppShortcutListFragment : SimpleRecyclerViewFragment<AppShortcutListItem>(
     override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         super.subscribeUi(binding)
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.CREATED) {
             viewModel.returnResult.collectLatest {
                 returnResult(EXTRA_RESULT to Json.encodeToString(it))
             }
         }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.showDialog.collectLatest {
-                viewModel.onDialogResponse(
-                    it.key,
-                    it.ui.show(this@AppShortcutListFragment)
-                )
-            }
-        }
+        viewModel.showUserResponseRequests(this, binding)
     }
 
     override fun populateList(

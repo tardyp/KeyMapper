@@ -43,7 +43,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
             }
         }
 
-        setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
+        setFragmentResultListener(ConfigConstraintsFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
                 viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
@@ -68,7 +68,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
                     it to FingerprintMapOptionsFragment.Info()
 
                 int(R.integer.fragment_id_constraint_list) ->
-                    it to FingerprintConstraintListFragment.Info()
+                    it to FingerprintConfigConstraintsFragment.Info()
 
                 int(R.integer.fragment_id_constraints_and_options) ->
                     it to FragmentInfo(R.string.tab_constraints_and_more) {
@@ -81,6 +81,6 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
 
     class ConstraintsAndOptionsFragment : TwoFragments(
         FingerprintMapOptionsFragment.Info(),
-        FingerprintConstraintListFragment.Info()
+        FingerprintConfigConstraintsFragment.Info()
     )
 }

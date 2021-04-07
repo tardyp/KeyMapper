@@ -3,24 +3,30 @@ package io.github.sds100.keymapper.ui.fragment
 import android.os.Bundle
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import io.github.sds100.keymapper.data.model.ChooseConstraintListItemModel
-import io.github.sds100.keymapper.data.viewmodel.ChooseConstraintListViewModel
-import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.sectionHeader
+import com.airbnb.epoxy.EpoxyRecyclerView
+import io.github.sds100.keymapper.NavAppDirections
+import io.github.sds100.keymapper.data.model.ChooseConstraintListItem
+import io.github.sds100.keymapper.data.viewmodel.ChooseConstraintViewModel
+import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.simple
-import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.ModelState
-import splitties.alertdialog.appcompat.alertDialog
-import splitties.alertdialog.appcompat.messageResource
-import splitties.alertdialog.appcompat.okButton
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.showUserResponseRequests
+import io.github.sds100.keymapper.util.InjectorUtils
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * A placeholder fragment containing a simple view.
  */
 class ChooseConstraintFragment
-    : DefaultRecyclerViewFragment<Map<Int, List<ChooseConstraintListItemModel>>>() {
+    : SimpleRecyclerViewFragment<ChooseConstraintListItem>() {
 
     companion object {
         const val EXTRA_CONSTRAINT = "extra_constraint"
@@ -28,106 +34,79 @@ class ChooseConstraintFragment
 
     private val navArgs by navArgs<ChooseConstraintFragmentArgs>()
 
-    private val viewModel: ChooseConstraintListViewModel by viewModels {
-        val supportedConstraints = navArgs.StringNavArgSupportedConstraintList
-        InjectorUtils.provideChooseConstraintListViewModel(supportedConstraints.toList())
+    private val viewModel: ChooseConstraintViewModel by viewModels {
+        InjectorUtils.provideChooseConstraintListViewModel(requireContext())
     }
 
-    override val modelState: ModelState<Map<Int, List<ChooseConstraintListItemModel>>>
-        get() = viewModel
+    override val listItems: Flow<ListUiState<ChooseConstraintListItem>>
+        get() = viewModel.state
 
     @Suppress("SuspiciousVarProperty")
     override var requestKey: String? = null
-        get() = navArgs<ChooseConstraintFragmentArgs>().value.StringNavArgChooseConstraintRequestKey
+        get() = navArgs<ChooseConstraintFragmentArgs>().value.chooseConstraintRequestKey
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.setSupportedConstraints(Json.decodeFromString(navArgs.supportedConstraintList))
+
         setFragmentResultListener(AppListFragment.REQUEST_KEY) { _, result ->
             val packageName = result.getString(AppListFragment.EXTRA_PACKAGE_NAME)
 
-            viewModel.packageChosen(packageName!!)
+            viewModel.onChooseApp(packageName!!)
         }
 
         setFragmentResultListener(BluetoothDeviceListFragment.REQUEST_KEY) { _, result ->
             val address = result.getString(BluetoothDeviceListFragment.EXTRA_ADDRESS)
             val name = result.getString(BluetoothDeviceListFragment.EXTRA_NAME)
 
-            viewModel.bluetoothDeviceChosen(address!!, name!!)
+            viewModel.onChooseBluetoothDevice(address!!, name!!)
         }
     }
 
-    override fun subscribeUi(binding: FragmentRecyclerviewBinding) {
+    override fun subscribeUi(binding: FragmentSimpleRecyclerviewBinding) {
         super.subscribeUi(binding)
 
-        viewModel.eventStream.observe(viewLifecycleOwner, { event ->
-            when (event) {
-                is ChoosePackage -> {
-                    val direction = ChooseConstraintFragmentDirections
-                        .actionChooseConstraintListFragmentToAppListFragment()
-                    findNavController().navigate(direction)
-                }
-
-                is ChooseBluetoothDevice -> {
-                    val direction =
-                        ChooseConstraintFragmentDirections
-                            .actionChooseConstraintListFragmentToBluetoothDevicesFragment()
-
-                    findNavController().navigate(direction)
-                }
-
-                is OkDialog -> {
-                    requireContext().alertDialog {
-                        messageResource = event.message
-
-                        okButton {
-                            viewModel.onDialogResponse(event.responseKey, UserResponse.POSITIVE)
-                        }
-
-                        show()
-                    }
-                }
-
-                is SelectConstraint -> {
-                    returnResult(EXTRA_CONSTRAINT to event.constraint)
-                }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.CREATED) {
+            viewModel.returnResult.collectLatest {
+                returnResult(EXTRA_CONSTRAINT to Json.encodeToString(it))
             }
-        })
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.chooseApp.collectLatest {
+                findNavController().navigate(NavAppDirections.chooseApp())
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.chooseBluetoothDevice.collectLatest {
+                findNavController().navigate(NavAppDirections.chooseBluetoothDevice())
+            }
+        }
+
+        viewModel.showUserResponseRequests(this, binding)
     }
 
     override fun populateList(
-        binding: FragmentRecyclerviewBinding,
-        model: Map<Int, List<ChooseConstraintListItemModel>>?
+        recyclerView: EpoxyRecyclerView,
+        listItems: List<ChooseConstraintListItem>
     ) {
-        binding.epoxyRecyclerView.withModels {
-            for ((sectionHeader, constraints) in model ?: emptyMap()) {
+        recyclerView.withModels {
+            listItems.forEach { listItem ->
+                simple {
+                    id(listItem.id.toString())
+                    primaryText(listItem.title)
 
-                sectionHeader {
-                    id(sectionHeader)
-                    header(requireContext().str(sectionHeader))
-                }
-
-                constraints.forEach { constraint ->
-                    simple {
-                        id(constraint.id)
-                        primaryText(requireContext().str(constraint.description))
-                        isSecondaryTextAnError(true)
-
-                        //TODO
-                        val isSupported = false
-
-//                        if (isSupported == null) {
-//                            secondaryText(null)
-//                        } else {
-//                            secondaryText(isSupported.getFullMessage(requireContext()))
-//                        }
-
-                        onClick { _ ->
-                            viewModel.chooseConstraint(constraint.id)
-                        }
+                    onClick { _ ->
+                        viewModel.chooseConstraint(listItem.id)
                     }
                 }
             }
         }
+    }
+
+    override fun rebuildUiState() {
+        viewModel.rebuildUiState()
     }
 }

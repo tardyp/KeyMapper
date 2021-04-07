@@ -26,25 +26,6 @@ fun CoordinatorLayout.showEnableAccessibilityServiceSnackBar() {
     }
 }
 
-fun CoordinatorLayout.showFixErrorSnackBar(
-    ctx: Context,
-    error: Error,
-    fixErrorDelegate: FixErrorDelegate,
-    navController: NavController
-) {
-    longSnack(error.getFullMessage(context)) {
-
-        //only add an action to fix the error if the error can be recovered from
-        if (error is FixableError) {
-            action(R.string.snackbar_fix) {
-                fixErrorDelegate.recover(ctx, error, navController)
-            }
-        }
-
-        show()
-    }
-}
-
 fun ViewDataBinding.showSnackBar(snackBarUi: SnackBarUi) {
     if (snackBarUi.long) {
         root.longSnack(snackBarUi.title) {

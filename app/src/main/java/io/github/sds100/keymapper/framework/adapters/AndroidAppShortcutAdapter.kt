@@ -16,7 +16,10 @@ import io.github.sds100.keymapper.ui.activity.LaunchKeymapShortcutActivity
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.success
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import java.util.*
 
 /**
@@ -25,7 +28,22 @@ import java.util.*
 class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
     private val ctx = context.applicationContext
 
-    override val installedAppShortcuts = MutableStateFlow<State<List<AppShortcutInfo>>>(State.Loading)
+    override val installedAppShortcuts: Flow<State<List<AppShortcutInfo>>> = flow {
+        emit(State.Loading)
+
+        val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
+
+        val shortcuts = ctx.packageManager.queryIntentActivities(shortcutIntent, 0)
+            .map {
+                val activityInfo = it.activityInfo
+                AppShortcutInfo(
+                    packageName = activityInfo.packageName,
+                    activityName = activityInfo.name
+                )
+            }
+
+        emit(State.Data(shortcuts))
+    }
 
     override val areLauncherShortcutsSupported: Boolean
         get() = ShortcutManagerCompat.isRequestPinShortcutSupported(ctx)

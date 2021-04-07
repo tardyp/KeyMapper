@@ -6,18 +6,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.AppShortcutListItem
-import io.github.sds100.keymapper.domain.actions.OpenAppShortcutAction
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.packages.ChooseAppShortcutResult
 import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCase
-import io.github.sds100.keymapper.ui.DialogViewModel
-import io.github.sds100.keymapper.ui.DialogViewModelImpl
+import io.github.sds100.keymapper.ui.UserResponseViewModel
+import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.dialogs.DialogUi
-import io.github.sds100.keymapper.ui.showDialog
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.getUserResponse
 import io.github.sds100.keymapper.util.filterByQuery
 import io.github.sds100.keymapper.util.result.valueOrNull
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,14 +28,14 @@ import java.util.*
 class ChooseAppShortcutViewModel internal constructor(
     private val useCase: DisplayAppShortcutsUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), DialogViewModel by DialogViewModelImpl(), ResourceProvider by resourceProvider {
+) : ViewModel(), UserResponseViewModel by UserResponseViewModelImpl(), ResourceProvider by resourceProvider {
 
     val searchQuery = MutableStateFlow<String?>(null)
 
     private val _state = MutableStateFlow<ListUiState<AppShortcutListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
 
-    private val _returnResult = MutableSharedFlow<OpenAppShortcutAction>()
+    private val _returnResult = MutableSharedFlow<ChooseAppShortcutResult>()
     val returnResult = _returnResult.asSharedFlow()
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
@@ -100,12 +99,12 @@ class ChooseAppShortcutViewModel internal constructor(
 
             val intentShortcutName = intent.getStringExtra(Intent.EXTRA_SHORTCUT_NAME)
 
-            val shortcutTitle: String = if (intentShortcutName != null) {
+            val shortcutName: String = if (intentShortcutName != null) {
                 intentShortcutName
             } else {
-                val response = showDialog(
+                val response = getUserResponse(
                     "create_shortcut_name",
-                    DialogUi.Text(
+                    RequestUserResponse.Text(
                         hint = getString(R.string.hint_shortcut_name),
                         allowEmpty = false
                     )
@@ -115,9 +114,9 @@ class ChooseAppShortcutViewModel internal constructor(
             }
 
             _returnResult.emit(
-                OpenAppShortcutAction(
+                ChooseAppShortcutResult(
                     packageName = packageName,
-                    shortcutTitle = shortcutTitle,
+                    shortcutName = shortcutName,
                     uri = uri
                 )
             )

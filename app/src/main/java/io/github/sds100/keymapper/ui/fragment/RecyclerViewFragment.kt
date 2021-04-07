@@ -174,32 +174,31 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     }
 
     private fun setupSearchView(binding: BINDING) {
+        getBottomAppBar(binding) ?: return
 
-        if (isSearchEnabled) {
-            findNavController().observeCurrentDestinationLiveData<String>(
-                viewLifecycleOwner,
-                searchStateKey!!
-            ) {
-                onSearchQuery(it)
+        val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
+        searchViewMenuItem.isVisible = isSearchEnabled
+
+        val searchView = searchViewMenuItem.actionView as SearchView
+
+        searchStateKey ?: return
+
+        findNavController().observeCurrentDestinationLiveData<String>(
+            viewLifecycleOwner,
+            searchStateKey!!
+        ) {
+            onSearchQuery(it)
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                onSearchQuery(newText)
+
+                return true
             }
 
-            getBottomAppBar(binding) ?: return
-
-            val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
-            searchViewMenuItem.isVisible = isSearchEnabled
-
-            val searchView = searchViewMenuItem.actionView as SearchView
-
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    onSearchQuery(newText)
-
-                    return true
-                }
-
-                override fun onQueryTextSubmit(query: String?) = onQueryTextChange(query)
-            })
-        }
+            override fun onQueryTextSubmit(query: String?) = onQueryTextChange(query)
+        })
     }
 
     open fun onSearchQuery(query: String?) {}

@@ -3,8 +3,6 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.setFragmentResultListener
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
@@ -13,10 +11,9 @@ import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.ui.onDialogResponse
+import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.
@@ -44,7 +41,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
             }
         }
 
-        setFragmentResultListener(ConstraintListFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
+        setFragmentResultListener(ConfigConstraintsFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
                 viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
@@ -67,30 +64,16 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.triggerViewModel.showDialog.collectLatest {
-                viewModel.triggerViewModel.onDialogResponse(
-                    it.key,
-                    it.ui.show(this@ConfigKeymapFragment, binding.coordinatorLayout)
-                )
-            }
-        }
+        viewModel.triggerViewModel.showUserResponseRequests(this, binding)
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.triggerViewModel.optionsViewModel.showDialog.collectLatest {
-                viewModel.triggerViewModel.optionsViewModel.onDialogResponse(
-                    it.key,
-                    it.ui.show(this@ConfigKeymapFragment, binding.coordinatorLayout)
-                )
-            }
-        }
+        viewModel.triggerViewModel.optionsViewModel.showUserResponseRequests(this, binding)
     }
 
     override fun getFragmentInfoList() = intArray(R.array.config_keymap_fragments).map {
         when (it) {
             int(R.integer.fragment_id_trigger) -> it to TriggerFragment.Info()
             int(R.integer.fragment_id_trigger_options) -> it to TriggerOptionsFragment.Info()
-            int(R.integer.fragment_id_constraint_list) -> it to KeymapConstraintListFragment.Info()
+            int(R.integer.fragment_id_constraint_list) -> it to KeymapConfigConstraintsFragment.Info()
             int(R.integer.fragment_id_action_list) -> it to KeymapActionListFragment.Info()
 
             int(R.integer.fragment_id_constraints_and_options) ->
@@ -115,13 +98,13 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
     class ConstraintsAndOptionsFragment : TwoFragments(
         TriggerOptionsFragment.Info(),
-        KeymapConstraintListFragment.Info()
+        KeymapConfigConstraintsFragment.Info()
     )
 
     class AllFragments : FourFragments(
         TriggerFragment.Info(),
         TriggerOptionsFragment.Info(),
         KeymapActionListFragment.Info(),
-        KeymapConstraintListFragment.Info()
+        KeymapConfigConstraintsFragment.Info()
     )
 }

@@ -3,34 +3,20 @@ package io.github.sds100.keymapper.ui.fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
-import androidx.lifecycle.lifecycleScope
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.OptionType
-import io.github.sds100.keymapper.data.model.SystemActionDef
 import io.github.sds100.keymapper.data.model.SystemActionListItem
-import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.data.viewmodel.SystemActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.sectionHeader
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.getFullMessage
-import io.github.sds100.keymapper.util.result.handle
-import io.github.sds100.keymapper.util.result.onSuccess
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import splitties.alertdialog.appcompat.*
-import splitties.alertdialog.appcompat.coroutines.showAndAwaitOkOrDismiss
-import splitties.experimental.ExperimentalSplittiesApi
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Created by sds100 on 31/03/2020.
@@ -66,14 +52,7 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
             }
         }
 
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.showDialog.collectLatest {
-                viewModel.onDialogResponse(
-                    it.key,
-                    it.ui.show(this@SystemActionListFragment)
-                )
-            }
-        }
+        viewModel.showUserResponseRequests(this, binding)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             viewModel.returnResult.collectLatest {

@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.AppShortcutAdapter
 import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 class DisplayAppShortcutsUseCaseImpl(
     private val appShortcutAdapter: AppShortcutAdapter,
 ) : DisplayAppShortcutsUseCase {
-    override val shortcuts: StateFlow<State<List<AppShortcutInfo>>> = appShortcutAdapter.installedAppShortcuts
+    override val shortcuts: Flow<State<List<AppShortcutInfo>>> = appShortcutAdapter.installedAppShortcuts
 
     override fun getShortcutName(appShortcutInfo: AppShortcutInfo): Result<String> {
         return appShortcutAdapter.getShortcutName(appShortcutInfo)
@@ -26,7 +27,7 @@ class DisplayAppShortcutsUseCaseImpl(
 }
 
 interface DisplayAppShortcutsUseCase {
-    val shortcuts: StateFlow<State<List<AppShortcutInfo>>>
+    val shortcuts: Flow<State<List<AppShortcutInfo>>>
 
     fun getShortcutName(appShortcutInfo: AppShortcutInfo): Result<String>
     fun getShortcutIcon(appShortcutInfo: AppShortcutInfo): Result<Drawable>

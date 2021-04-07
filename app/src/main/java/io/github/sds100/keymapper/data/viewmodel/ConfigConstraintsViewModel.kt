@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.constraints.ChooseConstraintType
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.constraints.*
 import io.github.sds100.keymapper.domain.utils.State
@@ -20,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 /**
  * Created by sds100 on 29/11/20.
@@ -29,6 +31,7 @@ class ConfigConstraintsViewModel(
     private val coroutineScope: CoroutineScope,
     private val display: DisplayConstraintUseCase,
     private val config: ConfigMappingUseCase<*, *>,
+     val allowedConstraints: Array<ChooseConstraintType>,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 

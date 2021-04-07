@@ -27,10 +27,6 @@ class SeedDatabaseWorker(
                         id = 0,
                         trigger = createRandomTrigger(),
                         actionList = createRandomActionList(),
-                        constraintList = listOf(
-                            ConstraintEntity.appConstraint(ConstraintEntity.APP_FOREGROUND, Constants.PACKAGE_NAME),
-                            ConstraintEntity.appConstraint(ConstraintEntity.APP_NOT_FOREGROUND, "io.github.sds100.keymapper.ci")
-                        ),
                         flags = 0
                     ))
                 }

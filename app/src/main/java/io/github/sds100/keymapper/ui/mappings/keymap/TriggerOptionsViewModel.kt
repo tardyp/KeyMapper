@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.DialogUi
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
 import io.github.sds100.keymapper.util.UserResponse
 import kotlinx.coroutines.*
@@ -26,7 +26,7 @@ class TriggerOptionsViewModel(
     private val config: ConfigKeyMapUseCase,
     private val createKeyMapShortcut: CreateKeyMapShortcutUseCase,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
+) : ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
 
     private companion object {
         const val ID_LONG_PRESS_DELAY = "long_press_delay"
@@ -102,7 +102,7 @@ class TriggerOptionsViewModel(
 
                 //TODO test this
                 val key = "create_launcher_shortcut"
-                val response = showDialog(key, DialogUi.Text(getString(R.string.hint_shortcut_name), allowEmpty = false))?: return@launch
+                val response = getUserResponse(key, RequestUserResponse.Text(getString(R.string.hint_shortcut_name), allowEmpty = false))?: return@launch
 
                 createKeyMapShortcut.createForMultipleActions(
                     keyMapUid = keyMapUid,

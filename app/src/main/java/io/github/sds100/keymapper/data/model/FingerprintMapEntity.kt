@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 /**
  * Created by sds100 on 08/11/20.
  */
-@Parcelize
+
 data class FingerprintMapEntity(
     @SerializedName(NAME_VERSION)
     val version: Int = CURRENT_VERSION,
@@ -31,7 +31,7 @@ data class FingerprintMapEntity(
 
     @SerializedName(NAME_ENABLED)
     val isEnabled: Boolean = true
-) : Parcelable {
+)  {
     companion object {
         const val ID_SWIPE_DOWN = "swipe_down"
         const val ID_SWIPE_UP = "swipe_up"

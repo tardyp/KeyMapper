@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.data.model
 
 import android.os.Parcelable
-import androidx.annotation.IntDef
-import androidx.annotation.StringDef
 import com.github.salomonbrys.kotson.byArray
 import com.github.salomonbrys.kotson.byString
 import com.github.salomonbrys.kotson.jsonDeserializer
@@ -16,42 +14,14 @@ import kotlinx.android.parcel.Parcelize
 /**
  * Created by sds100 on 17/03/2020.
  */
-@StringDef(value = [
-    ConstraintEntity.APP_FOREGROUND,
-    ConstraintEntity.APP_NOT_FOREGROUND,
-    ConstraintEntity.BT_DEVICE_CONNECTED,
-    ConstraintEntity.BT_DEVICE_DISCONNECTED,
-    ConstraintEntity.SCREEN_ON,
-    ConstraintEntity.SCREEN_OFF,
-    ConstraintEntity.ORIENTATION_PORTRAIT,
-    ConstraintEntity.ORIENTATION_LANDSCAPE,
-    ConstraintEntity.ORIENTATION_0,
-    ConstraintEntity.ORIENTATION_90,
-    ConstraintEntity.ORIENTATION_180,
-    ConstraintEntity.ORIENTATION_270
-])
-annotation class ConstraintType
 
-@IntDef(value = [
-    ConstraintEntity.MODE_AND,
-    ConstraintEntity.MODE_OR
-])
-annotation class ConstraintMode
+data class ConstraintEntity(
+    @SerializedName(NAME_TYPE)
+    val type: String,
 
-@IntDef(value = [
-    ConstraintEntity.CATEGORY_APP,
-    ConstraintEntity.CATEGORY_BLUETOOTH,
-    ConstraintEntity.CATEGORY_SCREEN]
-)
-annotation class ConstraintCategory
-
-@Parcelize
-data class ConstraintEntity(@ConstraintType
-                      @SerializedName(NAME_TYPE)
-                      val type: String,
-
-                            @SerializedName(NAME_EXTRAS)
-                      val extras: List<Extra>) : Parcelable {
+    @SerializedName(NAME_EXTRAS)
+    val extras: List<Extra>
+)  {
 
     constructor(type: String, vararg extra: Extra) : this(type, extra.toList())
 
@@ -126,14 +96,6 @@ data class ConstraintEntity(@ConstraintType
             CATEGORY_ORIENTATION to R.string.constraint_category_orientation
         )
 
-        fun appConstraint(@ConstraintType type: String, packageName: String): ConstraintEntity {
-            return ConstraintEntity(type, Extra(EXTRA_PACKAGE_NAME, packageName))
-        }
-
-        fun btConstraint(@ConstraintType type: String, address: String, name: String): ConstraintEntity {
-            return ConstraintEntity(type, Extra(EXTRA_BT_ADDRESS, address), Extra(EXTRA_BT_NAME, name))
-        }
-
         val DESERIALIZER = jsonDeserializer {
             val type by it.json.byString(NAME_TYPE)
 
@@ -143,22 +105,5 @@ data class ConstraintEntity(@ConstraintType
             ConstraintEntity(type, extraList)
         }
     }
-
-    fun getExtraData(extraId: String): Result<String> {
-        val extra = extras.find { it.id == extraId } ?: return Error.ExtraNotFound(extraId)
-
-        return Success(extra.data)
-    }
-
-    /**
-     * A unique identifier describing this constraint
-     */
-    val uniqueId: String
-        get() = buildString {
-            append(type)
-            extras.forEach {
-                append("${it.id}${it.data}")
-            }
-        }
 }
 

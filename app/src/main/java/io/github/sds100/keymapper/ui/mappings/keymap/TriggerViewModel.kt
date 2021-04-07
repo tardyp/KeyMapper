@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.DialogUi
+import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
@@ -41,7 +41,7 @@ class TriggerViewModel(
     private val createKeyMapShortcut: CreateKeyMapShortcutUseCase,
     private val displayKeyMap: DisplayKeyMapUseCase,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, DialogViewModel by DialogViewModelImpl() {
+) : ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
 
     private companion object {
         const val KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG = "enable_accessibility_service"
@@ -163,13 +163,12 @@ class TriggerViewModel(
 
                     if (recordResult is FixableError.AccessibilityServiceDisabled) {
 
-                        val snackBar = DialogUi.SnackBar(
+                        val snackBar = RequestUserResponse.SnackBar(
                             title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
                             actionText = getString(R.string.pos_turn_on)
                         )
 
-                        val response = showDialog(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
-
+                        val response = getUserResponse(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
                         if (response != null) {
                             _fixError.emit(recordResult)
                         }

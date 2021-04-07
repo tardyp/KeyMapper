@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import io.github.sds100.keymapper.constraints.ConstraintUtils
 import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
@@ -77,6 +78,7 @@ class ConfigKeyMapViewModel(
         viewModelScope,
         displayMapping,
         config,
+        ConstraintUtils.KEY_MAP_ALLOWED_CONSTRAINTS,
         resourceProvider
     )
 
@@ -105,9 +107,7 @@ class ConfigKeyMapViewModel(
     }
 
     override fun save() = config.getMapping().ifIsData {
-        viewModelScope.launch {
-            save(it)
-        }
+        save(it)
     }
 
     override fun saveState(outState: Bundle) {

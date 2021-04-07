@@ -9,7 +9,6 @@ import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.*
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.home.HomeScreenUseCaseImpl
@@ -46,10 +45,8 @@ object InjectorUtils {
         return BackupRestoreViewModel.Factory(ServiceLocator.backupManager(context))
     }
 
-    fun provideChooseConstraintListViewModel(
-        supportedConstraints: List<String>
-    ): ChooseConstraintListViewModel.Factory {
-        return ChooseConstraintListViewModel.Factory(supportedConstraints)
+    fun provideChooseConstraintListViewModel(ctx: Context): ChooseConstraintViewModel.Factory {
+        return ChooseConstraintViewModel.Factory(ServiceLocator.resourceProvider(ctx))
     }
 
     fun provideKeyActionTypeViewModel(): KeyActionTypeViewModel.Factory {
