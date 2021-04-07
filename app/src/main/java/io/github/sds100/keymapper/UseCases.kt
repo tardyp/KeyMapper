@@ -62,7 +62,7 @@ object UseCases {
     fun getInputDevices(ctx: Context) = GetInputDevicesUseCaseImpl(
         ServiceLocator.deviceInfoRepository(ctx),
         ServiceLocator.preferenceRepository(ctx),
-        ServiceLocator.externalDeviceAdapter(ctx)
+        ServiceLocator.externalDevicesAdapter(ctx)
     )
 
     fun createKeymapShortcut(ctx: Context) = CreateKeyMapShortcutUseCaseImpl(

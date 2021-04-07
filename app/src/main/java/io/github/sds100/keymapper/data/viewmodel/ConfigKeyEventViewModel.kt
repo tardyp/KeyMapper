@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.devices.DeviceInfo
+import io.github.sds100.keymapper.domain.devices.InputDeviceInfo
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.CheckBoxListItem
@@ -30,7 +30,7 @@ class ConfigKeyEventViewModel(
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
     private val keyCode = MutableStateFlow<Result<Int>>(Error.CantBeEmpty)
-    private val chosenDevice = MutableStateFlow<DeviceInfo?>(null)
+    private val chosenDevice = MutableStateFlow<InputDeviceInfo?>(null)
     private val useShell = MutableStateFlow(false)
     private val metaState = MutableStateFlow(0)
 
@@ -127,8 +127,8 @@ class ConfigKeyEventViewModel(
         keyCode: Result<Int>,
         useShell: Boolean,
         metaState: Int,
-        chosenDevice: DeviceInfo?,
-        inputDeviceList: List<DeviceInfo>
+        chosenDevice: InputDeviceInfo?,
+        inputDeviceList: List<InputDeviceInfo>
     ): ConfigKeyEventUiState {
         val keyCodeString = when (keyCode) {
             is Success -> keyCode.value.toString()
@@ -191,6 +191,6 @@ data class ConfigKeyEventUiState(
     val isModifierListShown: Boolean,
     val modifierListItems: List<CheckBoxListItem>,
     val isDoneButtonEnabled: Boolean,
-    val deviceListItems: List<DeviceInfo>,
+    val deviceListItems: List<InputDeviceInfo>,
     val chosenDeviceName: String
 )

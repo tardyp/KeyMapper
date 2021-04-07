@@ -22,7 +22,6 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.observeCurrentDestinationLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 /**
  * Created by sds100 on 22/02/2020.
@@ -93,8 +92,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
 
             subscribeUi(binding)
 
-            setupSearchView(binding)
-
             getBottomAppBar(binding)?.let {
                 it.isVisible = isAppBarVisible
 
@@ -102,6 +99,8 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
                     onBackPressed()
                 }
             }
+
+            setupSearchView(binding)
 
             if (isAppBarVisible) {
                 //don't override back button if another fragment is controlling the app bar
@@ -177,6 +176,9 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         getBottomAppBar(binding) ?: return
 
         val searchViewMenuItem = getBottomAppBar(binding)!!.menu.findItem(R.id.action_search)
+
+        searchViewMenuItem ?: return
+
         searchViewMenuItem.isVisible = isSearchEnabled
 
         val searchView = searchViewMenuItem.actionView as SearchView

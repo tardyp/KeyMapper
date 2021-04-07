@@ -2,26 +2,18 @@ package io.github.sds100.keymapper.ui
 
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.addRepeatingJob
-import androidx.navigation.fragment.findNavController
-import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponseEvent
 import io.github.sds100.keymapper.ui.dialogs.UserResponse
 import io.github.sds100.keymapper.ui.dialogs.UserResponseEvent
-import io.github.sds100.keymapper.ui.fragment.AppListFragment
-import io.github.sds100.keymapper.ui.fragment.BluetoothDeviceListFragment
 import io.github.sds100.keymapper.ui.utils.SnackBarUtils
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Created by sds100 on 23/03/2021.

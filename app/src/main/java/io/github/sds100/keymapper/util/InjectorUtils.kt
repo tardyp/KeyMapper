@@ -6,6 +6,8 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCaseImpl
 import io.github.sds100.keymapper.data.viewmodel.*
+import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCase
+import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.mappings.keymap.*
@@ -142,7 +144,7 @@ object InjectorUtils {
     fun provideConfigKeyMapViewModel(
         ctx: Context
     ): ConfigKeyMapViewModel.Factory {
-        val configKeymapUseCase = ConfigKeyMapUseCaseImpl(UseCases.getInputDevices(ctx))
+        val configKeymapUseCase = ConfigKeyMapUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx))
 
         return ConfigKeyMapViewModel.Factory(
             SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
@@ -264,6 +266,13 @@ object InjectorUtils {
                 ServiceLocator.preferenceRepository(service)
             ),
             preferenceRepository = ServiceLocator.preferenceRepository(service)
+        )
+    }
+
+    fun provideChooseBluetoothDevicesViewModel(ctx: Context): ChooseBluetoothDeviceViewModel.Factory{
+        return ChooseBluetoothDeviceViewModel.Factory(
+            ChooseBluetoothDeviceUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx)),
+            ServiceLocator.resourceProvider(ctx)
         )
     }
 }

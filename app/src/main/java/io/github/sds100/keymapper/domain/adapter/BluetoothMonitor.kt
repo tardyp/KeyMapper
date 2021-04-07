@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.domain.adapter
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
 /**
@@ -9,10 +10,17 @@ interface BluetoothMonitor {
     /**
      * Value is the address of the device
      */
-    val onDeviceConnect: SharedFlow<String>
+    val onDeviceConnect: Flow<String>
 
     /**
      * Value is the address of the device
      */
-    val onDeviceDisconnect: SharedFlow<String>
+    val onDeviceDisconnect: Flow<String>
+
+    /**
+     * Value is the address of the device
+     */
+    val onDevicePairedChange: Flow<String>
+
+    val isBluetoothEnabled: Flow<Boolean>
 }

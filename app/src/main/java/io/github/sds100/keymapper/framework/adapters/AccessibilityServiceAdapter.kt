@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.framework.adapters
 
+import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.database.ContentObserver
 import android.net.Uri
@@ -20,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.

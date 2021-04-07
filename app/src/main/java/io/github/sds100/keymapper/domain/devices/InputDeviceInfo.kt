@@ -7,4 +7,4 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-data class DeviceInfo(val descriptor: String, val name: String)
+data class InputDeviceInfo(val descriptor: String, val name: String)

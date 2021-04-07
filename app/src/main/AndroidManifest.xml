@@ -95,7 +95,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".broadcastreceiver.BluetoothConnectionBroadcastReceiver">
+        <receiver android:name=".broadcastreceiver.BluetoothBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />

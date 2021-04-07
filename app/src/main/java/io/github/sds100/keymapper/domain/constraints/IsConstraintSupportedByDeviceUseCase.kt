@@ -17,7 +17,7 @@ class IsConstraintSupportedByDeviceUseCaseImpl(
         when (constraint) {
             is Constraint.BtDeviceConnected,
             is Constraint.BtDeviceDisconnected ->
-                if (systemFeatureAdapter.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+                if (!systemFeatureAdapter.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
                     return Error.SystemFeatureNotSupported(PackageManager.FEATURE_BLUETOOTH)
                 }
         }

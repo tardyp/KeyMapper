@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.onEach
 /**
  * Created by sds100 on 14/02/2021.
  */
+//TODO rename as delegate. doesnt need to be an interface
 class ControlKeyboardOnToggleKeymapsUseCaseImpl(
     inputMethodAdapter: InputMethodAdapter,
     private val preferenceRepository: PreferenceRepository

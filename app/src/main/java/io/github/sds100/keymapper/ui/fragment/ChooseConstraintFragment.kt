@@ -56,9 +56,9 @@ class ChooseConstraintFragment
             viewModel.onChooseApp(packageName!!)
         }
 
-        setFragmentResultListener(BluetoothDeviceListFragment.REQUEST_KEY) { _, result ->
-            val address = result.getString(BluetoothDeviceListFragment.EXTRA_ADDRESS)
-            val name = result.getString(BluetoothDeviceListFragment.EXTRA_NAME)
+        setFragmentResultListener(ChooseBluetoothDeviceFragment.REQUEST_KEY) { _, result ->
+            val address = result.getString(ChooseBluetoothDeviceFragment.EXTRA_ADDRESS)
+            val name = result.getString(ChooseBluetoothDeviceFragment.EXTRA_NAME)
 
             viewModel.onChooseBluetoothDevice(address!!, name!!)
         }

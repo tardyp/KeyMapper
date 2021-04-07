@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.actions
 
-import io.github.sds100.keymapper.domain.devices.DeviceInfo
+import io.github.sds100.keymapper.domain.devices.InputDeviceInfo
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.util.IntentTarget
 import kotlinx.serialization.Serializable
@@ -28,7 +28,7 @@ data class KeyEventAction(
     val keyCode: Int,
     val metaState: Int = 0,
     val useShell: Boolean = false,
-    val device: DeviceInfo? = null
+    val device: InputDeviceInfo? = null
 ) : ActionData()
 
 @Serializable

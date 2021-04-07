@@ -121,6 +121,8 @@ class KeymapListViewModel internal constructor(
         }
     }
 
+    //TODO fix for constraints
+    //TODO create separate method for action and constraints
     fun onChipClick(keymapUid: String, chipModel: ChipUi) {
         if (chipModel is ChipUi.Error) {
             coroutineScope.launch {

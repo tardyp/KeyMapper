@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.KeyEventAction
-import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCase
+import io.github.sds100.keymapper.domain.adapter.ExternalDevicesAdapter
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKey
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
@@ -17,12 +17,12 @@ import io.github.sds100.keymapper.util.KeyEventUtils
  * Created by sds100 on 16/02/2021.
  */
 class ConfigKeyMapUseCaseImpl(
-        private val getInputDevices: GetInputDevicesUseCase
+    private val externalDevicesAdapter: ExternalDevicesAdapter
 ) : BaseConfigMappingUseCase<KeyMapAction, KeyMap>(), ConfigKeyMapUseCase {
 
     override fun addTriggerKey(
-            keyCode: Int,
-            device: TriggerKeyDevice
+        keyCode: Int,
+        device: TriggerKeyDevice
     ) = editTrigger { trigger ->
         val clickType = when (trigger.mode) {
             is TriggerMode.Parallel -> trigger.mode.clickType
@@ -37,7 +37,7 @@ class ConfigKeyMapUseCaseImpl(
                 //if the new key is not external, check whether a trigger key already exists for this device
                 val sameDevice = when {
                     keyToCompare.device is TriggerKeyDevice.External
-                            && device is TriggerKeyDevice.External ->
+                        && device is TriggerKeyDevice.External ->
                         keyToCompare.device.descriptor == device.descriptor
 
                     else -> true
@@ -53,9 +53,9 @@ class ConfigKeyMapUseCaseImpl(
         val newKeys = trigger.keys.toMutableList().apply {
 
             val triggerKey = TriggerKey(
-                    keyCode = keyCode,
-                    device = device,
-                    clickType = clickType
+                keyCode = keyCode,
+                device = device,
+                clickType = clickType
             )
 
             add(triggerKey)
@@ -89,9 +89,9 @@ class ConfigKeyMapUseCaseImpl(
 
     override fun moveTriggerKey(fromIndex: Int, toIndex: Int) = editTrigger { trigger ->
         trigger.copy(
-                keys = trigger.keys.toMutableList().apply {
-                    moveElement(fromIndex, toIndex)
-                }
+            keys = trigger.keys.toMutableList().apply {
+                moveElement(fromIndex, toIndex)
+            }
         )
     }
 
@@ -118,7 +118,7 @@ class ConfigKeyMapUseCaseImpl(
 
             //remove duplicates of keys that have the same keycode and device id
             newKeys =
-                    newKeys.distinctBy { Pair(it.keyCode, it.device) }.toMutableList()
+                newKeys.distinctBy { Pair(it.keyCode, it.device) }.toMutableList()
         }
 
         editTrigger { it.copy(keys = newKeys, mode = TriggerMode.Parallel(ClickType.SHORT_PRESS)) }
@@ -176,10 +176,10 @@ class ConfigKeyMapUseCaseImpl(
     override fun setVibrateEnabled(enabled: Boolean) = editTrigger { it.copy(vibrate = enabled) }
 
     override fun setVibrationDuration(duration: Defaultable<Int>) =
-            editTrigger { it.copy(vibrateDuration = duration.valueIfCustom()) }
+        editTrigger { it.copy(vibrateDuration = duration.valueIfCustom()) }
 
     override fun setLongPressDelay(delay: Defaultable<Int>) =
-            editTrigger { it.copy(longPressDelay = delay.valueIfCustom()) }
+        editTrigger { it.copy(longPressDelay = delay.valueIfCustom()) }
 
     override fun setDoublePressDelay(delay: Defaultable<Int>) {
         editTrigger { it.copy(doublePressDelay = delay.valueIfCustom()) }
@@ -206,8 +206,15 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     override fun getAvailableTriggerKeyDevices(): List<TriggerKeyDevice> {
-        val externalDevices = getInputDevices.devices.value.map {
-            TriggerKeyDevice.External(it.descriptor, it.name)
+        val externalDevices = sequence {
+            val inputDevices =
+                externalDevicesAdapter.inputDevices.value.dataOrNull() ?: return@sequence
+
+            inputDevices.forEach {
+                yield(
+                    TriggerKeyDevice.External(it.descriptor, it.name)
+                )
+            }
         }
 
         return sequence {
@@ -218,7 +225,7 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     override fun setActionRepeatEnabled(uid: String, enabled: Boolean) =
-            setActionOption(uid) { it.copy(repeat = enabled) }
+        setActionOption(uid) { it.copy(repeat = enabled) }
 
     override fun setEnabled(enabled: Boolean) {
         editKeymap { it.copy(isEnabled = enabled) }
@@ -238,9 +245,9 @@ class ConfigKeyMapUseCaseImpl(
         }
 
         return KeyMapAction(
-                data = data,
-                repeat = repeat,
-                holdDown = holdDown
+            data = data,
+            repeat = repeat,
+            holdDown = holdDown
         )
     }
 
@@ -253,8 +260,8 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     private fun setActionOption(
-            uid: String,
-            block: (action: KeyMapAction) -> KeyMapAction
+        uid: String,
+        block: (action: KeyMapAction) -> KeyMapAction
     ) {
         mapping.value.ifIsData { keyMap ->
             keyMap.actionList.map {

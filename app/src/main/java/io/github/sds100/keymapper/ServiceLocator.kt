@@ -11,7 +11,6 @@ import io.github.sds100.keymapper.data.db.IDataStoreManager
 import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repository.*
 import io.github.sds100.keymapper.domain.adapter.*
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
@@ -207,8 +206,8 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).inputMethodAdapter
     }
 
-    fun externalDeviceAdapter(context: Context): ExternalInputDeviceAdapter {
-        return (context.applicationContext as KeyMapperApp).externalDeviceAdapter
+    fun externalDevicesAdapter(context: Context): ExternalDevicesAdapter {
+        return (context.applicationContext as KeyMapperApp).externalDevicesAdapter
     }
 
     fun bluetoothMonitor(context: Context): BluetoothMonitor {
