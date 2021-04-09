@@ -98,8 +98,4 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
     override fun onSearchQuery(query: String?) {
         viewModel.searchQuery.value = query
     }
-
-    override fun rebuildUiState() {
-        viewModel.rebuildUiState()
-    }
 }

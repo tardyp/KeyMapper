@@ -20,13 +20,14 @@ import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 22/11/20.
  */
 
 //TODO rename as ConfigActionsViewModel
-class ActionListViewModel<A : Action, M: Mapping<A>>(
+class ActionListViewModel<A : Action, M : Mapping<A>>(
     private val coroutineScope: CoroutineScope,
     private val displayActionUseCase: DisplayActionUseCase,
     private val testAction: TestActionUseCase,
@@ -48,17 +49,12 @@ class ActionListViewModel<A : Action, M: Mapping<A>>(
     private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
+         val rebuildUiState = MutableSharedFlow<State<M>>()
+
         coroutineScope.launch {
-            combine(
-                rebuildUiState,
-                config.mapping,
-                displayActionUseCase.invalidateErrors
-            ) { _, mapping, _ ->
-                mapping
-            }.collectLatest { mapping ->
+            rebuildUiState.collectLatest { mapping ->
                 when (mapping) {
                     is State.Data -> withContext(Dispatchers.Default) {
                         _state.value = createListItems(mapping.data).createListState()
@@ -66,6 +62,18 @@ class ActionListViewModel<A : Action, M: Mapping<A>>(
 
                     is State.Loading -> _state.value = ListUiState.Loading
                 }
+            }
+        }
+
+        coroutineScope.launch {
+            config.mapping.collectLatest {
+                rebuildUiState.emit(it)
+            }
+        }
+
+        coroutineScope.launch {
+            displayActionUseCase.invalidateErrors.collectLatest {
+                rebuildUiState.emit(config.mapping.firstOrNull()?: return@collectLatest)
             }
         }
     }
@@ -86,20 +94,16 @@ class ActionListViewModel<A : Action, M: Mapping<A>>(
         }
     }
 
-    fun addAction(data: ActionData){
+    fun addAction(data: ActionData) {
         config.addAction(data)
     }
 
-    fun moveAction(fromIndex: Int, toIndex: Int){
+    fun moveAction(fromIndex: Int, toIndex: Int) {
         config.moveAction(fromIndex, toIndex)
     }
 
-    fun onRemoveClick(actionUid: String){
+    fun onRemoveClick(actionUid: String) {
         config.removeAction(actionUid)
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     private fun createListItems(mapping: M): List<ActionListItem> {
@@ -133,7 +137,12 @@ class ActionListViewModel<A : Action, M: Mapping<A>>(
                                 append(" $midDot ")
                             }
 
-                            append(getString(R.string.action_title_wait, action.delayBeforeNextAction!!))
+                            append(
+                                getString(
+                                    R.string.action_title_wait,
+                                    action.delayBeforeNextAction!!
+                                )
+                            )
                         }
                     }
                 }

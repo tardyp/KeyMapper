@@ -45,8 +45,6 @@ class KeyCodeListFragment : SimpleRecyclerViewFragment<KeyCodeListItem>() {
         }
     }
 
-    override fun rebuildUiState() = viewModel.rebuildUiState()
-
     override fun onSearchQuery(query: String?) {
         viewModel.searchQuery.value = query
     }

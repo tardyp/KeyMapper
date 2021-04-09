@@ -59,21 +59,30 @@ class ChooseConstraintViewModel(
     private val _chooseBluetoothDevice = MutableSharedFlow<Unit>()
     val chooseBluetoothDevice = _chooseBluetoothDevice.asSharedFlow()
 
-    private var supportedConstraints: Array<ChooseConstraintType>? = null
+    private var supportedConstraints = MutableStateFlow<Array<ChooseConstraintType>>(emptyArray())
     private var chosenConstraintType: ChooseConstraintType? = null
 
+    init {
+        viewModelScope.launch {
+            supportedConstraints.collectLatest {
+                _state.value = withContext(Dispatchers.Default) {
+                    buildListItems().createListState()
+                }
+            }
+        }
+    }
+
     fun setSupportedConstraints(supportedConstraints: Array<ChooseConstraintType>) {
-        this.supportedConstraints = supportedConstraints
-        rebuildUiState()
+        this.supportedConstraints.value = supportedConstraints
     }
 
     fun onChooseApp(packageName: String) {
-        chosenConstraintType?: return
+        chosenConstraintType ?: return
         viewModelScope.launch {
             val constraint = when (chosenConstraintType) {
                 ChooseConstraintType.APP_IN_FOREGROUND -> Constraint.AppInForeground(packageName)
-                ChooseConstraintType.APP_NOT_IN_FOREGROUND -> Constraint.AppInForeground(packageName)
-                ChooseConstraintType.APP_PLAYING_MEDIA -> Constraint.AppInForeground(packageName)
+                ChooseConstraintType.APP_NOT_IN_FOREGROUND -> Constraint.AppNotInForeground(packageName)
+                ChooseConstraintType.APP_PLAYING_MEDIA -> Constraint.AppPlayingMedia(packageName)
                 else -> throw Exception("Don't know how to create $chosenConstraintType constraint after choosing app")
             }
 
@@ -84,7 +93,7 @@ class ChooseConstraintViewModel(
     }
 
     fun onChooseBluetoothDevice(address: String, name: String) {
-        chosenConstraintType?: return
+        chosenConstraintType ?: return
 
         viewModelScope.launch {
             val constraint = when (chosenConstraintType) {
@@ -157,31 +166,23 @@ class ChooseConstraintViewModel(
                     _returnResult.emit(Constraint.OrientationLandscape)
 
                 ChooseConstraintType.ORIENTATION_0 ->
-                _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_0))
+                    _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_0))
 
                 ChooseConstraintType.ORIENTATION_90 ->
-                _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_90))
+                    _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_90))
 
                 ChooseConstraintType.ORIENTATION_180 ->
-                _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_180))
+                    _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_180))
 
                 ChooseConstraintType.ORIENTATION_270 ->
-                _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_270))
-            }
-        }
-    }
-
-    fun rebuildUiState() {
-        viewModelScope.launch {
-            _state.value = withContext(Dispatchers.Default) {
-                buildListItems().createListState()
+                    _returnResult.emit(Constraint.OrientationCustom(Orientation.ORIENTATION_270))
             }
         }
     }
 
     private fun buildListItems(): List<ChooseConstraintListItem> = sequence {
         ALL_CONSTRAINTS_ORDERED.forEach { type ->
-            if (supportedConstraints?.contains(type) == false) return@forEach
+            if (!supportedConstraints.value.contains(type)) return@forEach
 
             val listItem = when (type) {
                 ChooseConstraintType.APP_IN_FOREGROUND ->

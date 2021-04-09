@@ -14,6 +14,7 @@ import androidx.annotation.RequiresPermission
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.PermissionUtils.isPermissionGranted
 import io.github.sds100.keymapper.util.result.*
 import splitties.systemservices.inputMethodManager
@@ -46,13 +47,14 @@ object KeyboardUtils {
         KEY_MAPPER_GUI_IME_PACKAGE
     )
 
+    //TODO delete all this stuff in this file
     fun enableCompatibleInputMethods(ctx: Context) {
 
-        if (isPermissionGranted(ctx, Constants.PERMISSION_ROOT)) {
-            enableCompatibleInputMethodsRoot()
-        } else {
-            openImeSettings(ctx)
-        }
+//        if (isPermissionGranted(ctx, Permission.ROOT)) {
+//            enableCompatibleInputMethodsRoot()
+//        } else {
+//            openImeSettings(ctx)
+//        }
     }
 
     fun enableCompatibleInputMethodsRoot() {

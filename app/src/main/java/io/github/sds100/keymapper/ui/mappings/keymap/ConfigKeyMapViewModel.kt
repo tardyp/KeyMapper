@@ -26,7 +26,6 @@ import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 22/11/20.
@@ -92,18 +91,12 @@ class ConfigKeyMapViewModel(
         constraintListViewModel.fixError
     )
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
-            combine(rebuildUiState, config.mapping) { _, configState ->
-                buildUiState(configState)
-            }.collectLatest {
-                state.value = it
+            config.mapping.collectLatest {
+                state.value = buildUiState(it)
             }
         }
-
-        runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
     override fun save() = config.getMapping().ifIsData {
@@ -130,13 +123,6 @@ class ConfigKeyMapViewModel(
         viewModelScope.launch {
             config.setMapping(get(uid)!!)
         }
-    }
-
-    override fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
-        actionListViewModel.rebuildUiState()
-        constraintListViewModel.rebuildUiState()
-        triggerViewModel.rebuildUiState()
     }
 
     override fun addAction(actionData: ActionData) = config.addAction(actionData)

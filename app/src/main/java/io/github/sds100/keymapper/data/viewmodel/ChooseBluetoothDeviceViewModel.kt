@@ -12,7 +12,6 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.createListState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 07/04/2021.
@@ -32,23 +31,15 @@ class ChooseBluetoothDeviceViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, ListUiState.Loading)
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
-            combine(rebuildUiState, useCase.devices) { _, devices ->
-                devices
-            }.collectLatest { devicesState ->
+            useCase.devices.collectLatest { devicesState ->
                 _caption.value = when (devicesState) {
                     is State.Loading -> null
                     is State.Data -> getString(R.string.caption_no_paired_bt_devices)
                 }
             }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     class Factory(

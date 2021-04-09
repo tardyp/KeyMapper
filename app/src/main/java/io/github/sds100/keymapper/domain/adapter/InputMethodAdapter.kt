@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.domain.adapter
 
 import io.github.sds100.keymapper.domain.ime.ImeInfo
 import io.github.sds100.keymapper.util.result.Result
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -10,19 +10,18 @@ import kotlinx.coroutines.flow.StateFlow
 interface InputMethodAdapter {
     fun showImePicker(fromForeground: Boolean)
 
-    fun isImeEnabled(imeId: String): Boolean
+    fun isImeEnabledById(imeId: String): Boolean
+    fun isImeEnabledByPackageName(packageName: String): Boolean
     fun enableIme(imeId: String)
 
-    fun getImeId(packageName: String): Result<String>
-
-    fun isImeChosen(imeId: String): Boolean
+    fun isImeChosenById(imeId: String): Boolean
+    fun isImeChosenByPackageName(packageName: String): Boolean
     fun chooseIme(imeId: String)
 
     fun getLabel(imeId: String): Result<String>
 
     fun getImeHistory(): List<String>
 
-    fun getEnabledInputMethods(): List<ImeInfo>
-
-    val chosenIme: StateFlow<ImeInfo?>
+    val enabledInputMethods: Flow<List<ImeInfo>>
+    val chosenIme: Flow<ImeInfo>
 }

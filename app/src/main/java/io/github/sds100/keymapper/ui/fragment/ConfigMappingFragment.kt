@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.databinding.FragmentConfigMappingBinding
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
@@ -65,11 +66,9 @@ abstract class ConfigMappingFragment : Fragment() {
         fixErrorDelegate = FixErrorDelegate(
             "ConfigMappingFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner
-        ) {
-            viewModel.rebuildUiState()
-        }
-
+            viewLifecycleOwner,
+            ServiceLocator.permissionAdapter(requireContext())
+        )
         FragmentConfigMappingBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@ConfigMappingFragment.viewModel

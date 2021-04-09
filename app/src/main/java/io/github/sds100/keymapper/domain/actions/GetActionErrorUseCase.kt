@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
 import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
@@ -71,9 +72,9 @@ class GetActionErrorUseCaseImpl(
             is KeyEventAction ->
                 if (
                     action.useShell
-                    && !permissionAdapter.isGranted(Constants.PERMISSION_ROOT)
+                    && !permissionAdapter.isGranted(Permission.ROOT)
                 ) {
-                    FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                    FixableError.PermissionDenied(Permission.ROOT)
                 }
 
             is TapCoordinateAction ->
@@ -82,8 +83,8 @@ class GetActionErrorUseCaseImpl(
                 }
 
             is PhoneCallAction ->
-                if (!permissionAdapter.isGranted(Manifest.permission.CALL_PHONE)) {
-                    return FixableError.PermissionDenied(Manifest.permission.CALL_PHONE)
+                if (!permissionAdapter.isGranted(Permission.CALL_PHONE)) {
+                    return FixableError.PermissionDenied(Permission.CALL_PHONE)
                 }
 
             is SystemAction -> return action.getError()
@@ -117,7 +118,7 @@ class GetActionErrorUseCaseImpl(
                 }
 
             this is SwitchKeyboardSystemAction ->
-                if (!inputMethodAdapter.isImeEnabled(this.imeId)) {
+                if (!inputMethodAdapter.isImeEnabledById(this.imeId)) {
                     return Error.ImeNotFound(this.savedImeName)
                 }
         }

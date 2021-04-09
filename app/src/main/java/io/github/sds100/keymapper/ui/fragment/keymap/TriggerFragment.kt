@@ -152,10 +152,6 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     override fun getEmptyListPlaceHolder(binding: FragmentTriggerBinding) =
         binding.emptyListPlaceHolder
 
-    override fun rebuildUiState() {
-        triggerViewModel.rebuildUiState()
-    }
-
     override fun onPause() {
         super.onPause()
 

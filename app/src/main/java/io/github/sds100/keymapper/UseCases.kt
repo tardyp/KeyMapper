@@ -3,15 +3,8 @@ package io.github.sds100.keymapper
 import android.content.Context
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
-import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
-import io.github.sds100.keymapper.domain.constraints.GetConstraintErrorUseCaseImpl
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
-import io.github.sds100.keymapper.domain.permissions.IsBatteryOptimisedUseCaseImpl
-import io.github.sds100.keymapper.domain.permissions.IsDoNotDisturbAccessGrantedImpl
-import io.github.sds100.keymapper.domain.settings.GetSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCaseImpl
@@ -20,7 +13,6 @@ import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppsUseCase
 import io.github.sds100.keymapper.packages.DisplayAppsUseCaseImpl
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCaseImpl
-import io.github.sds100.keymapper.ui.shortcuts.IsRequestShortcutSupportedImpl
 
 /**
  * Created by sds100 on 03/03/2021.

@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.flow.first
 
 /**
  * Created by sds100 on 03/04/2021.
@@ -50,8 +51,8 @@ class CreateSystemActionUseCaseImpl(
         return packageManagerAdapter.getAppName(packageName)
     }
 
-    override fun getInputMethods(): List<ImeInfo> {
-        return inputMethodAdapter.getEnabledInputMethods()
+    override suspend fun getInputMethods(): List<ImeInfo> {
+        return inputMethodAdapter.enabledInputMethods.first()
     }
 }
 
@@ -60,5 +61,5 @@ interface CreateSystemActionUseCase {
 
     fun getInstalledPackages(): List<PackageInfo>
     fun getAppName(packageName: String): Result<String>
-    fun getInputMethods(): List<ImeInfo>
+   suspend fun getInputMethods(): List<ImeInfo>
 }

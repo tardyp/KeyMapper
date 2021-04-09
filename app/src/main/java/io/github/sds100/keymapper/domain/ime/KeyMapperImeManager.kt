@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.domain.ime
 
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.util.result.onSuccess
 
 /**
  * Created by sds100 on 16/03/2021.
@@ -28,10 +27,8 @@ class KeyMapperImeManager(val adapter: InputMethodAdapter) {
 
     fun isCompatibleImeChosen(): Boolean {
         KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->
-            adapter.getImeId(packageName).onSuccess {
-                if (adapter.isImeChosen(it)) {
-                    return true
-                }
+            if (adapter.isImeChosenByPackageName(packageName)) {
+                return true
             }
         }
 
@@ -40,10 +37,8 @@ class KeyMapperImeManager(val adapter: InputMethodAdapter) {
 
     fun isCompatibleImeEnabled(): Boolean {
         KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->
-            adapter.getImeId(packageName).onSuccess {
-                if (adapter.isImeEnabled(it)) {
-                    return true
-                }
+            if (adapter.isImeEnabledByPackageName(packageName)) {
+                return true
             }
         }
 

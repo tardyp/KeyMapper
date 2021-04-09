@@ -59,11 +59,9 @@ class FingerprintMapListFragment :
         fixErrorDelegate = FixErrorDelegate(
             "FingerprintGestureFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner
-        ) {
-
-            viewModel.rebuildUiState()
-        }
+            viewLifecycleOwner,
+            ServiceLocator.permissionAdapter(requireContext())
+        )
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -108,7 +106,6 @@ class FingerprintMapListFragment :
         }
     }
 
-    override fun rebuildUiState() = viewModel.rebuildUiState()
     override fun getRecyclerView(binding: FragmentFingerprintMapListBinding) =
         binding.epoxyRecyclerView
 

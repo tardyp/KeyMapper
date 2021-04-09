@@ -5,6 +5,7 @@ import android.content.Context
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -59,6 +60,7 @@ sealed class Error : Result<Nothing>() {
     data class ImeNotFoundForPackage(val packageName: String) : Error()
 }
 
+//TODO move these to Error and create isFixable extension function for Error.
 sealed class FixableError : Error() {
     data class AppNotFound(val packageName: String) : FixableError()
     data class AppDisabled(val packageName: String) : FixableError()
@@ -67,44 +69,23 @@ sealed class FixableError : Error() {
     object AccessibilityServiceDisabled : FixableError()
     object IsBatteryOptimised : FixableError()
 
-    //TODO create a separate sub class for each permission
-    data class PermissionDenied(val permission: String) : FixableError() {
+    data class PermissionDenied(val permission: Permission) : FixableError() {
         companion object {
-            //TODO remove
-            fun getMessageForPermission(ctx: Context, permission: String): String {
-                val resId = when (permission) {
-                    Manifest.permission.WRITE_SETTINGS -> R.string.error_action_requires_write_settings_permission
-                    Manifest.permission.CAMERA -> R.string.error_action_requires_camera_permission
-                    Manifest.permission.BIND_DEVICE_ADMIN -> R.string.error_need_to_enable_device_admin
-                    Manifest.permission.READ_PHONE_STATE -> R.string.error_action_requires_read_phone_state_permission
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY -> R.string.error_action_notification_policy_permission
-                    Manifest.permission.WRITE_SECURE_SETTINGS -> R.string.error_need_write_secure_settings_permission
-                    Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> R.string.error_denied_notification_listener_service_permission
-                    Manifest.permission.CALL_PHONE -> R.string.error_denied_call_phone_permission
-                    Constants.PERMISSION_ROOT -> R.string.error_requires_root
-
-                    else -> throw Exception("Couldn't find permission description for $permission")
-                }
-
-                return ctx.str(resId)
-            }
 
             fun getMessageForPermission(
                 resourceProvider: ResourceProvider,
-                permission: String
+                permission: Permission
             ): String {
                 val resId = when (permission) {
-                    Manifest.permission.WRITE_SETTINGS -> R.string.error_action_requires_write_settings_permission
-                    Manifest.permission.CAMERA -> R.string.error_action_requires_camera_permission
-                    Manifest.permission.BIND_DEVICE_ADMIN -> R.string.error_need_to_enable_device_admin
-                    Manifest.permission.READ_PHONE_STATE -> R.string.error_action_requires_read_phone_state_permission
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY -> R.string.error_action_notification_policy_permission
-                    Manifest.permission.WRITE_SECURE_SETTINGS -> R.string.error_need_write_secure_settings_permission
-                    Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> R.string.error_denied_notification_listener_service_permission
-                    Manifest.permission.CALL_PHONE -> R.string.error_denied_call_phone_permission
-                    Constants.PERMISSION_ROOT -> R.string.error_requires_root
-
-                    else -> throw Exception("Couldn't find permission description for $permission")
+                    Permission.WRITE_SETTINGS -> R.string.error_action_requires_write_settings_permission
+                    Permission.CAMERA -> R.string.error_action_requires_camera_permission
+                    Permission.DEVICE_ADMIN -> R.string.error_need_to_enable_device_admin
+                    Permission.READ_PHONE_STATE -> R.string.error_action_requires_read_phone_state_permission
+                    Permission.ACCESS_NOTIFICATION_POLICY -> R.string.error_action_notification_policy_permission
+                    Permission.WRITE_SECURE_SETTINGS -> R.string.error_need_write_secure_settings_permission
+                    Permission.NOTIFICATION_LISTENER -> R.string.error_denied_notification_listener_service_permission
+                    Permission.CALL_PHONE -> R.string.error_denied_call_phone_permission
+                    Permission.ROOT -> R.string.error_requires_root
                 }
 
                 return resourceProvider.getString(resId)

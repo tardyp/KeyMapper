@@ -136,6 +136,7 @@ object PermissionUtils {
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
+    //TODO delete
     fun isPermissionGranted(ctx: Context, permission: String): Boolean {
         val hasRootPermission =
             ServiceLocator.preferenceRepository(ctx)
@@ -146,9 +147,6 @@ object PermissionUtils {
             permission == Manifest.permission.WRITE_SETTINGS &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
                 return Settings.System.canWrite(ctx)
-
-            permission == Constants.PERMISSION_ROOT ->
-                return hasRootPermission
 
             permission == Manifest.permission.BIND_DEVICE_ADMIN -> {
                 return devicePolicyManager?.isAdminActive(

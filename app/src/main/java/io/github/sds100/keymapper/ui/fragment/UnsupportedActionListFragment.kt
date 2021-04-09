@@ -39,8 +39,4 @@ class UnsupportedActionListFragment
             }
         }
     }
-
-    override fun rebuildUiState() {
-        viewModel.rebuildUiState()
-    }
 }

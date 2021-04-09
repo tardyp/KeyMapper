@@ -47,17 +47,13 @@ class TriggerOptionsViewModel(
     private val _state = MutableStateFlow(buildUiState(State.Loading))
     val state = _state.asStateFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     private var createLauncherShortcutJob: Job? = null
 
     init {
         coroutineScope.launch {
-            combine(rebuildUiState, config.mapping) { _, configState ->
-                configState
-            }.collectLatest {
+            config.mapping.collectLatest {mapping ->
                 _state.value = withContext(Dispatchers.Default) {
-                    buildUiState(it)
+                    buildUiState(mapping)
                 }
             }
         }
@@ -110,10 +106,6 @@ class TriggerOptionsViewModel(
                 )
             }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     private fun buildUiState(configState: State<KeyMap>): ListUiState<ListItem> {

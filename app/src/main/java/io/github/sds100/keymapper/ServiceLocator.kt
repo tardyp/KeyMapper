@@ -129,22 +129,6 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var systemActionRepository: SystemActionRepository? = null
-
-    fun systemActionRepository(context: Context): SystemActionRepository {
-        synchronized(this) {
-            return systemActionRepository ?: createSystemActionRepository(context)
-        }
-    }
-
-    private fun createSystemActionRepository(context: Context): SystemActionRepository {
-        return systemActionRepository
-            ?: DefaultSystemActionRepository(context.applicationContext).also {
-                this.systemActionRepository = it
-            }
-    }
-
-    @Volatile
     private var packageRepository: AndroidAppRepository? = null
 
     fun packageRepository(context: Context): AppRepository {
@@ -298,7 +282,6 @@ object ServiceLocator {
     fun release() {
         synchronized(this) {
             packageRepository = null
-            systemActionRepository = null
         }
     }
 }

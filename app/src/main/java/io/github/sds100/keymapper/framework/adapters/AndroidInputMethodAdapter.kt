@@ -4,16 +4,22 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.database.ContentObserver
+import android.net.Uri
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.ime.ImeInfo
+import io.github.sds100.keymapper.framework.JobSchedulerHelper
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.result.success
 import kotlinx.coroutines.flow.MutableStateFlow
+import timber.log.Timber
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -40,13 +46,31 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
 
     private val ctx = context.applicationContext
 
-    override val chosenIme = MutableStateFlow<ImeInfo?>(getChosenIme())
+    override val chosenIme = MutableStateFlow(getChosenIme())
+
+    override val enabledInputMethods = MutableStateFlow(getEnabledInputMethods())
 
     private val inputMethodManager: InputMethodManager
         get() = ctx.getSystemService()!!
 
 
     init {
+        //use job scheduler because there is there is a much shorter delay when the app is in the background
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            JobSchedulerHelper.observeEnabledInputMethods(ctx)
+        } else {
+            val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS)
+            val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean, uri: Uri?) {
+                    super.onChange(selfChange, uri)
+
+                    onEnabledInputMethodsUpdate()
+                }
+            }
+
+            ctx.contentResolver.registerContentObserver(uri, false, observer)
+        }
+
         IntentFilter().apply {
             addAction(Intent.ACTION_INPUT_METHOD_CHANGED)
 
@@ -58,43 +82,50 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
         TODO("Not yet implemented")
     }
 
-    override fun isImeEnabled(imeId: String): Boolean {
-        return inputMethodManager.enabledInputMethodList.any { it.id == imeId }
+    override fun isImeEnabledById(imeId: String): Boolean {
+        return enabledInputMethods.value.any { it.id == imeId }
+    }
+
+    override fun isImeEnabledByPackageName(packageName: String): Boolean {
+        return enabledInputMethods.value.any{it.packageName == packageName}
     }
 
     override fun enableIme(imeId: String) {
         //TODO
     }
 
-    override fun isImeChosen(imeId: String): Boolean {
-        return chosenIme.value?.id == imeId
+    override fun isImeChosenById(imeId: String): Boolean {
+        return chosenIme.value.id == imeId
+    }
+
+    override fun isImeChosenByPackageName(packageName: String): Boolean {
+        return chosenIme.value.packageName == packageName
     }
 
     override fun chooseIme(imeId: String) {
         TODO("Not yet implemented")
     }
 
-    override fun getEnabledInputMethods(): List<ImeInfo> {
-        return inputMethodManager.enabledInputMethodList.map {
-            ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString())
-        }
-    }
-
-    override fun getImeId(packageName: String): Result<String> {
-        return inputMethodManager.inputMethodList
-            .find { it.packageName == packageName }
-            ?.id?.success() ?: Error.ImeNotFoundForPackage(packageName)
-    }
-
     override fun getLabel(imeId: String): Result<String> {
-        val label = inputMethodManager.enabledInputMethodList.find { it.id == imeId }
-            ?.loadLabel(ctx.packageManager)?.toString() ?: return Error.InputMethodNotFound(imeId)
+        val label = enabledInputMethods.value.find { it.id == imeId }
+            ?.label ?: return Error.InputMethodNotFound(imeId)
 
         return Success(label)
     }
 
     override fun getImeHistory(): List<String> {
         TODO("Not yet implemented")
+    }
+
+    fun onEnabledInputMethodsUpdate() {
+        Timber.e("onupdate")
+        enabledInputMethods.value = getEnabledInputMethods()
+    }
+
+    private fun getEnabledInputMethods(): List<ImeInfo> {
+        return inputMethodManager.enabledInputMethodList.map {
+            ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString())
+        }
     }
 
     private fun getSubtypeHistoryString(ctx: Context): String {

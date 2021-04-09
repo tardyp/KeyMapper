@@ -18,8 +18,6 @@ interface ConfigMappingViewModel {
 
     fun addAction(actionData: ActionData)
 
-    fun rebuildUiState()
-
     fun save()
     fun saveState(outState: Bundle)
     fun restoreState(state: Bundle)

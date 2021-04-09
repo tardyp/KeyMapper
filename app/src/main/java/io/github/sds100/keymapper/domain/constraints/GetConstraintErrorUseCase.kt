@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 
@@ -28,8 +29,8 @@ class GetConstraintErrorUseCaseImpl(
             is Constraint.AppNotInForeground -> return getAppError(constraint.packageName)
 
             is Constraint.AppPlayingMedia -> {
-                if (!permissionAdapter.isGranted(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)) {
-                    return FixableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+                if (!permissionAdapter.isGranted(Permission.NOTIFICATION_LISTENER)) {
+                    return FixableError.PermissionDenied(Permission.NOTIFICATION_LISTENER)
                 }
 
                 return getAppError(constraint.packageName)
@@ -38,15 +39,15 @@ class GetConstraintErrorUseCaseImpl(
             is Constraint.OrientationCustom,
             Constraint.OrientationLandscape,
             Constraint.OrientationPortrait ->
-                if (!permissionAdapter.isGranted(Manifest.permission.WRITE_SETTINGS)) {
-                    return FixableError.PermissionDenied(Manifest.permission.WRITE_SETTINGS)
+                if (!permissionAdapter.isGranted(Permission.WRITE_SETTINGS)) {
+                    return FixableError.PermissionDenied(Permission.WRITE_SETTINGS)
                 }
 
 
             Constraint.ScreenOff,
             Constraint.ScreenOn -> {
-                if (!permissionAdapter.isGranted(Constants.PERMISSION_ROOT)) {
-                    return FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                if (!permissionAdapter.isGranted(Permission.ROOT)) {
+                    return FixableError.PermissionDenied(Permission.ROOT)
                 }
             }
         }

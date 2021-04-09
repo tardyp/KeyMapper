@@ -20,7 +20,6 @@ import io.github.sds100.keymapper.util.*
  */
 class ConfigKeymapFragment : ConfigMappingFragment() {
 
-
     private val args by navArgs<ConfigKeymapFragmentArgs>()
 
     override val viewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {

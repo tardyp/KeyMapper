@@ -1,18 +1,16 @@
 package io.github.sds100.keymapper.data.viewmodel
 
-import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
 import io.github.sds100.keymapper.mappings.common.BaseMappingListViewModel
-import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
-import io.github.sds100.keymapper.ui.mappings.keymap.KeymapListItemCreator
+import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -23,7 +21,7 @@ class KeymapListViewModel internal constructor(
     private val multiSelectProvider: MultiSelectProvider
 ) : BaseMappingListViewModel(coroutineScope, resourceProvider) {
 
-    private val listItemCreator = KeymapListItemCreator(useCase, resourceProvider)
+    private val listItemCreator = KeyMapListItemCreator(useCase, resourceProvider)
 
     private val _state = MutableStateFlow<ListUiState<KeyMapListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
@@ -31,27 +29,22 @@ class KeymapListViewModel internal constructor(
     /**
      * The database id of the key map
      */
-    private val _launchConfigKeymap = MutableSharedFlow<String>()
-    val launchConfigKeymap = _launchConfigKeymap.asSharedFlow()
-
-    private val rebuildUiState = MutableSharedFlow<Unit>()
+    private val _launchConfigKeyMap = MutableSharedFlow<String>()
+    val launchConfigKeymap = _launchConfigKeyMap.asSharedFlow()
 
     init {
-        val keymapStateListFlow =
+        val keyMapStateListFlow =
             MutableStateFlow<ListUiState<KeyMapListItem.KeyMapUiState>>(ListUiState.Loading)
 
+        val rebuildUiState = MutableSharedFlow<State<List<KeyMap>>>()
+
         coroutineScope.launch {
-            combine(
-                rebuildUiState,
-                useCase.keymapList,
-                useCase.invalidateErrors
-            ) { _, keymapListState, _ ->
-                keymapListState
-            }.collectLatest { keymapListState ->
-                //don't show progress bar because when swiping between tabs the recycler view will flash
-                keymapStateListFlow.value = withContext(Dispatchers.Default) {
-                    when (keymapListState) {
-                        is State.Data -> keymapListState.data.map { listItemCreator.map(it) }
+            rebuildUiState.collectLatest { keyMapListState ->
+                keyMapStateListFlow.value = ListUiState.Loading
+
+                keyMapStateListFlow.value = withContext(Dispatchers.Default) {
+                    when (keyMapListState) {
+                        is State.Data -> keyMapListState.data.map { listItemCreator.map(it) }
                             .createListState()
 
                         State.Loading -> ListUiState.Loading
@@ -61,8 +54,20 @@ class KeymapListViewModel internal constructor(
         }
 
         coroutineScope.launch {
+            useCase.keyMapList.collectLatest {
+                rebuildUiState.emit(it)
+            }
+        }
+
+        coroutineScope.launch {
+            useCase.invalidateErrors.drop(1).collectLatest {
+                rebuildUiState.emit(useCase.keyMapList.firstOrNull() ?: return@collectLatest)
+            }
+        }
+
+        coroutineScope.launch {
             combine(
-                keymapStateListFlow,
+                keyMapStateListFlow,
                 multiSelectProvider.state
             ) { keymapListState, selectionState ->
                 Pair(keymapListState, selectionState)
@@ -102,7 +107,7 @@ class KeymapListViewModel internal constructor(
             multiSelectProvider.toggleSelection(uid)
         } else {
             coroutineScope.launch {
-                _launchConfigKeymap.emit(uid)
+                _launchConfigKeyMap.emit(uid)
             }
         }
     }
@@ -123,9 +128,5 @@ class KeymapListViewModel internal constructor(
                 }
             }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 }

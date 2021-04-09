@@ -82,7 +82,6 @@ abstract class ConfigConstraintsFragment
         }
     }
 
-    override fun rebuildUiState() = configConstraintsViewModel.rebuildUiState()
     override fun getRecyclerView(binding: FragmentConstraintListBinding) = binding.epoxyRecyclerView
     override fun getProgressBar(binding: FragmentConstraintListBinding) = binding.progressBar
     override fun getEmptyListPlaceHolder(binding: FragmentConstraintListBinding) =

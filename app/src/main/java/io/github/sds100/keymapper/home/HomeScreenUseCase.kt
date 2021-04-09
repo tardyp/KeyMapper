@@ -36,7 +36,7 @@ class HomeScreenUseCaseImpl(
 ) : HomeScreenUseCase,
     DisplayKeyMapUseCase by displayKeyMapUseCase {
 
-    override val keymapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList
+    override val keyMapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList
         .map { state ->
             state.mapData { keymapList ->
                 keymapList.map {
@@ -111,7 +111,7 @@ class HomeScreenUseCaseImpl(
 }
 
 interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase {
-    val keymapList: Flow<State<List<KeyMap>>>
+    val keyMapList: Flow<State<List<KeyMap>>>
     fun deleteKeyMap(vararg uid: String)
     fun enableKeyMap(vararg uid: String)
     fun disableKeyMap(vararg uid: String)

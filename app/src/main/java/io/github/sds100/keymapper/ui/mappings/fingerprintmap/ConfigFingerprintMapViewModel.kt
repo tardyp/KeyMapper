@@ -115,12 +115,6 @@ class ConfigFingerprintMapViewModel(
         }
     }
 
-    override fun rebuildUiState() {
-        actionListViewModel.rebuildUiState()
-        constraintListViewModel.rebuildUiState()
-        //TODO rebuild options viewmodel
-    }
-
     override fun addAction(actionData: ActionData) = config.addAction(actionData)
 
     private fun buildUiState(configState: State<FingerprintMap>): ConfigFingerprintMapUiState {

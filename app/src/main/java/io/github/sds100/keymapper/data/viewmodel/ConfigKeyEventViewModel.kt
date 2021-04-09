@@ -29,6 +29,7 @@ class ConfigKeyEventViewModel(
     resourceProvider: ResourceProvider
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
+    //TODO merge into one State class
     private val keyCode = MutableStateFlow<Result<Int>>(Error.CantBeEmpty)
     private val chosenDevice = MutableStateFlow<InputDeviceInfo?>(null)
     private val useShell = MutableStateFlow(false)

@@ -105,8 +105,4 @@ class ChooseConstraintFragment
             }
         }
     }
-
-    override fun rebuildUiState() {
-        viewModel.rebuildUiState()
-    }
 }

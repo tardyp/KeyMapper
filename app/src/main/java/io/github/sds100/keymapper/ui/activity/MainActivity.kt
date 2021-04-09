@@ -1,13 +1,7 @@
 package io.github.sds100.keymapper.ui.activity
 
 import android.Manifest
-import android.app.Service
-import android.database.ContentObserver
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.SystemClock
-import android.provider.Settings
 import android.view.KeyEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +22,6 @@ import splitties.alertdialog.appcompat.okButton
 import splitties.alertdialog.appcompat.titleResource
 import splitties.snackbar.snack
 import splitties.toast.toast
-import timber.log.Timber
 
 /**
  * Created by sds100 on 19/02/2020.

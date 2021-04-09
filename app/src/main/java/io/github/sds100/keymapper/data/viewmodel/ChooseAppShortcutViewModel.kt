@@ -38,15 +38,12 @@ class ChooseAppShortcutViewModel internal constructor(
     private val _returnResult = MutableSharedFlow<ChooseAppShortcutResult>()
     val returnResult = _returnResult.asSharedFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
             combine(
                 searchQuery,
-                useCase.shortcuts,
-                rebuildUiState
-            ) { query, shortcuts, _ ->
+                useCase.shortcuts
+            ) { query, shortcuts ->
                 Pair(query, shortcuts)
             }.collectLatest { pair ->
                 val (query, shortcuts) = pair
@@ -121,10 +118,6 @@ class ChooseAppShortcutViewModel internal constructor(
                 )
             )
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     class Factory(

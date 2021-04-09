@@ -69,6 +69,4 @@ class AppListFragment : RecyclerViewFragment<AppListItem, FragmentAppListBinding
     override fun getProgressBar(binding: FragmentAppListBinding) = binding.progressBar
     override fun getEmptyListPlaceHolder(binding: FragmentAppListBinding) =
         binding.emptyListPlaceHolder
-
-    override fun rebuildUiState() = viewModel.rebuildUiState()
 }

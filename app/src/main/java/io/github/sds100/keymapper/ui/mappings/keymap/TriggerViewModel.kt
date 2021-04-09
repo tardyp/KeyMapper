@@ -1,11 +1,11 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
-import android.Manifest
 import android.os.Build
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
@@ -14,6 +14,7 @@ import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
@@ -26,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 /**
  * Created by sds100 on 24/11/20.
@@ -80,7 +80,6 @@ class TriggerViewModel(
     )
     val state = _state.asStateFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
 
     init {
         recordTrigger.onRecordKey.onEach {
@@ -95,10 +94,9 @@ class TriggerViewModel(
         //TODO dialogs
         coroutineScope.launch {
             combine(
-                rebuildUiState,
                 config.mapping,
                 recordTrigger.state
-            ) { _, configState, recordTriggerState ->
+            ) { configState, recordTriggerState ->
                 UiBuilder(configState.mapData { it.trigger }, recordTriggerState)
             }.collectLatest {
                 _state.value = it.build()
@@ -168,7 +166,8 @@ class TriggerViewModel(
                             actionText = getString(R.string.pos_turn_on)
                         )
 
-                        val response = getUserResponse(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
+                        val response =
+                            getUserResponse(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
                         if (response != null) {
                             _fixError.emit(recordResult)
                         }
@@ -180,16 +179,12 @@ class TriggerViewModel(
 
     fun stopRecordingTrigger() = recordTrigger.stopRecording()
 
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
-    }
-
     fun fixError(listItemId: String) {
         coroutineScope.launch {
             when (KeyMapTriggerError.valueOf(listItemId)) {
                 KeyMapTriggerError.DND_ACCESS_DENIED -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val error =
-                        FixableError.PermissionDenied(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
+                        FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
                     _fixError.emit(error)
                 }
             }

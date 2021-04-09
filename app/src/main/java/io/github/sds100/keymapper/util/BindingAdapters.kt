@@ -10,9 +10,11 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textview.MaterialTextView
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.ui.ChipUi
@@ -133,7 +135,7 @@ fun ChipGroup.setChipUiModels(
             }
 
             is ChipUi.Error -> {
-                MaterialButton(context, null, R.attr.errorChipButtonStyle).apply {
+                TextView(context, null, R.attr.errorChipButtonStyle).apply {
                     id = View.generateViewId()
 
                     text = model.text

@@ -93,7 +93,5 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
             }
         }
     }
-
-    override fun rebuildUiState() = viewModel.rebuildUiState()
 }
 

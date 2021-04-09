@@ -96,10 +96,9 @@ class HomeFragment : Fragment() {
         fixErrorDelegate = FixErrorDelegate(
             "HomeFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner
-        ) {
-            homeViewModel.rebuildUiState()
-        }
+            viewLifecycleOwner,
+            ServiceLocator.permissionAdapter(requireContext())
+        )
 
         FragmentHomeBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner

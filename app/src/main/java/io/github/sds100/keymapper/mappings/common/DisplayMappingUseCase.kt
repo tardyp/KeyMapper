@@ -1,9 +1,7 @@
 package io.github.sds100.keymapper.mappings.common
 
-import android.Manifest
 import android.graphics.drawable.Drawable
 import android.os.Build
-import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.adapter.CameraAdapter
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
@@ -14,12 +12,13 @@ import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDevi
 import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 03/04/2021.
@@ -39,9 +38,13 @@ class DisplaySimpleMappingUseCaseImpl(
     private val isConstraintSupportedByDevice =
         IsConstraintSupportedByDeviceUseCaseImpl(systemFeatureAdapter)
 
-    override val invalidateErrors: Flow<Unit> = combine(inputMethodAdapter.chosenIme) {}
+    override val invalidateErrors: Flow<Unit> =
+        merge(
+            inputMethodAdapter.chosenIme.drop(1).map { }, //dont collect the initial value
+            permissionAdapter.onPermissionsUpdate
+        )
 
-    override fun getAppName(packageName: String): Result<String> =
+        override fun getAppName(packageName: String): Result<String> =
         packageManager.getAppName(packageName)
 
     override fun getAppIcon(packageName: String): Result<Drawable> =
@@ -76,9 +79,9 @@ class DisplaySimpleMappingUseCaseImpl(
             is KeyEventAction ->
                 if (
                     actionData.useShell
-                    && !permissionAdapter.isGranted(Constants.PERMISSION_ROOT)
+                    && !permissionAdapter.isGranted(Permission.ROOT)
                 ) {
-                    FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                    FixableError.PermissionDenied(Permission.ROOT)
                 }
 
             is TapCoordinateAction ->
@@ -87,8 +90,8 @@ class DisplaySimpleMappingUseCaseImpl(
                 }
 
             is PhoneCallAction ->
-                if (!permissionAdapter.isGranted(Manifest.permission.CALL_PHONE)) {
-                    return FixableError.PermissionDenied(Manifest.permission.CALL_PHONE)
+                if (!permissionAdapter.isGranted(Permission.CALL_PHONE)) {
+                    return FixableError.PermissionDenied(Permission.CALL_PHONE)
                 }
 
             is SystemAction -> return actionData.getError()
@@ -122,7 +125,7 @@ class DisplaySimpleMappingUseCaseImpl(
                 }
 
             this is SwitchKeyboardSystemAction ->
-                if (!inputMethodAdapter.isImeEnabled(this.imeId)) {
+                if (!inputMethodAdapter.isImeEnabledById(this.imeId)) {
                     return Error.ImeNotFound(this.savedImeName)
                 }
         }
@@ -138,8 +141,8 @@ class DisplaySimpleMappingUseCaseImpl(
             is Constraint.AppNotInForeground -> return getAppError(constraint.packageName)
 
             is Constraint.AppPlayingMedia -> {
-                if (!permissionAdapter.isGranted(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)) {
-                    return FixableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+                if (!permissionAdapter.isGranted(Permission.NOTIFICATION_LISTENER)) {
+                    return FixableError.PermissionDenied(Permission.NOTIFICATION_LISTENER)
                 }
 
                 return getAppError(constraint.packageName)
@@ -148,15 +151,15 @@ class DisplaySimpleMappingUseCaseImpl(
             is Constraint.OrientationCustom,
             Constraint.OrientationLandscape,
             Constraint.OrientationPortrait ->
-                if (!permissionAdapter.isGranted(Manifest.permission.WRITE_SETTINGS)) {
-                    return FixableError.PermissionDenied(Manifest.permission.WRITE_SETTINGS)
+                if (!permissionAdapter.isGranted(Permission.WRITE_SETTINGS)) {
+                    return FixableError.PermissionDenied(Permission.WRITE_SETTINGS)
                 }
 
 
             Constraint.ScreenOff,
             Constraint.ScreenOn -> {
-                if (!permissionAdapter.isGranted(Constants.PERMISSION_ROOT)) {
-                    return FixableError.PermissionDenied(Constants.PERMISSION_ROOT)
+                if (!permissionAdapter.isGranted(Permission.ROOT)) {
+                    return FixableError.PermissionDenied(Permission.ROOT)
                 }
             }
         }

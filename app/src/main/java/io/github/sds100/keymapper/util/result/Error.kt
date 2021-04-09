@@ -12,10 +12,10 @@ import io.github.sds100.keymapper.util.str
 
 //TODO remove
 fun Error.getFullMessage(ctx: Context) = when (this) {
-    is FixableError.PermissionDenied -> FixableError.PermissionDenied.getMessageForPermission(
-        ctx,
-        permission
-    )
+//    is FixableError.PermissionDenied -> FixableError.PermissionDenied.getMessageForPermission(
+//        ctx,
+//        permission
+//    )
     is FixableError.AppNotFound -> ctx.str(R.string.error_app_isnt_installed, packageName)
     is FixableError.AppDisabled -> ctx.str(R.string.error_app_is_disabled)
     is FixableError.NoCompatibleImeEnabled -> ctx.str(R.string.error_ime_service_disabled)

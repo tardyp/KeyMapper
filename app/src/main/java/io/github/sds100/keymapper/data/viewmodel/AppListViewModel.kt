@@ -40,16 +40,13 @@ class AppListViewModel internal constructor(
     )
     val state = _state.asStateFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
             combine(
                 useCase.installedPackages,
                 showHiddenApps,
-                searchQuery,
-                rebuildUiState
-            ) { packageInfoList, showHiddenApps, query, _ ->
+                searchQuery
+            ) { packageInfoList, showHiddenApps, query ->
 
                 Triple(packageInfoList, query, showHiddenApps)
 
@@ -91,10 +88,6 @@ class AppListViewModel internal constructor(
 
     fun onHiddenAppsCheckedChange(checked: Boolean) {
         showHiddenApps.value = checked
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     private suspend fun List<PackageInfo>.buildListItems(): List<AppListItem> = flow {

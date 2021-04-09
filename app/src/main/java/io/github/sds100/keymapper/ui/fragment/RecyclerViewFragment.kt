@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.ui.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.observeCurrentDestinationLiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 /**
  * Created by sds100 on 22/02/2020.
@@ -165,7 +167,12 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        rebuildUiState()
+        /*
+        Don't rebuild UI state in onResume because then EVERY time the fragment is resumed the UI could be updated
+        twice. 1st when the state is collected and a 2nd time after the view model has updated it the state
+        from the call in onResume even if no configuration has changed. Doing this here
+        can cause jank if a list item is complicated.
+         */
     }
 
     override fun onDestroyView() {
@@ -213,7 +220,6 @@ abstract class RecyclerViewFragment<T, BINDING : ViewDataBinding> : Fragment() {
         findNavController().navigateUp()
     }
 
-    abstract fun rebuildUiState()
     abstract fun getRecyclerView(binding: BINDING): EpoxyRecyclerView
     abstract fun getProgressBar(binding: BINDING): View
     abstract fun getEmptyListPlaceHolder(binding: BINDING): View

@@ -75,7 +75,6 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
     override fun getEmptyListPlaceHolder(binding: FragmentActionListBinding) =
         binding.emptyListPlaceHolder
 
-    override fun rebuildUiState() = actionListViewModel.rebuildUiState()
 
     private fun FragmentActionListBinding.enableActionDragging(
         controller: EpoxyController

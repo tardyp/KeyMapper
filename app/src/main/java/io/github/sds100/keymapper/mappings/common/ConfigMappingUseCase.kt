@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.moveElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -21,6 +22,7 @@ abstract class BaseConfigMappingUseCase<ACTION : Action, T : Mapping<ACTION>> : 
 
     override fun setMapping(mapping: T) {
         this.mapping.value = State.Data(mapping)
+        Timber.e("set mapping")
     }
 
     override fun getMapping(): State<T> = mapping.value

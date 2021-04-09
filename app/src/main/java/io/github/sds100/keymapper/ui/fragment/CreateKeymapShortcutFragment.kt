@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
@@ -43,11 +44,9 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeyMapList
         fixErrorDelegate = FixErrorDelegate(
             "CreateKeymapShortcutFragment",
             requireActivity().activityResultRegistry,
-            viewLifecycleOwner
-        ) {
-
-            viewModel.rebuildModels()
-        }
+            viewLifecycleOwner,
+            ServiceLocator.permissionAdapter(requireContext())
+        )
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }

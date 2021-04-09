@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.util.KeyEventUtils
 /**
  * Created by sds100 on 19/03/2021.
  */
-class KeymapListItemCreator(
+class KeyMapListItemCreator(
     private val displayMapping: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
 ) : BaseMappingListItemCreator<KeyMap, KeyMapAction>(

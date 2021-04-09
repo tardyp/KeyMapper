@@ -3,6 +3,10 @@ package io.github.sds100.keymapper
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
@@ -59,6 +63,7 @@ class KeyMapperApp : MultiDexApplication(),
     val permissionAdapter by lazy {
         AndroidPermissionAdapter(
             this,
+            appCoroutineScope,
             ServiceLocator.preferenceRepository(this)
         )
     }
@@ -73,6 +78,8 @@ class KeyMapperApp : MultiDexApplication(),
 
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 
+    private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
+
     override fun onCreate() {
 
         applicationViewModel.theme.observeForever {
@@ -86,6 +93,14 @@ class KeyMapperApp : MultiDexApplication(),
         }
 
         initialiseManagers()
+
+        processLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+            fun onResume() {
+                //when the user returns to the app let everything know that the permissions could have changed
+                permissionAdapter.onPermissionsChanged()
+            }
+        })
     }
 
     override fun openOutputStream(uriString: String): Result<OutputStream> {

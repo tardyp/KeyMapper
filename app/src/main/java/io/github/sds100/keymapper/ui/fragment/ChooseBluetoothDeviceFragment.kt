@@ -63,8 +63,4 @@ class ChooseBluetoothDeviceFragment : SimpleRecyclerViewFragment<BluetoothDevice
            }
        }
     }
-
-    override fun rebuildUiState() {
-        viewModel.rebuildUiState()
-    }
 }

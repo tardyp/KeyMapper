@@ -12,60 +12,105 @@ import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.service.DeviceAdmin
 import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.firstBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import splitties.systemservices.devicePolicyManager
 import splitties.systemservices.notificationManager
-import splitties.systemservices.powerManager
+import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.
  */
 class AndroidPermissionAdapter(
     context: Context,
+    private val coroutineScope: CoroutineScope,
     private val preferenceRepository: PreferenceRepository
 ) : PermissionAdapter {
     private val ctx = context.applicationContext
 
-    override fun isGranted(permission: String): Boolean {
-        val hasRootPermission =
-            preferenceRepository.get(Keys.hasRootPermission).firstBlocking() ?: false
+    override val onPermissionsUpdate = MutableSharedFlow<Unit>()
 
-        when {
-            permission == Manifest.permission.WRITE_SETTINGS &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
-                return Settings.System.canWrite(ctx)
+    init {
+        coroutineScope.launch {
+            preferenceRepository.get(Keys.hasRootPermission)
+                .drop(1) //drop the first value when collecting initially
+                .collectLatest {
+                    onPermissionsUpdate.emit(Unit)
+                }
+        }
+    }
 
-            permission == Constants.PERMISSION_ROOT ->
-                return hasRootPermission
+    override fun isGranted(permission: Permission): Boolean {
 
-            permission == Manifest.permission.BIND_DEVICE_ADMIN -> {
-                return devicePolicyManager?.isAdminActive(
-                    ComponentName(
-                        ctx,
-                        DeviceAdmin::class.java
-                    )
-                ) == true
-            }
+        return when (permission) {
+            Permission.WRITE_SETTINGS ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Settings.System.canWrite(ctx)
+                } else {
+                    true
+                }
 
-            permission == Manifest.permission.ACCESS_NOTIFICATION_POLICY ->
-                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Permission.CAMERA ->
+                ContextCompat.checkSelfPermission(
+                    ctx,
+                    Manifest.permission.CAMERA
+                ) == PERMISSION_GRANTED
+
+            Permission.DEVICE_ADMIN -> devicePolicyManager?.isAdminActive(
+                ComponentName(
+                    ctx,
+                    DeviceAdmin::class.java
+                )
+            ) == true
+
+            Permission.READ_PHONE_STATE -> ContextCompat.checkSelfPermission(
+                ctx,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PERMISSION_GRANTED
+
+            Permission.ACCESS_NOTIFICATION_POLICY ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     notificationManager.isNotificationPolicyAccessGranted
                 } else {
                     true
                 }
 
-            permission == Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE -> {
-                return NotificationManagerCompat.getEnabledListenerPackages(ctx)
+            Permission.WRITE_SECURE_SETTINGS -> {
+                if (isGranted(Permission.ROOT)) {
+                    RootUtils.executeRootCommand("pm grant ${Constants.PACKAGE_NAME} ${Manifest.permission.WRITE_SECURE_SETTINGS}")
+                }
+
+                ContextCompat.checkSelfPermission(
+                    ctx,
+                    Manifest.permission.WRITE_SECURE_SETTINGS
+                ) == PERMISSION_GRANTED
+            }
+
+            Permission.NOTIFICATION_LISTENER ->
+                NotificationManagerCompat.getEnabledListenerPackages(ctx)
                     .contains(Constants.PACKAGE_NAME)
-            }
 
-            permission == Manifest.permission.WRITE_SECURE_SETTINGS && hasRootPermission -> {
-                RootUtils.executeRootCommand("pm grant ${Constants.PACKAGE_NAME} ${Manifest.permission.WRITE_SECURE_SETTINGS}")
-            }
+            Permission.CALL_PHONE ->
+                ContextCompat.checkSelfPermission(
+                    ctx,
+                    Manifest.permission.CALL_PHONE
+                ) == PERMISSION_GRANTED
+
+            Permission.ROOT ->
+                preferenceRepository.get(Keys.hasRootPermission).firstBlocking()
+                    ?: false
         }
+    }
 
-        return ContextCompat.checkSelfPermission(ctx, permission) == PERMISSION_GRANTED
+    fun onPermissionsChanged() {
+        runBlocking {
+            onPermissionsUpdate.emit(Unit)
+        }
     }
 }

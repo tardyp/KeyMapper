@@ -88,10 +88,6 @@ class ChooseAppShortcutFragment : SimpleRecyclerViewFragment<AppShortcutListItem
         }
     }
 
-    override fun rebuildUiState() {
-        viewModel.rebuildUiState()
-    }
-
     override fun onSearchQuery(query: String?) {
         viewModel.searchQuery.value = query
     }

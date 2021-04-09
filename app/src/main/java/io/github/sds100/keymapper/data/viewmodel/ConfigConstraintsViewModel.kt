@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
+import io.github.sds100.keymapper.mappings.common.Mapping
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
@@ -20,8 +21,6 @@ import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 /**
  * Created by sds100 on 29/11/20.
@@ -31,7 +30,7 @@ class ConfigConstraintsViewModel(
     private val coroutineScope: CoroutineScope,
     private val display: DisplayConstraintUseCase,
     private val config: ConfigMappingUseCase<*, *>,
-     val allowedConstraints: Array<ChooseConstraintType>,
+    val allowedConstraints: Array<ChooseConstraintType>,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider {
 
@@ -46,14 +45,24 @@ class ConfigConstraintsViewModel(
     private val _state = MutableStateFlow(buildState(State.Loading))
     val state = _state.asStateFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
+        val rebuildUiState = MutableSharedFlow<State<Mapping<*>>>()
+
         coroutineScope.launch {
-            combine(rebuildUiState, config.mapping, display.invalidateErrors) { _, mapping, _ ->
-                mapping
-            }.collectLatest { mapping ->
+            rebuildUiState.collectLatest { mapping ->
                 _state.value = buildState(mapping.mapData { it.constraintState })
+            }
+        }
+
+        coroutineScope.launch {
+            config.mapping.collectLatest {
+                rebuildUiState.emit(it)
+            }
+        }
+
+        coroutineScope.launch {
+            display.invalidateErrors.collectLatest {
+                rebuildUiState.emit(config.mapping.firstOrNull() ?: return@collectLatest)
             }
         }
     }
@@ -94,10 +103,6 @@ class ConfigConstraintsViewModel(
                 }
             }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     private fun createListItem(constraint: Constraint): ConstraintListItem {

@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.data.model.SystemActionListItem
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.utils.*
@@ -31,8 +32,6 @@ class SystemActionListViewModel(
 
     val searchQuery = MutableStateFlow<String?>(null)
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     private val _state = MutableStateFlow(SystemActionListState(ListUiState.Loading, false))
     val state = _state.asStateFlow()
 
@@ -41,12 +40,7 @@ class SystemActionListViewModel(
 
     init {
         viewModelScope.launch {
-            combine(
-                searchQuery,
-                rebuildUiState
-            ) { query, _ ->
-                query
-            }.collectLatest { query ->
+            searchQuery.collectLatest { query ->
                 _state.value = withContext(Dispatchers.Default) {
                     buildState(query)
                 }
@@ -209,10 +203,6 @@ class SystemActionListViewModel(
         }
     }
 
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
-    }
-
     private suspend fun showMessageForSystemAction(id: SystemActionId) {
         @StringRes val messageToShow: Int? = when (id) {
             SystemActionId.FAST_FORWARD_PACKAGE,
@@ -266,7 +256,7 @@ class SystemActionListViewModel(
                     }
 
                     val requiresRoot = SystemActionUtils.getRequiredPermissions(systemActionId)
-                        .contains(Constants.PERMISSION_ROOT)
+                        .contains(Permission.ROOT)
 
                     childrenListItems.add(
                         SystemActionListItem(

@@ -12,11 +12,15 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FixableError
-import splitties.alertdialog.appcompat.*
+import splitties.alertdialog.appcompat.cancelButton
+import splitties.alertdialog.appcompat.messageResource
+import splitties.alertdialog.appcompat.neutralButton
+import splitties.alertdialog.appcompat.positiveButton
 import splitties.alertdialog.material.materialAlertDialog
 import splitties.toast.longToast
 
@@ -28,7 +32,7 @@ class FixErrorDelegate(
     keyPrefix: String,
     resultRegistry: ActivityResultRegistry,
     lifecycleOwner: LifecycleOwner,
-    private val onSuccessfulRecover: () -> Unit
+    private val permissionAdapter: AndroidPermissionAdapter,
 ) {
 
     private val startActivityForResultLauncher =
@@ -37,9 +41,7 @@ class FixErrorDelegate(
             lifecycleOwner,
             ActivityResultContracts.StartActivityForResult()
         ) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                onSuccessfulRecover.invoke()
-            }
+            permissionAdapter.onPermissionsChanged()
         }
 
     private val requestPermissionLauncher =
@@ -48,62 +50,58 @@ class FixErrorDelegate(
             lifecycleOwner,
             ActivityResultContracts.RequestPermission()
         ) {
-            if (it) {
-                onSuccessfulRecover.invoke()
-            }
+            permissionAdapter.onPermissionsChanged()
         }
 
     fun recover(ctx: Context, failure: FixableError, navController: NavController) {
         when (failure) {
             is FixableError.PermissionDenied -> {
                 when (failure.permission) {
-                    Manifest.permission.WRITE_SETTINGS ->
+                    Permission.WRITE_SETTINGS ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             PermissionUtils.requestWriteSettings(ctx)
                         }
 
-                    Manifest.permission.CAMERA ->
+                    Permission.CAMERA ->
                         PermissionUtils.requestStandardPermission(
                             requestPermissionLauncher,
                             Manifest.permission.CAMERA
                         )
 
-                    Manifest.permission.BIND_DEVICE_ADMIN ->
+                    Permission.DEVICE_ADMIN ->
                         PermissionUtils.requestDeviceAdmin(ctx, startActivityForResultLauncher)
 
-                    Manifest.permission.READ_PHONE_STATE ->
+                    Permission.READ_PHONE_STATE ->
                         PermissionUtils.requestStandardPermission(
                             requestPermissionLauncher,
                             Manifest.permission.READ_PHONE_STATE
                         )
 
-                    Manifest.permission.ACCESS_NOTIFICATION_POLICY ->
+                    Permission.ACCESS_NOTIFICATION_POLICY ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             PermissionUtils.requestAccessNotificationPolicy(
                                 startActivityForResultLauncher
                             )
                         }
 
-                    Manifest.permission.WRITE_SECURE_SETTINGS ->
+                    Permission.WRITE_SECURE_SETTINGS ->
                         PermissionUtils.requestWriteSecureSettingsPermission(ctx, navController)
 
-                    Constants.PERMISSION_ROOT -> PermissionUtils.requestRootPermission(
+                    Permission.ROOT -> PermissionUtils.requestRootPermission(
                         ctx,
                         navController
                     )
 
-                    Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE ->
+                    Permission.NOTIFICATION_LISTENER ->
                         PermissionUtils.requestNotificationListenerAccess(
                             startActivityForResultLauncher
                         )
 
-                    Manifest.permission.CALL_PHONE ->
+                    Permission.CALL_PHONE ->
                         PermissionUtils.requestStandardPermission(
                             requestPermissionLauncher,
                             Manifest.permission.CALL_PHONE
                         )
-
-                    else -> throw Exception("Don't know how to ask for permission ${failure.permission}")
                 }
             }
 
@@ -125,7 +123,7 @@ class FixErrorDelegate(
                 ctx
             )
 
-            is FixableError.AccessibilityServiceDisabled ->{
+            is FixableError.AccessibilityServiceDisabled -> {
                 AccessibilityUtils.enableService(ctx)
             }
 

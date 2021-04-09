@@ -33,15 +33,12 @@ class KeyCodeListViewModel : ViewModel() {
         }.let { emit(it) }
     }
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
             combine(
                 searchQuery,
                 allListItems,
-                rebuildUiState
-            ) { query, allListItems, _ ->
+            ) { query, allListItems ->
                 Pair(allListItems, query)
             }.collectLatest { pair ->
                 val (allListItems, query) = pair
@@ -52,11 +49,6 @@ class KeyCodeListViewModel : ViewModel() {
             }
         }
     }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
-    }
-
     @Suppress("UNCHECKED_CAST")
     class Factory : ViewModelProvider.NewInstanceFactory() {
 

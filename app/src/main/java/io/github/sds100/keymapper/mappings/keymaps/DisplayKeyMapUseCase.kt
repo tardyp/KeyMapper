@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
 import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.permissions.Permission
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -29,7 +30,7 @@ class DisplayKeyMapUseCaseImpl(
 
         if (trigger.keys.any { it.keyCode in keysThatRequireDndAccess }) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && !permissionAdapter.isGranted(Manifest.permission.ACCESS_NOTIFICATION_POLICY)
+                && !permissionAdapter.isGranted(Permission.ACCESS_NOTIFICATION_POLICY)
             ) {
                 errors.add(KeyMapTriggerError.DND_ACCESS_DENIED)
             }

@@ -34,12 +34,8 @@ class UnsupportedActionListViewModel(
         MutableStateFlow<ListUiState<UnsupportedActionListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
 
-    private val rebuildUiState = MutableSharedFlow<Unit>()
-
     init {
         viewModelScope.launch {
-            combine(rebuildUiState) {}.collectLatest {
-
                 val unsupportedSystemActionsWithReasons = SystemActionId.values()
                     .map { it to isSystemActionSupported.invoke(it) }
                     .filter { it.second != null }
@@ -68,12 +64,7 @@ class UnsupportedActionListViewModel(
                         )
                     }
                 }.toList().createListState()
-            }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildUiState.emit(Unit) }
     }
 
     @Suppress("UNCHECKED_CAST")

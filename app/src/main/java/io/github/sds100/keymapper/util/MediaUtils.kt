@@ -8,6 +8,7 @@ import android.media.session.MediaController
 import android.os.Build
 import android.view.KeyEvent
 import androidx.annotation.RequiresApi
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.service.NotificationReceiver
 import io.github.sds100.keymapper.util.result.*
 import splitties.systemservices.mediaSessionManager
@@ -113,6 +114,6 @@ object MediaUtils {
             return Success(mediaSessionManager.getActiveSessions(component))
         }
 
-        return FixableError.PermissionDenied(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+        return FixableError.PermissionDenied(Permission.NOTIFICATION_LISTENER)
     }
 }
