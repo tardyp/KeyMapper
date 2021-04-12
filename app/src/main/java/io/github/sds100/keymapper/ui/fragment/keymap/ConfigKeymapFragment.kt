@@ -9,9 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapActionOptionsFragment
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.showUserResponseRequests
@@ -79,7 +77,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     override fun getFragmentInfoList() = intArray(R.array.config_keymap_fragments).map {
         when (it) {
             int(R.integer.fragment_id_trigger) -> it to TriggerFragment.Info()
-            int(R.integer.fragment_id_trigger_options) -> it to TriggerOptionsFragment.Info()
+            int(R.integer.fragment_id_trigger_options) -> it to ConfigTriggerOptionsFragment.Info()
             int(R.integer.fragment_id_constraint_list) -> it to KeymapConfigConstraintsFragment.Info()
             int(R.integer.fragment_id_action_list) -> it to KeyMapConfigActionsFragment.Info()
 
@@ -104,13 +102,13 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     )
 
     class ConstraintsAndOptionsFragment : TwoFragments(
-        TriggerOptionsFragment.Info(),
+        ConfigTriggerOptionsFragment.Info(),
         KeymapConfigConstraintsFragment.Info()
     )
 
     class AllFragments : FourFragments(
         TriggerFragment.Info(),
-        TriggerOptionsFragment.Info(),
+        ConfigTriggerOptionsFragment.Info(),
         KeyMapConfigActionsFragment.Info(),
         KeymapConfigConstraintsFragment.Info()
     )

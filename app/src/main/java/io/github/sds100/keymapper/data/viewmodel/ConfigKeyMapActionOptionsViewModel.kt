@@ -9,6 +9,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.ConfigActionOptionsViewModel
+import io.github.sds100.keymapper.mappings.common.OptionMinimums
 import io.github.sds100.keymapper.mappings.common.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.ui.*
 import kotlinx.coroutines.CoroutineScope
@@ -117,9 +118,9 @@ class ConfigKeyMapActionOptionsViewModel(
                         sliderModel = SliderModel(
                             value = Defaultable.create(action.repeatRate),
                             isDefaultStepEnabled = true,
-                            min = KeyMapAction.REPEAT_RATE_MIN,
-                            max = 5000,
-                            stepSize = 5
+                            min = OptionMinimums.ACTION_REPEAT_RATE,
+                            max = SliderMaximums.ACTION_REPEAT_RATE,
+                            stepSize = SliderStepSizes.ACTION_REPEAT_RATE
                         )
                     )
                 )
@@ -178,9 +179,9 @@ class ConfigKeyMapActionOptionsViewModel(
                         sliderModel = SliderModel(
                             value = Defaultable.create(action.holdDownDuration),
                             isDefaultStepEnabled = true,
-                            min = KeyMapAction.HOLD_DOWN_DURATION_MIN,
-                            max = 5000,
-                            stepSize = 5
+                            min = OptionMinimums.ACTION_HOLD_DOWN_DURATION,
+                            max = SliderMaximums.ACTION_HOLD_DOWN_DURATION,
+                            stepSize = SliderStepSizes.ACTION_HOLD_DOWN_DURATION
                         )
                     )
                 )
@@ -213,9 +214,9 @@ class ConfigKeyMapActionOptionsViewModel(
                         sliderModel = SliderModel(
                             value = Defaultable.create(action.delayBeforeNextAction),
                             isDefaultStepEnabled = true,
-                            min = Action.DELAY_BEFORE_NEXT_ACTION_MIN,
-                            max = Action.DELAY_BEFORE_NEXT_ACTION_SLIDER_MAX,
-                            stepSize = Action.DELAY_BEFORE_NEXT_ACTION_SLIDER_STEP_SIZE
+                            min = OptionMinimums.DELAY_BEFORE_NEXT_ACTION,
+                            max = SliderMaximums.DELAY_BEFORE_NEXT_ACTION,
+                            stepSize = SliderStepSizes.DELAY_BEFORE_NEXT_ACTION
                         )
                     )
                 )
@@ -228,9 +229,9 @@ class ConfigKeyMapActionOptionsViewModel(
                     sliderModel = SliderModel(
                         value = Defaultable.create(action.multiplier),
                         isDefaultStepEnabled = true,
-                        min = Action.ACTION_MULTIPLIER_MIN,
-                        max = Action.ACTION_MULTIPLIER_SLIDER_MAX,
-                        stepSize = 1
+                        min = OptionMinimums.ACTION_MULTIPLIER,
+                        max = SliderMaximums.ACTION_MULTIPLIER,
+                        stepSize = SliderStepSizes.ACTION_MULTIPLIER
                     )
                 )
             )

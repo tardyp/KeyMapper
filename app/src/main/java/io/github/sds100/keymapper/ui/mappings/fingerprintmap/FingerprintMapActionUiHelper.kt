@@ -21,11 +21,11 @@ class FingerprintMapActionUiHelper(
 
     override fun getOptionLabels(mapping: FingerprintMap, action: FingerprintMapAction): List<String> = sequence {
 
-        if (action.isRepeatingUntilSwipedAgainAllowed() && action.repeatUntilSwipedAgain) {
+        if (mapping.isRepeatingActionUntilSwipedAgainAllowed() && action.repeatUntilSwipedAgain) {
             yield(getString(R.string.flag_repeat_until_swiped_again))
         }
 
-         if (action.isHoldingDownUntilSwipedAgainAllowed() && action.holdDownUntilSwipedAgain) {
+         if (mapping.isHoldingDownActionUntilSwipedAgainAllowed(action) && action.holdDownUntilSwipedAgain) {
             yield(getString(R.string.flag_hold_down_until_swiped_again))
         }
 

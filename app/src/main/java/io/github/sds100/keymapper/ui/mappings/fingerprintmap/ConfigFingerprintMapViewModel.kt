@@ -14,6 +14,8 @@ import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapActionOptionsViewModel
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapOptionsViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
@@ -39,9 +41,15 @@ class ConfigFingerprintMapViewModel(
 ) : ViewModel(), ConfigMappingViewModel, UserResponseViewModel by UserResponseViewModelImpl() {
 
     companion object {
-        private const val STATE_KEY_MAP = "config_fingerprint_map"
+        private const val STATE_FINGERPRINT_MAP = "config_fingerprint_map"
         private const val STATE_KEY_ID = "config_fingerprint_map_id"
     }
+
+    val configActionOptionsViewModel =
+        ConfigFingerprintMapActionOptionsViewModel(viewModelScope, config, resourceProvider)
+
+    val configOptionsViewModel =
+        ConfigFingerprintMapOptionsViewModel(viewModelScope, config, resourceProvider)
 
     val actionListViewModel = ConfigActionsViewModel(
         viewModelScope,
@@ -62,8 +70,6 @@ class ConfigFingerprintMapViewModel(
 
     override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
 
-    override fun setEnabled(enabled: Boolean) = config.setEnabled(enabled)
-
     override val fixError = merge(actionListViewModel.fixError, constraintListViewModel.fixError)
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
@@ -82,18 +88,20 @@ class ConfigFingerprintMapViewModel(
         runBlocking { rebuildUiState.emit(Unit) } //build the initial state on init
     }
 
+    override fun setEnabled(enabled: Boolean) = config.setEnabled(enabled)
+
     override fun save() = config.getMapping().ifIsData { save(id, it) }
 
     override fun saveState(outState: Bundle) {
         config.getMapping().ifIsData {
-            outState.putString(STATE_KEY_MAP, Json.encodeToString(it))
+            outState.putString(STATE_FINGERPRINT_MAP, Json.encodeToString(it))
             outState.putString(STATE_KEY_ID, Json.encodeToString(id))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun restoreState(state: Bundle) {
-        state.getJsonSerializable<FingerprintMap>(STATE_KEY_MAP)?.let {
+        state.getJsonSerializable<FingerprintMap>(STATE_FINGERPRINT_MAP)?.let {
             config.setMapping(it)
         }
 
@@ -111,6 +119,7 @@ class ConfigFingerprintMapViewModel(
                 FingerprintMapId.SWIPE_RIGHT -> get.swipeRight
             }.first()
 
+            this@ConfigFingerprintMapViewModel.id = id
             config.setMapping(map)
         }
     }
@@ -135,7 +144,14 @@ class ConfigFingerprintMapViewModel(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            ConfigFingerprintMapViewModel(save, get, config, testAction, display, resourceProvider) as T
+            ConfigFingerprintMapViewModel(
+                save,
+                get,
+                config,
+                testAction,
+                display,
+                resourceProvider
+            ) as T
     }
 }
 

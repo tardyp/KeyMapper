@@ -22,12 +22,12 @@ import splitties.toast.toast
 /**
  * Created by sds100 on 29/11/20.
  */
-class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
+class ConfigTriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
 
     class Info : FragmentInfo(
         R.string.option_list_header,
         R.string.url_trigger_options_guide,
-        { TriggerOptionsFragment() }
+        { ConfigTriggerOptionsFragment() }
     )
 
     private val configKeyMapViewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
@@ -46,13 +46,13 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
         recyclerView.withModels {
             listItems.forEach { listItem ->
                 if (listItem is CheckBoxListItem) {
-                    configuredCheckBox(this@TriggerOptionsFragment, listItem) { isChecked ->
+                    configuredCheckBox( listItem) { isChecked ->
                         viewModel.setCheckboxValue(listItem.id, isChecked)
                     }
                 }
 
                 if (listItem is SliderListItem) {
-                    configuredSlider(this@TriggerOptionsFragment, listItem) { newValue ->
+                    configuredSlider(this@ConfigTriggerOptionsFragment, listItem) { newValue ->
                         viewModel.setSliderValue(listItem.id, newValue)
                     }
                 }

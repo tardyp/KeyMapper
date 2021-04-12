@@ -19,6 +19,7 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -71,6 +72,10 @@ class HomeScreenUseCaseImpl(
         keyMapRepository.duplicate(*uid)
     }
 
+    override fun resetFingerprintMaps() {
+        fingerprintMapRepository.reset()
+    }
+
     override fun enableFingerprintMap(id: FingerprintMapId) {
         val entityId = FingerprintMapIdEntityMapper.toEntity(id)
         fingerprintMapRepository.enableFingerprintMap(entityId)
@@ -82,7 +87,6 @@ class HomeScreenUseCaseImpl(
     }
 
     override fun enableAllMappings() {
-
         keyMapRepository.enableAll()
         fingerprintMapRepository.enableAll()
     }
@@ -119,6 +123,7 @@ interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase 
     val fingerprintMaps: Flow<FingerprintMapGroup>
     fun enableFingerprintMap(id: FingerprintMapId)
     fun disableFingerprintMap(id: FingerprintMapId)
+    fun resetFingerprintMaps()
 
     fun enableAllMappings()
     fun disableAllMappings()

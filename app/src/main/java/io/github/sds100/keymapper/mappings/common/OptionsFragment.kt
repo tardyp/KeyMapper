@@ -78,25 +78,19 @@ abstract class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
         binding.epoxyRecyclerView.withModels {
             listItems.forEach { model ->
                 if (model is RadioButtonPairListItem) {
-                    configuredRadioButtonPair(
-                        this@OptionsBottomSheetFragment,
-                        model
-                    ) { id, isChecked ->
+                    configuredRadioButtonPair(model) { id, isChecked ->
                         viewModel.setRadioButtonValue(id, isChecked)
                     }
                 }
 
                 if (model is RadioButtonTripleListItem) {
-                    configuredRadioButtonTriple(
-                        this@OptionsBottomSheetFragment,
-                        model
-                    ) { id, isChecked ->
+                    configuredRadioButtonTriple(model) { id, isChecked ->
                         viewModel.setRadioButtonValue(id, isChecked)
                     }
                 }
 
                 if (model is CheckBoxListItem) {
-                    configuredCheckBox(this@OptionsBottomSheetFragment, model) {
+                    configuredCheckBox( model) {
                         viewModel.setCheckboxValue(model.id, it)
                     }
                 }

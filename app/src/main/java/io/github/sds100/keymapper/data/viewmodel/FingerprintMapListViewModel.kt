@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListI
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class FingerprintMapListViewModel(
     private val coroutineScope: CoroutineScope,
@@ -27,6 +28,9 @@ class FingerprintMapListViewModel(
 
     private val _state = MutableStateFlow<ListUiState<FingerprintMapListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
+
+    private val _launchConfigFingerprintMap = MutableSharedFlow<FingerprintMapId>()
+    val launchConfigFingerprintMap = _launchConfigFingerprintMap.asSharedFlow()
 
     init {
         val rebuildUiState = MutableSharedFlow<FingerprintMapGroup>()
@@ -76,11 +80,15 @@ class FingerprintMapListViewModel(
         }
     }
 
+    fun onCardClick(id: FingerprintMapId){
+        runBlocking { _launchConfigFingerprintMap.emit(id) }
+    }
+
     fun onBackupAllClick() {
         TODO()
     }
 
     fun onResetClick() {
-        TODO()
+        useCase.resetFingerprintMaps()
     }
 }

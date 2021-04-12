@@ -35,8 +35,6 @@ data class KeyMapAction(
 ) : Action{
     companion object{
         const val REPEAT_DELAY_MIN = 0
-        const val REPEAT_RATE_MIN = 5
-        const val HOLD_DOWN_DURATION_MIN = 0
     }
 }
 

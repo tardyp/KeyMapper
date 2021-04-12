@@ -4,13 +4,12 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
+import io.github.sds100.keymapper.mappings.common.OptionMinimums
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
@@ -176,9 +175,9 @@ class ConfigKeyMapTriggerOptionsViewModel(
                             SliderModel(
                                 value = Defaultable.create(trigger.vibrateDuration),
                                 isDefaultStepEnabled = true,
-                                min = KeyMapTrigger.VIBRATION_DURATION_MIN,
-                                max = 1000,
-                                stepSize = 5,
+                                min = OptionMinimums.VIBRATION_DURATION,
+                                max = SliderMaximums.VIBRATION_DURATION,
+                                stepSize = SliderStepSizes.VIBRATION_DURATION,
                             )
                         )
                     )
@@ -192,9 +191,9 @@ class ConfigKeyMapTriggerOptionsViewModel(
                             SliderModel(
                                 value = Defaultable.create(trigger.longPressDelay),
                                 isDefaultStepEnabled = true,
-                                min = KeyMapTrigger.LONG_PRESS_DELAY_MIN,
-                                max = 5000,
-                                stepSize = 5,
+                                min = OptionMinimums.TRIGGER_LONG_PRESS_DELAY,
+                                max = SliderMaximums.TRIGGER_LONG_PRESS_DELAY,
+                                stepSize = SliderStepSizes.TRIGGER_LONG_PRESS_DELAY,
                             )
                         )
                     )
@@ -208,9 +207,9 @@ class ConfigKeyMapTriggerOptionsViewModel(
                             SliderModel(
                                 value = Defaultable.create(trigger.doublePressDelay),
                                 isDefaultStepEnabled = true,
-                                min = KeyMapTrigger.DOUBLE_PRESS_DELAY_MIN,
-                                max = 5000,
-                                stepSize = 5,
+                                min = OptionMinimums.TRIGGER_DOUBLE_PRESS_DELAY,
+                                max = SliderMaximums.TRIGGER_DOUBLE_PRESS_DELAY,
+                                stepSize = SliderStepSizes.TRIGGER_DOUBLE_PRESS_DELAY,
                             )
                         )
                     )
@@ -224,9 +223,9 @@ class ConfigKeyMapTriggerOptionsViewModel(
                             SliderModel(
                                 value = Defaultable.create(trigger.sequenceTriggerTimeout),
                                 isDefaultStepEnabled = true,
-                                min = KeyMapTrigger.SEQUENCE_TRIGGER_TIMEOUT_MIN,
-                                max = 5000,
-                                stepSize = 5,
+                                min = OptionMinimums.TRIGGER_SEQUENCE_TRIGGER_TIMEOUT,
+                                max = SliderMaximums.TRIGGER_SEQUENCE_TRIGGER_TIMEOUT,
+                                stepSize = SliderStepSizes.TRIGGER_SEQUENCE_TRIGGER_TIMEOUT,
                             )
                         )
                     )

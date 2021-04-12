@@ -159,7 +159,7 @@
                     tools:text="Long Press Volume Down → Alt → 1" />
 
                 <TextView
-                    android:id="@+id/textViewFlagsHeader"
+                    android:id="@+id/textViewOptionsHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -172,7 +172,7 @@
                     app:layout_constraintTop_toBottomOf="@id/textViewTrigger" />
 
                 <TextView
-                    android:id="@+id/textViewSecondary"
+                    android:id="@+id/textViewOptions"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -180,8 +180,8 @@
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                     android:visibility="@{keyMapUiState.hasOptions ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/textViewFlagsHeader"
-                    app:layout_constraintTop_toTopOf="@id/textViewFlagsHeader"
+                    app:layout_constraintStart_toEndOf="@id/textViewOptionsHeader"
+                    app:layout_constraintTop_toTopOf="@id/textViewOptionsHeader"
                     tools:text="Vibrate" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

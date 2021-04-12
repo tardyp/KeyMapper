@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapActionEntityMapper
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
 import io.github.sds100.keymapper.mappings.common.Mapping
@@ -57,11 +58,8 @@ data class KeyMap(
 
 object KeyMapEntityMapper {
     fun fromEntity(entity: KeyMapEntity): KeyMap {
-        val actionList = sequence {
-            entity.actionList.forEach { entity ->
-                KeymapActionEntityMapper.fromEntity(entity)?.let { yield(it) }
-            }
-        }.toList()
+        val actionList = entity.actionList.mapNotNull { KeymapActionEntityMapper.fromEntity(it) }
+
 
         val constraintList =
             entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }.toSet()

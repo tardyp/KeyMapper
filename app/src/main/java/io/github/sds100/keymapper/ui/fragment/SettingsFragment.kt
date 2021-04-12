@@ -23,6 +23,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
+import io.github.sds100.keymapper.mappings.common.OptionMinimums
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
 import splitties.alertdialog.appcompat.*
@@ -485,7 +486,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_long_press_delay)
             setSummary(R.string.summary_pref_long_press_delay)
-            min = KeyMapTrigger.LONG_PRESS_DELAY_MIN
+            min = OptionMinimums.TRIGGER_LONG_PRESS_DELAY
             max = 5000
             showSeekBarValue = true
 
@@ -499,7 +500,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_double_press_delay)
             setSummary(R.string.summary_pref_double_press_delay)
-            min = KeyMapTrigger.DOUBLE_PRESS_DELAY_MIN
+            min = OptionMinimums.TRIGGER_DOUBLE_PRESS_DELAY
             max = 5000
             showSeekBarValue = true
 
@@ -513,7 +514,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_vibration_duration)
             setSummary(R.string.summary_pref_vibration_duration)
-            min = KeyMapTrigger.VIBRATION_DURATION_MIN
+            min = OptionMinimums.VIBRATION_DURATION
             max = 1000
             showSeekBarValue = true
 
@@ -556,7 +557,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_sequence_trigger_timeout)
             setSummary(R.string.summary_pref_sequence_trigger_timeout)
-            min = KeyMapTrigger.SEQUENCE_TRIGGER_TIMEOUT_MIN
+            min = OptionMinimums.TRIGGER_SEQUENCE_TRIGGER_TIMEOUT
             max = 5000
             showSeekBarValue = true
 

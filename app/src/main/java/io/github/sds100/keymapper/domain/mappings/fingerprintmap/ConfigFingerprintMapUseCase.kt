@@ -3,6 +3,7 @@ package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
+import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.mappings.common.BaseConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
@@ -26,6 +27,15 @@ class ConfigFingerprintMapUseCaseImpl : BaseConfigMappingUseCase<FingerprintMapA
         editFingerprintMap { it.copy(constraintState = constraintState) }
     }
 
+    override fun setVibrateEnabled(enabled: Boolean) = editFingerprintMap { it.copy(vibrate = enabled) }
+
+    override fun setVibrationDuration(duration: Defaultable<Int>) =
+        editFingerprintMap { it.copy(vibrateDuration = duration.nullIfDefault()) }
+
+    override fun setShowToastEnabled(enabled: Boolean) {
+        editFingerprintMap { it.copy(showToast = enabled) }
+    }
+
     override fun setActionMultiplier(uid: String, multiplier: Int?) {
         setActionOption(uid){it.copy(multiplier = multiplier)}
     }
@@ -33,6 +43,18 @@ class ConfigFingerprintMapUseCaseImpl : BaseConfigMappingUseCase<FingerprintMapA
     override fun setDelayBeforeNextAction(uid: String, delay: Int?) {
         setActionOption(uid){it.copy(delayBeforeNextAction = delay)}
     }
+
+    override fun setActionRepeatEnabled(uid: String, repeat: Boolean) =
+        setActionOption(uid) { it.copy(repeatUntilSwipedAgain = repeat) }
+
+    override fun setActionRepeatRate(uid: String, repeatRate: Int?) =
+        setActionOption(uid) { it.copy(repeatRate = repeatRate) }
+
+    override fun setActionHoldDownEnabled(uid: String, holdDown: Boolean) =
+        setActionOption(uid) { it.copy(holdDownUntilSwipedAgain = holdDown) }
+
+    override fun setActionHoldDownDuration(uid: String, holdDownDuration: Int?) =
+        setActionOption(uid) { it.copy(holdDownDuration = holdDownDuration) }
 
     private fun editFingerprintMap(block: (fingerprintMap: FingerprintMap) -> FingerprintMap) {
         mapping.value.ifIsData { setMapping(block.invoke(it)) }
@@ -58,4 +80,13 @@ class ConfigFingerprintMapUseCaseImpl : BaseConfigMappingUseCase<FingerprintMapA
     }
 }
 
-interface ConfigFingerprintMapUseCase : ConfigMappingUseCase<FingerprintMapAction, FingerprintMap>
+interface ConfigFingerprintMapUseCase : ConfigMappingUseCase<FingerprintMapAction, FingerprintMap>{
+    fun setVibrateEnabled(enabled: Boolean)
+    fun setVibrationDuration(duration: Defaultable<Int>)
+    fun setShowToastEnabled(enabled: Boolean)
+
+    fun setActionRepeatEnabled(uid: String, repeat: Boolean)
+    fun setActionRepeatRate(uid: String, repeatRate: Int?)
+    fun setActionHoldDownEnabled(uid: String, holdDown: Boolean)
+    fun setActionHoldDownDuration(uid: String, holdDownDuration: Int?)
+}

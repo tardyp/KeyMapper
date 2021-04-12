@@ -131,7 +131,7 @@ class DataStoreFingerprintMapRepository(
 
     override fun enableAll() {
         coroutineScope.launch {
-            val group = fingerprintMaps.firstOrNull()?: return@launch
+            val group = fingerprintMaps.firstOrNull() ?: return@launch
 
             val newGroup = group.copy(
                 swipeDown = group.swipeDown.copy(isEnabled = true),
@@ -141,17 +141,24 @@ class DataStoreFingerprintMapRepository(
             )
 
             dataStore.edit { prefs ->
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] = gson.toJson(newGroup.swipeDown)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] = gson.toJson(newGroup.swipeUp)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] = gson.toJson(newGroup.swipeLeft)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] = gson.toJson(newGroup.swipeRight)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] =
+                    gson.toJson(newGroup.swipeDown)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] =
+                    gson.toJson(newGroup.swipeUp)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] =
+                    gson.toJson(newGroup.swipeLeft)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
+                    gson.toJson(newGroup.swipeRight)
             }
         }
     }
 
     override fun disableAll() {
         coroutineScope.launch {
-            val group = fingerprintMaps.firstOrNull()?: return@launch
+            val group = fingerprintMaps.firstOrNull() ?: return@launch
 
             val newGroup = group.copy(
                 swipeDown = group.swipeDown.copy(isEnabled = false),
@@ -161,10 +168,17 @@ class DataStoreFingerprintMapRepository(
             )
 
             dataStore.edit { prefs ->
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] = gson.toJson(newGroup.swipeDown)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] = gson.toJson(newGroup.swipeUp)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] = gson.toJson(newGroup.swipeLeft)
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] = gson.toJson(newGroup.swipeRight)
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] =
+                    gson.toJson(newGroup.swipeDown)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] =
+                    gson.toJson(newGroup.swipeUp)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] =
+                    gson.toJson(newGroup.swipeLeft)
+
+                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
+                    gson.toJson(newGroup.swipeRight)
             }
         }
     }

@@ -1,7 +1,11 @@
 package io.github.sds100.keymapper.ui.fragment.fingerprint
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
@@ -9,12 +13,14 @@ import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
+import io.github.sds100.keymapper.ui.fragment.keymap.ConfigKeymapFragmentDirections
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.int
 import io.github.sds100.keymapper.util.intArray
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -48,13 +54,16 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
                 viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
         }
+    }
 
-        setFragmentResultListener(FingerprintActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<FingerprintActionOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
-                ?.let {
-                    //TODO
-//                    viewModel.actionListViewModel.setOptions(it)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.actionListViewModel.openEditOptions.collectLatest { actionUid ->
+                viewModel.configActionOptionsViewModel.setActionToConfigure(actionUid)
+                findNavController().navigate(ConfigFingerprintMapFragmentDirections.configActionFragment())
+            }
         }
     }
 

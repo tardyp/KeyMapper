@@ -27,9 +27,6 @@ class KeymapListViewModel internal constructor(
     private val _state = MutableStateFlow<ListUiState<KeyMapListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
 
-    /**
-     * The database id of the key map
-     */
     private val _launchConfigKeyMap = MutableSharedFlow<String>()
     val launchConfigKeymap = _launchConfigKeyMap.asSharedFlow()
 

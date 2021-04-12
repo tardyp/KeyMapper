@@ -4,6 +4,7 @@ import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
 import io.github.sds100.keymapper.mappings.common.Mapping
@@ -25,6 +26,22 @@ data class FingerprintMap(
     val vibrateDuration: Int? = null,
     val showToast: Boolean = false
 ) : Mapping<FingerprintMapAction> {
+
+    fun isRepeatingActionUntilSwipedAgainAllowed(): Boolean {
+        return true
+    }
+
+    fun isChangingActionRepeatRateAllowed(action: FingerprintMapAction): Boolean {
+        return action.repeatUntilSwipedAgain
+    }
+
+    fun isHoldingDownActionUntilSwipedAgainAllowed(action: FingerprintMapAction): Boolean {
+        return action.data.canBeHeldDown()
+    }
+
+    fun isHoldingDownActionBeforeRepeatingAllowed(action: FingerprintMapAction): Boolean {
+        return action.repeatUntilSwipedAgain && action.holdDownUntilSwipedAgain
+    }
 
     fun isVibrateAllowed(): Boolean {
         return true
@@ -61,7 +78,7 @@ object FingerprintMapEntityMapper {
     fun fromEntity(
         entity: FingerprintMapEntity,
     ): FingerprintMap {
-        val actionList = entity.actionList.map { FingerprintMapActionEntityMapper.fromEntity(it) }
+        val actionList = entity.actionList.mapNotNull { FingerprintMapActionEntityMapper.fromEntity(it) }
 
         val constraintList =
             entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }.toSet()
@@ -98,7 +115,7 @@ object FingerprintMapEntityMapper {
 
         return FingerprintMapEntity(
             version = FingerprintMapEntity.CURRENT_VERSION,
-            actionList = model.actionList.map { FingerprintMapActionEntityMapper.toEntity(it) },
+            actionList = FingerprintMapActionEntityMapper.toEntity(model),
             constraintList = model.constraintState.constraints.map { ConstraintEntityMapper.toEntity(it) },
             constraintMode = ConstraintModeEntityMapper.toEntity(model.constraintState.mode),
             extras = extras,

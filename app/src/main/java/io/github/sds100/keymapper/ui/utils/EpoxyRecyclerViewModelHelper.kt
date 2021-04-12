@@ -3,80 +3,66 @@ package io.github.sds100.keymapper.ui.utils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.airbnb.epoxy.EpoxyController
-import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.slider.Slider
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.domain.utils.Defaultable
-import io.github.sds100.keymapper.radioButtonPair
 import io.github.sds100.keymapper.ui.CheckBoxListItem
 import io.github.sds100.keymapper.ui.RadioButtonPairListItem
 import io.github.sds100.keymapper.ui.RadioButtonTripleListItem
 import io.github.sds100.keymapper.ui.SliderListItem
 import io.github.sds100.keymapper.util.editTextNumberAlertDialog
 import io.github.sds100.keymapper.util.viewLifecycleScope
-import timber.log.Timber
 
 /**
  * Created by sds100 on 20/03/2021.
  */
 
 fun EpoxyController.configuredRadioButtonTriple(
-    fragment: Fragment,
     model: RadioButtonTripleListItem,
     onCheckedChange: (buttonId: String, isChecked: Boolean) -> Unit
 ) {
+    radioButtonTriple {
+        id(model.id)
+        model(model)
 
-    fragment.apply {
-        radioButtonTriple {
-            id(model.id)
-            model(model)
-
-            onCheckedChange { group, checkedId ->
-                when(checkedId){
-                    R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
-                    R.id.radioButtonCenter -> onCheckedChange(model.centerButtonId, true)
-                    R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
-                }
+        onCheckedChange { group, checkedId ->
+            when (checkedId) {
+                R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
+                R.id.radioButtonCenter -> onCheckedChange(model.centerButtonId, true)
+                R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
             }
         }
     }
 }
 
 fun EpoxyController.configuredRadioButtonPair(
-    fragment: Fragment,
     model: RadioButtonPairListItem,
     onCheckedChange: (buttonId: String, isChecked: Boolean) -> Unit
 ) {
+    radioButtonPair {
+        id(model.id)
+        model(model)
 
-    fragment.apply {
-        radioButtonPair {
-            id(model.id)
-            model(model)
-
-            onCheckedChange { group, checkedId ->
-                when(checkedId){
-                    R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
-                    R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
-                }
+        onCheckedChange { group, checkedId ->
+            when (checkedId) {
+                R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
+                R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
             }
         }
     }
 }
 
 fun EpoxyController.configuredCheckBox(
-    fragment: Fragment,
     model: CheckBoxListItem,
     onCheckedChange: (checked: Boolean) -> Unit
 ) {
-    fragment.apply {
-        checkbox {
-            id(model.id)
-            isChecked(model.isChecked)
-            primaryText(model.label)
+    checkbox {
+        id(model.id)
+        isChecked(model.isChecked)
+        primaryText(model.label)
 
-            onCheckedChange { buttonView, isChecked ->
-                onCheckedChange.invoke(isChecked)
-            }
+        onCheckedChange { buttonView, isChecked ->
+            onCheckedChange.invoke(isChecked)
         }
     }
 }
