@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import splitties.mainthread.mainLooper
-import timber.log.Timber
 
 /**
  * Created by sds100 on 13/03/2021.
@@ -48,7 +47,7 @@ class AndroidExternalDevicesAdapter(
                 bluetoothMonitor.onDevicePairedChange,
                 bluetoothMonitor.isBluetoothEnabled
             ).collectLatest {
-               updatePairedBluetoothDevices()
+                updatePairedBluetoothDevices()
             }
         }
 
@@ -82,7 +81,7 @@ class AndroidExternalDevicesAdapter(
         return Error.DeviceNotFound(descriptor)
     }
 
-    private fun updateInputDevices(){
+    private fun updateInputDevices() {
         val devices = mutableListOf<InputDeviceInfo>()
 
         InputDevice.getDeviceIds().forEach {
@@ -96,8 +95,15 @@ class AndroidExternalDevicesAdapter(
         inputDevices.value = State.Data(devices)
     }
 
-    private fun updatePairedBluetoothDevices(){
-        val devices = BluetoothAdapter.getDefaultAdapter().bondedDevices.map {
+    private fun updatePairedBluetoothDevices() {
+        val adapter = BluetoothAdapter.getDefaultAdapter()
+
+        if (adapter == null) {
+            pairedBluetoothDevices.value = State.Data(emptyList())
+            return
+        }
+
+        val devices = adapter.bondedDevices.map {
             BluetoothDeviceInfo(it.address, it.name)
         }
 

@@ -4,12 +4,13 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.preferences.PreferenceMinimums
+import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.*
 /**
  * Created by sds100 on 29/11/20.
  */
-class TriggerOptionsViewModel(
+class ConfigKeyMapTriggerOptionsViewModel(
     private val coroutineScope: CoroutineScope,
     private val onboarding: OnboardingUseCase,
     private val config: ConfigKeyMapUseCase,
@@ -28,18 +29,18 @@ class TriggerOptionsViewModel(
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
 
-    private companion object {
-        const val ID_LONG_PRESS_DELAY = "long_press_delay"
-        const val ID_DOUBLE_PRESS_DELAY = "double_press_delay"
-        const val ID_SEQUENCE_TRIGGER_TIMEOUT = "sequence_trigger_timeout"
-        const val ID_VIBRATE_DURATION = "vibrate_duration"
-        const val ID_VIBRATE = "vibrate"
-        const val ID_LONG_PRESS_DOUBLE_VIBRATION = "long_press_double_vibration"
-        const val ID_SCREEN_OFF_TRIGGER = "screen_off_trigger"
-        const val ID_TRIGGER_FROM_OTHER_APPS = "trigger_from_other_apps"
-        const val ID_SHOW_TOAST = "show_toast"
+    companion object {
+        private const val ID_LONG_PRESS_DELAY = "long_press_delay"
+        private const val ID_DOUBLE_PRESS_DELAY = "double_press_delay"
+        private const val ID_SEQUENCE_TRIGGER_TIMEOUT = "sequence_trigger_timeout"
+        private const val ID_VIBRATE_DURATION = "vibrate_duration"
+        private const val ID_VIBRATE = "vibrate"
+        private const val ID_LONG_PRESS_DOUBLE_VIBRATION = "long_press_double_vibration"
+        private const val ID_SCREEN_OFF_TRIGGER = "screen_off_trigger"
+        private const val ID_TRIGGER_FROM_OTHER_APPS = "trigger_from_other_apps"
+        private const val ID_SHOW_TOAST = "show_toast"
 
-        const val KEY_SCREEN_OFF_TRIGGERS = "screen_off_triggers"
+        private const val KEY_SCREEN_OFF_TRIGGERS = "screen_off_triggers"
     }
 
     //TODO screen off triggers explanation
@@ -51,7 +52,7 @@ class TriggerOptionsViewModel(
 
     init {
         coroutineScope.launch {
-            config.mapping.collectLatest {mapping ->
+            config.mapping.collectLatest { mapping ->
                 _state.value = withContext(Dispatchers.Default) {
                     buildUiState(mapping)
                 }
@@ -96,9 +97,14 @@ class TriggerOptionsViewModel(
                 createKeyMapShortcut.createForSingleAction(keyMapUid, mapping.actionList[0])
             } else {
 
-                //TODO test this
                 val key = "create_launcher_shortcut"
-                val response = getUserResponse(key, RequestUserResponse.Text(getString(R.string.hint_shortcut_name), allowEmpty = false))?: return@launch
+                val response = getUserResponse(
+                    key,
+                    RequestUserResponse.Text(
+                        getString(R.string.hint_shortcut_name),
+                        allowEmpty = false
+                    )
+                ) ?: return@launch
 
                 createKeyMapShortcut.createForMultipleActions(
                     keyMapUid = keyMapUid,
@@ -168,9 +174,9 @@ class TriggerOptionsViewModel(
                             id = ID_VIBRATE_DURATION,
                             label = getString(R.string.extra_label_vibration_duration),
                             SliderModel(
-                                value = trigger.vibrateDuration,
+                                value = Defaultable.create(trigger.vibrateDuration),
                                 isDefaultStepEnabled = true,
-                                min = PreferenceMinimums.VIBRATION_DURATION_MIN,
+                                min = KeyMapTrigger.VIBRATION_DURATION_MIN,
                                 max = 1000,
                                 stepSize = 5,
                             )
@@ -184,9 +190,9 @@ class TriggerOptionsViewModel(
                             id = ID_LONG_PRESS_DELAY,
                             label = getString(R.string.extra_label_long_press_delay_timeout),
                             SliderModel(
-                                value = trigger.longPressDelay,
+                                value = Defaultable.create(trigger.longPressDelay),
                                 isDefaultStepEnabled = true,
-                                min = PreferenceMinimums.LONG_PRESS_DELAY_MIN,
+                                min = KeyMapTrigger.LONG_PRESS_DELAY_MIN,
                                 max = 5000,
                                 stepSize = 5,
                             )
@@ -200,9 +206,9 @@ class TriggerOptionsViewModel(
                             id = ID_DOUBLE_PRESS_DELAY,
                             label = getString(R.string.extra_label_double_press_delay_timeout),
                             SliderModel(
-                                value = trigger.doublePressDelay,
+                                value = Defaultable.create(trigger.doublePressDelay),
                                 isDefaultStepEnabled = true,
-                                min = PreferenceMinimums.DOUBLE_PRESS_DELAY_MIN,
+                                min = KeyMapTrigger.DOUBLE_PRESS_DELAY_MIN,
                                 max = 5000,
                                 stepSize = 5,
                             )
@@ -216,9 +222,9 @@ class TriggerOptionsViewModel(
                             id = ID_SEQUENCE_TRIGGER_TIMEOUT,
                             label = getString(R.string.extra_label_sequence_trigger_timeout),
                             SliderModel(
-                                value = trigger.sequenceTriggerTimeout,
+                                value = Defaultable.create(trigger.sequenceTriggerTimeout),
                                 isDefaultStepEnabled = true,
-                                min = PreferenceMinimums.SEQUENCE_TRIGGER_TIMEOUT_MIN,
+                                min = KeyMapTrigger.SEQUENCE_TRIGGER_TIMEOUT_MIN,
                                 max = 5000,
                                 stepSize = 5,
                             )

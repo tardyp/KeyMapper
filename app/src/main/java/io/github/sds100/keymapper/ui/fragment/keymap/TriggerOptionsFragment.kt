@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.TriggerOptionsViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerOptionsViewModel
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredSlider
 import io.github.sds100.keymapper.util.FragmentInfo
@@ -34,7 +34,7 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
         InjectorUtils.provideConfigKeyMapViewModel(requireContext())
     }
 
-    private val viewModel: TriggerOptionsViewModel
+    private val viewModel: ConfigKeyMapTriggerOptionsViewModel
         get() = configKeyMapViewModel.triggerViewModel.optionsViewModel
 
     override var isAppBarVisible = false

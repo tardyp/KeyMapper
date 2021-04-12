@@ -93,7 +93,7 @@ class HomeViewModel(
             }.toSet()
 
             val showTabs = when {
-                tabs.isEmpty() -> false
+                tabs.size == 1 -> false
                 selectionState is SelectionState.Selecting -> false
                 else -> true
             }

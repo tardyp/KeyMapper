@@ -21,7 +21,7 @@ import io.github.sds100.keymapper.triggerKey
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.TriggerViewModel
+import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.collectWhenStarted
@@ -48,7 +48,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
         { TriggerFragment() }
     )
 
-    private val triggerViewModel: TriggerViewModel by lazy {
+    private val configKeyMapTriggerViewModel: ConfigKeyMapTriggerViewModel by lazy {
         navGraphViewModels<ConfigKeyMapViewModel>(R.id.nav_config_keymap) {
             InjectorUtils.provideConfigKeyMapViewModel(requireContext())
         }.value.triggerViewModel
@@ -57,7 +57,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     private val triggerKeyController = TriggerKeyController()
 
     override val listItems: Flow<ListUiState<TriggerKeyListItem>>
-        get() = triggerViewModel.state.map { it.triggerKeyListItems }
+        get() = configKeyMapTriggerViewModel.state.map { it.triggerKeyListItems }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentTriggerBinding.inflate(inflater, container, false).apply {
@@ -68,11 +68,11 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     private var sequenceTriggerExplanationDialog: AlertDialog? = null
 
     override fun subscribeUi(binding: FragmentTriggerBinding) {
-        binding.viewModel = triggerViewModel
+        binding.viewModel = configKeyMapTriggerViewModel
 
         binding.recyclerViewTriggerKeys.adapter = triggerKeyController.adapter
 
-        triggerViewModel.showEnableCapsLockKeyboardLayoutPrompt
+        configKeyMapTriggerViewModel.showEnableCapsLockKeyboardLayoutPrompt
             .collectWhenStarted(viewLifecycleOwner) {
                 requireContext().alertDialog {
                     messageResource =
@@ -85,7 +85,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
             }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            triggerViewModel.state.collectLatest { state ->
+            configKeyMapTriggerViewModel.state.collectLatest { state ->
                 if (state.showParallelTriggerOrderExplanation
                     && parallelTriggerOrderDialog != null
                 ) {
@@ -93,7 +93,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                         messageResource = R.string.dialog_message_parallel_trigger_order
 
                         okButton {
-                            triggerViewModel.approvedParallelTriggerOrderExplanation()
+                            configKeyMapTriggerViewModel.approvedParallelTriggerOrderExplanation()
                         }
 
                         show()
@@ -108,7 +108,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                         messageResource = R.string.dialog_message_sequence_trigger_explanation
 
                         okButton {
-                            triggerViewModel.approvedSequenceTriggerExplanation()
+                            configKeyMapTriggerViewModel.approvedSequenceTriggerExplanation()
                         }
 
                         show()
@@ -127,7 +127,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                             model(it)
 
                             onFixClick { _ ->
-                                triggerViewModel.fixError(it.id)
+                                configKeyMapTriggerViewModel.fixError(it.id)
                             }
                         }
                     }
@@ -135,7 +135,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
             }
         }
 
-        triggerViewModel.showChooseDeviceDialog.collectWhenStarted(viewLifecycleOwner) { model ->
+        configKeyMapTriggerViewModel.showChooseDeviceDialog.collectWhenStarted(viewLifecycleOwner) { model ->
 
         }
     }
@@ -155,7 +155,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     override fun onPause() {
         super.onPause()
 
-        triggerViewModel.stopRecordingTrigger()
+        configKeyMapTriggerViewModel.stopRecordingTrigger()
     }
 
     override fun onDestroyView() {
@@ -220,7 +220,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                     modelBeingMoved: TriggerKeyBindingModel_?,
                     itemView: View?
                 ) {
-                    triggerViewModel.onMoveTriggerKey(fromPosition, toPosition)
+                    configKeyMapTriggerViewModel.onMoveTriggerKey(fromPosition, toPosition)
                 }
 
                 override fun onDragStarted(
@@ -251,15 +251,15 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                     model(model)
 
                     onRemoveClick { _ ->
-                        triggerViewModel.onRemoveKeyClick(model.id)
+                        configKeyMapTriggerViewModel.onRemoveKeyClick(model.id)
                     }
 
                     onMoreClick { _ ->
-                        triggerViewModel.onTriggerKeyOptionsClick(model.id)
+                        configKeyMapTriggerViewModel.onTriggerKeyOptionsClick(model.id)
                     }
 
                     onDeviceClick { _ ->
-                        triggerViewModel.onChooseDeviceClick(model.id)
+                        configKeyMapTriggerViewModel.onChooseDeviceClick(model.id)
                     }
                 }
             }

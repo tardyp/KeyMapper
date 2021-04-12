@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.constraints.ConstraintUtils
-import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
@@ -43,7 +43,7 @@ class ConfigFingerprintMapViewModel(
         private const val STATE_KEY_ID = "config_fingerprint_map_id"
     }
 
-    val actionListViewModel = ActionListViewModel(
+    val actionListViewModel = ConfigActionsViewModel(
         viewModelScope,
         display,
         testAction,

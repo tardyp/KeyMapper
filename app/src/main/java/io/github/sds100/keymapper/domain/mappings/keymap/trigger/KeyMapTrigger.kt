@@ -29,6 +29,13 @@ data class KeyMapTrigger(
     val showToast: Boolean = false
 ) {
 
+    companion object{
+        const val LONG_PRESS_DELAY_MIN = 5
+        const val DOUBLE_PRESS_DELAY_MIN = 5
+        const val SEQUENCE_TRIGGER_TIMEOUT_MIN = 5
+        const val VIBRATION_DURATION_MIN = 5
+    }
+
     fun isVibrateAllowed(): Boolean {
         return true
     }

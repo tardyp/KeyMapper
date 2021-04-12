@@ -50,7 +50,7 @@ abstract class ConfigMappingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
+        setFragmentResultListener(ConfigActionsFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
                 viewModel.addAction(it)
             }

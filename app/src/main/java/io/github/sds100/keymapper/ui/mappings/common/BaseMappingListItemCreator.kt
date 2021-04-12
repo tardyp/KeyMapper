@@ -26,10 +26,34 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
         val midDot = getString(R.string.middot)
 
         mapping.actionList.forEach { action ->
-            val title: String = if (action.multiplier != null) {
+            val actionTitle: String = if (action.multiplier != null) {
                 "${action.multiplier}x ${actionUiHelper.getTitle(action.data)}"
             } else {
                 actionUiHelper.getTitle(action.data)
+            }
+
+            val chipText = buildString {
+
+                append(actionTitle)
+
+                actionUiHelper.getOptionLabels(mapping, action).forEach{ label ->
+                    append(" $midDot ")
+
+                    append(label)
+                }
+
+                if (mapping.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
+                    if (this@buildString.isNotBlank()) {
+                        append(" $midDot ")
+                    }
+
+                    append(
+                        getString(
+                            R.string.action_title_wait,
+                            action.delayBeforeNextAction!!
+                        )
+                    )
+                }
             }
 
             val icon: IconInfo? = actionUiHelper.getIcon(action.data)
@@ -37,43 +61,19 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
             val error: Error? = displayMapping.getActionError(action.data)
 
             if (error == null) {
-                val chipText = buildString {
-
-                    append(title)
-
-                    actionUiHelper.getOptionLabels(mapping, action).forEachIndexed { index, label ->
-                        append(" $midDot ")
-
-                        append(label)
-
-                        if (mapping.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
-                            if (this@buildString.isNotBlank()) {
-                                append(" $midDot ")
-                            }
-
-                            append(
-                                getString(
-                                    R.string.action_title_wait,
-                                    action.delayBeforeNextAction!!
-                                )
-                            )
-                        }
-                    }
-                }
-
                 val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)
                 yield(chip)
             } else {
                 val chip = if (error is FixableError) {
                     ChipUi.FixableError(
                         action.uid,
-                        title,
+                        chipText,
                         error
                     )
                 } else {
                     ChipUi.Error(
                         action.uid,
-                        title
+                        chipText
                     )
                 }
 

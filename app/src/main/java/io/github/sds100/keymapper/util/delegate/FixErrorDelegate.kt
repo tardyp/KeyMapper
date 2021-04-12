@@ -17,10 +17,7 @@ import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FixableError
-import splitties.alertdialog.appcompat.cancelButton
-import splitties.alertdialog.appcompat.messageResource
-import splitties.alertdialog.appcompat.neutralButton
-import splitties.alertdialog.appcompat.positiveButton
+import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
 import splitties.toast.longToast
 
@@ -116,9 +113,14 @@ class FixErrorDelegate(
                 }
             }
 
-            is FixableError.NoCompatibleImeEnabled -> KeyboardUtils.enableCompatibleInputMethods(
-                ctx
-            )
+            is FixableError.NoCompatibleImeEnabled -> {
+                if (permissionAdapter.isGranted(Permission.ROOT)) {
+                    KeyboardUtils.enableCompatibleInputMethodsRoot()
+                } else {
+                    KeyboardUtils.openImeSettings(ctx)
+                }
+            }
+
             is FixableError.NoCompatibleImeChosen -> KeyboardUtils.chooseCompatibleInputMethod(
                 ctx
             )
@@ -131,6 +133,7 @@ class FixErrorDelegate(
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
 
                 ctx.materialAlertDialog {
+                    titleResource = R.string.dialog_title_disable_battery_optimisation
                     messageResource = R.string.dialog_message_disable_battery_optimisation
 
                     positiveButton(R.string.pos_turn_off) {

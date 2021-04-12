@@ -135,7 +135,6 @@ object PermissionUtils {
         }
     }
 
-    @Suppress("EXPERIMENTAL_API_USAGE")
     //TODO delete
     fun isPermissionGranted(ctx: Context, permission: String): Boolean {
         val hasRootPermission =

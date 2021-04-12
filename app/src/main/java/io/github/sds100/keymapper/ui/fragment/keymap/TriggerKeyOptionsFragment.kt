@@ -8,14 +8,14 @@ import com.airbnb.epoxy.EpoxyControllerAdapter
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.data.viewmodel.TriggerKeyOptionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentTriggerKeyOptionsBinding
-import io.github.sds100.keymapper.ui.fragment.BaseOptionsDialogFragment
+import io.github.sds100.keymapper.ui.fragment.OldBaseOptionsDialogFragment
 import io.github.sds100.keymapper.util.InjectorUtils
 
 /**
  * Created by sds100 on 27/06/2020.
  */
 class TriggerKeyOptionsFragment
-    : BaseOptionsDialogFragment<FragmentTriggerKeyOptionsBinding, TriggerKeyOptions>() {
+    : OldBaseOptionsDialogFragment<FragmentTriggerKeyOptionsBinding, TriggerKeyOptions>() {
 
     companion object {
         const val REQUEST_KEY = "request_trigger_key_behavior"

@@ -333,7 +333,7 @@
     <string name="button_pick_coordinate_select_screenshot">Select Screenshot</string>
     <!-- Button titles -->
 
-    <!-- Dialog titles -->
+    <!-- Dialog stuff -->
     <string name="dialog_title_are_you_sure">Are you sure?</string>
     <string name="dialog_title_create_shortcut_title">Create shortcut title</string>
     <string name="dialog_title_cant_find_paired_devices">Can\'t find any paired devices</string>
@@ -343,9 +343,6 @@
     <string name="dialog_title_choose_flash">Choose flash</string>
     <string name="dialog_title_cant_find_accessibility_settings_page">Can\'t find the accessibility settings page</string>
     <string name="dialog_title_cant_record_trigger">Can\'t record trigger?</string>
-    <!-- Dialog titles -->
-
-    <!-- Dialog messages -->
     <string name="dialog_message_are_you_sure_want_to_leave_without_saving">Are you sure you want to leave without saving?</string>
     <string name="dialog_message_cant_find_paired_devices">Make sure Bluetooth is turned on and you have paired devices, then try again.</string>
     <string name="dialog_message_root_prompt">When you tap \"OK\", you will be taken to the settings.
@@ -368,11 +365,12 @@
     <string name="dialog_message_enable_physical_keyboard_caps_lock_a_keyboard_layout">You need to choose the \"Caps Lock to camera\" keyboard layout for your keyboard otherwise the Caps Lock key will still lock caps. You can find this setting in your device settings -> Languages and Input -> Physical Keyboard -> Tap on your keyboard -> Set Up Keyboard Layouts. This will remap the Caps Lock key to KEYCODE_CAMERA so Key Mapper can remap it properly.\n\nAfter you\'ve done this you must remove the Caps Lock trigger key and record the Caps Lock key again. It should say \"Camera\" instead of \"Caps Lock\" if you did the steps correctly.</string>
     <string name="dialog_message_select_app_store_gui_keyboard">Where do you want to get the new keyboard?</string>
     <string name="dialog_message_cant_record_trigger"><b>Reboot</b> your device if the "Record trigger" button is counting down and the buttons that you are pressing aren\'t showing up. If your buttons are still not showing up after rebooting then Key Mapper doesn\'t support your buttons. There isn\'t a fix for this.</string>
-    <string name="dialog_message_disable_battery_optimisation">You MUST read this all otherwise you will get frustrated in the future! Tapping \"turn off\" will prevent Android from stopping the app while it is in the background. This is NOT ENOUGH. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com.</string>
-    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
-    <!-- Dialog messages -->
 
-    <!-- Dialog buttons -->
+    <string name="dialog_title_disable_battery_optimisation">Disable battery optimisation</string>
+    <string name="dialog_message_disable_battery_optimisation">You <b>MUST</b> read this all otherwise you will get frustrated in the future!\n\nTapping \"turn off\" will prevent Android from stopping the app while it is in the background.\n\n<b>This is NOT ENOUGH</b>. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com.</string>
+
+    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
+
     <string name="pos_yes">Yes</string>
     <string name="pos_done">Done</string>
     <string name="pos_opt_in">Opt in</string>
@@ -397,7 +395,7 @@
 
     <string name="snackbar_cancel">Cancel</string>
     <string name="snackbar_fix">Fix</string>
-    <!-- Dialog buttons -->
+    <!-- Dialog stuff -->
 
     <!-- Notification strings -->
     <string name="notification_channel_ime_picker">Keyboard picker</string>
@@ -553,7 +551,9 @@
     <string name="flag_long_press_double_vibration">Vibrate when keys are initially pressed and again when long pressed.</string>
     <string name="flag_detect_triggers_screen_off">Detect trigger when screen is off. ROOT only.</string>
     <string name="flag_repeat_actions">Repeat</string>
+    <string name="flag_repeat_until_pressed_again">Repeat until pressed again</string>
     <string name="flag_hold_down">Hold down</string>
+    <string name="flag_hold_down_until_pressed_again">Hold down until pressed again</string>
     <string name="flag_dont_override_default_action">Do not override default action</string>
     <string name="flag_repeat_until_swiped_again">Repeat until swiped again</string>
     <string name="flag_hold_down_until_swiped_again">Hold down until swiped again</string>

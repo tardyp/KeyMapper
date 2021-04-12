@@ -176,17 +176,17 @@ class ConfigKeyMapUseCaseImpl(
     override fun setVibrateEnabled(enabled: Boolean) = editTrigger { it.copy(vibrate = enabled) }
 
     override fun setVibrationDuration(duration: Defaultable<Int>) =
-        editTrigger { it.copy(vibrateDuration = duration.valueIfCustom()) }
+        editTrigger { it.copy(vibrateDuration = duration.nullIfDefault()) }
 
     override fun setLongPressDelay(delay: Defaultable<Int>) =
-        editTrigger { it.copy(longPressDelay = delay.valueIfCustom()) }
+        editTrigger { it.copy(longPressDelay = delay.nullIfDefault()) }
 
     override fun setDoublePressDelay(delay: Defaultable<Int>) {
-        editTrigger { it.copy(doublePressDelay = delay.valueIfCustom()) }
+        editTrigger { it.copy(doublePressDelay = delay.nullIfDefault()) }
     }
 
     override fun setSequenceTriggerTimeout(delay: Defaultable<Int>) {
-        editTrigger { it.copy(sequenceTriggerTimeout = delay.valueIfCustom()) }
+        editTrigger { it.copy(sequenceTriggerTimeout = delay.nullIfDefault()) }
     }
 
     override fun setLongPressDoubleVibrationEnabled(enabled: Boolean) {
@@ -224,12 +224,36 @@ class ConfigKeyMapUseCaseImpl(
         }.toList()
     }
 
-    override fun setActionRepeatEnabled(uid: String, enabled: Boolean) =
-        setActionOption(uid) { it.copy(repeat = enabled) }
-
     override fun setEnabled(enabled: Boolean) {
         editKeymap { it.copy(isEnabled = enabled) }
     }
+
+    override fun setActionRepeatEnabled(uid: String, repeat: Boolean) =
+        setActionOption(uid) { it.copy(repeat = repeat) }
+
+    override fun setActionRepeatRate(uid: String, repeatRate: Int?) =
+        setActionOption(uid) { it.copy(repeatRate = repeatRate) }
+
+    override fun setActionRepeatDelay(uid: String, repeatDelay: Int?) =
+        setActionOption(uid) { it.copy(repeatDelay = repeatDelay) }
+
+    override fun setActionHoldDownEnabled(uid: String, holdDown: Boolean) =
+        setActionOption(uid) { it.copy(holdDown = holdDown) }
+
+    override fun setActionHoldDownDuration(uid: String, holdDownDuration: Int?) =
+        setActionOption(uid) { it.copy(holdDownDuration = holdDownDuration) }
+
+    override fun setActionStopRepeatingWhenTriggerPressedAgain(uid: String, enabled: Boolean) =
+        setActionOption(uid) { it.copy(stopRepeatingWhenTriggerPressedAgain = enabled) }
+
+    override fun setActionStopHoldingDownWhenTriggerPressedAgain(uid: String, enabled: Boolean) =
+        setActionOption(uid) { it.copy(stopHoldDownWhenTriggerPressedAgain = enabled) }
+
+    override fun setActionMultiplier(uid: String, multiplier: Int?) =
+        setActionOption(uid) { it.copy(multiplier = multiplier) }
+
+    override fun setDelayBeforeNextAction(uid: String, delay: Int?) =
+        setActionOption(uid) { it.copy(delayBeforeNextAction = delay) }
 
     override fun createAction(data: ActionData): KeyMapAction {
         var holdDown = false
@@ -263,16 +287,18 @@ class ConfigKeyMapUseCaseImpl(
         uid: String,
         block: (action: KeyMapAction) -> KeyMapAction
     ) {
-        mapping.value.ifIsData { keyMap ->
-            keyMap.actionList.map {
-                if (it.uid == uid) {
-                    block.invoke(it)
-                } else {
-                    it
+        editKeymap { keyMap ->
+            val newActionList = keyMap.actionList.map { action ->
+                if (action.uid == uid){
+                    block.invoke(action)
+                }else{
+                    action
                 }
-            }.let {
-                setMapping(keyMap.copy(actionList = it))
             }
+
+            keyMap.copy(
+                actionList = newActionList
+            )
         }
     }
 
@@ -318,6 +344,11 @@ interface ConfigKeyMapUseCase : ConfigMappingUseCase<KeyMapAction, KeyMap> {
     fun getAvailableTriggerKeyDevices(): List<TriggerKeyDevice>
 
     //actions
-
-    fun setActionRepeatEnabled(uid: String, enabled: Boolean)
+    fun setActionRepeatEnabled(uid: String, repeat: Boolean)
+    fun setActionRepeatRate(uid: String, repeatRate: Int?)
+    fun setActionRepeatDelay(uid: String, repeatDelay: Int?)
+    fun setActionHoldDownEnabled(uid: String, holdDown: Boolean)
+    fun setActionHoldDownDuration(uid: String, holdDownDuration: Int?)
+    fun setActionStopRepeatingWhenTriggerPressedAgain(uid: String, enabled: Boolean)
+    fun setActionStopHoldingDownWhenTriggerPressedAgain(uid: String, enabled: Boolean)
 }

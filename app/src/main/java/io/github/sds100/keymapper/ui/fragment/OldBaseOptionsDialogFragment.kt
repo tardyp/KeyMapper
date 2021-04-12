@@ -21,7 +21,7 @@ import io.github.sds100.keymapper.util.*
  */
 
 //TODO
-abstract class BaseOptionsDialogFragment<BINDING : ViewDataBinding, O : BaseOptions<*>>
+abstract class OldBaseOptionsDialogFragment<BINDING : ViewDataBinding, O : BaseOptions<*>>
     : BottomSheetDialogFragment() {
 
     companion object {

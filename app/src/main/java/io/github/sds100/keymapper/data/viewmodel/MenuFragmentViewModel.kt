@@ -34,6 +34,7 @@ class MenuFragmentViewModel(
     fun enableAll() {
         keymapUseCase.enableAll()
 
+        //TODO fingerprint
 //        FingerprintMapUtils.GESTURES.forEach { gestureId ->
             //TODO
 //            fingerprintMapRepository.updateGesture(gestureId) {

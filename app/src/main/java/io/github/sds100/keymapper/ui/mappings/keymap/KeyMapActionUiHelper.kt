@@ -17,12 +17,29 @@ class KeyMapActionUiHelper(
 ) : BaseActionUiHelper<KeyMap, KeyMapAction>(displayActionUseCase, resourceProvider) {
 
     override fun getOptionLabels(mapping: KeyMap, action: KeyMapAction) = sequence {
-        if (mapping.isRepeatingActionsAllowed() && action.repeat){
+        if (mapping.isRepeatingActionsAllowed()
+            && action.repeat
+            && !action.stopRepeatingWhenTriggerPressedAgain
+        ) {
             yield(getString(R.string.flag_repeat_actions))
         }
 
-        if (mapping.isHoldingDownActionAllowed(action) && action.holdDown){
+        if (mapping.isStopRepeatingActionWhenTriggerPressedAgainAllowed(action)
+            && action.stopRepeatingWhenTriggerPressedAgain
+        ) {
+            yield(getString(R.string.flag_repeat_until_pressed_again))
+        }
+
+        if (mapping.isHoldingDownActionAllowed(action)
+            && action.holdDown
+            && !action.stopHoldDownWhenTriggerPressedAgain) {
             yield(getString(R.string.flag_hold_down))
+        }
+
+        if (mapping.isHoldingDownActionAllowed(action)
+            && action.holdDown
+            && action.stopHoldDownWhenTriggerPressedAgain) {
+            yield(getString(R.string.flag_hold_down_until_pressed_again))
         }
 
     }.toList()

@@ -5,7 +5,6 @@ import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
@@ -26,14 +25,13 @@ import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 24/11/20.
  */
 
 //TODO rename as ConfigKeymapTriggerViewModel
-class TriggerViewModel(
+class ConfigKeyMapTriggerViewModel(
     private val coroutineScope: CoroutineScope,
     private val onboarding: OnboardingUseCase,
     private val config: ConfigKeyMapUseCase,
@@ -47,7 +45,7 @@ class TriggerViewModel(
         const val KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG = "enable_accessibility_service"
     }
 
-    val optionsViewModel = TriggerOptionsViewModel(
+    val optionsViewModel = ConfigKeyMapTriggerOptionsViewModel(
         coroutineScope,
         onboarding,
         config,

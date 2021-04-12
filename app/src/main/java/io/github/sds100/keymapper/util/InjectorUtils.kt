@@ -6,7 +6,6 @@ import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCaseImpl
 import io.github.sds100.keymapper.data.viewmodel.*
-import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCase
 import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
@@ -105,10 +104,6 @@ object InjectorUtils {
             UseCases.isSystemActionSupported(context),
             ServiceLocator.resourceProvider(context)
         )
-    }
-
-    fun provideKeymapActionOptionsViewModel(): KeymapActionOptionsViewModel.Factory {
-        return KeymapActionOptionsViewModel.Factory()
     }
 
     fun provideFingerprintActionOptionsViewModel(): FingerprintActionOptionsViewModel.Factory {

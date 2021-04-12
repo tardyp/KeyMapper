@@ -23,7 +23,7 @@ sealed class Defaultable<out T> {
         }
     }
 
-    fun valueIfCustom(): T? = if (this is Custom) {
+    fun nullIfDefault(): T? = if (this is Custom) {
         this.data
     } else {
         null

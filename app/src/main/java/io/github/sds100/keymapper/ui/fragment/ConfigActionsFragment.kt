@@ -17,7 +17,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.action
 import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.options.BaseOptions
-import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.ui.ListUiState
@@ -28,17 +28,17 @@ import kotlinx.coroutines.flow.collectLatest
 /**
  * Created by sds100 on 22/11/20.
  */
-abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
+abstract class ConfigActionsFragment<O : BaseOptions<ActionEntity>, A : Action>
     : RecyclerViewFragment<ActionListItem, FragmentActionListBinding>() {
 
     companion object {
         const val CHOOSE_ACTION_REQUEST_KEY = "request_choose_action"
     }
 
-    abstract val actionListViewModel: ActionListViewModel<A, *>
+    abstract val configActionsViewModel: ConfigActionsViewModel<A, *>
 
     override val listItems: Flow<ListUiState<ActionListItem>>
-        get() = actionListViewModel.state
+        get() = configActionsViewModel.state
 
     private val actionListController = ActionListController()
 
@@ -46,8 +46,6 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
         FragmentActionListBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
-    abstract fun openActionOptionsFragment(options: O)
 
     override fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<ActionListItem>) {
         binding.enableActionDragging(actionListController)
@@ -57,11 +55,6 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
 
     override fun subscribeUi(binding: FragmentActionListBinding) {
         binding.epoxyRecyclerView.adapter = actionListController.adapter
-
-//        actionListViewModel.openEditOptions.observe(viewLifecycleOwner, {
-        //TODO
-//            openActionOptionsFragment(it)
-//        })
 
         binding.setOnAddActionClick {
             val direction =
@@ -96,7 +89,7 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
                     modelBeingMoved: ActionBindingModel_?,
                     itemView: View?
                 ) {
-                    actionListViewModel.moveAction(fromPosition, toPosition)
+                    configActionsViewModel.moveAction(fromPosition, toPosition)
                 }
 
                 override fun onDragStarted(
@@ -127,16 +120,15 @@ abstract class ActionListFragment<O : BaseOptions<ActionEntity>, A : Action>
                     state(it)
 
                     onRemoveClick { _ ->
-                        actionListViewModel.onRemoveClick(it.id)
+                        configActionsViewModel.onRemoveClick(it.id)
                     }
 
                     onMoreClick { _ ->
-                        //TODO
-//                        actionListViewModel.editOptions(model.id)
+                        configActionsViewModel.editOptions(it.id)
                     }
 
                     onClick { _ ->
-                        actionListViewModel.onModelClick(it.id)
+                        configActionsViewModel.onModelClick(it.id)
                     }
                 }
             }

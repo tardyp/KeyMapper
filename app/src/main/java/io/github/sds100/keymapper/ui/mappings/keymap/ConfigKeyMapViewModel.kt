@@ -5,8 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.constraints.ConstraintUtils
-import io.github.sds100.keymapper.data.viewmodel.ActionListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigKeyMapActionOptionsViewModel
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
@@ -24,7 +25,9 @@ import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /**
@@ -54,7 +57,10 @@ class ConfigKeyMapViewModel(
         private const val STATE_KEY = "config_keymap"
     }
 
-    val actionListViewModel = ActionListViewModel(
+    val configActionOptionsViewModel =
+        ConfigKeyMapActionOptionsViewModel(viewModelScope, config, resourceProvider)
+
+    val actionListViewModel = ConfigActionsViewModel(
         viewModelScope,
         displayMapping,
         testAction,
@@ -63,7 +69,7 @@ class ConfigKeyMapViewModel(
         resourceProvider
     )
 
-    val triggerViewModel = TriggerViewModel(
+    val triggerViewModel = ConfigKeyMapTriggerViewModel(
         viewModelScope,
         onboard,
         config,

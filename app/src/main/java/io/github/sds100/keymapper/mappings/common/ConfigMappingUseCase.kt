@@ -22,7 +22,6 @@ abstract class BaseConfigMappingUseCase<ACTION : Action, T : Mapping<ACTION>> : 
 
     override fun setMapping(mapping: T) {
         this.mapping.value = State.Data(mapping)
-        Timber.e("set mapping")
     }
 
     override fun getMapping(): State<T> = mapping.value
@@ -105,6 +104,9 @@ interface ConfigMappingUseCase<ACTION : Action, T : Mapping<ACTION>> {
     fun addAction(data: ActionData)
     fun moveAction(fromIndex: Int, toIndex: Int)
     fun removeAction(uid: String)
+
+    fun setActionMultiplier(uid: String, multiplier: Int?)
+    fun setDelayBeforeNextAction(uid: String, delay: Int?)
 
     fun addConstraint(constraint: Constraint): Boolean
     fun removeConstraint(id: String)

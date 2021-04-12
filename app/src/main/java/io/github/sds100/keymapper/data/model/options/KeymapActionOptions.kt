@@ -13,6 +13,7 @@ import kotlinx.android.parcel.Parcelize
  * Created by sds100 on 22/11/20.
  */
 
+//TODO delete
 @Parcelize
 class KeymapActionOptions(
     override val id: String,

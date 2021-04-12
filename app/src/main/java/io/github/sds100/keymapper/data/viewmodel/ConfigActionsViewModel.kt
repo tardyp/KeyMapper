@@ -20,14 +20,12 @@ import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * Created by sds100 on 22/11/20.
  */
 
-//TODO rename as ConfigActionsViewModel
-class ActionListViewModel<A : Action, M : Mapping<A>>(
+class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
     private val coroutineScope: CoroutineScope,
     private val displayActionUseCase: DisplayActionUseCase,
     private val testAction: TestActionUseCase,
@@ -51,7 +49,7 @@ class ActionListViewModel<A : Action, M : Mapping<A>>(
 
 
     init {
-         val rebuildUiState = MutableSharedFlow<State<M>>()
+        val rebuildUiState = MutableSharedFlow<State<M>>()
 
         coroutineScope.launch {
             rebuildUiState.collectLatest { mapping ->
@@ -73,7 +71,7 @@ class ActionListViewModel<A : Action, M : Mapping<A>>(
 
         coroutineScope.launch {
             displayActionUseCase.invalidateErrors.collectLatest {
-                rebuildUiState.emit(config.mapping.firstOrNull()?: return@collectLatest)
+                rebuildUiState.emit(config.mapping.firstOrNull() ?: return@collectLatest)
             }
         }
     }
@@ -106,6 +104,10 @@ class ActionListViewModel<A : Action, M : Mapping<A>>(
         config.removeAction(actionUid)
     }
 
+    fun editOptions(actionUid: String) {
+        runBlocking { _openEditOptions.emit(actionUid) }
+    }
+
     private fun createListItems(mapping: M): List<ActionListItem> {
         val actionCount = mapping.actionList.size
 
@@ -130,20 +132,20 @@ class ActionListViewModel<A : Action, M : Mapping<A>>(
                     }
 
                     append(label)
+                }
 
-                    action.delayBeforeNextAction.apply {
-                        if (mapping.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
-                            if (this@buildString.isNotBlank()) {
-                                append(" $midDot ")
-                            }
-
-                            append(
-                                getString(
-                                    R.string.action_title_wait,
-                                    action.delayBeforeNextAction!!
-                                )
-                            )
+                action.delayBeforeNextAction.apply {
+                    if (mapping.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
+                        if (this@buildString.isNotBlank()) {
+                            append(" $midDot ")
                         }
+
+                        append(
+                            getString(
+                                R.string.action_title_wait,
+                                action.delayBeforeNextAction!!
+                            )
+                        )
                     }
                 }
             }.takeIf { it.isNotBlank() }

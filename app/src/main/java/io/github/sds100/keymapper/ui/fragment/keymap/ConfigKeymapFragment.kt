@@ -3,17 +3,25 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
+import io.github.sds100.keymapper.mappings.common.ConfigActionOptionsFragment
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.FragmentInfo
+import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.int
+import io.github.sds100.keymapper.util.intArray
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.
@@ -46,22 +54,30 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
             }
         }
 
-        setFragmentResultListener(KeymapActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<KeymapActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
+        setFragmentResultListener(ConfigActionOptionsFragment.REQUEST_KEY) { _, result ->
+            result.getParcelable<KeymapActionOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
                 ?.let {
                     //TODO
                 }
         }
 
         setFragmentResultListener(TriggerKeyOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<TriggerKeyOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)?.let {
-                viewModel.triggerViewModel.setTriggerKeyOptions(it)
-            }
+            result.getParcelable<TriggerKeyOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
+                ?.let {
+                    viewModel.triggerViewModel.setTriggerKeyOptions(it)
+                }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.actionListViewModel.openEditOptions.collectLatest { actionUid ->
+                viewModel.configActionOptionsViewModel.setActionToConfigure(actionUid)
+                findNavController().navigate(ConfigKeymapFragmentDirections.actionConfigKeymapFragmentToActionOptionsFragment())
+            }
+        }
 
         viewModel.triggerViewModel.showUserResponseRequests(this, binding)
 
@@ -73,7 +89,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
             int(R.integer.fragment_id_trigger) -> it to TriggerFragment.Info()
             int(R.integer.fragment_id_trigger_options) -> it to TriggerOptionsFragment.Info()
             int(R.integer.fragment_id_constraint_list) -> it to KeymapConfigConstraintsFragment.Info()
-            int(R.integer.fragment_id_action_list) -> it to KeymapActionListFragment.Info()
+            int(R.integer.fragment_id_action_list) -> it to KeyMapConfigActionsFragment.Info()
 
             int(R.integer.fragment_id_constraints_and_options) ->
                 it to FragmentInfo(R.string.tab_constraints_and_more) {
@@ -92,7 +108,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
     class TriggerAndActionsFragment : TwoFragments(
         TriggerFragment.Info(),
-        KeymapActionListFragment.Info()
+        KeyMapConfigActionsFragment.Info()
     )
 
     class ConstraintsAndOptionsFragment : TwoFragments(
@@ -103,7 +119,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     class AllFragments : FourFragments(
         TriggerFragment.Info(),
         TriggerOptionsFragment.Info(),
-        KeymapActionListFragment.Info(),
+        KeyMapConfigActionsFragment.Info(),
         KeymapConfigConstraintsFragment.Info()
     )
 }

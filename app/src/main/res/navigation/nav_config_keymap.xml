@@ -40,11 +40,7 @@
 
     <dialog
         android:id="@+id/keymapActionOptionsFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.keymap.KeymapActionOptionsFragment"
+        android:name="io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapActionOptionsFragment"
         android:label="KeymapActionOptionsFragment">
-
-        <argument
-            android:name="@string/nav_arg_keymap_action_options"
-            app:argType="io.github.sds100.keymapper.data.model.options.KeymapActionOptions" />
-    </dialog>
+   </dialog>
 </navigation>

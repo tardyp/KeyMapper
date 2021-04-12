@@ -25,7 +25,7 @@ class AndroidBluetoothMonitor(
     override val onDeviceDisconnect = MutableSharedFlow<String>()
     override val onDevicePairedChange = MutableSharedFlow<String>()
     override val isBluetoothEnabled =
-        MutableStateFlow(BluetoothAdapter.getDefaultAdapter().isEnabled)
+        MutableStateFlow(BluetoothAdapter.getDefaultAdapter()?.isEnabled ?: false)
 
     private val ctx: Context = context.applicationContext
     private val broadcastReceiver = object : BroadcastReceiver() {

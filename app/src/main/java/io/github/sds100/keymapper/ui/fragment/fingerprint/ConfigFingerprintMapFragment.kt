@@ -37,7 +37,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
             viewModel.loadFingerprintMap(Json.decodeFromString(args.gestureId))
         }
 
-        setFragmentResultListener(ActionListFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
+        setFragmentResultListener(ConfigActionsFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
                 viewModel.actionListViewModel.addAction(it)
             }
@@ -50,7 +50,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
         }
 
         setFragmentResultListener(FingerprintActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<FingerprintActionOptions>(BaseOptionsDialogFragment.EXTRA_OPTIONS)
+            result.getParcelable<FingerprintActionOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
                 ?.let {
                     //TODO
 //                    viewModel.actionListViewModel.setOptions(it)
@@ -62,7 +62,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
         intArray(R.array.config_fingerprint_map_fragments).map {
             when (it) {
                 int(R.integer.fragment_id_action_list) ->
-                    it to FingerprintActionListFragment.Info()
+                    it to FingerprintConfigActionsFragment.Info()
 
                 int(R.integer.fragment_id_fingerprint_map_options) ->
                     it to FingerprintMapOptionsFragment.Info()
