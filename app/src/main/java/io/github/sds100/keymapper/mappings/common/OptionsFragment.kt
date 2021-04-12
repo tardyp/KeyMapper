@@ -6,35 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
-import androidx.navigation.navGraphViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeyMapActionOptionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentOptionsBinding
 import io.github.sds100.keymapper.divider
-import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredRadioButtonPair
+import io.github.sds100.keymapper.ui.utils.configuredRadioButtonTriple
 import io.github.sds100.keymapper.ui.utils.configuredSlider
-import io.github.sds100.keymapper.util.InjectorUtils
 import io.github.sds100.keymapper.util.UrlUtils
-import io.github.sds100.keymapper.util.str
 import kotlinx.coroutines.flow.collectLatest
 
 /**
- * Created by sds100 on 27/06/2020.
+ * Created by sds100 on 12/04/2021.
  */
-abstract class ConfigActionOptionsFragment<M : Mapping<A>, A : Action> : BottomSheetDialogFragment() {
+abstract class OptionsBottomSheetFragment : BottomSheetDialogFragment() {
 
-    companion object {
-        const val REQUEST_KEY = "request_choose_action_options"
-    }
-
-    abstract val viewModel: ConfigActionOptionsViewModel<M, A>
+    abstract val url: String
+    abstract val viewModel: OptionsViewModel
 
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
@@ -70,7 +61,7 @@ abstract class ConfigActionOptionsFragment<M : Mapping<A>, A : Action> : BottomS
         }
 
         binding.setOnHelpClick {
-            UrlUtils.openUrl(requireContext(), str(R.string.url_keymap_action_options_guide))
+            UrlUtils.openUrl(requireContext(), url)
         }
 
         binding.setOnDoneClick {
@@ -88,7 +79,16 @@ abstract class ConfigActionOptionsFragment<M : Mapping<A>, A : Action> : BottomS
             listItems.forEach { model ->
                 if (model is RadioButtonPairListItem) {
                     configuredRadioButtonPair(
-                        this@ConfigActionOptionsFragment,
+                        this@OptionsBottomSheetFragment,
+                        model
+                    ) { id, isChecked ->
+                        viewModel.setRadioButtonValue(id, isChecked)
+                    }
+                }
+
+                if (model is RadioButtonTripleListItem) {
+                    configuredRadioButtonTriple(
+                        this@OptionsBottomSheetFragment,
                         model
                     ) { id, isChecked ->
                         viewModel.setRadioButtonValue(id, isChecked)
@@ -96,13 +96,13 @@ abstract class ConfigActionOptionsFragment<M : Mapping<A>, A : Action> : BottomS
                 }
 
                 if (model is CheckBoxListItem) {
-                    configuredCheckBox(this@ConfigActionOptionsFragment, model) {
+                    configuredCheckBox(this@OptionsBottomSheetFragment, model) {
                         viewModel.setCheckboxValue(model.id, it)
                     }
                 }
 
                 if (model is SliderListItem) {
-                    configuredSlider(this@ConfigActionOptionsFragment, model) {
+                    configuredSlider(this@OptionsBottomSheetFragment, model) {
                         viewModel.setSliderValue(model.id, it)
                     }
                 }

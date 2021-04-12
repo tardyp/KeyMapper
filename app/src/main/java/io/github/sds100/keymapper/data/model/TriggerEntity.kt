@@ -108,10 +108,6 @@ data class TriggerEntity(
 
             const val FLAG_DO_NOT_CONSUME_KEY_EVENT = 1
 
-            val TRIGGER_KEY_FLAG_LABEL_MAP = mapOf(
-                FLAG_DO_NOT_CONSUME_KEY_EVENT to R.string.flag_dont_override_default_action
-            )
-
             val DESERIALIZER = jsonDeserializer {
                 val keycode by it.json.byInt(NAME_KEYCODE)
                 val deviceId by it.json.byString(NAME_DEVICE_ID)
@@ -124,12 +120,6 @@ data class TriggerEntity(
                 KeyEntity(keycode, deviceId, clickType, flags ?: 0, uid ?: UUID.randomUUID().toString())
             }
         }
-
-        override fun equals(other: Any?): Boolean {
-            return (other as KeyEntity?)?.keyCode == keyCode
-        }
-
-        override fun hashCode() = keyCode.hashCode()
     }
 
     @IntDef(value = [PARALLEL, SEQUENCE, UNDEFINED])

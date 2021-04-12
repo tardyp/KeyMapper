@@ -35,7 +35,9 @@
                 android:indeterminate="true"
                 android:indeterminateBehavior="repeat"
                 android:visibility="@{showProgressBar ? View.VISIBLE : View.GONE}"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/epoxyRecyclerView"/>
 
             <com.airbnb.epoxy.EpoxyRecyclerView
                 android:id="@+id/epoxyRecyclerView"

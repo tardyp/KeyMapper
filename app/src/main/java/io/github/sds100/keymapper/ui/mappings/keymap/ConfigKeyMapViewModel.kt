@@ -19,6 +19,7 @@ import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.keymaps.ConfigTriggerKeyViewModel
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingUiState
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
@@ -60,6 +61,9 @@ class ConfigKeyMapViewModel(
     val configActionOptionsViewModel =
         ConfigKeyMapActionOptionsViewModel(viewModelScope, config, resourceProvider)
 
+    val configTriggerKeyViewModel =
+        ConfigTriggerKeyViewModel(viewModelScope, config, resourceProvider)
+
     val actionListViewModel = ConfigActionsViewModel(
         viewModelScope,
         displayMapping,
@@ -69,7 +73,7 @@ class ConfigKeyMapViewModel(
         resourceProvider
     )
 
-    val triggerViewModel = ConfigKeyMapTriggerViewModel(
+    val configTriggerViewModel = ConfigKeyMapTriggerViewModel(
         viewModelScope,
         onboard,
         config,
@@ -92,7 +96,7 @@ class ConfigKeyMapViewModel(
     override fun setEnabled(enabled: Boolean) = config.setEnabled(enabled)
 
     override val fixError = merge(
-        triggerViewModel.fixError,
+        configTriggerViewModel.fixError,
         actionListViewModel.fixError,
         constraintListViewModel.fixError
     )

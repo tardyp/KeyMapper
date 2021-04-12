@@ -3,6 +3,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 import io.github.sds100.keymapper.data.model.TriggerEntity
 import io.github.sds100.keymapper.domain.utils.ClickType
 import kotlinx.serialization.Serializable
+import splitties.bitflags.hasFlag
 import splitties.bitflags.withFlag
 import java.util.*
 
@@ -39,7 +40,8 @@ object KeymapTriggerKeyEntityMapper {
                 TriggerEntity.LONG_PRESS -> ClickType.LONG_PRESS
                 TriggerEntity.DOUBLE_PRESS -> ClickType.DOUBLE_PRESS
                 else -> ClickType.SHORT_PRESS
-            }
+            },
+            consumeKeyEvent = !entity.flags.hasFlag(TriggerEntity.KeyEntity.FLAG_DO_NOT_CONSUME_KEY_EVENT)
         )
     }
 

@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.ui.mappings.keymap
 import android.os.Build
 import android.view.KeyEvent
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.*
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
@@ -16,7 +15,6 @@ import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
-import io.github.sds100.keymapper.ui.fragment.keymap.ChooseTriggerKeyDeviceModel
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
 import io.github.sds100.keymapper.util.KeyEventUtils
@@ -25,6 +23,7 @@ import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 24/11/20.
@@ -67,8 +66,12 @@ class ConfigKeyMapTriggerViewModel(
         onboarding.shownSequenceTriggerExplanation = true
     }
 
-    private val _showChooseDeviceDialog = MutableSharedFlow<ChooseTriggerKeyDeviceModel>()
-    val showChooseDeviceDialog = _showChooseDeviceDialog.asSharedFlow()
+    private val _openEditOptions = MutableSharedFlow<String>()
+
+    /**
+     * value is the uid of the action
+     */
+    val openEditOptions = _openEditOptions.asSharedFlow()
 
     private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
@@ -78,8 +81,15 @@ class ConfigKeyMapTriggerViewModel(
     )
     val state = _state.asStateFlow()
 
-
     init {
+        val rebuildUiState = MutableSharedFlow<UiBuilder>()
+
+        coroutineScope.launch {
+            rebuildUiState.collectLatest { uiBuilder ->
+                _state.value = uiBuilder.build()
+            }
+        }
+
         recordTrigger.onRecordKey.onEach {
 
             if (it.keyCode == KeyEvent.KEYCODE_CAPS_LOCK) {
@@ -90,6 +100,7 @@ class ConfigKeyMapTriggerViewModel(
         }.launchIn(coroutineScope)
 
         //TODO dialogs
+
         coroutineScope.launch {
             combine(
                 config.mapping,
@@ -97,54 +108,70 @@ class ConfigKeyMapTriggerViewModel(
             ) { configState, recordTriggerState ->
                 UiBuilder(configState.mapData { it.trigger }, recordTriggerState)
             }.collectLatest {
-                _state.value = it.build()
+                rebuildUiState.emit(it)
+            }
+        }
+
+        coroutineScope.launch {
+            displayKeyMap.invalidateErrors.collectLatest {
+                val configState = config.mapping.firstOrNull() ?: return@collectLatest
+                val recordTriggerState = recordTrigger.state.firstOrNull() ?: return@collectLatest
+
+                rebuildUiState.emit(
+                    UiBuilder(configState.mapData { it.trigger }, recordTriggerState)
+                )
             }
         }
     }
 
-    fun setParallelTriggerModeChecked(checked: Boolean) {
-        if (checked) {
-            config.setParallelTriggerMode()
+    fun onClickTypeRadioButtonCheckedChange(buttonId: Int) {
+        when (buttonId) {
+            R.id.radioButtonShortPress -> config.setTriggerShortPress()
+            R.id.radioButtonLongPress -> config.setTriggerLongPress()
+            R.id.radioButtonDoublePress -> config.setTriggerDoublePress()
         }
     }
 
-    fun setSequenceTriggerModeChecked(checked: Boolean) {
-        if (checked) {
-            config.setSequenceTriggerMode()
+    fun onTriggerModeRadioButtonCheckedChange(buttonId: Int) {
+        when (buttonId) {
+            R.id.radioButtonParallel -> config.setParallelTriggerMode()
+            R.id.radioButtonSequence -> config.setSequenceTriggerMode()
         }
     }
-
-    fun setShortPressButtonChecked(checked: Boolean) {
-        if (checked) {
-            config.setParallelTriggerShortPress()
-        }
-    }
-
-    fun setLongPressButtonChecked(checked: Boolean) {
-        if (checked) {
-            config.setParallelTriggerLongPress()
-        }
-    }
-
-    fun setTriggerKeyDevice(uid: String, device: TriggerKeyDevice) =
-        config.setTriggerKeyDevice(uid, device)
 
     fun onRemoveKeyClick(uid: String) = config.removeTriggerKey(uid)
     fun onMoveTriggerKey(fromIndex: Int, toIndex: Int) = config.moveTriggerKey(fromIndex, toIndex)
 
     fun onTriggerKeyOptionsClick(id: String) {
-//        TODO()
-    }
-
-    fun setTriggerKeyOptions(options: TriggerKeyOptions) {
-//        TODO()
+        runBlocking { _openEditOptions.emit(id) }
     }
 
     fun onChooseDeviceClick(keyUid: String) {
         coroutineScope.launch {
+            val idAny = "any"
+            val idInternal = "this_device"
             val devices = config.getAvailableTriggerKeyDevices()
 
-            _showChooseDeviceDialog.emit(ChooseTriggerKeyDeviceModel(keyUid, devices))
+            val listItems = devices.map {
+                when (it) {
+                    TriggerKeyDevice.Any -> idAny to getString(R.string.any_device)
+                    is TriggerKeyDevice.External -> it.descriptor to it.name
+                    TriggerKeyDevice.Internal -> idInternal to getString(R.string.this_device)
+                }
+            }
+
+            val response = getUserResponse(
+                "pick_trigger_key_device",
+                RequestUserResponse.SingleChoice(listItems)
+            ) ?: return@launch
+
+            val selectedTriggerKeyDevice = when (response.item) {
+                idAny -> TriggerKeyDevice.Any
+                idInternal -> TriggerKeyDevice.Internal
+                else -> devices.single { it is TriggerKeyDevice.External && it.descriptor == response.item }
+            }
+
+            config.setTriggerKeyDevice(keyUid, selectedTriggerKeyDevice)
         }
     }
 
@@ -261,26 +288,51 @@ class ConfigKeyMapTriggerViewModel(
             }
         }
 
-        fun build(): TriggerUiState = when (triggerState) {
+        val checkedClickTypeRadioButton: Int by lazy {
+            if (triggerState !is State.Data) return@lazy R.id.radioButtonShortPress
+
+            val clickType: ClickType? = when {
+                triggerState.data.mode is TriggerMode.Parallel -> triggerState.data.mode.clickType
+                triggerState.data.keys.size == 1 -> triggerState.data.keys[0].clickType
+                else -> null
+            }
+
+            when (clickType) {
+                ClickType.SHORT_PRESS -> R.id.radioButtonShortPress
+                ClickType.LONG_PRESS -> R.id.radioButtonLongPress
+                ClickType.DOUBLE_PRESS -> R.id.radioButtonDoublePress
+                null -> R.id.radioButtonShortPress
+            }
+        }
+
+        val checkedTriggerModeRadioButton: Int by lazy {
+            if (triggerState !is State.Data) return@lazy R.id.radioButtonUndefined
+
+            when (triggerState.data.mode) {
+                is TriggerMode.Parallel -> R.id.radioButtonParallel
+                TriggerMode.Sequence -> R.id.radioButtonSequence
+                TriggerMode.Undefined -> R.id.radioButtonUndefined
+            }
+        }
+
+        fun build(): KeyMapTriggerUiState = when (triggerState) {
             is State.Data -> loadedState(triggerState.data)
             is State.Loading -> loadingState()
         }
 
-        private fun loadedState(trigger: KeyMapTrigger) = TriggerUiState(
+        private fun loadedState(trigger: KeyMapTrigger) = KeyMapTriggerUiState(
             triggerKeyListItems = createListItems(trigger).createListState(),
 
             recordTriggerButtonText = recordTriggerButtonText,
 
-            clickTypeRadioButtonsVisible = trigger.mode is TriggerMode.Parallel,
+            clickTypeRadioButtonsVisible = trigger.mode is TriggerMode.Parallel || trigger.keys.size == 1,
+            checkedClickTypeRadioButton = checkedClickTypeRadioButton,
 
-            shortPressButtonChecked =
-            trigger.mode is TriggerMode.Parallel && trigger.mode.clickType == ClickType.SHORT_PRESS,
-            longPressButtonChecked =
-            trigger.mode is TriggerMode.Parallel && trigger.mode.clickType == ClickType.LONG_PRESS,
+            doublePressButtonVisible = trigger.keys.size == 1,
 
             triggerModeButtonsEnabled = trigger.keys.size > 1,
-            parallelTriggerModeButtonChecked = trigger.mode is TriggerMode.Parallel,
-            sequenceTriggerModeButtonChecked = trigger.mode is TriggerMode.Sequence,
+
+            checkedTriggerModeRadioButton = checkedTriggerModeRadioButton,
 
             showSequenceTriggerExplanation = trigger.mode is TriggerMode.Sequence
                 && !onboarding.shownSequenceTriggerExplanation,
@@ -292,19 +344,18 @@ class ConfigKeyMapTriggerViewModel(
             errorListItems = errorListItems
         )
 
-        private fun loadingState() = TriggerUiState(
+        private fun loadingState() = KeyMapTriggerUiState(
             triggerKeyListItems = ListUiState.Empty,
             recordTriggerButtonText = recordTriggerButtonText,
 
             clickTypeRadioButtonsVisible = false,
 
-            shortPressButtonChecked = false,
-            longPressButtonChecked = false,
+            checkedClickTypeRadioButton = R.id.radioButtonShortPress,
+            doublePressButtonVisible = false,
 
             triggerModeButtonsEnabled = false,
 
-            parallelTriggerModeButtonChecked = false,
-            sequenceTriggerModeButtonChecked = false,
+            checkedTriggerModeRadioButton = R.id.radioButtonUndefined,
 
             showSequenceTriggerExplanation = false,
             showParallelTriggerOrderExplanation = false,
@@ -314,17 +365,16 @@ class ConfigKeyMapTriggerViewModel(
     }
 }
 
-data class TriggerUiState(
+data class KeyMapTriggerUiState(
     val triggerKeyListItems: ListUiState<TriggerKeyListItem>,
     val recordTriggerButtonText: String,
 
     val clickTypeRadioButtonsVisible: Boolean,
-    val shortPressButtonChecked: Boolean,
-    val longPressButtonChecked: Boolean,
+    val checkedClickTypeRadioButton: Int,
+    val doublePressButtonVisible: Boolean,
 
     val triggerModeButtonsEnabled: Boolean,
-    val parallelTriggerModeButtonChecked: Boolean,
-    val sequenceTriggerModeButtonChecked: Boolean,
+    val checkedTriggerModeRadioButton: Int,
 
     val showSequenceTriggerExplanation: Boolean,
     val showParallelTriggerOrderExplanation: Boolean,

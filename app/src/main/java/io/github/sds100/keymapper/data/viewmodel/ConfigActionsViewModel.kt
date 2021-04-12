@@ -47,7 +47,6 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
     private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
 
-
     init {
         val rebuildUiState = MutableSharedFlow<State<M>>()
 

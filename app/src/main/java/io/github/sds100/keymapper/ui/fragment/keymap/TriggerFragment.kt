@@ -51,7 +51,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
     private val configKeyMapTriggerViewModel: ConfigKeyMapTriggerViewModel by lazy {
         navGraphViewModels<ConfigKeyMapViewModel>(R.id.nav_config_keymap) {
             InjectorUtils.provideConfigKeyMapViewModel(requireContext())
-        }.value.triggerViewModel
+        }.value.configTriggerViewModel
     }
 
     private val triggerKeyController = TriggerKeyController()
@@ -133,10 +133,6 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
                     }
                 }
             }
-        }
-
-        configKeyMapTriggerViewModel.showChooseDeviceDialog.collectWhenStarted(viewLifecycleOwner) { model ->
-
         }
     }
 

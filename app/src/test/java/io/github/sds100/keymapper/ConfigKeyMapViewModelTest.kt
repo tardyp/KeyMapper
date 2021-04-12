@@ -2,7 +2,7 @@ package io.github.sds100.keymapper
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.github.sds100.keymapper.data.repository.DeviceInfoCache
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapRepository
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,13 +27,13 @@ class ConfigKeyMapViewModelTest {
     private val coroutineScope = TestCoroutineScope(testDispatcher)
 
     private lateinit var mockDeviceInfoRepository: DeviceInfoCache
-    private lateinit var mockKeymapRepository: KeymapRepository
+    private lateinit var mockKeyMapRepository: KeyMapRepository
 
     private lateinit var viewModel: ConfigKeyMapViewModel
 
     @Before
     fun init() {
-        mockKeymapRepository = mock(KeymapRepository::class.java)
+        mockKeyMapRepository = mock(KeyMapRepository::class.java)
         mockDeviceInfoRepository = mock(DeviceInfoCache::class.java)
 
         Dispatchers.setMain(testDispatcher)

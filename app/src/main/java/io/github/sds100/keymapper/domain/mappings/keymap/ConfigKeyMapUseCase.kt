@@ -95,15 +95,12 @@ class ConfigKeyMapUseCaseImpl(
         )
     }
 
-    override fun setParallelTriggerMode() = mapping.value.ifIsData { keyMap ->
-        val trigger = keyMap.trigger
-
-        if (trigger.mode is TriggerMode.Parallel) return@ifIsData
+    override fun setParallelTriggerMode() = editTrigger { trigger ->
+        if (trigger.mode is TriggerMode.Parallel) return@editTrigger trigger
 
         //undefined mode only allowed if one or no keys
         if (trigger.keys.size <= 1) {
-            editTrigger { it.copy(mode = TriggerMode.Undefined) }
-            return@ifIsData
+            return@editTrigger trigger.copy(mode = TriggerMode.Undefined)
         }
 
         val oldKeys = trigger.keys
@@ -121,7 +118,13 @@ class ConfigKeyMapUseCaseImpl(
                 newKeys.distinctBy { Pair(it.keyCode, it.device) }.toMutableList()
         }
 
-        editTrigger { it.copy(keys = newKeys, mode = TriggerMode.Parallel(ClickType.SHORT_PRESS)) }
+        val newMode = if (newKeys.size <= 1){
+            TriggerMode.Undefined
+        }else{
+            TriggerMode.Parallel(newKeys[0].clickType)
+        }
+
+        trigger.copy(keys = newKeys, mode = newMode)
     }
 
     override fun setSequenceTriggerMode() = editTrigger { trigger ->
@@ -145,32 +148,68 @@ class ConfigKeyMapUseCaseImpl(
         trigger.copy(mode = TriggerMode.Undefined)
     }
 
-    override fun setParallelTriggerShortPress() {
+    override fun setTriggerShortPress() {
         editTrigger { oldTrigger ->
+            if (oldTrigger.mode == TriggerMode.Sequence) {
+                return@editTrigger oldTrigger
+            }
 
             val newKeys = oldTrigger.keys.map { it.copy(clickType = ClickType.SHORT_PRESS) }
-            val newMode = TriggerMode.Parallel(ClickType.SHORT_PRESS)
+            val newMode = if (newKeys.size <= 1) {
+                TriggerMode.Undefined
+            } else {
+                TriggerMode.Parallel(ClickType.SHORT_PRESS)
+            }
+            oldTrigger.copy(keys = newKeys, mode = newMode)
+        }
+    }
+
+    override fun setTriggerLongPress() {
+        editTrigger { oldTrigger ->
+            if (oldTrigger.mode == TriggerMode.Sequence) {
+                return@editTrigger oldTrigger
+            }
+
+            val newKeys = oldTrigger.keys.map { it.copy(clickType = ClickType.LONG_PRESS) }
+            val newMode = if (newKeys.size <= 1) {
+                TriggerMode.Undefined
+            } else {
+                TriggerMode.Parallel(ClickType.LONG_PRESS)
+            }
 
             oldTrigger.copy(keys = newKeys, mode = newMode)
         }
     }
 
-    override fun setParallelTriggerLongPress() {
+    override fun setTriggerDoublePress() {
         editTrigger { oldTrigger ->
+            if (oldTrigger.mode != TriggerMode.Undefined) {
+                return@editTrigger oldTrigger
+            }
 
-            val newKeys = oldTrigger.keys.map { it.copy(clickType = ClickType.LONG_PRESS) }
-            val newMode = TriggerMode.Parallel(ClickType.LONG_PRESS)
+            val newKeys = oldTrigger.keys.map { it.copy(clickType = ClickType.DOUBLE_PRESS) }
+            val newMode = TriggerMode.Undefined
 
             oldTrigger.copy(keys = newKeys, mode = newMode)
         }
     }
 
     override fun setTriggerKeyClickType(keyUid: String, clickType: ClickType) {
-        TODO("Not yet implemented")
+        editTriggerKey(keyUid) {
+            it.copy(clickType = clickType)
+        }
     }
 
     override fun setTriggerKeyDevice(keyUid: String, device: TriggerKeyDevice) {
-        TODO()
+        editTriggerKey(keyUid) {
+            it.copy(device = device)
+        }
+    }
+
+    override fun setTriggerKeyConsumeKeyEvent(keyUid: String, consumeKeyEvent: Boolean) {
+        editTriggerKey(keyUid) {
+            it.copy(consumeKeyEvent = consumeKeyEvent)
+        }
     }
 
     override fun setVibrateEnabled(enabled: Boolean) = editTrigger { it.copy(vibrate = enabled) }
@@ -289,9 +328,9 @@ class ConfigKeyMapUseCaseImpl(
     ) {
         editKeymap { keyMap ->
             val newActionList = keyMap.actionList.map { action ->
-                if (action.uid == uid){
+                if (action.uid == uid) {
                     block.invoke(action)
-                }else{
+                } else {
                     action
                 }
             }
@@ -310,6 +349,20 @@ class ConfigKeyMapUseCaseImpl(
         }
     }
 
+    private fun editTriggerKey(uid: String, block: (key: TriggerKey) -> TriggerKey) {
+        editTrigger { oldTrigger ->
+            val newKeys = oldTrigger.keys.map {
+                if (it.uid == uid) {
+                    block.invoke(it)
+                } else {
+                    it
+                }
+            }
+
+            oldTrigger.copy(keys = newKeys)
+        }
+    }
+
     private fun editKeymap(block: (keymap: KeyMap) -> KeyMap) {
         mapping.value.ifIsData { setMapping(block.invoke(it)) }
     }
@@ -325,11 +378,13 @@ interface ConfigKeyMapUseCase : ConfigMappingUseCase<KeyMapAction, KeyMap> {
     fun setSequenceTriggerMode()
     fun setUndefinedTriggerMode()
 
-    fun setParallelTriggerShortPress()
-    fun setParallelTriggerLongPress()
+    fun setTriggerShortPress()
+    fun setTriggerLongPress()
+    fun setTriggerDoublePress()
 
     fun setTriggerKeyClickType(keyUid: String, clickType: ClickType)
     fun setTriggerKeyDevice(keyUid: String, device: TriggerKeyDevice)
+    fun setTriggerKeyConsumeKeyEvent(keyUid: String, consumeKeyEvent: Boolean)
 
     fun setVibrateEnabled(enabled: Boolean)
     fun setVibrationDuration(duration: Defaultable<Int>)

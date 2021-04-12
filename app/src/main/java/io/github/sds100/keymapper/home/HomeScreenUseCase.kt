@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapI
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapIdEntityMapper
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapEntityMapper
-import io.github.sds100.keymapper.domain.mappings.keymap.KeymapRepository
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.State
@@ -19,14 +19,13 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
  */
 
 class HomeScreenUseCaseImpl(
-    private val keyMapRepository: KeymapRepository,
+    private val keyMapRepository: KeyMapRepository,
     private val fingerprintMapRepository: FingerprintMapRepository,
     private val powerManagementAdapter: PowerManagementAdapter,
     private val serviceAdapter: ServiceAdapter,

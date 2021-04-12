@@ -5,13 +5,12 @@ import androidx.lifecycle.*
 import com.airbnb.epoxy.EpoxyController
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.slider.Slider
-import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.checkbox
+import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.radioButtonPair
-import io.github.sds100.keymapper.slider
 import io.github.sds100.keymapper.ui.CheckBoxListItem
 import io.github.sds100.keymapper.ui.RadioButtonPairListItem
+import io.github.sds100.keymapper.ui.RadioButtonTripleListItem
 import io.github.sds100.keymapper.ui.SliderListItem
 import io.github.sds100.keymapper.util.editTextNumberAlertDialog
 import io.github.sds100.keymapper.util.viewLifecycleScope
@@ -20,6 +19,28 @@ import timber.log.Timber
 /**
  * Created by sds100 on 20/03/2021.
  */
+
+fun EpoxyController.configuredRadioButtonTriple(
+    fragment: Fragment,
+    model: RadioButtonTripleListItem,
+    onCheckedChange: (buttonId: String, isChecked: Boolean) -> Unit
+) {
+
+    fragment.apply {
+        radioButtonTriple {
+            id(model.id)
+            model(model)
+
+            onCheckedChange { group, checkedId ->
+                when(checkedId){
+                    R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
+                    R.id.radioButtonCenter -> onCheckedChange(model.centerButtonId, true)
+                    R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
+                }
+            }
+        }
+    }
+}
 
 fun EpoxyController.configuredRadioButtonPair(
     fragment: Fragment,
@@ -33,11 +54,9 @@ fun EpoxyController.configuredRadioButtonPair(
             model(model)
 
             onCheckedChange { group, checkedId ->
-                val isChecked = group.checkedRadioButtonId == checkedId
-
                 when(checkedId){
-                    R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, isChecked)
-                    R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, isChecked)
+                    R.id.radioButtonLeft -> onCheckedChange(model.leftButtonId, true)
+                    R.id.radioButtonRight -> onCheckedChange(model.rightButtonId, true)
                 }
             }
         }

@@ -5,7 +5,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap
  */
 
 class DeleteKeymapsUseCaseImpl(
-    private val repository: KeymapRepository,
+    private val repository: KeyMapRepository,
 ) : DeleteKeymapsUseCase {
 
     override operator fun invoke(vararg uid: String) {

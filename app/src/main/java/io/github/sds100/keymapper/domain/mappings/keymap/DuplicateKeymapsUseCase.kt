@@ -5,7 +5,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap
  */
 
 class DuplicateKeymapsUseCaseImpl(
-    private val repository: KeymapRepository
+    private val repository: KeyMapRepository
 ) : DuplicateKeymapsUseCase {
     override fun invoke(vararg uid: String) = repository.duplicate(*uid)
 }

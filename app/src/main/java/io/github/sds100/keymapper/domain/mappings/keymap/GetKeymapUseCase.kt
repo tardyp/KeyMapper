@@ -6,7 +6,7 @@ package io.github.sds100.keymapper.domain.mappings.keymap
  */
 
 class GetKeymapUseCaseImpl(
-    private val repository: KeymapRepository,
+    private val repository: KeyMapRepository,
 ) : GetKeymapUseCase {
 
     override suspend operator fun invoke(uid: String): KeyMap? {

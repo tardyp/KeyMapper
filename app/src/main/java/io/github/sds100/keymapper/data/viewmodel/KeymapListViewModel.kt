@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class KeymapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,

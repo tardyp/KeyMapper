@@ -35,7 +35,7 @@ class TriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
     }
 
     private val viewModel: ConfigKeyMapTriggerOptionsViewModel
-        get() = configKeyMapViewModel.triggerViewModel.optionsViewModel
+        get() = configKeyMapViewModel.configTriggerViewModel.optionsViewModel
 
     override var isAppBarVisible = false
 

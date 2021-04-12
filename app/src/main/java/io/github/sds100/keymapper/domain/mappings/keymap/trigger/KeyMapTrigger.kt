@@ -29,7 +29,7 @@ data class KeyMapTrigger(
     val showToast: Boolean = false
 ) {
 
-    companion object{
+    companion object {
         const val LONG_PRESS_DELAY_MIN = 5
         const val DOUBLE_PRESS_DELAY_MIN = 5
         const val SEQUENCE_TRIGGER_TIMEOUT_MIN = 5
@@ -72,11 +72,10 @@ object KeymapTriggerEntityMapper {
     ): KeyMapTrigger {
         val keys = entity.keys.map { KeymapTriggerKeyEntityMapper.fromEntity(it) }
 
-        val mode = when (entity.mode) {
-            TriggerEntity.SEQUENCE -> TriggerMode.Sequence
-            TriggerEntity.PARALLEL -> TriggerMode.Parallel(keys[0].clickType)
-            TriggerEntity.UNDEFINED -> TriggerMode.Undefined
-            else -> throw Exception("don't know how to convert trigger mode ${entity.mode}")
+        val mode = when {
+            entity.mode == TriggerEntity.SEQUENCE && keys.size > 1 -> TriggerMode.Sequence
+            entity.mode == TriggerEntity.PARALLEL && keys.size > 1 -> TriggerMode.Parallel(keys[0].clickType)
+            else -> TriggerMode.Undefined
         }
 
         return KeyMapTrigger(
@@ -110,19 +109,39 @@ object KeymapTriggerEntityMapper {
         val extras = mutableListOf<Extra>()
 
         if (trigger.isChangingSequenceTriggerTimeoutAllowed() && trigger.sequenceTriggerTimeout != null) {
-            extras.add(Extra(TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT, trigger.sequenceTriggerTimeout.toString()))
+            extras.add(
+                Extra(
+                    TriggerEntity.EXTRA_SEQUENCE_TRIGGER_TIMEOUT,
+                    trigger.sequenceTriggerTimeout.toString()
+                )
+            )
         }
 
         if (trigger.isChangingLongPressDelayAllowed() && trigger.longPressDelay != null) {
-            extras.add(Extra(TriggerEntity.EXTRA_LONG_PRESS_DELAY, trigger.longPressDelay.toString()))
+            extras.add(
+                Extra(
+                    TriggerEntity.EXTRA_LONG_PRESS_DELAY,
+                    trigger.longPressDelay.toString()
+                )
+            )
         }
 
         if (trigger.isChangingDoublePressDelayAllowed() && trigger.doublePressDelay != null) {
-            extras.add(Extra(TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY, trigger.doublePressDelay.toString()))
+            extras.add(
+                Extra(
+                    TriggerEntity.EXTRA_DOUBLE_PRESS_DELAY,
+                    trigger.doublePressDelay.toString()
+                )
+            )
         }
 
         if (trigger.isChangingVibrationDurationAllowed() && trigger.vibrateDuration != null) {
-            extras.add(Extra(TriggerEntity.EXTRA_VIBRATION_DURATION, trigger.vibrateDuration.toString()))
+            extras.add(
+                Extra(
+                    TriggerEntity.EXTRA_VIBRATION_DURATION,
+                    trigger.vibrateDuration.toString()
+                )
+            )
         }
 
         val mode = when (trigger.mode) {

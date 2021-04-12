@@ -10,9 +10,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
-import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
 import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.mappings.common.ConfigActionOptionsFragment
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapActionOptionsFragment
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.showUserResponseRequests
@@ -53,20 +52,6 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
                 viewModel.constraintListViewModel.onChosenNewConstraint(it)
             }
         }
-
-        setFragmentResultListener(ConfigActionOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<KeymapActionOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
-                ?.let {
-                    //TODO
-                }
-        }
-
-        setFragmentResultListener(TriggerKeyOptionsFragment.REQUEST_KEY) { _, result ->
-            result.getParcelable<TriggerKeyOptions>(OldBaseOptionsDialogFragment.EXTRA_OPTIONS)
-                ?.let {
-                    viewModel.triggerViewModel.setTriggerKeyOptions(it)
-                }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,9 +64,16 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
             }
         }
 
-        viewModel.triggerViewModel.showUserResponseRequests(this, binding)
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.configTriggerViewModel.openEditOptions.collectLatest { triggerKeyUid ->
+                viewModel.configTriggerKeyViewModel.setTriggerKeyToConfigure(triggerKeyUid)
+                findNavController().navigate(ConfigKeymapFragmentDirections.actionTriggerKeyOptionsFragment())
+            }
+        }
 
-        viewModel.triggerViewModel.optionsViewModel.showUserResponseRequests(this, binding)
+        viewModel.configTriggerViewModel.showUserResponseRequests(this, binding)
+
+        viewModel.configTriggerViewModel.optionsViewModel.showUserResponseRequests(this, binding)
     }
 
     override fun getFragmentInfoList() = intArray(R.array.config_keymap_fragments).map {

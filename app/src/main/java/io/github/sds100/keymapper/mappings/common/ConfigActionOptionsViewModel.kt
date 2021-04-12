@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.mappings.common
 
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.ListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,16 +12,18 @@ import kotlinx.coroutines.flow.*
  */
 
 abstract class ConfigActionOptionsViewModel<M : Mapping<A>, A : Action>(
-     coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope,
     config: ConfigMappingUseCase<A, M>
 ) : OptionsViewModel {
-    val actionUid = MutableStateFlow<String?>(null)
+    private val _actionUid = MutableStateFlow<String?>(null)
+    val actionUid = _actionUid.asStateFlow()
 
-    override val state = combine(config.mapping, actionUid) { mapping, actionUid ->
+    override val state = combine(config.mapping, _actionUid) { mapping, actionUid ->
 
         when {
-            mapping is State.Data && actionUid != null -> {
-                val action = mapping.data.actionList.single { it.uid == actionUid }
+            mapping is State.Data -> {
+                val action = mapping.data.actionList.find { it.uid == actionUid }
+                    ?: return@combine OptionsUiState(showProgressBar = true)
 
                 OptionsUiState(
                     listItems = createListItems(mapping.data, action),
@@ -42,7 +43,7 @@ abstract class ConfigActionOptionsViewModel<M : Mapping<A>, A : Action>(
         )
 
     fun setActionToConfigure(uid: String) {
-        actionUid.value = uid
+        _actionUid.value = uid
     }
 
     abstract fun createListItems(mapping: M, action: A): List<ListItem>

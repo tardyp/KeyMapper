@@ -54,13 +54,13 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var roomKeymapRepository: RoomKeymapRepository? = null
+    private var roomKeymapRepository: RoomKeyMapRepository? = null
 
-    fun roomKeymapRepository(context: Context): RoomKeymapRepository {
+    fun roomKeymapRepository(context: Context): RoomKeyMapRepository {
         synchronized(this) {
             val dataBase = database ?: createDatabase(context.applicationContext)
 
-            return roomKeymapRepository ?: RoomKeymapRepository(
+            return roomKeymapRepository ?: RoomKeyMapRepository(
                 dataBase.keymapDao(),
                 (context.applicationContext as KeyMapperApp).appCoroutineScope
             ).also {
