@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import io.github.sds100.keymapper.*
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.databinding.FragmentFingerprintMapListBinding
 import io.github.sds100.keymapper.ui.ChipUi
@@ -38,17 +37,12 @@ class FingerprintMapListFragment :
 
     private val viewModel by lazy { homeViewModel.fingerprintMapListViewModel }
 
+    //TODO
     private val backupLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
             it ?: return@registerForActivityResult
 
-            backupRestoreViewModel
-                .backupFingerprintMaps(requireContext().contentResolver.openOutputStream(it))
         }
-
-    private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
-        InjectorUtils.provideBackupRestoreViewModel(requireContext())
-    }
 
     override val listItems: Flow<ListUiState<FingerprintMapListItem>>
         get() = viewModel.state

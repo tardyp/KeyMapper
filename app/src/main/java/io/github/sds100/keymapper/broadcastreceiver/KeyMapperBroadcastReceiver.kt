@@ -40,10 +40,10 @@ class KeyMapperBroadcastReceiver : BroadcastReceiver() {
             ACTION_TOGGLE_KEYBOARD -> KeyboardUtils.toggleCompatibleIme(context)
 
             ACTION_PAUSE_KEYMAPS -> ServiceLocator.preferenceRepository(context)
-                .set(Keys.keymapsPaused, true)
+                .set(Keys.mappingsPaused, true)
 
             ACTION_RESUME_KEYMAPS -> ServiceLocator.preferenceRepository(context)
-                .set(Keys.keymapsPaused, false)
+                .set(Keys.mappingsPaused, false)
 
             MyAccessibilityService.ACTION_START_SERVICE -> AccessibilityUtils.enableService(context)
 

@@ -42,10 +42,6 @@ object InjectorUtils {
         )
     }
 
-    fun provideBackupRestoreViewModel(context: Context): BackupRestoreViewModel.Factory {
-        return BackupRestoreViewModel.Factory(ServiceLocator.backupManager(context))
-    }
-
     fun provideChooseConstraintListViewModel(ctx: Context): ChooseConstraintViewModel.Factory {
         return ChooseConstraintViewModel.Factory(ServiceLocator.resourceProvider(ctx))
     }
@@ -128,14 +124,6 @@ object InjectorUtils {
         )
     }
 
-    fun provideMenuFragmentViewModel(context: Context): MenuFragmentViewModel.Factory {
-        return MenuFragmentViewModel.Factory(
-            ServiceLocator.defaultKeymapRepository(context),
-            ServiceLocator.fingerprintMapRepository(context),
-            ControlKeymapsPausedState(ServiceLocator.preferenceRepository(context))
-        )
-    }
-
     fun provideConfigKeyMapViewModel(
         ctx: Context
     ): ConfigKeyMapViewModel.Factory {
@@ -187,7 +175,8 @@ object InjectorUtils {
                 serviceAdapter = ServiceLocator.serviceAdapter(ctx),
                 permissionAdapter = ServiceLocator.permissionAdapter(ctx),
                 displayKeyMapUseCase = UseCases.displayKeyMap(ctx),
-                displaySimpleMappingUseCase = UseCases.displaySimpleMapping(ctx)
+                displaySimpleMappingUseCase = UseCases.displaySimpleMapping(ctx),
+                inputMethodAdapter = ServiceLocator.inputMethodAdapter(ctx),
             ),
             UseCases.onboarding(ctx),
             ServiceLocator.resourceProvider(ctx)

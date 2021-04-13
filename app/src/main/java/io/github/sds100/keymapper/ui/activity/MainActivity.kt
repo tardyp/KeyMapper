@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.activity
 
-import android.Manifest
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.viewModels
@@ -12,14 +11,12 @@ import androidx.navigation.findNavController
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.ActivityMainBinding
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
@@ -39,10 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     private val keyActionTypeViewModel: KeyActionTypeViewModel by viewModels {
         InjectorUtils.provideKeyActionTypeViewModel()
-    }
-
-    private val backupRestoreViewModel: BackupRestoreViewModel by viewModels {
-        InjectorUtils.provideBackupRestoreViewModel(this)
     }
 
     private lateinit var requestPermissionDelegate: RequestPermissionDelegate
@@ -65,17 +58,6 @@ class MainActivity : AppCompatActivity() {
                 show()
             }
         }
-
-        backupRestoreViewModel.eventStream.observe(this, {
-            when (it) {
-                is MessageEvent -> toast(str(it.textRes))
-
-                is AutomaticBackupResult ->
-                    it.result.onFailure { failure ->
-                        if (failure is Error.FileAccessDenied) showFileAccessDeniedSnackBar()
-                    }
-            }
-        })
 
         requestPermissionDelegate = RequestPermissionDelegate(this)
 

@@ -7,18 +7,17 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
-import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.DialogResponse
-import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
+import io.github.sds100.keymapper.ui.ListItem
+import io.github.sds100.keymapper.ui.TextListItem
+import io.github.sds100.keymapper.ui.UserResponseViewModel
+import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.home.HomeTab
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.MultiSelectProviderImpl
-import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 18/01/21.
@@ -38,6 +37,8 @@ class HomeViewModel(
 
     private val multiSelectProvider: MultiSelectProvider = MultiSelectProviderImpl()
 
+    val menuViewModel = HomeMenuViewModel(viewModelScope, useCase, resourceProvider)
+
     val keymapListViewModel = KeymapListViewModel(
         viewModelScope,
         useCase,
@@ -54,7 +55,9 @@ class HomeViewModel(
     private val _openUrl = MutableSharedFlow<String>()
     val openUrl = _openUrl.asSharedFlow()
 
-    private val rebuildState = MutableSharedFlow<Unit>()
+    private val isBatteryOptimised = useCase.invalidateErrors.map {
+        useCase.isBatteryOptimised()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, useCase.isBatteryOptimised())
 
     val onboardingState = combine(
         onboarding.showGuiKeyboardAdFlow,
@@ -133,10 +136,10 @@ class HomeViewModel(
     )
 
     val errorListState = combine(
+        isBatteryOptimised,
         useCase.isAccessibilityServiceEnabled,
-        useCase.hideHomeScreenAlerts,
-        rebuildState
-    ) { isServiceEnabled, isHidden, _ ->
+        useCase.hideHomeScreenAlerts
+    ) { isBatteryOptimised, isServiceEnabled, isHidden ->
         val listItems = sequence {
             if (isServiceEnabled) {
                 yield(
@@ -154,7 +157,7 @@ class HomeViewModel(
                 )
             }
 
-            if (useCase.isBatteryOptimised()) {
+            if (isBatteryOptimised) {
                 yield(
                     TextListItem.Error(
                         ID_BATTERY_OPTIMISATION_LIST_ITEM,
@@ -253,10 +256,6 @@ class HomeViewModel(
                 ID_BATTERY_OPTIMISATION_LIST_ITEM -> useCase.ignoreBatteryOptimisation()
             }
         }
-    }
-
-    fun rebuildUiState() {
-        runBlocking { rebuildState.emit(Unit) }
     }
 
     @Suppress("UNCHECKED_CAST")

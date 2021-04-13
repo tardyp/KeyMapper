@@ -1,5 +1,8 @@
 package io.github.sds100.keymapper.ui.dialogs
 
+import java.io.InputStream
+import java.io.OutputStream
+
 /**
  * Created by sds100 on 23/03/2021.
  */

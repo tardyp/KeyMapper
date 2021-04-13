@@ -356,7 +356,6 @@
     <string name="dialog_message_double_press_restricted_to_single_key">"Multiple keys can't be double pressed at the same time."</string>
     <string name="dialog_message_parallel_trigger_order">The keys need to be listed from top to bottom in the order that they will be held down.</string>
     <string name="dialog_message_sequence_trigger_explanation">A \"sequence\" trigger has a timeout unlike parallel triggers. This means after you press the first key, you will have a set amount of time to input the rest of the keys in the trigger. All the keys that you have added to the trigger won\'t do their usual action until the timeout has been reached. You can change this timeout in the "Options" tab.</string>
-    <string name="dialog_message_view_faq_and_use_discord_over_email">Please check out the FAQ to see if your question has already been answered. If not, then the developer would prefer it if you ask for help and suggest features in the Discord server. If you don\'t have Discord, you can email the developer directly.</string>
     <string name="dialog_message_bt_constraint_limitation">Android doesn\'t allow apps to get a list of connected (not paired) Bluetooth devices. Apps can only detect when they are connected and disconnected. So if your Bluetooth device is already connected to your device when the accessibility service starts, you will have to reconnect it for the app to know it is connected.</string>
     <string name="dialog_message_change_location_or_disable">Change location or turn off automatic back up?</string>
     <string name="dialog_message_screen_constraints_limitation">Screen on/off constraints will only work if you have turned on the \"detect trigger when screen is off\" key map option. This option will only show for some keys (e.g volume buttons) and if you are rooted. See a list of supported keys on the Help page.</string>
@@ -368,6 +367,9 @@
 
     <string name="dialog_title_disable_battery_optimisation">Disable battery optimisation</string>
     <string name="dialog_message_disable_battery_optimisation">You <b>MUST</b> read this all otherwise you will get frustrated in the future!\n\nTapping \"turn off\" will prevent Android from stopping the app while it is in the background.\n\n<b>This is NOT ENOUGH</b>. Your OEM\'s skin such as MIUI or Samsung Experience may have other \"battery saving\" features so you MUST turn them off for Key Mapper as well by following the guide at dontkillmyapp.com.</string>
+
+    <string name="dialog_title_send_feedback">Send feedback</string>
+    <string name="dialog_message_view_faq_and_use_discord_over_email">Please check out the FAQ to see if your question has already been answered. If not, then the developer would prefer it if you ask for help and suggest features in the Discord server. If you don\'t have Discord, you can email the developer directly.</string>
 
     <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
 

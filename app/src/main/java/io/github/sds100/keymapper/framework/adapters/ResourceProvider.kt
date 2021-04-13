@@ -2,8 +2,10 @@ package io.github.sds100.keymapper.framework.adapters
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.github.sds100.keymapper.util.color
 import io.github.sds100.keymapper.util.drawable
 import io.github.sds100.keymapper.util.str
 
@@ -29,6 +31,10 @@ class ResourceProviderImpl(context: Context): ResourceProvider {
     override fun getDrawable(resId: Int): Drawable {
         return ctx.drawable(resId)
     }
+
+    override fun getColor(color: Int): Int {
+        return ctx.color(color)
+    }
 }
 
 interface ResourceProvider {
@@ -36,4 +42,5 @@ interface ResourceProvider {
     fun getString(@StringRes resId: Int, arg: Any): String
     fun getString(@StringRes resId: Int): String
     fun getDrawable(@DrawableRes resId: Int): Drawable
+    fun getColor(@ColorRes color: Int): Int
 }

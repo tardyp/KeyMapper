@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.home
 
 import android.os.Build
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapEntityMapper
@@ -31,6 +32,7 @@ class HomeScreenUseCaseImpl(
     private val preferenceRepository: PreferenceRepository,
     private val serviceAdapter: ServiceAdapter,
     private val permissionAdapter: PermissionAdapter,
+    private val inputMethodAdapter: InputMethodAdapter,
     displayKeyMapUseCase: DisplayKeyMapUseCase,
     displaySimpleMappingUseCase: DisplaySimpleMappingUseCase
 ) : HomeScreenUseCase,
@@ -96,11 +98,23 @@ class HomeScreenUseCaseImpl(
         fingerprintMapRepository.disableAll()
     }
 
+    override fun backupAllMappings(uri: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun restoreMappings(uri: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun showInputMethodPicker() {
+        inputMethodAdapter.showImePicker(fromForeground = true)
+    }
+
     override fun isBatteryOptimised(): Boolean {
         return !permissionAdapter.isGranted(Permission.IGNORE_BATTERY_OPTIMISATION)
     }
 
-    override val isAccessibilityServiceEnabled: Flow<Boolean> =serviceAdapter.isEnabled
+    override val isAccessibilityServiceEnabled: Flow<Boolean> = serviceAdapter.isEnabled
 
     override val areFingerprintGesturesSupported: Flow<Boolean> =
         preferenceRepository.get(Keys.fingerprintGesturesAvailable).map {
@@ -108,6 +122,17 @@ class HomeScreenUseCaseImpl(
 
             it ?: false
         }
+
+    override val areMappingsPaused: Flow<Boolean> =
+        preferenceRepository.get(Keys.mappingsPaused).map { it ?: false }
+
+    override fun pauseMappings() {
+        preferenceRepository.set(Keys.mappingsPaused, true)
+    }
+
+    override fun resumeMappings() {
+        preferenceRepository.set(Keys.mappingsPaused, false)
+    }
 
     override val hideHomeScreenAlerts: Flow<Boolean> =
         preferenceRepository.get(Keys.hideHomeScreenAlerts).map { it ?: false }
@@ -135,12 +160,22 @@ interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase 
 
     fun enableAllMappings()
     fun disableAllMappings()
+    fun backupAllMappings(uri: String)
+    fun restoreMappings(uri: String)
 
+    fun showInputMethodPicker()
+
+    val isAccessibilityServiceEnabled: Flow<Boolean>
     fun enableAccessibilityService()
+
     fun ignoreBatteryOptimisation()
     fun isBatteryOptimised(): Boolean
-    val isAccessibilityServiceEnabled: Flow<Boolean>
+
     val areFingerprintGesturesSupported: Flow<Boolean>
+
+    val areMappingsPaused: Flow<Boolean>
+    fun pauseMappings()
+    fun resumeMappings()
 
     val hideHomeScreenAlerts: Flow<Boolean>
 }

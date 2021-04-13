@@ -6,7 +6,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
@@ -21,7 +20,6 @@ import io.github.sds100.keymapper.util.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import timber.log.Timber
 
 /**
  * Created by sds100 on 22/02/2020.
@@ -34,10 +32,6 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeyMapListItem>() {
 
     private val viewModel: KeymapListViewModel
         get() = homeViewModel.keymapListViewModel
-
-    private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
-        InjectorUtils.provideBackupRestoreViewModel(requireContext())
-    }
 
     private val backupLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {

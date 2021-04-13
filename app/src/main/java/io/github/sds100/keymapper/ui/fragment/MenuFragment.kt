@@ -7,43 +7,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
-import io.github.sds100.keymapper.data.viewmodel.MenuFragmentViewModel
+import io.github.sds100.keymapper.data.viewmodel.HomeMenuViewModel
+import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.databinding.FragmentMenuBinding
 import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
 
 class MenuFragment : BottomSheetDialogFragment() {
 
-    private val viewModel: MenuFragmentViewModel by activityViewModels {
-        InjectorUtils.provideMenuFragmentViewModel(requireContext())
+    private val homeViewModel: HomeViewModel by activityViewModels {
+        InjectorUtils.provideHomeViewModel(requireContext())
     }
 
-    private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
-        InjectorUtils.provideBackupRestoreViewModel(requireContext())
-    }
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent ?: return
-
-            when (intent.action) {
-                MyAccessibilityService.ACTION_ON_START -> {
-                    viewModel.accessibilityServiceEnabled.value = true
-                }
-
-                MyAccessibilityService.ACTION_ON_STOP -> {
-                    viewModel.accessibilityServiceEnabled.value = false
-                }
-            }
-        }
-    }
+    private val viewModel: HomeMenuViewModel
+        get() = homeViewModel.menuViewModel
 
     /**
      * Scoped to the lifecycle of the fragment's view (between onCreateView and onDestroyView)
@@ -51,17 +40,6 @@ class MenuFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentMenuBinding? = null
     val binding: FragmentMenuBinding
         get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        IntentFilter().apply {
-            addAction(MyAccessibilityService.ACTION_ON_START)
-            addAction(MyAccessibilityService.ACTION_ON_STOP)
-
-            requireContext().registerReceiver(broadcastReceiver, this)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,75 +63,35 @@ class MenuFragment : BottomSheetDialogFragment() {
 
         binding.viewModel = viewModel
 
-        viewModel.apply {
-            accessibilityServiceEnabled.value = AccessibilityUtils.isServiceEnabled(requireContext())
+        viewModel.showUserResponseRequests(this, binding)
 
-            eventStream.observe(viewLifecycleOwner, {
-                when (it) {
-                    is ChooseKeyboard -> {
-                        KeyboardUtils.showInputMethodPicker()
-                        dismiss()
-                    }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
+            viewModel.openSettings.collectLatest {
+                findNavController().navigate(NavAppDirections.actionGlobalSettingsFragment())
+            }
+        }
 
-                    is SendFeedback -> this@MenuFragment.sendFeedback()
-                    is OpenSettings -> {
-                        findNavController().navigate(R.id.action_global_settingsFragment)
-                        dismiss()
-                    }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
+            viewModel.openAbout.collectLatest {
+                findNavController().navigate(NavAppDirections.actionGlobalAboutFragment())
+            }
+        }
 
-                    is OpenAbout -> {
-                        findNavController().navigate(R.id.action_global_aboutFragment)
-                        dismiss()
-                    }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
+            viewModel.emailDeveloper.collectLatest {
+                FeedbackUtils.emailDeveloper(requireContext())
+            }
+        }
 
-                    is EnableAccessibilityService ->
-                        AccessibilityUtils.enableService(requireContext())
-
-                    is RequestRestore -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        backupRestoreViewModel.requestRestore()
-                        dismiss()
-                    }
-
-                    is RequestBackupAll -> backupRestoreViewModel.requestBackupAll()
-                }
-            })
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
+            viewModel.openUrl.collectLatest {
+                UrlUtils.openUrl(requireContext(), it)
+            }
         }
     }
 
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        requireContext().unregisterReceiver(broadcastReceiver)
-
-        super.onDestroy()
-    }
-
-    private fun sendFeedback() {
-        requireContext().alertDialog {
-            messageResource = R.string.dialog_message_view_faq_and_use_discord_over_email
-
-            positiveButton(R.string.pos_grant_write_secure_settings_guide) {
-                dismiss()
-                UrlUtils.launchCustomTab(
-                    requireContext(),
-                    str(R.string.url_grant_write_secure_settings_guide)
-                )
-            }
-
-            negativeButton(R.string.neutral_discord) {
-                dismiss()
-                UrlUtils.openUrl(requireContext(), str(R.string.url_discord_server_invite))
-            }
-
-            neutralButton(R.string.neg_email) {
-                dismiss()
-                FeedbackUtils.emailDeveloper(requireContext())
-            }
-
-            show()
-        }
     }
 }

@@ -28,7 +28,7 @@ import java.io.OutputStream
  * Created by sds100 on 23/01/21.
  */
 
-//TODO ensure is singleton. create use cases for view models to interact with this
+//TODO ensure is singleton.
 class BackupManager(
     private val keymapRepository: BackupRestoreUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,

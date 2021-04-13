@@ -9,6 +9,7 @@ import java.io.OutputStream
 /**
  * Created by sds100 on 23/01/21.
  */
+//TODO delete
 interface IBackupManager {
     val eventStream: LiveData<Event>
     fun backupKeymaps(outputStream: OutputStream, keymapIds: List<Long>)

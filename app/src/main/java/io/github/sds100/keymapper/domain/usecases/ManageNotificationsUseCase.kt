@@ -13,7 +13,7 @@ class ManageNotificationsUseCase(
     preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository {
 
-    val keymapsPaused by FlowPrefDelegate(Keys.keymapsPaused, false)
+    val keymapsPaused by FlowPrefDelegate(Keys.mappingsPaused, false)
     val hasRootPermission by FlowPrefDelegate(Keys.hasRootPermission, false)
 
     val showImePickerNotification by FlowPrefDelegate(

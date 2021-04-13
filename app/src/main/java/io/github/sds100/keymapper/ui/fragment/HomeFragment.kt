@@ -55,24 +55,19 @@ class HomeFragment : Fragment() {
     private val binding: FragmentHomeBinding
         get() = _binding!!
 
-    private val backupAllKeymapsLauncher =
+    private val backupMappingsLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
             it ?: return@registerForActivityResult
 
-            backupRestoreViewModel
-                .backupAll(requireContext().contentResolver.openOutputStream(it))
+            homeViewModel.menuViewModel.onChoseBackupFile(it.toString())
         }
 
-    private val restoreLauncher =
+    private val restoreMappingsLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
             it ?: return@registerForActivityResult
 
-            backupRestoreViewModel.restore(requireContext().contentResolver.openInputStream(it))
+            homeViewModel.menuViewModel.onChoseRestoreFile(it.toString())
         }
-
-    private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
-        InjectorUtils.provideBackupRestoreViewModel(requireContext())
-    }
 
     private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
@@ -180,16 +175,6 @@ class HomeFragment : Fragment() {
             homeViewModel.onAppBarNavigationButtonClick()
         }
 
-        backupRestoreViewModel.eventStream.observe(viewLifecycleOwner, {
-            when (it) {
-                is MessageEvent -> toast(it.textRes)
-                is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
-                is RequestRestore -> restoreLauncher.launch(FileUtils.MIME_TYPE_ALL)
-                is RequestBackupAll ->
-                    backupAllKeymapsLauncher.launch(BackupUtils.createFileName())
-            }
-        })
-
         binding.setGetNewGuiKeyboard {
             requireContext().alertDialog {
                 messageResource = R.string.dialog_message_select_app_store_gui_keyboard
@@ -232,7 +217,7 @@ class HomeFragment : Fragment() {
                     if (quickStartGuideTapTarget?.state != MaterialTapTargetPrompt.STATE_REVEALED) {
                         quickStartGuideTapTarget?.dismiss()
 
-                        delay(500)
+                        delay(200)
 
                         quickStartGuideTapTarget =
                             QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
@@ -280,6 +265,18 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.menuViewModel.chooseBackupFile.collectLatest {
+                backupMappingsLauncher.launch(BackupUtils.createFileName())
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.menuViewModel.chooseRestoreFile.collectLatest {
+                restoreMappingsLauncher.launch(FileUtils.MIME_TYPE_ALL)
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.errorListState.collectLatest { state ->
                 binding.recyclerViewError.isVisible = state.isVisible
 
@@ -312,8 +309,6 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
-        homeViewModel.rebuildUiState()
 
         if (PackageUtils.isAppInstalled(
                 requireContext(),

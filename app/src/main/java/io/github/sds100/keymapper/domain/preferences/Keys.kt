@@ -30,7 +30,7 @@ internal object Keys {
     val toggleKeyboardOnToggleKeymaps =
         preferencesKey<Boolean>("key_toggle_keyboard_on_pause_resume_keymaps")
     val automaticBackupLocation = preferencesKey<String>("pref_automatic_backup_location")
-    val keymapsPaused = preferencesKey<Boolean>("pref_keymaps_paused")
+    val mappingsPaused = preferencesKey<Boolean>("pref_keymaps_paused")
     val hideHomeScreenAlerts = preferencesKey<Boolean>("pref_hide_home_screen_alerts")
     val showGuiKeyboardAd = preferencesKey<Boolean>("pref_show_gui_keyboard_ad")
     val showDeviceDescriptors = preferencesKey<Boolean>("pref_show_device_descriptors")

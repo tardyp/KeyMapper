@@ -15,11 +15,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.SettingsViewModel
 import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
@@ -81,10 +78,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private var showingNoPairedDevicesDialog = false
 
-    private val backupRestoreViewModel: BackupRestoreViewModel by activityViewModels {
-        InjectorUtils.provideBackupRestoreViewModel(requireContext())
-    }
-
     private val chooseAutomaticBackupLocationLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
             it ?: return@registerForActivityResult
@@ -97,11 +90,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
                 requireContext().contentResolver.takePersistableUriPermission(it, takeFlags)
 
-                backupRestoreViewModel.backupAll(
-                    requireContext().contentResolver.openOutputStream(
-                        it
-                    )
-                )
+                //TODO
             }
         }
 
