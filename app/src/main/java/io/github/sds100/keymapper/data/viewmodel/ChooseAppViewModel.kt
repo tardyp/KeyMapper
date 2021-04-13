@@ -13,9 +13,6 @@ import io.github.sds100.keymapper.util.filterByQuery
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -23,7 +20,7 @@ import java.util.*
  */
 
 //TODO rename as ChooseAppViewModel
-class AppListViewModel internal constructor(
+class ChooseAppViewModel internal constructor(
     private val useCase: DisplayAppsUseCase,
 ) : ViewModel() {
 
@@ -40,50 +37,50 @@ class AppListViewModel internal constructor(
     )
     val state = _state.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            combine(
-                useCase.installedPackages,
-                showHiddenApps,
-                searchQuery
-            ) { packageInfoList, showHiddenApps, query ->
+    private val allAppListItems = useCase.installedPackages.map { state ->
+        state.mapData { it.buildListItems() }
+    }.flowOn(Dispatchers.Default)
 
-                Triple(packageInfoList, query, showHiddenApps)
-
-            }.collectLatest { pair ->
-                val packageInfoList = pair.first
-                val query = pair.second
-                val showHiddenApps = pair.third
-
-                val packagesToFilter = if (showHiddenApps) {
-                    packageInfoList
-                } else {
-                    withContext(Dispatchers.Default) {
-                        packageInfoList.mapData { list -> list.filter { it.canBeLaunched } }
-                    }
-                }
-
-                when (val modelList = packagesToFilter.mapData { it.buildListItems() }) {
-                    is State.Data ->
-                        modelList.data.filterByQuery(query)
-                            .flowOn(Dispatchers.Default)
-                            .collect { modelListState ->
-                                _state.value = AppListState(
-                                    modelListState,
-                                    showHiddenAppsButton = true,
-                                    isHiddenAppsChecked = showHiddenApps
-                                )
-                            }
-
-                    is State.Loading -> _state.value =
-                        AppListState(
-                            ListUiState.Loading,
-                            showHiddenAppsButton = true,
-                            isHiddenAppsChecked = showHiddenApps
-                        )
-                }
-            }
+    private val launchableAppListItems = useCase.installedPackages.map { state ->
+        state.mapData { packageInfoList ->
+            packageInfoList.filter { it.canBeLaunched }.buildListItems()
         }
+    }.flowOn(Dispatchers.Default)
+
+    init {
+
+        combine(
+            allAppListItems,
+            launchableAppListItems,
+            showHiddenApps,
+            searchQuery
+        ) { allAppListItems, launchableAppListItems, showHiddenApps, query ->
+
+            val packagesToFilter = if (showHiddenApps) {
+                allAppListItems
+            } else {
+                launchableAppListItems
+            }
+
+            when (packagesToFilter) {
+                is State.Data -> {
+                    val filteredListItems = packagesToFilter.data.filterByQuery(query).first()
+
+                    _state.value = AppListState(
+                        filteredListItems,
+                        showHiddenAppsButton = true,
+                        isHiddenAppsChecked = showHiddenApps
+                    )
+                }
+
+                is State.Loading -> _state.value =
+                    AppListState(
+                        ListUiState.Loading,
+                        showHiddenAppsButton = true,
+                        isHiddenAppsChecked = showHiddenApps
+                    )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onHiddenAppsCheckedChange(checked: Boolean) {
@@ -113,7 +110,7 @@ class AppListViewModel internal constructor(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>) =
-            AppListViewModel(useCase) as T
+            ChooseAppViewModel(useCase) as T
     }
 }
 

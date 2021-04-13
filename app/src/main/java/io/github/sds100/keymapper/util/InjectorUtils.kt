@@ -27,8 +27,8 @@ import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
 //TODO rename to Inject. remove provide prefix from functions
 object InjectorUtils {
 
-    fun provideAppListViewModel(context: Context): AppListViewModel.Factory {
-        return AppListViewModel.Factory(
+    fun provideAppListViewModel(context: Context): ChooseAppViewModel.Factory {
+        return ChooseAppViewModel.Factory(
             UseCases.displayPackages(context)
         )
     }

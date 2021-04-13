@@ -50,8 +50,8 @@ class ChooseConstraintFragment
 
         viewModel.setSupportedConstraints(Json.decodeFromString(navArgs.supportedConstraintList))
 
-        setFragmentResultListener(AppListFragment.REQUEST_KEY) { _, result ->
-            val packageName = result.getString(AppListFragment.EXTRA_PACKAGE_NAME)
+        setFragmentResultListener(ChooseAppFragment.REQUEST_KEY) { _, result ->
+            val packageName = result.getString(ChooseAppFragment.EXTRA_PACKAGE_NAME)
 
             viewModel.onChooseApp(packageName!!)
         }

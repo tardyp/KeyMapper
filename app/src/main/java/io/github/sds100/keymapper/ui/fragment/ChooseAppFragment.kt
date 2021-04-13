@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.data.model.AppListItem
-import io.github.sds100.keymapper.data.viewmodel.AppListViewModel
-import io.github.sds100.keymapper.databinding.FragmentAppListBinding
+import io.github.sds100.keymapper.data.viewmodel.ChooseAppViewModel
+import io.github.sds100.keymapper.databinding.FragmentChooseAppBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.util.InjectorUtils
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 /**
  * Created by sds100 on 22/02/2020.
  */
-class AppListFragment : RecyclerViewFragment<AppListItem, FragmentAppListBinding>() {
+class ChooseAppFragment : RecyclerViewFragment<AppListItem, FragmentChooseAppBinding>() {
 
     companion object {
         const val REQUEST_KEY = "request_app"
@@ -27,14 +27,14 @@ class AppListFragment : RecyclerViewFragment<AppListItem, FragmentAppListBinding
     override var searchStateKey: String? = SEARCH_STATE_KEY
     override var requestKey: String? = REQUEST_KEY
 
-    private val viewModel: AppListViewModel by activityViewModels {
+    private val viewModel: ChooseAppViewModel by activityViewModels {
         InjectorUtils.provideAppListViewModel(requireContext())
     }
 
     override val listItems: Flow<ListUiState<AppListItem>>
         get() = viewModel.state.map { it.listItems }
 
-    override fun subscribeUi(binding: FragmentAppListBinding) {
+    override fun subscribeUi(binding: FragmentChooseAppBinding) {
         binding.viewModel = viewModel
     }
 
@@ -43,11 +43,11 @@ class AppListFragment : RecyclerViewFragment<AppListItem, FragmentAppListBinding
     }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
-        FragmentAppListBinding.inflate(inflater, container, false).apply {
+        FragmentChooseAppBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
-    override fun getBottomAppBar(binding: FragmentAppListBinding) = binding.appBar
+    override fun getBottomAppBar(binding: FragmentChooseAppBinding) = binding.appBar
 
     override fun populateList(recyclerView: EpoxyRecyclerView, listItems: List<AppListItem>) {
         binding.epoxyRecyclerView.withModels {
@@ -65,8 +65,8 @@ class AppListFragment : RecyclerViewFragment<AppListItem, FragmentAppListBinding
         }
     }
 
-    override fun getRecyclerView(binding: FragmentAppListBinding) = binding.epoxyRecyclerView
-    override fun getProgressBar(binding: FragmentAppListBinding) = binding.progressBar
-    override fun getEmptyListPlaceHolder(binding: FragmentAppListBinding) =
+    override fun getRecyclerView(binding: FragmentChooseAppBinding) = binding.epoxyRecyclerView
+    override fun getProgressBar(binding: FragmentChooseAppBinding) = binding.progressBar
+    override fun getEmptyListPlaceHolder(binding: FragmentChooseAppBinding) =
         binding.emptyListPlaceHolder
 }

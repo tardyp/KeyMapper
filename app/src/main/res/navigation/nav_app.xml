@@ -159,7 +159,7 @@
 
     <fragment
         android:id="@+id/appListFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.AppListFragment"
+        android:name="io.github.sds100.keymapper.ui.fragment.ChooseAppFragment"
         android:label="AppListFragment"
         tools:layout="@layout/fragment_recyclerview" />
 

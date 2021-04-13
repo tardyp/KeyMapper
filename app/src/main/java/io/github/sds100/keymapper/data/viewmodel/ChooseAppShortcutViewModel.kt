@@ -7,16 +7,18 @@ import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.AppShortcutListItem
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.packages.ChooseAppShortcutResult
 import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCase
+import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
-import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.getUserResponse
 import io.github.sds100.keymapper.util.filterByQuery
 import io.github.sds100.keymapper.util.result.valueOrNull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -27,7 +29,8 @@ import java.util.*
 class ChooseAppShortcutViewModel internal constructor(
     private val useCase: DisplayAppShortcutsUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), UserResponseViewModel by UserResponseViewModelImpl(), ResourceProvider by resourceProvider {
+) : ViewModel(), UserResponseViewModel by UserResponseViewModelImpl(),
+    ResourceProvider by resourceProvider {
 
     val searchQuery = MutableStateFlow<String?>(null)
 
@@ -37,38 +40,34 @@ class ChooseAppShortcutViewModel internal constructor(
     private val _returnResult = MutableSharedFlow<ChooseAppShortcutResult>()
     val returnResult = _returnResult.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            combine(
-                searchQuery,
-                useCase.shortcuts
-            ) { query, shortcuts ->
-                Pair(query, shortcuts)
-            }.collectLatest { pair ->
-                val (query, shortcuts) = pair
+    private val listItems = useCase.shortcuts.map { state ->
+        state.mapData { appShortcuts ->
+            appShortcuts
+                .mapNotNull {
+                    val name = useCase.getShortcutName(it).valueOrNull()
+                        ?: return@mapNotNull null
 
-                when (shortcuts) {
-                    is State.Data -> {
-                        shortcuts.data
-                            .mapNotNull {
-                                val name = useCase.getShortcutName(it).valueOrNull()
-                                    ?: return@mapNotNull null
+                    val icon = useCase.getShortcutIcon(it).valueOrNull()
+                        ?: return@mapNotNull null
 
-                                val icon = useCase.getShortcutIcon(it).valueOrNull()
-                                    ?: return@mapNotNull null
-
-                                AppShortcutListItem(shortcutInfo = it, name, icon)
-                            }
-                            .sortedBy { it.label.toLowerCase(Locale.getDefault()) }
-                            .filterByQuery(query)
-                            .collect {
-                                _state.value = it
-                            }
-                    }
-                    State.Loading -> _state.value = ListUiState.Loading
+                    AppShortcutListItem(shortcutInfo = it, name, icon)
                 }
-            }
+                .sortedBy { it.label.toLowerCase(Locale.getDefault()) }
         }
+    }.flowOn(Dispatchers.Default)
+
+    init {
+        combine(
+            searchQuery,
+            listItems
+        ) { query, listItems ->
+            when (listItems) {
+                is State.Data -> {
+                    listItems.data.filterByQuery(query).collect { _state.value = it }
+                }
+                State.Loading -> _state.value = ListUiState.Loading
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onConfigureShortcutResult(intent: Intent) {

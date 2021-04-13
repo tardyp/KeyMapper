@@ -55,8 +55,8 @@ class ChooseActionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        createActionOnResult(AppListFragment.REQUEST_KEY) {
-            val packageName = it.getString(AppListFragment.EXTRA_PACKAGE_NAME)
+        createActionOnResult(ChooseAppFragment.REQUEST_KEY) {
+            val packageName = it.getString(ChooseAppFragment.EXTRA_PACKAGE_NAME)
             OpenAppAction(packageName!!)
         }
 
