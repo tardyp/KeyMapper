@@ -26,7 +26,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
 import splitties.bitflags.hasFlag
 import splitties.toast.toast
 import timber.log.Timber
@@ -303,6 +302,7 @@ class AccessibilityServiceController(
         when (event) {
             is StartRecordingTrigger -> startRecordingTrigger()
             is StopRecordingTrigger -> stopRecordingTrigger()
+            is PingService -> runBlocking { _sendEventToUi.emit(PingServiceResponse(event.key)) }
         }
     }
 
@@ -343,7 +343,10 @@ class AccessibilityServiceController(
             * been supported at some point. Just in case the fingerprint reader is being
             * used while this is called. */
             if (!areFingerprintGesturesSupported.isSupported.firstBlocking()) {
-                preferenceRepository.set(Keys.fingerprintGesturesAvailable, isGestureDetectionAvailable)
+                preferenceRepository.set(
+                    Keys.fingerprintGesturesAvailable,
+                    isGestureDetectionAvailable
+                )
             }
         }
 

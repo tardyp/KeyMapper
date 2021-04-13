@@ -29,6 +29,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Event
 
+@Serializable
+data class PingService(val key: String) : Event()
+@Serializable
+data class PingServiceResponse(val key: String) : Event()
+
 open class MessageEvent(@StringRes val textRes: Int) : Event()
 
 class FixFailure(val error: Error) : Event()

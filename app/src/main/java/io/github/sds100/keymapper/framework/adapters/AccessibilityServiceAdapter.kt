@@ -1,37 +1,44 @@
 package io.github.sds100.keymapper.framework.adapters
 
-import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
+import io.github.sds100.keymapper.Constants
+import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.framework.JobSchedulerHelper
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.activity.MainActivity
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
-import io.github.sds100.keymapper.util.AccessibilityUtils
-import io.github.sds100.keymapper.util.Event
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.sendPackageBroadcast
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.
  */
-class AccessibilityServiceAdapter(context: Context, coroutineScope: CoroutineScope) :
-    ServiceAdapter {
+class AccessibilityServiceAdapter(
+    context: Context,
+    private val coroutineScope: CoroutineScope
+) : ServiceAdapter {
+
     private val ctx = context.applicationContext
     override val eventReceiver = MutableSharedFlow<Event>()
 
     override val isEnabled = MutableStateFlow(getIsEnabled())
+
+    private val permissionAdapter: PermissionAdapter by lazy { ServiceLocator.permissionAdapter(ctx) }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -90,11 +97,117 @@ class AccessibilityServiceAdapter(context: Context, coroutineScope: CoroutineSco
     }
 
     override fun enableService() {
-        TODO("Not yet implemented")
+        if (permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+            val enabledServices = SettingsUtils.getSecureSetting<String>(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            )
+
+            val className = MyAccessibilityService::class.java.name
+
+            val keyMapperEntry = "${Constants.PACKAGE_NAME}/$className"
+
+            val newEnabledServices = when {
+                enabledServices == null -> keyMapperEntry
+                enabledServices.contains(keyMapperEntry) -> enabledServices
+                else -> "$keyMapperEntry:$enabledServices"
+            }
+
+            SettingsUtils.putSecureSetting(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
+            )
+
+            /*
+            Turning on the accessibility service doesn't necessarily mean that it is running so
+            this will check if it is indeed running and then turn it off and on so that it
+            is running.
+             */
+            coroutineScope.launch {
+                send(PingService("ping_accessibility_service"))
+                var isCrashed = true
+
+                val job = eventReceiver.onEach {
+                    if (it is PingServiceResponse) {
+                        isCrashed = false
+                    }
+                }.launchIn(coroutineScope)
+
+                delay(1000L)
+                job.cancel()
+
+                if (isCrashed) {
+                    disableService()
+                    delay(200)
+
+                    SettingsUtils.putSecureSetting(
+                        ctx,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
+                    )
+                }
+            }
+        } else {
+            openAccessibilitySettings()
+        }
     }
 
     override fun disableService() {
-        TODO("Not yet implemented")
+        if (permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+            val enabledServices = SettingsUtils.getSecureSetting<String>(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            )
+
+            enabledServices ?: return
+
+            val className = MyAccessibilityService::class.java.name
+
+            val keyMapperEntry = "${Constants.PACKAGE_NAME}/$className"
+
+            val newEnabledServices = if (enabledServices.contains(keyMapperEntry)) {
+                val services = enabledServices.split(':').toMutableList()
+                services.remove(keyMapperEntry)
+
+                services.joinToString(":")
+            } else {
+                enabledServices
+            }
+
+            SettingsUtils.putSecureSetting(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                newEnabledServices
+            )
+        } else {
+            openAccessibilitySettings()
+        }
+    }
+
+    fun updateWhetherServiceIsEnabled() {
+        isEnabled.value = getIsEnabled()
+    }
+
+    private fun openAccessibilitySettings() {
+        try {
+            val settingsIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+
+            settingsIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                    or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+            )
+
+            ctx.startActivity(settingsIntent)
+
+        } catch (e: ActivityNotFoundException) {
+            //open the app to show a dialog to tell the user to give the app WRITE_SECURE_SETTINGS permission
+            Intent(ctx, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                putExtra(MainActivity.KEY_SHOW_ACCESSIBILITY_SETTINGS_NOT_FOUND_DIALOG, true)
+
+                ctx.startActivity(this)
+            }
+        }
     }
 
     private fun getIsEnabled(): Boolean {

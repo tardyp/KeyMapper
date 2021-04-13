@@ -14,13 +14,13 @@ import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
-import io.github.sds100.keymapper.databinding.ActivityHomeBinding
+import io.github.sds100.keymapper.databinding.ActivityMainBinding
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.onFailure
-import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
 import splitties.snackbar.snack
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DataBindingUtil.setContentView<ActivityHomeBinding>(this, R.layout.activity_home)
+        DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         if (intent.getBooleanExtra(KEY_SHOW_ACCESSIBILITY_SETTINGS_NOT_FOUND_DIALOG, false)) {
             alertDialog {
@@ -64,14 +64,6 @@ class MainActivity : AppCompatActivity() {
 
                 show()
             }
-        }
-
-        if (BuildConfig.DEBUG && PermissionUtils.isPermissionGranted(
-                this,
-                Manifest.permission.WRITE_SECURE_SETTINGS
-            )
-        ) {
-            AccessibilityUtils.enableService(this)
         }
 
         backupRestoreViewModel.eventStream.observe(this, {
@@ -115,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyUp(keyCode, event)
     }
 
+    //TODO replace this
     private fun showFileAccessDeniedSnackBar() {
         coordinatorLayout.snack(R.string.error_file_access_denied_automatic_backup).apply {
             setAction(R.string.reset) {
@@ -124,5 +117,4 @@ class MainActivity : AppCompatActivity() {
             show()
         }
     }
-
 }

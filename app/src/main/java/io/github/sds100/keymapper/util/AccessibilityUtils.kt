@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.ui.activity.MainActivity
  * Created by sds100 on 06/08/2019.
  */
 
+//TODO remove
 object AccessibilityUtils {
     fun enableService(ctx: Context) {
         when {
@@ -33,8 +34,10 @@ object AccessibilityUtils {
                     "$keyMapperEntry:$enabledServices"
                 }
 
-                SettingsUtils.putSecureSetting(ctx,
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices)
+                SettingsUtils.putSecureSetting(
+                    ctx,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
+                )
             }
 
             else -> openAccessibilitySettings(ctx)
@@ -79,9 +82,11 @@ object AccessibilityUtils {
         try {
             val settingsIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
 
-            settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+            settingsIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                    or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+            )
 
             context.startActivity(settingsIntent)
 
@@ -105,7 +110,8 @@ object AccessibilityUtils {
          * list. :(*/
         val settingValue = Settings.Secure.getString(
             ctx.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
 
         //it can be null if the user has never interacted with accessibility settings before
         if (settingValue != null) {

@@ -12,6 +12,7 @@ import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
 import io.github.sds100.keymapper.framework.adapters.*
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.INotificationController
 import io.github.sds100.keymapper.ui.NotificationViewModel
 import io.github.sds100.keymapper.util.*
@@ -19,7 +20,6 @@ import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.MainScope
-import splitties.systemservices.activityManager
 import timber.log.Timber
 import java.io.OutputStream
 
@@ -99,6 +99,11 @@ class KeyMapperApp : MultiDexApplication(),
             fun onResume() {
                 //when the user returns to the app let everything know that the permissions could have changed
                 permissionAdapter.onPermissionsChanged()
+                serviceAdapter.updateWhetherServiceIsEnabled()
+
+                if (BuildConfig.DEBUG && permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+                    serviceAdapter.enableService()
+                }
             }
         })
     }

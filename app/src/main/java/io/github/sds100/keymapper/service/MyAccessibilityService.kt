@@ -37,6 +37,7 @@ import splitties.bitflags.withFlag
 import splitties.systemservices.displayManager
 import splitties.systemservices.vibrator
 import splitties.toast.toast
+import java.lang.Exception
 
 /**
  * Created by sds100 on 05/04/2020.
