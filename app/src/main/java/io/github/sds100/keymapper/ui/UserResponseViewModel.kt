@@ -7,15 +7,12 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.dialogs.RequestUserResponseEvent
 import io.github.sds100.keymapper.ui.dialogs.UserResponse
 import io.github.sds100.keymapper.ui.dialogs.UserResponseEvent
 import io.github.sds100.keymapper.ui.utils.SnackBarUtils
-import io.github.sds100.keymapper.util.editTextStringAlertDialog
-import io.github.sds100.keymapper.util.multiChoiceDialog
-import io.github.sds100.keymapper.util.okDialog
-import io.github.sds100.keymapper.util.singleChoiceDialog
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 
@@ -54,7 +51,7 @@ fun UserResponseViewModel.onUserResponse(key: String, response: UserResponse?) {
 
 suspend inline fun <reified R : UserResponse> UserResponseViewModel.getUserResponse(
     key: String,
-    ui: RequestUserResponse<R>
+    ui: GetUserResponse<R>
 ): R? {
     getUserResponse(RequestUserResponseEvent(key, ui))
 
@@ -92,16 +89,16 @@ fun UserResponseViewModel.showUserResponseRequests(
             })
 
             val response = when (event.ui) {
-                is RequestUserResponse.Ok ->
+                is GetUserResponse.Ok ->
                     ctx.okDialog(lifecycleOwner, event.ui.message)
 
-                is RequestUserResponse.MultiChoice<*> ->
+                is GetUserResponse.MultiChoice<*> ->
                     ctx.multiChoiceDialog(lifecycleOwner, event.ui.items)
 
-                is RequestUserResponse.SingleChoice<*> ->
+                is GetUserResponse.SingleChoice<*> ->
                     ctx.singleChoiceDialog(lifecycleOwner, event.ui.items)
 
-                is RequestUserResponse.SnackBar ->
+                is GetUserResponse.SnackBar ->
                     SnackBarUtils.show(
                         binding.root.findViewById(R.id.coordinatorLayout),
                         event.ui.title,
@@ -109,11 +106,13 @@ fun UserResponseViewModel.showUserResponseRequests(
                         event.ui.long
                     )
 
-                is RequestUserResponse.Text -> ctx.editTextStringAlertDialog(
+                is GetUserResponse.Text -> ctx.editTextStringAlertDialog(
                     lifecycleOwner,
                     event.ui.hint,
                     event.ui.allowEmpty
                 )
+
+                is GetUserResponse.Dialog -> ctx.materialAlertDialog(lifecycleOwner, event.ui)
             }
 
             if (!responded) {

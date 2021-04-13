@@ -14,7 +14,6 @@ import androidx.annotation.RequiresPermission
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.result.*
 import splitties.systemservices.inputMethodManager
 import splitties.toast.toast
@@ -25,13 +24,19 @@ import splitties.toast.toast
 
 object KeyboardUtils {
     //DON'T CHANGE THESE!!!
-    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP = "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_DOWN_UP"
-    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN = "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_DOWN"
-    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP = "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_UP"
-    private const val KEY_MAPPER_INPUT_METHOD_ACTION_TEXT = "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_TEXT"
+    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP =
+        "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_DOWN_UP"
+    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN =
+        "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_DOWN"
+    private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP =
+        "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_UP"
+    private const val KEY_MAPPER_INPUT_METHOD_ACTION_TEXT =
+        "io.github.sds100.keymapper.inputmethod.ACTION_INPUT_TEXT"
 
-    private const val KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT = "io.github.sds100.keymapper.inputmethod.EXTRA_KEY_EVENT"
-    private const val KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT = "io.github.sds100.keymapper.inputmethod.EXTRA_TEXT"
+    private const val KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT =
+        "io.github.sds100.keymapper.inputmethod.EXTRA_KEY_EVENT"
+    private const val KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT =
+        "io.github.sds100.keymapper.inputmethod.EXTRA_TEXT"
 
     const val KEY_MAPPER_GUI_IME_PACKAGE = "io.github.sds100.keymapper.inputmethod.latin"
     const val KEY_MAPPER_GUI_IME_MIN_API = Build.VERSION_CODES.KITKAT
@@ -131,7 +136,8 @@ object KeyboardUtils {
         if (Build.VERSION.SDK_INT < O_MR1) {
             inputMethodManager.showInputMethodPicker()
         } else if ((O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT)) {
-            val command = "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
+            val command =
+                "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
             RootUtils.executeRootCommand(command)
         } else {
             ctx.toast(R.string.error_this_is_unsupported)
@@ -237,7 +243,8 @@ object KeyboardUtils {
 
             val eventTime = SystemClock.uptimeMillis()
 
-            val keyEvent = KeyEvent(eventTime, eventTime, action, keyCode, 0, metaState, deviceId, scanCode)
+            val keyEvent =
+                KeyEvent(eventTime, eventTime, action, keyCode, 0, metaState, deviceId, scanCode)
 
             putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT, keyEvent)
 

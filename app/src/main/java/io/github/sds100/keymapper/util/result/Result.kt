@@ -66,8 +66,8 @@ sealed class FixableError : Error() {
     data class AppDisabled(val packageName: String) : FixableError()
     object NoCompatibleImeEnabled : FixableError()
     object NoCompatibleImeChosen : FixableError()
+
     object AccessibilityServiceDisabled : FixableError()
-    object IsBatteryOptimised : FixableError()
 
     data class PermissionDenied(val permission: Permission) : FixableError() {
         companion object {
@@ -86,6 +86,7 @@ sealed class FixableError : Error() {
                     Permission.NOTIFICATION_LISTENER -> R.string.error_denied_notification_listener_service_permission
                     Permission.CALL_PHONE -> R.string.error_denied_call_phone_permission
                     Permission.ROOT -> R.string.error_requires_root
+                    Permission.IGNORE_BATTERY_OPTIMISATION -> R.string.error_battery_optimisation_enabled
                 }
 
                 return resourceProvider.getString(resId)

@@ -2,12 +2,12 @@ package io.github.sds100.keymapper.mappings.common
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.getUserResponse
-import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +20,10 @@ import kotlinx.coroutines.launch
  */
 abstract class BaseMappingListViewModel(
     private val coroutineScope: CoroutineScope,
+    private val displayMappingUseCase: DisplaySimpleMappingUseCase,
     resourceProvider: ResourceProvider
-) :
-    ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
+) : ResourceProvider by resourceProvider,
+    UserResponseViewModel by UserResponseViewModelImpl() {
 
     private val _fixError = MutableSharedFlow<FixableError>()
     val fixError = _fixError.asSharedFlow()
@@ -41,14 +42,14 @@ abstract class BaseMappingListViewModel(
 
     private fun showSnackBarAndFixError(error: FixableError) {
         coroutineScope.launch {
-            val snackBar = RequestUserResponse.SnackBar(
+            val snackBar = GetUserResponse.SnackBar(
                 title = error.getFullMessage(this@BaseMappingListViewModel),
                 actionText = getString(R.string.snackbar_fix)
             )
 
-            getUserResponse("fix_constraint", snackBar) ?: return@launch
+            getUserResponse("fix_error", snackBar) ?: return@launch
 
-            _fixError.emit(error)
+            displayMappingUseCase.fixError(error)
         }
     }
 }

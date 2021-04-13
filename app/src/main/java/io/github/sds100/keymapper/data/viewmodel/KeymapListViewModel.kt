@@ -20,7 +20,7 @@ class KeymapListViewModel internal constructor(
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
     private val multiSelectProvider: MultiSelectProvider
-) : BaseMappingListViewModel(coroutineScope, resourceProvider) {
+) : BaseMappingListViewModel(coroutineScope, useCase, resourceProvider) {
 
     private val listItemCreator = KeyMapListItemCreator(useCase, resourceProvider)
 

@@ -7,8 +7,9 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
-import io.github.sds100.keymapper.ui.ListItem
-import io.github.sds100.keymapper.ui.TextListItem
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.DialogResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.home.HomeTab
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
@@ -26,7 +27,9 @@ class HomeViewModel(
     private val useCase: HomeScreenUseCase,
     private val onboarding: OnboardingUseCase,
     resourceProvider: ResourceProvider,
-) : ViewModel(), ResourceProvider by resourceProvider {
+) : ViewModel(),
+    ResourceProvider by resourceProvider,
+    UserResponseViewModel by UserResponseViewModelImpl() {
 
     private companion object {
         const val ID_ACCESSIBILITY_SERVICE_LIST_ITEM = "accessibility_service"
@@ -47,6 +50,9 @@ class HomeViewModel(
         useCase,
         resourceProvider
     )
+
+    private val _openUrl = MutableSharedFlow<String>()
+    val openUrl = _openUrl.asSharedFlow()
 
     private val rebuildState = MutableSharedFlow<Unit>()
 
@@ -170,13 +176,6 @@ class HomeViewModel(
     private val _closeKeyMapper = MutableSharedFlow<Unit>()
     val closeKeyMapper = _closeKeyMapper.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = merge(
-        _fixError,
-        keymapListViewModel.fixError,
-        fingerprintMapListViewModel.fixError
-    )
-
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
     fun approvedWhatsNew() = onboarding.showedOnboardingAfterUpdateHomeScreen()
@@ -250,8 +249,8 @@ class HomeViewModel(
     fun onFixErrorListItemClick(id: String) {
         viewModelScope.launch {
             when (id) {
-                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> _fixError.emit(FixableError.AccessibilityServiceDisabled)
-                ID_BATTERY_OPTIMISATION_LIST_ITEM -> _fixError.emit(FixableError.IsBatteryOptimised)
+                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> useCase.enableAccessibilityService()
+                ID_BATTERY_OPTIMISATION_LIST_ITEM -> useCase.ignoreBatteryOptimisation()
             }
         }
     }

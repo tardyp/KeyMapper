@@ -1,20 +1,14 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.viewmodel.CreateKeymapShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -32,24 +26,6 @@ class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeyMapList
 
     override val modelState: ModelState<List<KeyMapListItem>>
         get() = viewModel
-
-    private lateinit var fixErrorDelegate: FixErrorDelegate
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        fixErrorDelegate = FixErrorDelegate(
-            "CreateKeymapShortcutFragment",
-            requireActivity().activityResultRegistry,
-            viewLifecycleOwner,
-            ServiceLocator.permissionAdapter(requireContext())
-        )
-
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
 
     override fun subscribeUi(binding: FragmentRecyclerviewBinding) {
         super.subscribeUi(binding)

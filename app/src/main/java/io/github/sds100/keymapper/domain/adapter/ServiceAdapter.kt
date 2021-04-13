@@ -11,6 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
  */
 interface ServiceAdapter {
     val isEnabled: StateFlow<Boolean>
+
+    fun enableService()
+    fun disableService()
+
     fun send(event: Event): Result<Unit>
     val eventReceiver: SharedFlow<Event>
 }

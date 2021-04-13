@@ -130,5 +130,4 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     FixableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
     is Error.ImeNotFoundForPackage -> TODO()
-    is FixableError.IsBatteryOptimised -> resourceProvider.getString(R.string.error_battery_optimisation_enabled)
 }

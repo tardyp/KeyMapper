@@ -14,7 +14,7 @@ import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.fragment.keymap.TriggerKeyListItem
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
 import io.github.sds100.keymapper.util.KeyEventUtils
@@ -72,9 +72,6 @@ class ConfigKeyMapTriggerViewModel(
      * value is the uid of the action
      */
     val openEditOptions = _openEditOptions.asSharedFlow()
-
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = _fixError.asSharedFlow()
 
     private val _state = MutableStateFlow(
         UiBuilder(State.Loading, RecordTriggerState.Stopped).build()
@@ -162,7 +159,7 @@ class ConfigKeyMapTriggerViewModel(
 
             val response = getUserResponse(
                 "pick_trigger_key_device",
-                RequestUserResponse.SingleChoice(listItems)
+                GetUserResponse.SingleChoice(listItems)
             ) ?: return@launch
 
             val selectedTriggerKeyDevice = when (response.item) {
@@ -186,15 +183,16 @@ class ConfigKeyMapTriggerViewModel(
 
                     if (recordResult is FixableError.AccessibilityServiceDisabled) {
 
-                        val snackBar = RequestUserResponse.SnackBar(
+                        val snackBar = GetUserResponse.SnackBar(
                             title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
                             actionText = getString(R.string.pos_turn_on)
                         )
 
                         val response =
                             getUserResponse(KEY_ENABLE_ACCESSIBILITY_SERVICE_DIALOG, snackBar)
+
                         if (response != null) {
-                            _fixError.emit(recordResult)
+                            displayKeyMap.fixError(FixableError.AccessibilityServiceDisabled)
                         }
                     }
                 }
@@ -210,7 +208,7 @@ class ConfigKeyMapTriggerViewModel(
                 KeyMapTriggerError.DND_ACCESS_DENIED -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val error =
                         FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
-                    _fixError.emit(error)
+                    displayKeyMap.fixError(error)
                 }
             }
         }

@@ -19,6 +19,7 @@ import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.MainScope
+import splitties.systemservices.activityManager
 import timber.log.Timber
 import java.io.OutputStream
 
@@ -70,7 +71,6 @@ class KeyMapperApp : MultiDexApplication(),
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
     val appShortcutAdapter by lazy { AndroidAppShortcutAdapter(this) }
-    val powerManagerAdapter by lazy { AndroidPowerManagementAdapter(this) }
 
     val recordTriggerController by lazy {
         RecordTriggerController(appCoroutineScope, serviceAdapter)

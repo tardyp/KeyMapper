@@ -6,20 +6,23 @@ import android.view.KeyEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.findNavController
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.BackupRestoreViewModel
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.ActivityHomeBinding
+import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.android.synthetic.main.activity_home.*
-import splitties.alertdialog.appcompat.alertDialog
-import splitties.alertdialog.appcompat.messageResource
-import splitties.alertdialog.appcompat.okButton
-import splitties.alertdialog.appcompat.titleResource
+import kotlinx.coroutines.flow.collectLatest
+import splitties.alertdialog.appcompat.*
 import splitties.snackbar.snack
 import splitties.toast.toast
 
@@ -42,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         InjectorUtils.provideBackupRestoreViewModel(this)
     }
 
+    private lateinit var requestPermissionDelegate: RequestPermissionDelegate
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,17 +58,18 @@ class MainActivity : AppCompatActivity() {
                 messageResource = R.string.dialog_message_cant_find_accessibility_settings_page
 
                 okButton {
-                    PermissionUtils.requestWriteSecureSettingsPermission(
-                        this@MainActivity, findNavController(R.id.container)
-                    )
+                    ServiceLocator.permissionAdapter(this@MainActivity)
+                        .request(Permission.WRITE_SECURE_SETTINGS)
                 }
 
                 show()
             }
         }
 
-        if (BuildConfig.DEBUG
-            && PermissionUtils.isPermissionGranted(this, Manifest.permission.WRITE_SECURE_SETTINGS)
+        if (BuildConfig.DEBUG && PermissionUtils.isPermissionGranted(
+                this,
+                Manifest.permission.WRITE_SECURE_SETTINGS
+            )
         ) {
             AccessibilityUtils.enableService(this)
         }
@@ -78,12 +84,22 @@ class MainActivity : AppCompatActivity() {
                     }
             }
         })
+
+        requestPermissionDelegate = RequestPermissionDelegate(this)
+
+        addRepeatingJob(Lifecycle.State.RESUMED) {
+            ServiceLocator.permissionAdapter(this@MainActivity).request.collectLatest { permission ->
+                requestPermissionDelegate.requestPermission(
+                    permission,
+                    findNavController(R.id.container)
+                )
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
-        ServiceLocator.serviceAdapter(this).updateWhetherServiceIsEnabled()
         ServiceLocator.notificationController(this).invalidateNotifications()
     }
 
@@ -108,4 +124,5 @@ class MainActivity : AppCompatActivity() {
             show()
         }
     }
+
 }

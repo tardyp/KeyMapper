@@ -165,7 +165,11 @@
 
     <action
         android:id="@+id/chooseApp"
-        app:destination="@id/appListFragment" />
+        app:destination="@id/appListFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right" />
 
     <fragment
         android:id="@+id/bluetoothDevicesFragment"
@@ -175,5 +179,9 @@
 
     <action
         android:id="@+id/chooseBluetoothDevice"
-        app:destination="@+id/bluetoothDevicesFragment" />
+        app:destination="@+id/bluetoothDevicesFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right"/>
 </navigation>

@@ -1,16 +1,9 @@
 package io.github.sds100.keymapper.util
 
-import android.content.Context
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.ViewDataBinding
-import androidx.navigation.NavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.SnackBarUi
-import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.getFullMessage
-import splitties.snackbar.action
 import splitties.snackbar.longSnack
 import splitties.snackbar.snack
 

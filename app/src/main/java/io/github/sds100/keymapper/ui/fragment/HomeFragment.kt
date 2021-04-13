@@ -30,7 +30,6 @@ import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
 import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -86,19 +85,11 @@ class HomeFragment : Fragment() {
     }
 
     private var quickStartGuideTapTarget: MaterialTapTargetPrompt? = null
-    private lateinit var fixErrorDelegate: FixErrorDelegate
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        fixErrorDelegate = FixErrorDelegate(
-            "HomeFragment",
-            requireActivity().activityResultRegistry,
-            viewLifecycleOwner,
-            ServiceLocator.permissionAdapter(requireContext())
-        )
 
         FragmentHomeBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
@@ -110,8 +101,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        homeViewModel.showUserResponseRequests(this, binding)
         homeViewModel.keymapListViewModel.showUserResponseRequests(this, binding)
         homeViewModel.fingerprintMapListViewModel.showUserResponseRequests(this, binding)
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.openUrl.collectLatest {
+                UrlUtils.openUrl(requireContext(), it)
+            }
+        }
 
         binding.viewModel = this@HomeFragment.homeViewModel
 
@@ -209,12 +207,6 @@ class HomeFragment : Fragment() {
                 cancelButton()
 
                 show()
-            }
-        }
-
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            homeViewModel.fixError.collectLatest {
-                fixErrorDelegate.recover(requireContext(), it, findNavController())
             }
         }
 

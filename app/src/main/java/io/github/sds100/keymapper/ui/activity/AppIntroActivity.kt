@@ -31,6 +31,7 @@ import splitties.toast.longToast
  * Created by sds100 on 07/07/2019.
  */
 
+//TODO put in viewmodel. each fragment should observe the AppIntroViewModel
 class AppIntroActivity : AppIntro2() {
 
     private val viewModel by viewModels<AppIntroViewModel> {
@@ -341,7 +342,7 @@ class DndAccessSlide : AppIntroScrollableFragment() {
         imageDrawable = drawable(R.drawable.ic_outline_dnd_circle_outline_64)
 
         setOnButton1ClickListener {
-            PermissionUtils.requestAccessNotificationPolicy(requestAccessNotificationPolicy)
+//            PermissionUtils.requestAccessNotificationPolicy(requestAccessNotificationPolicy)
         }
     }
 

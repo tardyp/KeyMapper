@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.ui.fragment.fingerprint
 
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
@@ -22,7 +20,6 @@ import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItem
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.encodeToString
@@ -53,26 +50,8 @@ class FingerprintMapListFragment :
         InjectorUtils.provideBackupRestoreViewModel(requireContext())
     }
 
-    private lateinit var fixErrorDelegate: FixErrorDelegate
-
     override val listItems: Flow<ListUiState<FingerprintMapListItem>>
         get() = viewModel.state
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        fixErrorDelegate = FixErrorDelegate(
-            "FingerprintGestureFragment",
-            requireActivity().activityResultRegistry,
-            viewLifecycleOwner,
-            ServiceLocator.permissionAdapter(requireContext())
-        )
-
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
 
     override fun bind(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentFingerprintMapListBinding.inflate(inflater, container, false).apply {

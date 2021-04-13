@@ -1,13 +1,11 @@
 package io.github.sds100.keymapper.domain.actions
 
-import android.Manifest
 import android.os.Build
-import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.CameraAdapter
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
-import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
 import io.github.sds100.keymapper.permissions.Permission
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.combine
  * Created by sds100 on 15/02/2021.
  */
 
-//TODO delete
 class GetActionErrorUseCaseImpl(
     private val packageManager: PackageManagerAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
@@ -31,7 +28,7 @@ class GetActionErrorUseCaseImpl(
 ) : GetActionErrorUseCase {
 
     private val isSystemActionSupported = IsSystemActionSupportedUseCaseImpl(systemFeatureAdapter)
-    private val keyMapperImeManager = KeyMapperImeManager(inputMethodAdapter)
+    private val keyMapperImeManager = KeyMapperImeHelper(inputMethodAdapter)
 
     override val invalidateErrors = combine(inputMethodAdapter.chosenIme) {}
 

@@ -9,11 +9,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.ui.fragment.*
-import io.github.sds100.keymapper.ui.fragment.keymap.ConfigKeymapFragmentDirections
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.FragmentInfo
@@ -45,13 +43,13 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
 
         setFragmentResultListener(ConfigActionsFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
-                viewModel.actionListViewModel.addAction(it)
+                viewModel.configActionsViewModel.addAction(it)
             }
         }
 
         setFragmentResultListener(ConfigConstraintsFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
-                viewModel.constraintListViewModel.onChosenNewConstraint(it)
+                viewModel.configConstraintsViewModel.onChosenNewConstraint(it)
             }
         }
     }
@@ -60,7 +58,7 @@ class ConfigFingerprintMapFragment : ConfigMappingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.actionListViewModel.openEditOptions.collectLatest { actionUid ->
+            viewModel.configActionsViewModel.openEditOptions.collectLatest { actionUid ->
                 viewModel.configActionOptionsViewModel.setActionToConfigure(actionUid)
                 findNavController().navigate(ConfigFingerprintMapFragmentDirections.configActionFragment())
             }

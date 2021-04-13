@@ -2,12 +2,13 @@ package io.github.sds100.keymapper.domain.ime
 
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.util.KeyboardUtils
 
 /**
  * Created by sds100 on 16/03/2021.
  */
 
-class KeyMapperImeManager(val adapter: InputMethodAdapter) {
+class KeyMapperImeHelper(val adapter: InputMethodAdapter) {
     private companion object {
         const val KEY_MAPPER_GUI_IME_PACKAGE = "io.github.sds100.keymapper.inputmethod.latin"
 
@@ -18,9 +19,12 @@ class KeyMapperImeManager(val adapter: InputMethodAdapter) {
     }
 
     fun enableCompatibleInputMethods() {
-
+        KeyboardUtils.KEY_MAPPER_IME_PACKAGE_LIST.forEach {
+            adapter.enableImeByPackageName(it)
+        }
     }
 
+    //TODO
     fun chooseCompatibleInputMethod(fromForeground: Boolean) {}
     fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean) {}
     fun toggleCompatibleInputMethod() {}

@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment.fingerprint
 
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.options.FingerprintActionOptions
@@ -32,5 +31,5 @@ class FingerprintConfigActionsFragment :
     }
 
     override val configActionsViewModel: ConfigActionsViewModel<FingerprintMapAction, FingerprintMap>
-        get() = viewModel.actionListViewModel
+        get() = viewModel.configActionsViewModel
 }

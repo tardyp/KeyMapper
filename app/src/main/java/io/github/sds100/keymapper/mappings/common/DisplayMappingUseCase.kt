@@ -3,13 +3,10 @@ package io.github.sds100.keymapper.mappings.common
 import android.graphics.drawable.Drawable
 import android.os.Build
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.adapter.CameraAdapter
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
+import io.github.sds100.keymapper.domain.adapter.*
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
-import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.CameraLens
 import io.github.sds100.keymapper.permissions.Permission
@@ -17,8 +14,10 @@ import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
-import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 /**
  * Created by sds100 on 03/04/2021.
@@ -29,11 +28,12 @@ class DisplaySimpleMappingUseCaseImpl(
     private val permissionAdapter: PermissionAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
     private val systemFeatureAdapter: SystemFeatureAdapter,
-    private val cameraAdapter: CameraAdapter
+    private val cameraAdapter: CameraAdapter,
+    private val serviceAdapter: ServiceAdapter,
 ) : DisplaySimpleMappingUseCase {
 
     private val isSystemActionSupported = IsSystemActionSupportedUseCaseImpl(systemFeatureAdapter)
-    private val keyMapperImeManager = KeyMapperImeManager(inputMethodAdapter)
+    private val keyMapperImeHelper = KeyMapperImeHelper(inputMethodAdapter)
 
     private val isConstraintSupportedByDevice =
         IsConstraintSupportedByDeviceUseCaseImpl(systemFeatureAdapter)
@@ -44,7 +44,7 @@ class DisplaySimpleMappingUseCaseImpl(
             permissionAdapter.onPermissionsUpdate
         )
 
-        override fun getAppName(packageName: String): Result<String> =
+    override fun getAppName(packageName: String): Result<String> =
         packageManager.getAppName(packageName)
 
     override fun getAppIcon(packageName: String): Result<Drawable> =
@@ -53,14 +53,27 @@ class DisplaySimpleMappingUseCaseImpl(
     override fun getInputMethodLabel(imeId: String): Result<String> =
         inputMethodAdapter.getLabel(imeId)
 
+    override fun fixError(error: FixableError) {
+        when (error) {
+            FixableError.AccessibilityServiceDisabled -> serviceAdapter.enableService()
+            is FixableError.AppDisabled -> packageManager.enableApp(error.packageName)
+            is FixableError.AppNotFound -> packageManager.installApp(error.packageName)
+            FixableError.NoCompatibleImeChosen -> keyMapperImeHelper.chooseCompatibleInputMethod(
+                fromForeground = true
+            )
+            FixableError.NoCompatibleImeEnabled -> keyMapperImeHelper.enableCompatibleInputMethods()
+            is FixableError.PermissionDenied -> permissionAdapter.request(error.permission)
+        }
+    }
+
     //TODO move this to its own use case and displaysimplemapping should take this use case as a param
     override fun getActionError(actionData: ActionData): Error? {
         if (actionData.requiresImeToPerform()) {
-            if (!keyMapperImeManager.isCompatibleImeEnabled()) {
+            if (!keyMapperImeHelper.isCompatibleImeEnabled()) {
                 return FixableError.NoCompatibleImeEnabled
             }
 
-            if (!keyMapperImeManager.isCompatibleImeChosen()) {
+            if (!keyMapperImeHelper.isCompatibleImeChosen()) {
                 return FixableError.NoCompatibleImeChosen
             }
         }
@@ -180,8 +193,7 @@ class DisplaySimpleMappingUseCaseImpl(
     }
 }
 
-interface DisplaySimpleMappingUseCase : DisplayActionUseCase, DisplayConstraintUseCase {
-}
+interface DisplaySimpleMappingUseCase : DisplayActionUseCase, DisplayConstraintUseCase
 
 interface DisplayActionUseCase {
     val invalidateErrors: Flow<Unit>
@@ -190,6 +202,7 @@ interface DisplayActionUseCase {
     fun getAppIcon(packageName: String): Result<Drawable>
     fun getInputMethodLabel(imeId: String): Result<String>
     fun getActionError(actionData: ActionData): Error?
+    fun fixError(error: FixableError)
 }
 
 interface DisplayConstraintUseCase {
@@ -199,4 +212,5 @@ interface DisplayConstraintUseCase {
     fun getAppIcon(packageName: String): Result<Drawable>
     fun getInputMethodLabel(imeId: String): Result<String>
     fun getConstraintError(constraint: Constraint): Error?
+    fun fixError(error: FixableError)
 }

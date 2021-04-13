@@ -12,11 +12,13 @@ interface InputMethodAdapter {
 
     fun isImeEnabledById(imeId: String): Boolean
     fun isImeEnabledByPackageName(packageName: String): Boolean
-    fun enableIme(imeId: String)
+    fun enableImeById(imeId: String)
+    fun enableImeByPackageName(packageName: String)
 
     fun isImeChosenById(imeId: String): Boolean
     fun isImeChosenByPackageName(packageName: String): Boolean
-    fun chooseIme(imeId: String)
+    fun chooseImeById(imeId: String)
+    fun chooseImeByPackageName(packageName: String)
 
     fun getLabel(imeId: String): Result<String>
 

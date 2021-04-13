@@ -39,9 +39,6 @@ class ConfigConstraintsViewModel(
     private val _showToast = MutableSharedFlow<String>()
     val showToast = _showToast.asSharedFlow()
 
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = _fixError.asSharedFlow()
-
     private val _state = MutableStateFlow(buildState(State.Loading))
     val state = _state.asStateFlow()
 
@@ -99,7 +96,7 @@ class ConfigConstraintsViewModel(
                 val error = display.getConstraintError(constraint)
 
                 if (error is FixableError) {
-                    _fixError.emit(error)
+                   display.fixError(error)
                 }
             }
         }

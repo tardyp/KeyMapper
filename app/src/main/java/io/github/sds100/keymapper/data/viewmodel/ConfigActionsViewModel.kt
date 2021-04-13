@@ -5,15 +5,12 @@ import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
-import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
-import io.github.sds100.keymapper.mappings.common.Mapping
-import io.github.sds100.keymapper.mappings.common.isDelayBeforeNextActionAllowed
-import io.github.sds100.keymapper.ui.IconInfo
-import io.github.sds100.keymapper.ui.ListUiState
+import io.github.sds100.keymapper.mappings.common.*
+import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.actions.ActionListItem
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper
-import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
@@ -43,9 +40,6 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
      * value is the uid of the action
      */
     val openEditOptions = _openEditOptions.asSharedFlow()
-
-    private val _fixError = MutableSharedFlow<FixableError>()
-    val fixError = _fixError.asSharedFlow()
 
     init {
         val rebuildUiState = MutableSharedFlow<State<M>>()
@@ -81,11 +75,12 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
                 val actionData = data.actionList.singleOrNull { it.uid == uid }?.data
                     ?: return@launch
 
-                displayActionUseCase.getActionError(actionData)?.let { error ->
-                    when (error) {
-                        is FixableError -> _fixError.emit(error)
-                        else -> testAction(actionData)
-                    }
+                val error = displayActionUseCase.getActionError(actionData)
+
+                when (error) {
+                    null -> testAction(actionData)
+                    is FixableError -> displayActionUseCase.fixError(error)
+                    else -> testAction(actionData)
                 }
             }
         }

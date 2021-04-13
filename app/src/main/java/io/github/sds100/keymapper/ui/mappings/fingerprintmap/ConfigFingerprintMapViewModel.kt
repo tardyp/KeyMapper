@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.constraints.ConstraintUtils
 import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
-import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.utils.State
@@ -51,7 +50,7 @@ class ConfigFingerprintMapViewModel(
     val configOptionsViewModel =
         ConfigFingerprintMapOptionsViewModel(viewModelScope, config, resourceProvider)
 
-    val actionListViewModel = ConfigActionsViewModel(
+    override val configActionsViewModel = ConfigActionsViewModel(
         viewModelScope,
         display,
         testAction,
@@ -60,7 +59,7 @@ class ConfigFingerprintMapViewModel(
         resourceProvider
     )
 
-    val constraintListViewModel = ConfigConstraintsViewModel(
+    override val configConstraintsViewModel = ConfigConstraintsViewModel(
         viewModelScope,
         display,
         config,
@@ -69,8 +68,6 @@ class ConfigFingerprintMapViewModel(
     )
 
     override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
-
-    override val fixError = merge(actionListViewModel.fixError, constraintListViewModel.fixError)
 
     private val rebuildUiState = MutableSharedFlow<Unit>()
 
@@ -123,8 +120,6 @@ class ConfigFingerprintMapViewModel(
             config.setMapping(map)
         }
     }
-
-    override fun addAction(actionData: ActionData) = config.addAction(actionData)
 
     private fun buildUiState(configState: State<FingerprintMap>): ConfigFingerprintMapUiState {
         return when (configState) {

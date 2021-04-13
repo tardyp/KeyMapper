@@ -27,5 +27,5 @@ class FingerprintConfigConstraintsFragment : ConfigConstraintsFragment() {
         }
 
     override val configConstraintsViewModel: ConfigConstraintsViewModel
-        get() = viewModel.constraintListViewModel
+        get() = viewModel.configConstraintsViewModel
 }

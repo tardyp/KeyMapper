@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.home
 
 import android.os.Build
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
-import io.github.sds100.keymapper.domain.adapter.PowerManagementAdapter
+import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapEntityMapper
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
@@ -17,9 +17,9 @@ import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
+import io.github.sds100.keymapper.permissions.Permission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -28,9 +28,9 @@ import timber.log.Timber
 class HomeScreenUseCaseImpl(
     private val keyMapRepository: KeyMapRepository,
     private val fingerprintMapRepository: FingerprintMapRepository,
-    private val powerManagementAdapter: PowerManagementAdapter,
-    private val serviceAdapter: ServiceAdapter,
     private val preferenceRepository: PreferenceRepository,
+    private val serviceAdapter: ServiceAdapter,
+    private val permissionAdapter: PermissionAdapter,
     displayKeyMapUseCase: DisplayKeyMapUseCase,
     displaySimpleMappingUseCase: DisplaySimpleMappingUseCase
 ) : HomeScreenUseCase,
@@ -97,10 +97,10 @@ class HomeScreenUseCaseImpl(
     }
 
     override fun isBatteryOptimised(): Boolean {
-        return !powerManagementAdapter.isIgnoringBatteryOptimisation
+        return !permissionAdapter.isGranted(Permission.IGNORE_BATTERY_OPTIMISATION)
     }
 
-    override val isAccessibilityServiceEnabled: Flow<Boolean> = serviceAdapter.isEnabled
+    override val isAccessibilityServiceEnabled: Flow<Boolean> =serviceAdapter.isEnabled
 
     override val areFingerprintGesturesSupported: Flow<Boolean> =
         preferenceRepository.get(Keys.fingerprintGesturesAvailable).map {
@@ -111,6 +111,14 @@ class HomeScreenUseCaseImpl(
 
     override val hideHomeScreenAlerts: Flow<Boolean> =
         preferenceRepository.get(Keys.hideHomeScreenAlerts).map { it ?: false }
+
+    override fun ignoreBatteryOptimisation() {
+        permissionAdapter.request(Permission.IGNORE_BATTERY_OPTIMISATION)
+    }
+
+    override fun enableAccessibilityService() {
+        serviceAdapter.enableService()
+    }
 }
 
 interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase {
@@ -128,6 +136,8 @@ interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase 
     fun enableAllMappings()
     fun disableAllMappings()
 
+    fun enableAccessibilityService()
+    fun ignoreBatteryOptimisation()
     fun isBatteryOptimised(): Boolean
     val isAccessibilityServiceEnabled: Flow<Boolean>
     val areFingerprintGesturesSupported: Flow<Boolean>

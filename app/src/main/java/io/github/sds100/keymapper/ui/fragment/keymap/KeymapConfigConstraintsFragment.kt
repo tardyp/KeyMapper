@@ -26,5 +26,5 @@ class KeymapConfigConstraintsFragment : ConfigConstraintsFragment() {
         }
 
     override val configConstraintsViewModel: ConfigConstraintsViewModel
-        get() = configKeyMapViewModel.constraintListViewModel
+        get() = configKeyMapViewModel.configConstraintsViewModel
 }

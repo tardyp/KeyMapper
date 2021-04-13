@@ -51,25 +51,8 @@ data class ConstraintEntity(
         const val ORIENTATION_270 = "constraint_orientation_270"
         const val ORIENTATION_PORTRAIT = "constraint_orientation_portrait"
         const val ORIENTATION_LANDSCAPE = "constraint_orientation_landscape"
+
         //types
-
-        /**
-         * Constraints supported by all types of mappings.
-         */
-        //TODO move to sealed Constraint model in domain
-        val COMMON_SUPPORTED_CONSTRAINTS = listOf(
-            APP_FOREGROUND,
-            APP_NOT_FOREGROUND,
-            BT_DEVICE_CONNECTED,
-            BT_DEVICE_DISCONNECTED,
-            ORIENTATION_PORTRAIT,
-            ORIENTATION_LANDSCAPE,
-            ORIENTATION_0,
-            ORIENTATION_90,
-            ORIENTATION_180,
-            ORIENTATION_270
-        )
-
         val ORIENTATION_CONSTRAINTS = arrayOf(
             ORIENTATION_PORTRAIT,
             ORIENTATION_LANDSCAPE,
@@ -82,19 +65,6 @@ data class ConstraintEntity(
         const val EXTRA_PACKAGE_NAME = "extra_package_name"
         const val EXTRA_BT_ADDRESS = "extra_bluetooth_device_address"
         const val EXTRA_BT_NAME = "extra_bluetooth_device_name"
-
-        //Categories
-        const val CATEGORY_APP = 0
-        const val CATEGORY_BLUETOOTH = 1
-        const val CATEGORY_SCREEN = 2
-        const val CATEGORY_ORIENTATION = 3
-
-        val CATEGORY_LABEL_MAP = mapOf(
-            CATEGORY_APP to R.string.constraint_category_app,
-            CATEGORY_BLUETOOTH to R.string.constraint_category_bluetooth,
-            CATEGORY_SCREEN to R.string.constraint_category_screen,
-            CATEGORY_ORIENTATION to R.string.constraint_category_orientation
-        )
 
         val DESERIALIZER = jsonDeserializer {
             val type by it.json.byString(NAME_TYPE)

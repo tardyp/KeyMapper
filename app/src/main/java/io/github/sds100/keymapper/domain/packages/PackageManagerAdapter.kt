@@ -16,5 +16,8 @@ interface PackageManagerAdapter {
     fun isAppEnabled(packageName: String): Boolean
     fun isAppInstalled(packageName: String): Boolean
 
+    fun enableApp(packageName: String)
+    fun installApp(packageName: String)
+
     fun isVoiceAssistantInstalled(): Boolean
 }

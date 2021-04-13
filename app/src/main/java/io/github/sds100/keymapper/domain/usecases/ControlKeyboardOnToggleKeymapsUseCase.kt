@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.domain.usecases
 
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.ime.KeyMapperImeManager
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.utils.PrefDelegate
@@ -18,7 +18,7 @@ class ControlKeyboardOnToggleKeymapsUseCaseImpl(
     private val preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository, ControlKeyboardOnToggleKeymapsUseCase {
 
-    private val imeManager = KeyMapperImeManager(inputMethodAdapter)
+    private val imeManager = KeyMapperImeHelper(inputMethodAdapter)
     private val getKeymapsPausedUseCase = GetKeymapsPausedUseCase(preferenceRepository)
 
     private val keymapsPaused = getKeymapsPausedUseCase()

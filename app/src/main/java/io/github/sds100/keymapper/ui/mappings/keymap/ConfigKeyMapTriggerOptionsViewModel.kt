@@ -11,7 +11,7 @@ import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.common.OptionMinimums
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
 import io.github.sds100.keymapper.util.UserResponse
 import kotlinx.coroutines.*
@@ -99,7 +99,7 @@ class ConfigKeyMapTriggerOptionsViewModel(
                 val key = "create_launcher_shortcut"
                 val response = getUserResponse(
                     key,
-                    RequestUserResponse.Text(
+                    GetUserResponse.Text(
                         getString(R.string.hint_shortcut_name),
                         allowEmpty = false
                     )

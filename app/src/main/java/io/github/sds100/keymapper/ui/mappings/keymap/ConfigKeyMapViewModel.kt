@@ -35,12 +35,6 @@ import kotlinx.coroutines.launch
  * Created by sds100 on 22/11/20.
  */
 
-/*
-TODO
-- move classes in data, domain and ui into individual feature packages
-- dont have individual use cases for modifying key maps. Create functions in ConfigKeymap object
- */
-
 class ConfigKeyMapViewModel(
     private val save: SaveKeymapUseCase,
     private val get: GetKeymapUseCase,
@@ -51,8 +45,7 @@ class ConfigKeyMapViewModel(
     private val createKeyMapShortcut: CreateKeyMapShortcutUseCase,
     private val displayMapping: DisplayKeyMapUseCase,
     resourceProvider: ResourceProvider
-) : ViewModel(), ConfigMappingViewModel,
-    ResourceProvider by resourceProvider {
+) : ViewModel(), ConfigMappingViewModel, ResourceProvider by resourceProvider {
 
     companion object {
         private const val STATE_KEY = "config_keymap"
@@ -64,7 +57,7 @@ class ConfigKeyMapViewModel(
     val configTriggerKeyViewModel =
         ConfigTriggerKeyViewModel(viewModelScope, config, resourceProvider)
 
-    val actionListViewModel = ConfigActionsViewModel(
+    override val configActionsViewModel = ConfigActionsViewModel(
         viewModelScope,
         displayMapping,
         testAction,
@@ -83,7 +76,7 @@ class ConfigKeyMapViewModel(
         resourceProvider
     )
 
-    val constraintListViewModel = ConfigConstraintsViewModel(
+    override val configConstraintsViewModel = ConfigConstraintsViewModel(
         viewModelScope,
         displayMapping,
         config,
@@ -94,12 +87,6 @@ class ConfigKeyMapViewModel(
     override val state = MutableStateFlow<ConfigMappingUiState>(buildUiState(State.Loading))
 
     override fun setEnabled(enabled: Boolean) = config.setEnabled(enabled)
-
-    override val fixError = merge(
-        configTriggerViewModel.fixError,
-        actionListViewModel.fixError,
-        constraintListViewModel.fixError
-    )
 
     init {
         viewModelScope.launch {
@@ -134,8 +121,6 @@ class ConfigKeyMapViewModel(
             config.setMapping(get(uid)!!)
         }
     }
-
-    override fun addAction(actionData: ActionData) = config.addAction(actionData)
 
     private fun buildUiState(configState: State<KeyMap>): ConfigKeymapUiState {
         return when (configState) {

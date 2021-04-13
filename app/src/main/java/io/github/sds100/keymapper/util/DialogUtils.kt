@@ -3,14 +3,12 @@ package io.github.sds100.keymapper.util
 import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
-import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
-import io.github.sds100.keymapper.data.model.SeekBarListItemModel
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
-import io.github.sds100.keymapper.databinding.DialogSeekbarListBinding
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.DialogResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.*
@@ -18,16 +16,43 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Created by sds100 on 30/03/2020.
  */
 
+suspend fun Context.materialAlertDialog(
+    lifecycleOwner: LifecycleOwner,
+    model: GetUserResponse.Dialog
+) = suspendCancellableCoroutine<DialogResponse?> { continuation ->
+
+    materialAlertDialog {
+        title = model.title
+        message = model.message
+
+        setPositiveButton(model.positiveButtonText) { _, _ ->
+            continuation.resume(DialogResponse.POSITIVE)
+        }
+
+        setNeutralButton(model.neutralButtonText) { _, _ ->
+            continuation.resume(DialogResponse.NEUTRAL)
+        }
+
+        setNegativeButton(model.negativeButtonText) { _, _ ->
+            continuation.resume(DialogResponse.NEGATIVE)
+        }
+
+        show().apply {
+            resumeNullOnDismiss(continuation)
+            dismissOnDestroy(lifecycleOwner)
+        }
+    }
+}
+
 suspend fun <ID> Context.multiChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<RequestUserResponse.MultiChoiceResponse<ID>?> { continuation ->
+) = suspendCancellableCoroutine<GetUserResponse.MultiChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         val checkedItems = BooleanArray(items.size) { false }
 
@@ -49,7 +74,7 @@ suspend fun <ID> Context.multiChoiceDialog(
                 }
             }.toList()
 
-            continuation.resume(RequestUserResponse.MultiChoiceResponse(checkedItemIds))
+            continuation.resume(GetUserResponse.MultiChoiceResponse(checkedItemIds))
         }
 
         show().apply {
@@ -62,12 +87,12 @@ suspend fun <ID> Context.multiChoiceDialog(
 suspend fun <ID> Context.singleChoiceDialog(
     lifecycleOwner: LifecycleOwner,
     items: List<Pair<ID, String>>
-) = suspendCancellableCoroutine<RequestUserResponse.SingleChoiceResponse<ID>?> { continuation ->
+) = suspendCancellableCoroutine<GetUserResponse.SingleChoiceResponse<ID>?> { continuation ->
     materialAlertDialog {
         setItems(
             items.map { it.second }.toTypedArray(),
         ) { _, position ->
-            continuation.resume(RequestUserResponse.SingleChoiceResponse(items[position].first))
+            continuation.resume(GetUserResponse.SingleChoiceResponse(items[position].first))
         }
 
         show().apply {
@@ -81,7 +106,7 @@ suspend fun Context.editTextStringAlertDialog(
     lifecycleOwner: LifecycleOwner,
     hint: String,
     allowEmpty: Boolean = false
-) = suspendCancellableCoroutine<RequestUserResponse.TextResponse?> { continuation ->
+) = suspendCancellableCoroutine<GetUserResponse.TextResponse?> { continuation ->
 
     val text = MutableStateFlow("")
 
@@ -97,7 +122,7 @@ suspend fun Context.editTextStringAlertDialog(
         }
 
         okButton {
-            continuation.resume(RequestUserResponse.TextResponse(text.value))
+            continuation.resume(GetUserResponse.TextResponse(text.value))
         }
 
         cancelButton()
@@ -193,14 +218,14 @@ suspend fun Context.editTextNumberAlertDialog(
 suspend fun Context.okDialog(
     lifecycleOwner: LifecycleOwner,
     message: String
-) = suspendCancellableCoroutine<RequestUserResponse.OkResponse?> { continuation ->
+) = suspendCancellableCoroutine<GetUserResponse.OkResponse?> { continuation ->
 
     val alertDialog = materialAlertDialog {
 
         setMessage(message)
 
         okButton {
-            continuation.resume(RequestUserResponse.OkResponse)
+            continuation.resume(GetUserResponse.OkResponse)
         }
     }
 

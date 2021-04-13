@@ -12,13 +12,20 @@ import android.os.Looper
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
+import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
+import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.ime.ImeInfo
 import io.github.sds100.keymapper.framework.JobSchedulerHelper
+import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.result.onSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
+import splitties.toast.toast
 import timber.log.Timber
 
 /**
@@ -27,9 +34,14 @@ import timber.log.Timber
 
 //TODO inject root process delegate
 class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
+
     companion object {
         private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
     }
+
+    override val chosenIme by lazy { MutableStateFlow(getChosenIme()) }
+
+    override val enabledInputMethods by lazy { MutableStateFlow(getEnabledInputMethods()) }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -46,13 +58,10 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
 
     private val ctx = context.applicationContext
 
-    override val chosenIme = MutableStateFlow(getChosenIme())
-
-    override val enabledInputMethods = MutableStateFlow(getEnabledInputMethods())
-
     private val inputMethodManager: InputMethodManager
         get() = ctx.getSystemService()!!
 
+    private val permissionAdapter: PermissionAdapter by lazy { ServiceLocator.permissionAdapter(ctx) }
 
     init {
         //use job scheduler because there is there is a much shorter delay when the app is in the background
@@ -87,11 +96,28 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
     }
 
     override fun isImeEnabledByPackageName(packageName: String): Boolean {
-        return enabledInputMethods.value.any{it.packageName == packageName}
+        return enabledInputMethods.value.any { it.packageName == packageName }
     }
 
-    override fun enableIme(imeId: String) {
-        //TODO
+    override fun enableImeById(imeId: String) {
+        if (permissionAdapter.isGranted(Permission.ROOT)) {
+            RootUtils.executeRootCommand("ime enable $imeId")
+        } else {
+            try {
+                val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
+                intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_TASK
+
+                ctx.startActivity(intent)
+            } catch (e: Exception) {
+                toast(R.string.error_cant_find_ime_settings)
+            }
+        }
+    }
+
+    override fun enableImeByPackageName(packageName: String) {
+        getImeId(packageName).onSuccess {
+            enableImeById(it)
+        }
     }
 
     override fun isImeChosenById(imeId: String): Boolean {
@@ -102,7 +128,11 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
         return chosenIme.value.packageName == packageName
     }
 
-    override fun chooseIme(imeId: String) {
+    override fun chooseImeById(imeId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun chooseImeByPackageName(packageName: String) {
         TODO("Not yet implemented")
     }
 
@@ -165,6 +195,16 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
             Error.InputMethodNotFound(imeId)
         } else {
             Success(packageName)
+        }
+    }
+
+    private fun getImeId(packageName: String): Result<String> {
+        val imeId = inputMethodManager.inputMethodList.find { it.packageName == packageName }?.id
+
+        return if (imeId == null) {
+            Error.InputMethodNotFound(packageName)
+        } else {
+            Success(imeId)
         }
     }
 }

@@ -13,13 +13,12 @@ import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCase
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.getUserResponse
 import io.github.sds100.keymapper.util.filterByQuery
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.*
 
 /**
@@ -101,7 +100,7 @@ class ChooseAppShortcutViewModel internal constructor(
             } else {
                 val response = getUserResponse(
                     "create_shortcut_name",
-                    RequestUserResponse.Text(
+                    GetUserResponse.Text(
                         hint = getString(R.string.hint_shortcut_name),
                         allowEmpty = false
                     )

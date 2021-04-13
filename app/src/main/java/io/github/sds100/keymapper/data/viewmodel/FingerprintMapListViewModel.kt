@@ -19,7 +19,7 @@ class FingerprintMapListViewModel(
     private val coroutineScope: CoroutineScope,
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
-) : BaseMappingListViewModel(coroutineScope, resourceProvider) {
+) : BaseMappingListViewModel(coroutineScope,useCase, resourceProvider) {
 
     private val listItemCreator = FingerprintMapListItemCreator(
         useCase,

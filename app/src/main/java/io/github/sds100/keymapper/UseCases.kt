@@ -37,7 +37,8 @@ object UseCases {
             ServiceLocator.permissionAdapter(ctx),
             ServiceLocator.inputMethodAdapter(ctx),
             ServiceLocator.systemFeatureAdapter(ctx),
-            ServiceLocator.cameraAdapter(ctx)
+            ServiceLocator.cameraAdapter(ctx),
+            ServiceLocator.serviceAdapter(ctx)
         )
     }
 

@@ -89,8 +89,12 @@ class AccessibilityServiceAdapter(context: Context, coroutineScope: CoroutineSco
         return Success(Unit)
     }
 
-    fun updateWhetherServiceIsEnabled() {
-        isEnabled.value = getIsEnabled()
+    override fun enableService() {
+        TODO("Not yet implemented")
+    }
+
+    override fun disableService() {
+        TODO("Not yet implemented")
     }
 
     private fun getIsEnabled(): Boolean {

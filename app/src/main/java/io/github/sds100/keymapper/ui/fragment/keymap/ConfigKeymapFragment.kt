@@ -47,7 +47,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
 
         setFragmentResultListener(ConfigConstraintsFragment.CHOOSE_CONSTRAINT_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<Constraint>(ChooseConstraintFragment.EXTRA_CONSTRAINT)?.let {
-                viewModel.constraintListViewModel.onChosenNewConstraint(it)
+                viewModel.configConstraintsViewModel.onChosenNewConstraint(it)
             }
         }
     }
@@ -56,7 +56,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.actionListViewModel.openEditOptions.collectLatest { actionUid ->
+            viewModel.configActionsViewModel.openEditOptions.collectLatest { actionUid ->
                 viewModel.configActionOptionsViewModel.setActionToConfigure(actionUid)
                 findNavController().navigate(ConfigKeymapFragmentDirections.actionConfigKeymapFragmentToActionOptionsFragment())
             }
@@ -70,7 +70,6 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
         }
 
         viewModel.configTriggerViewModel.showUserResponseRequests(this, binding)
-
         viewModel.configTriggerViewModel.optionsViewModel.showUserResponseRequests(this, binding)
     }
 

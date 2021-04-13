@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -105,7 +105,7 @@ class PickDisplayCoordinateViewModel(
 
             val response  = getUserResponse(
                 "coordinate_description",
-                RequestUserResponse.Text(
+                GetUserResponse.Text(
                     getString(R.string.hint_tap_coordinate_title),
                     allowEmpty = true
                 )

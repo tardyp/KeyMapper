@@ -5,9 +5,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
@@ -17,12 +19,14 @@ import io.github.sds100.keymapper.service.DeviceAdmin
 import io.github.sds100.keymapper.util.RootUtils
 import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import splitties.systemservices.devicePolicyManager
 import splitties.systemservices.notificationManager
-import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.
@@ -36,6 +40,9 @@ class AndroidPermissionAdapter(
 
     override val onPermissionsUpdate = MutableSharedFlow<Unit>()
 
+    private val _request = MutableSharedFlow<Permission>()
+    val request = _request.asSharedFlow()
+
     init {
         coroutineScope.launch {
             preferenceRepository.get(Keys.hasRootPermission)
@@ -44,6 +51,10 @@ class AndroidPermissionAdapter(
                     onPermissionsUpdate.emit(Unit)
                 }
         }
+    }
+
+    override fun request(permission: Permission) {
+        runBlocking { _request.emit(permission) }
     }
 
     override fun isGranted(permission: Permission): Boolean {
@@ -105,6 +116,14 @@ class AndroidPermissionAdapter(
             Permission.ROOT ->
                 preferenceRepository.get(Keys.hasRootPermission).firstBlocking()
                     ?: false
+
+            Permission.IGNORE_BATTERY_OPTIMISATION ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    ctx.getSystemService<PowerManager>()
+                        ?.isIgnoringBatteryOptimizations(Constants.PACKAGE_NAME) ?: false
+                } else {
+                    true
+                }
         }
     }
 

@@ -183,9 +183,9 @@ object InjectorUtils {
             HomeScreenUseCaseImpl(
                 keyMapRepository = ServiceLocator.roomKeymapRepository(ctx),
                 fingerprintMapRepository = ServiceLocator.fingerprintMapRepository(ctx),
-                powerManagementAdapter = ServiceLocator.powerManagementAdapter(ctx),
-                serviceAdapter = ServiceLocator.serviceAdapter(ctx),
                 preferenceRepository = ServiceLocator.preferenceRepository(ctx),
+                serviceAdapter = ServiceLocator.serviceAdapter(ctx),
+                permissionAdapter = ServiceLocator.permissionAdapter(ctx),
                 displayKeyMapUseCase = UseCases.displayKeyMap(ctx),
                 displaySimpleMappingUseCase = UseCases.displaySimpleMapping(ctx)
             ),

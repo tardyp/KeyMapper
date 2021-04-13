@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.util.result.valueOrNull
 /**
  * Created by sds100 on 13/12/20.
  */
+//TODO
 class ConstraintDelegate(
     constraintState: IConstraintState
 ) : IConstraintState by constraintState, IConstraintDelegate {

@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.utils.Orientation
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -128,7 +128,7 @@ class ChooseConstraintViewModel(
                 ChooseConstraintType.BT_DEVICE_DISCONNECTED -> {
                     val response = getUserResponse(
                         "bluetooth_device_constraint_limitation",
-                        RequestUserResponse.Ok(getString(R.string.dialog_message_bt_constraint_limitation))
+                        GetUserResponse.Ok(getString(R.string.dialog_message_bt_constraint_limitation))
                     )
 
                     response ?: return@launch
@@ -140,7 +140,7 @@ class ChooseConstraintViewModel(
                 ChooseConstraintType.SCREEN_ON -> {
                     val response = getUserResponse(
                         "screen_on_constraint_limitation",
-                        RequestUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
+                        GetUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
                     )
 
                     response ?: return@launch
@@ -151,7 +151,7 @@ class ChooseConstraintViewModel(
                 ChooseConstraintType.SCREEN_OFF -> {
                     val response = getUserResponse(
                         "screen_off_constraint_limitation",
-                        RequestUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
+                        GetUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
                     )
 
                     response ?: return@launch

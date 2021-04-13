@@ -30,5 +30,5 @@ class KeyMapConfigActionsFragment : ConfigActionsFragment<KeymapActionOptions, K
     }
 
     override val configActionsViewModel: ConfigActionsViewModel<KeyMapAction, KeyMap>
-        get() = configKeyMapViewModel.actionListViewModel
+        get() = configKeyMapViewModel.configActionsViewModel
 }

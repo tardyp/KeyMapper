@@ -1,9 +1,8 @@
 package io.github.sds100.keymapper.ui.mappings.common
 
 import android.os.Bundle
-import io.github.sds100.keymapper.domain.actions.ActionData
-import io.github.sds100.keymapper.util.result.FixableError
-import kotlinx.coroutines.flow.Flow
+import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -14,9 +13,8 @@ interface ConfigMappingViewModel {
     val state: StateFlow<ConfigMappingUiState>
     fun setEnabled(enabled: Boolean)
 
-    val fixError: Flow<FixableError>
-
-    fun addAction(actionData: ActionData)
+    val configActionsViewModel: ConfigActionsViewModel<*, *>
+    val configConstraintsViewModel: ConfigConstraintsViewModel
 
     fun save()
     fun saveState(outState: Bundle)

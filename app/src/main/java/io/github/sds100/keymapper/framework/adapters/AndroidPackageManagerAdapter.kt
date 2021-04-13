@@ -1,8 +1,12 @@
 package io.github.sds100.keymapper.framework.adapters
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.provider.Settings
 import io.github.sds100.keymapper.domain.packages.PackageInfo
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.utils.State
@@ -38,6 +42,29 @@ class AndroidPackageManagerAdapter(
 
                 PackageInfo(it.packageName, canBeLaunched)
             }.let { installedPackages.value = State.Data(it) }
+        }
+    }
+
+    override fun installApp(packageName: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("market://details?id=$packageName")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            ctx.startActivity(intent)
+
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+            ctx.startActivity(intent)
+        }
+    }
+
+    override fun enableApp(packageName: String) {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${packageName}")
+            flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+
+            ctx.startActivity(this)
         }
     }
 

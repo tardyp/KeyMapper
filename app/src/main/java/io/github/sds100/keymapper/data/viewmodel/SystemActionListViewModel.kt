@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCase
 import io.github.sds100.keymapper.data.model.SystemActionListItem
@@ -13,7 +12,7 @@ import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.RequestUserResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.containsQuery
@@ -59,7 +58,7 @@ class SystemActionListViewModel(
                         it.id to it.label
                     }
 
-                    val imeId = getUserResponse("choose_ime", RequestUserResponse.SingleChoice(items))?.item
+                    val imeId = getUserResponse("choose_ime", GetUserResponse.SingleChoice(items))?.item
                         ?: return@launch
                     val imeName = inputMethods.single { it.id == imeId }.label
 
@@ -89,7 +88,7 @@ class SystemActionListViewModel(
                     }
 
                     val packageName =
-                        getUserResponse("choose_package", RequestUserResponse.SingleChoice(items))?.item
+                        getUserResponse("choose_package", GetUserResponse.SingleChoice(items))?.item
                             ?: return@launch
 
                     val action = when (id) {
@@ -118,7 +117,7 @@ class SystemActionListViewModel(
                     val items = VolumeStream.values()
                         .map { it to getString(VolumeStreamUtils.getLabel(it)) }
 
-                    val stream = getUserResponse("pick_volume_stream", RequestUserResponse.SingleChoice(items))
+                    val stream = getUserResponse("pick_volume_stream", GetUserResponse.SingleChoice(items))
                         ?.item ?: return@launch
 
                     val action = when (id) {
@@ -139,7 +138,7 @@ class SystemActionListViewModel(
                         .map { it to getString(RingerModeUtils.getLabel(it)) }
 
                     val ringerMode =
-                        getUserResponse("pick_ringer_mode", RequestUserResponse.SingleChoice(items))?.item
+                        getUserResponse("pick_ringer_mode", GetUserResponse.SingleChoice(items))?.item
                             ?: return@launch
 
                     _returnResult.emit(ChangeRingerModeSystemAction(ringerMode))
@@ -151,7 +150,7 @@ class SystemActionListViewModel(
                     val items = DndMode.values()
                         .map { it to getString(DndModeUtils.getLabel(it)) }
 
-                    val dndMode = getUserResponse("pick_dnd_mode", RequestUserResponse.SingleChoice(items))?.item
+                    val dndMode = getUserResponse("pick_dnd_mode", GetUserResponse.SingleChoice(items))?.item
                         ?: return@launch
 
                     val action = when (id) {
@@ -172,7 +171,7 @@ class SystemActionListViewModel(
                         .map { it to getString(OrientationUtils.getLabel(it)) }
 
                     val orientations =
-                        getUserResponse("pick_orientations", RequestUserResponse.MultiChoice(items))?.items
+                        getUserResponse("pick_orientations", GetUserResponse.MultiChoice(items))?.items
                             ?: return@launch
 
                     _returnResult.emit(CycleRotationsSystemAction(orientations))
@@ -185,7 +184,7 @@ class SystemActionListViewModel(
                         it to getString(CameraLensUtils.getLabel(it))
                     }
 
-                    val lens = getUserResponse("pick_lens", RequestUserResponse.SingleChoice(items))?.item
+                    val lens = getUserResponse("pick_lens", GetUserResponse.SingleChoice(items))?.item
                         ?: return@launch
 
                     val action = when (id) {
@@ -226,7 +225,7 @@ class SystemActionListViewModel(
         if (messageToShow != null) {
             getUserResponse(
                 "show_system_action_message",
-                RequestUserResponse.Ok(message = getString(messageToShow))
+                GetUserResponse.Ok(message = getString(messageToShow))
             )
         }
     }

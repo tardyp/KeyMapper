@@ -234,10 +234,6 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).appShortcutAdapter
     }
 
-    fun powerManagementAdapter(context: Context): PowerManagementAdapter {
-        return (context.applicationContext as KeyMapperApp).powerManagerAdapter
-    }
-
     @VisibleForTesting
     fun resetKeymapRepository() {
         synchronized(lock) {

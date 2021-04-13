@@ -15,15 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.databinding.FragmentConfigMappingBinding
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.ui.adapter.GenericFragmentPagerAdapter
 import io.github.sds100.keymapper.ui.mappings.common.ConfigMappingViewModel
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.FixErrorDelegate
-import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -45,14 +42,12 @@ abstract class ConfigMappingFragment : Fragment() {
 
     private var onBackPressedDialog: AlertDialog? = null
 
-    private lateinit var fixErrorDelegate: FixErrorDelegate
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener(ConfigActionsFragment.CHOOSE_ACTION_REQUEST_KEY) { _, result ->
             result.getJsonSerializable<ActionData>(ChooseActionFragment.EXTRA_ACTION)?.let {
-                viewModel.addAction(it)
+                viewModel.configActionsViewModel.addAction(it)
             }
         }
     }
@@ -63,12 +58,6 @@ abstract class ConfigMappingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        fixErrorDelegate = FixErrorDelegate(
-            "ConfigMappingFragment",
-            requireActivity().activityResultRegistry,
-            viewLifecycleOwner,
-            ServiceLocator.permissionAdapter(requireContext())
-        )
         FragmentConfigMappingBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@ConfigMappingFragment.viewModel
@@ -139,13 +128,6 @@ abstract class ConfigMappingFragment : Fragment() {
                     true
                 }
                 else -> false
-            }
-        }
-
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.fixError.collectLatest {
-                //don't show snackbar here
-                fixErrorDelegate.recover(requireContext(), it, findNavController())
             }
         }
     }

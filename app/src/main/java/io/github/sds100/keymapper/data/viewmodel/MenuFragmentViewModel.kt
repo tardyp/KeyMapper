@@ -5,6 +5,8 @@ import com.hadilq.liveevent.LiveEvent
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.data.usecase.MenuKeymapUseCase
 import io.github.sds100.keymapper.domain.usecases.ControlKeymapsPausedState
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.home.HomeScreenUseCase
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -36,7 +38,7 @@ class MenuFragmentViewModel(
 
         //TODO fingerprint
 //        FingerprintMapUtils.GESTURES.forEach { gestureId ->
-            //TODO
+        //TODO
 //            fingerprintMapRepository.updateGesture(gestureId) {
 //                it.copy(isEnabled = true)
 //            }
@@ -48,7 +50,7 @@ class MenuFragmentViewModel(
         keymapUseCase.disableAll()
 
 //        FingerprintMapUtils.GESTURES.forEach { gestureId ->
-            //TODO
+        //TODO
 //            fingerprintMapRepository.updateGesture(gestureId) {
 //                it.copy(isEnabled = false)
 //            }
