@@ -60,7 +60,6 @@ object KeyMapEntityMapper {
     fun fromEntity(entity: KeyMapEntity): KeyMap {
         val actionList = entity.actionList.mapNotNull { KeymapActionEntityMapper.fromEntity(it) }
 
-
         val constraintList =
             entity.constraintList.map { ConstraintEntityMapper.fromEntity(it) }.toSet()
 

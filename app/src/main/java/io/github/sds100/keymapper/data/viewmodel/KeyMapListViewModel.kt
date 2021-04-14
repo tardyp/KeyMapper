@@ -11,11 +11,13 @@ import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class KeymapListViewModel internal constructor(
+class KeyMapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
@@ -34,16 +36,20 @@ class KeymapListViewModel internal constructor(
         val keyMapStateListFlow =
             MutableStateFlow<ListUiState<KeyMapListItem.KeyMapUiState>>(ListUiState.Loading)
 
-        val rebuildUiState = MutableSharedFlow<State<List<KeyMap>>>()
+        val rebuildUiState = MutableSharedFlow<State<List<KeyMap>>>(replay = 1)
 
         coroutineScope.launch {
             rebuildUiState.collectLatest { keyMapListState ->
+
                 keyMapStateListFlow.value = ListUiState.Loading
 
                 keyMapStateListFlow.value = withContext(Dispatchers.Default) {
                     when (keyMapListState) {
-                        is State.Data -> keyMapListState.data.map { listItemCreator.map(it) }
-                            .createListState()
+                        is State.Data -> {
+                            keyMapListState.data
+                                .map { listItemCreator.map(it) }
+                                .createListState()
+                        }
 
                         State.Loading -> ListUiState.Loading
                     }
@@ -59,7 +65,13 @@ class KeymapListViewModel internal constructor(
 
         coroutineScope.launch {
             useCase.invalidateErrors.drop(1).collectLatest {
-                rebuildUiState.emit(useCase.keyMapList.firstOrNull() ?: return@collectLatest)
+                /*
+                Don't get the key maps from the repository because there can be a race condition
+                when restoring key maps. This happens because when the activity is resumed the
+                key maps in the repository are being updated and this flow is collected
+                at the same time.
+                 */
+                rebuildUiState.emit(rebuildUiState.first())
             }
         }
 
@@ -80,7 +92,7 @@ class KeymapListViewModel internal constructor(
 
                         val isSelectable = selectionState is SelectionState.Selecting
 
-                        _state.value = withContext(Dispatchers.Default) {
+                        val listItems = withContext(Dispatchers.Default) {
                             keymapUiListState.data.map { keymapUiState ->
                                 val isSelected = if (selectionState is SelectionState.Selecting) {
                                     selectionState.selectedIds.contains(keymapUiState.uid)
@@ -92,8 +104,10 @@ class KeymapListViewModel internal constructor(
                                     keymapUiState,
                                     KeyMapListItem.SelectionUiState(isSelected, isSelectable)
                                 )
-                            }.createListState()
+                            }
                         }
+
+                        _state.value = listItems.createListState()
                     }
                 }
             }

@@ -30,7 +30,6 @@ import io.github.sds100.keymapper.ui.TextListItem
 import io.github.sds100.keymapper.ui.adapter.HomePagerAdapter
 import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.getFullMessage
 import io.github.sds100.keymapper.worker.SeedDatabaseWorker
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.delay
@@ -38,10 +37,10 @@ import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
-import splitties.toast.toast
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 
+//TODO very janky when opening the app for the first time. fix
 class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
@@ -60,6 +59,20 @@ class HomeFragment : Fragment() {
             it ?: return@registerForActivityResult
 
             homeViewModel.menuViewModel.onChoseBackupFile(it.toString())
+        }
+
+    private val backupFingerprintMapsLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+            it ?: return@registerForActivityResult
+
+            homeViewModel.backupFingerprintMaps(it.toString())
+        }
+
+    private val backupKeyMapsLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+            it ?: return@registerForActivityResult
+
+            homeViewModel.backupSelectedKeyMaps(it.toString())
         }
 
     private val restoreMappingsLauncher =
@@ -159,7 +172,7 @@ class HomeFragment : Fragment() {
                 }
 
                 R.id.action_backup -> {
-                    homeViewModel.onBackupSelectedKeymapsClick()
+                    backupKeyMapsLauncher.launch(BackupUtils.createKeyMapsFileName())
                     true
                 }
 
@@ -266,7 +279,7 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             homeViewModel.menuViewModel.chooseBackupFile.collectLatest {
-                backupMappingsLauncher.launch(BackupUtils.createFileName())
+                backupMappingsLauncher.launch(BackupUtils.createMappingsFileName())
             }
         }
 
@@ -303,6 +316,18 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.fingerprintMapListViewModel.requestFingerprintMapsBackup.collectLatest {
+                backupFingerprintMapsLauncher.launch(BackupUtils.createFingerprintMapsFileName())
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            homeViewModel.openSettings.collectLatest {
+                findNavController().navigate(NavAppDirections.actionGlobalSettingsFragment())
             }
         }
     }

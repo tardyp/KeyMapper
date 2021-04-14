@@ -37,13 +37,6 @@ class FingerprintMapListFragment :
 
     private val viewModel by lazy { homeViewModel.fingerprintMapListViewModel }
 
-    //TODO
-    private val backupLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
-            it ?: return@registerForActivityResult
-
-        }
-
     override val listItems: Flow<ListUiState<FingerprintMapListItem>>
         get() = viewModel.state
 

@@ -59,12 +59,10 @@ suspend inline fun <reified R : UserResponse> UserResponseViewModel.getUserRespo
     This ensures only one job for a dialog is active at once by cancelling previous jobs when a new
     dialog is shown with the same key
      */
-    val response = merge(
+    return merge(
         requestUserResponse.dropWhile { it.key != key }.map { null },
         onUserResponse.dropWhile { it.response !is R? && it.key != key }.map { it.response }
     ).first() as R?
-
-    return response
 }
 
 fun UserResponseViewModel.showUserResponseRequests(
@@ -90,7 +88,7 @@ fun UserResponseViewModel.showUserResponseRequests(
 
             val response = when (event.ui) {
                 is GetUserResponse.Ok ->
-                    ctx.okDialog(lifecycleOwner, event.ui.message)
+                    ctx.okDialog(lifecycleOwner, event.ui.message, event.ui.title)
 
                 is GetUserResponse.MultiChoice<*> ->
                     ctx.multiChoiceDialog(lifecycleOwner, event.ui.items)

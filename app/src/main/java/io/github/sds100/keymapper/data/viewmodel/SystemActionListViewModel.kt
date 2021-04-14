@@ -49,7 +49,9 @@ class SystemActionListViewModel(
 
     fun onSystemActionClick(id: SystemActionId) {
         viewModelScope.launch {
-            showMessageForSystemAction(id)
+            val approvedMessage = showMessageForSystemAction(id)
+
+            if (!approvedMessage) return@launch
 
             when (id) {
                 SystemActionId.SWITCH_KEYBOARD -> {
@@ -202,7 +204,10 @@ class SystemActionListViewModel(
         }
     }
 
-    private suspend fun showMessageForSystemAction(id: SystemActionId) {
+    /**
+     * @return whether the user approved the message
+     */
+    private suspend fun showMessageForSystemAction(id: SystemActionId):Boolean {
         @StringRes val messageToShow: Int? = when (id) {
             SystemActionId.FAST_FORWARD_PACKAGE,
             SystemActionId.FAST_FORWARD -> R.string.action_fast_forward_message
@@ -223,11 +228,15 @@ class SystemActionListViewModel(
         }
 
         if (messageToShow != null) {
-            getUserResponse(
+            val response = getUserResponse(
                 "show_system_action_message",
                 GetUserResponse.Ok(message = getString(messageToShow))
             )
+
+            return response != null
         }
+
+        return true
     }
 
     private fun buildState(query: String?): SystemActionListState {

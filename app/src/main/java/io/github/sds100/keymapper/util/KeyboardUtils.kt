@@ -22,6 +22,7 @@ import splitties.toast.toast
  * Created by sds100 on 28/12/2018.
  */
 
+//TODO delete
 object KeyboardUtils {
     //DON'T CHANGE THESE!!!
     private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP =
@@ -51,12 +52,6 @@ object KeyboardUtils {
         KEY_MAPPER_GUI_IME_PACKAGE
     )
 
-    //TODO delete all this stuff in this file
-    fun enableCompatibleInputMethods(ctx: Context) {
-
-
-    }
-
     fun enableCompatibleInputMethodsRoot() {
         KEY_MAPPER_IME_PACKAGE_LIST.forEach {
             getImeId(it).onSuccess { imeId ->
@@ -65,28 +60,6 @@ object KeyboardUtils {
         }
     }
 
-    fun chooseCompatibleInputMethod(ctx: Context) {
-
-        if (PermissionUtils.haveWriteSecureSettingsPermission(ctx)) {
-            getLastUsedCompatibleImeId(ctx).onSuccess {
-                switchIme(ctx, it)
-                return
-            }
-
-            getImeId(Constants.PACKAGE_NAME).valueOrNull()?.let {
-                switchIme(ctx, it)
-                return
-            }
-        }
-
-        showInputMethodPicker()
-    }
-
-    fun chooseLastUsedIncompatibleInputMethod(ctx: Context) {
-        getLastUsedIncompatibleImeId(ctx).onSuccess {
-            switchIme(ctx, it)
-        }
-    }
 
     fun toggleCompatibleIme(ctx: Context) {
         if (!isCompatibleImeEnabled()) {
@@ -175,11 +148,6 @@ object KeyboardUtils {
         }
     }
 
-    fun isImeEnabled(imeId: String): Boolean = getInputMethodIds().handle(
-        onSuccess = { it.contains(imeId) },
-        onError = { false }
-    )
-
     fun isCompatibleImeEnabled(): Boolean {
         val enabledMethods = inputMethodManager.enabledInputMethodList ?: return false
 
@@ -190,17 +158,6 @@ object KeyboardUtils {
         return getChosenInputMethodPackageName(ctx)
             .then { Success(KEY_MAPPER_IME_PACKAGE_LIST.contains(it)) }
             .valueOrNull() ?: false
-    }
-
-    fun openImeSettings(ctx: Context) {
-        try {
-            val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
-            intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_TASK
-
-            ctx.startActivity(intent)
-        } catch (e: Exception) {
-            toast(R.string.error_cant_find_ime_settings)
-        }
     }
 
     /**

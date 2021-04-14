@@ -7,7 +7,7 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
-import io.github.sds100.keymapper.data.viewmodel.KeymapListViewModel
+import io.github.sds100.keymapper.data.viewmodel.KeyMapListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.keymap
 import io.github.sds100.keymapper.ui.ChipUi
@@ -30,18 +30,8 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeyMapListItem>() {
         InjectorUtils.provideHomeViewModel(requireContext())
     }
 
-    private val viewModel: KeymapListViewModel
+    private val viewModel: KeyMapListViewModel
         get() = homeViewModel.keymapListViewModel
-
-    private val backupLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
-            it ?: return@registerForActivityResult
-
-            //TODO
-//            backupRestoreViewModel.backupKeymaps(
-//                requireContext().contentResolver.openOutputStream(it),
-//            )
-        }
 
     override val listItems: Flow<ListUiState<KeyMapListItem>>
         get() = viewModel.state

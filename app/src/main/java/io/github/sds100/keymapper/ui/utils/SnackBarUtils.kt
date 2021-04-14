@@ -35,6 +35,11 @@ object SnackBarUtils {
                 }
             }
 
+            //if there is no action then there is no point waiting for a user response
+            if (actionText == null){
+                continuation.resume(null)
+            }
+
             snackBar.onDismiss {
                 if (!continuation.isCompleted) {
                     continuation.resume(null)

@@ -12,12 +12,12 @@ import java.io.OutputStream
 sealed class GetUserResponse<RESPONSE : UserResponse> {
 
     data class SnackBar(
-        val title: String, val long: Boolean = false, val actionText: String?
+        val title: String, val long: Boolean = false, val actionText: String? = null
     ) : GetUserResponse<SnackBarActionResponse>()
 
     object SnackBarActionResponse : UserResponse
 
-    data class Ok(val message: String) : GetUserResponse<OkResponse>()
+    data class Ok(val message: String,val title: String? = null) : GetUserResponse<OkResponse>()
     object OkResponse : UserResponse
 
     data class Dialog(

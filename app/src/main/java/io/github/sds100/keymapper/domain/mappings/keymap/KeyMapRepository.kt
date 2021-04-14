@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.Flow
  */
 interface KeyMapRepository {
     val keyMapList: Flow<State<List<KeyMapEntity>>>
+    val requestBackup: Flow<List<KeyMapEntity>>
 
-    fun insert(keymap: KeyMapEntity)
-    fun update(keymap: KeyMapEntity)
+    fun insert(vararg keyMap: KeyMapEntity)
+    fun update(vararg keyMap: KeyMapEntity)
     suspend fun get(uid: String): KeyMapEntity?
     fun delete(vararg uid: String)
+    suspend fun restore(dbVersion: Int, keyMapJsonList: List<String>)
 
     fun duplicate(vararg uid: String)
     fun enableById(vararg uid: String)

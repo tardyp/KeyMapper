@@ -188,8 +188,11 @@
     <!--  Toasts  -->
     <string name="toast_chose_keyboard">Chose %s</string>
     <string name="toast_backup_successful">Back up successful!</string>
+    <string name="toast_backup_failed">Back up failed!</string>
     <string name="toast_restore_successful">Restore successful!</string>
+    <string name="toast_restore_failed">Restore failed!</string>
     <string name="toast_automatic_backup_successful">Automatic back up successful!</string>
+    <string name="toast_automatic_backup_failed">Automatic back up failed!</string>
     <string name="toast_screenshot_taken">Screenshot taken</string>
     <string name="toast_io_exception_shrug">IO exception ¯\\_(ツ)_/¯</string>
     <string name="toast_incorrect_screenshot_resolution">Screenshot resolution doesn\'t match this device\'s resolution!</string>
@@ -383,6 +386,7 @@
     <string name="pos_join">Join</string>
     <string name="pos_change_location">Change</string>
     <string name="pos_turn_off">Turn off</string>
+    <string name="pos_ok">Ok</string>
     <string name="pos_turn_on">Turn on</string>
 
     <string name="neg_turn_off">Turn off</string>
@@ -394,6 +398,7 @@
     <string name="neg_email">Email</string>
     <string name="neutral_discord">Discord</string>
     <string name="neutral_go_to_dont_kill_my_app">Don\'t Kill My App</string>
+    <string name="neutral_go_to_settings">Settings</string>
 
     <string name="snackbar_cancel">Cancel</string>
     <string name="snackbar_fix">Fix</string>

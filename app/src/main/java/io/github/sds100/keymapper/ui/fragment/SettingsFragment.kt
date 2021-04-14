@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.*
@@ -82,16 +81,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
             it ?: return@registerForActivityResult
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                viewModel.setAutomaticBackupLocation(it.toString())
+            viewModel.setAutomaticBackupLocation(it.toString())
 
-                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 
-                requireContext().contentResolver.takePersistableUriPermission(it, takeFlags)
-
-                //TODO
-            }
+            requireContext().contentResolver.takePersistableUriPermission(it, takeFlags)
         }
 
     private val viewModel by viewModels<SettingsViewModel> {
@@ -153,47 +148,45 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         //automatic backup location
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Preference(requireContext()).apply {
-                key = Keys.automaticBackupLocation.name
-                setDefaultValue("")
+        Preference(requireContext()).apply {
+            key = Keys.automaticBackupLocation.name
+            setDefaultValue("")
 
-                setTitle(R.string.title_pref_automatic_backup_location)
+            setTitle(R.string.title_pref_automatic_backup_location)
 
-                viewModel.automaticBackupLocation.collectWhenResumed(viewLifecycleOwner, {
-                    summary = if (it.isBlank()) {
-                        str(R.string.summary_pref_automatic_backup_location_disabled)
-                    } else {
-                        it
-                    }
-                })
-
-                setOnPreferenceClickListener {
-                    val backupLocation = viewModel.automaticBackupLocation.firstBlocking()
-
-                    if (backupLocation.isBlank()) {
-                        chooseAutomaticBackupLocationLauncher.launch(BackupUtils.DEFAULT_AUTOMATIC_BACKUP_NAME)
-
-                    } else {
-                        requireContext().alertDialog {
-                            messageResource = R.string.dialog_message_change_location_or_disable
-
-                            positiveButton(R.string.pos_change_location) {
-                                chooseAutomaticBackupLocationLauncher.launch(BackupUtils.DEFAULT_AUTOMATIC_BACKUP_NAME)
-                            }
-
-                            negativeButton(R.string.neg_turn_off) {
-                                viewModel.disableAutomaticBackup()
-                            }
-
-                            show()
-                        }
-                    }
-
-                    true
+            viewModel.automaticBackupLocation.collectWhenResumed(viewLifecycleOwner, {
+                summary = if (it.isBlank()) {
+                    str(R.string.summary_pref_automatic_backup_location_disabled)
+                } else {
+                    it
                 }
-                addPreference(this)
+            })
+
+            setOnPreferenceClickListener {
+                val backupLocation = viewModel.automaticBackupLocation.firstBlocking()
+
+                if (backupLocation.isBlank()) {
+                    chooseAutomaticBackupLocationLauncher.launch(BackupUtils.DEFAULT_AUTOMATIC_BACKUP_NAME)
+
+                } else {
+                    requireContext().alertDialog {
+                        messageResource = R.string.dialog_message_change_location_or_disable
+
+                        positiveButton(R.string.pos_change_location) {
+                            chooseAutomaticBackupLocationLauncher.launch(BackupUtils.DEFAULT_AUTOMATIC_BACKUP_NAME)
+                        }
+
+                        negativeButton(R.string.neg_turn_off) {
+                            viewModel.disableAutomaticBackup()
+                        }
+
+                        show()
+                    }
+                }
+
+                true
             }
+            addPreference(this)
         }
 
         //hide home screen alerts

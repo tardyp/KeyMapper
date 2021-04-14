@@ -60,7 +60,7 @@ class MenuFragment : BottomSheetDialogFragment() {
 
         val dialog = requireDialog() as BottomSheetDialog
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
+        
         binding.viewModel = viewModel
 
         viewModel.showUserResponseRequests(this, binding)
@@ -86,6 +86,12 @@ class MenuFragment : BottomSheetDialogFragment() {
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
             viewModel.openUrl.collectLatest {
                 UrlUtils.openUrl(requireContext(), it)
+            }
+        }
+
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED){
+            viewModel.dismiss.collectLatest {
+                dismiss()
             }
         }
     }

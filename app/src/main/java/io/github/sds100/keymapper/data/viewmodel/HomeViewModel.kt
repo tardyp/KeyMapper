@@ -7,17 +7,20 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.home.HomeScreenUseCase
-import io.github.sds100.keymapper.ui.ListItem
-import io.github.sds100.keymapper.ui.TextListItem
-import io.github.sds100.keymapper.ui.UserResponseViewModel
-import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.DialogResponse
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.home.HomeTab
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
 import io.github.sds100.keymapper.util.MultiSelectProviderImpl
+import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 18/01/21.
@@ -39,7 +42,7 @@ class HomeViewModel(
 
     val menuViewModel = HomeMenuViewModel(viewModelScope, useCase, resourceProvider)
 
-    val keymapListViewModel = KeymapListViewModel(
+    val keymapListViewModel = KeyMapListViewModel(
         viewModelScope,
         useCase,
         resourceProvider,
@@ -54,6 +57,9 @@ class HomeViewModel(
 
     private val _openUrl = MutableSharedFlow<String>()
     val openUrl = _openUrl.asSharedFlow()
+
+    private val _openSettings = MutableSharedFlow<Unit>()
+    val openSettings = _openSettings.asSharedFlow()
 
     private val isBatteryOptimised = useCase.invalidateErrors.map {
         useCase.isBatteryOptimised()
@@ -179,6 +185,80 @@ class HomeViewModel(
     private val _closeKeyMapper = MutableSharedFlow<Unit>()
     val closeKeyMapper = _closeKeyMapper.asSharedFlow()
 
+    init {
+        viewModelScope.launch {
+            useCase.onBackupResult.collectLatest { result ->
+                when (result) {
+                    is Success -> {
+                        getUserResponse(
+                            "successful_backup_result",
+                            GetUserResponse.SnackBar(getString(R.string.toast_backup_successful))
+                        )
+                    }
+
+                    is Error -> getUserResponse(
+                        "backup_error",
+                        GetUserResponse.Ok(
+                            title = getString(R.string.toast_backup_failed),
+                            message = result.getFullMessage(this@HomeViewModel)
+                        )
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            useCase.onRestoreResult.collectLatest { result ->
+                when (result) {
+                    is Success -> {
+                        getUserResponse(
+                            "successful_restore_result",
+                            GetUserResponse.SnackBar(getString(R.string.toast_restore_successful))
+                        )
+                    }
+
+                    is Error -> getUserResponse(
+                        "restore_error",
+                        GetUserResponse.Ok(
+                            title = getString(R.string.toast_restore_failed),
+                            message = result.getFullMessage(this@HomeViewModel)
+                        )
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            useCase.onAutomaticBackupResult.collectLatest { result ->
+                Timber.e("automatic backup $result")
+                when (result) {
+                    is Success -> {
+                        getUserResponse(
+                            "successful_automatic_backup_result",
+                            GetUserResponse.SnackBar(getString(R.string.toast_automatic_backup_successful))
+                        )
+                    }
+
+                    is Error -> {
+                        val response = getUserResponse(
+                            "automatic_backup_error",
+                            GetUserResponse.Dialog(
+                                title = getString(R.string.toast_automatic_backup_failed),
+                                message = result.getFullMessage(this@HomeViewModel),
+                                positiveButtonText = getString(R.string.pos_ok),
+                                neutralButtonText = getString(R.string.neutral_go_to_settings)
+                            )
+                        ) ?: return@collectLatest
+
+                        if (response == DialogResponse.NEUTRAL) {
+                            _openSettings.emit(Unit)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
 
     fun approvedWhatsNew() = onboarding.showedOnboardingAfterUpdateHomeScreen()
@@ -245,8 +325,22 @@ class HomeViewModel(
         }
     }
 
-    fun onBackupSelectedKeymapsClick() {
-        //TODO
+    fun backupFingerprintMaps(uri: String) {
+        useCase.backupFingerprintMaps(uri)
+    }
+
+    fun backupSelectedKeyMaps(uri: String) {
+        viewModelScope.launch {
+            val selectionState = multiSelectProvider.state.first()
+
+            if (selectionState !is SelectionState.Selecting) return@launch
+
+            val selectedIds = selectionState.selectedIds
+
+            useCase.backupKeyMaps(*selectedIds.toTypedArray(), uri = uri)
+
+            multiSelectProvider.stopSelecting()
+        }
     }
 
     fun onFixErrorListItemClick(id: String) {

@@ -10,6 +10,7 @@ import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -35,7 +36,7 @@ class DataStorePreferenceRepository(
     )
 
     override fun <T> get(key: Preferences.Key<T>): Flow<T?> {
-        return dataStore.data.map { it[key] }
+        return dataStore.data.map { it[key] }.distinctUntilChanged()
     }
 
     override fun <T> set(key: Preferences.Key<T>, value: T?) {

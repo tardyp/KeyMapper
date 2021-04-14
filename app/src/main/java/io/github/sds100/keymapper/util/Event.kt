@@ -26,6 +26,7 @@ import io.github.sds100.keymapper.util.result.Result
 import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
+//TODO delete unused events
 @Serializable
 sealed class Event
 
@@ -86,14 +87,6 @@ class CreateKeymapShortcutEvent(
 ) : Event()
 
 data class SaveEvent<T>(val model: T) : Event()
-
-sealed class ResultEvent<T> : Event() {
-    abstract val result: Result<T>
-}
-
-data class BackupResult(override val result: Result<Unit>) : ResultEvent<Unit>()
-data class RestoreResult(override val result: Result<Unit>) : ResultEvent<Unit>()
-data class AutomaticBackupResult(override val result: Result<Unit>) : ResultEvent<Unit>()
 
 object OnBootEvent : Event(), UpdateNotificationEvent
 

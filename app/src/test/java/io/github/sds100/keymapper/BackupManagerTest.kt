@@ -7,8 +7,6 @@ import com.github.salomonbrys.kotson.get
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.BackupManager
-import io.github.sds100.keymapper.data.IBackupManager
 import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity

@@ -3,17 +3,18 @@ package io.github.sds100.keymapper
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
-import io.github.sds100.keymapper.data.BackupManager
-import io.github.sds100.keymapper.data.IBackupManager
 import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.db.DefaultDataStoreManager
 import io.github.sds100.keymapper.data.db.IDataStoreManager
 import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repository.*
+import io.github.sds100.keymapper.domain.BackupManager
+import io.github.sds100.keymapper.domain.BackupManagerImpl
 import io.github.sds100.keymapper.domain.adapter.*
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
+import io.github.sds100.keymapper.files.FileAdapter
 import io.github.sds100.keymapper.framework.adapters.*
 import io.github.sds100.keymapper.ui.NotificationViewModel
 import kotlinx.coroutines.runBlocking
@@ -165,25 +166,29 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var backupManager: IBackupManager? = null
+    private var backupManager: BackupManager? = null
 
-    fun backupManager(context: Context): IBackupManager {
+    fun backupManager(context: Context): BackupManager {
         synchronized(this) {
             return backupManager ?: createBackupManager(context)
         }
     }
 
-    private fun createBackupManager(context: Context): IBackupManager {
-        return backupManager ?: BackupManager(
-            defaultKeymapRepository(context),
-            fingerprintMapRepository(context),
-            deviceInfoRepository(context),
+    private fun createBackupManager(context: Context): BackupManager {
+        return backupManager ?: BackupManagerImpl(
             (context.applicationContext as KeyMapperApp).appCoroutineScope,
-            (context.applicationContext as KeyMapperApp),
-            BackupRestoreUseCase(preferenceRepository(context))
+            fileAdapter(context),
+            roomKeymapRepository(context),
+            deviceInfoRepository(context),
+            preferenceRepository(context),
+            fingerprintMapRepository(context)
         ).also {
             this.backupManager = it
         }
+    }
+
+    fun fileAdapter(context: Context):FileAdapter{
+        return (context.applicationContext as KeyMapperApp).fileAdapter
     }
 
     fun inputMethodAdapter(context: Context): InputMethodAdapter {

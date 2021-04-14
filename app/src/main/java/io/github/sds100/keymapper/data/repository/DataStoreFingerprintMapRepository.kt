@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.preferencesKey
 import androidx.datastore.preferences.core.remove
-import androidx.lifecycle.MutableLiveData
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.nullInt
 import com.github.salomonbrys.kotson.registerTypeAdapter
@@ -18,7 +17,6 @@ import io.github.sds100.keymapper.data.model.ConstraintEntity
 import io.github.sds100.keymapper.data.model.Extra
 import io.github.sds100.keymapper.data.model.FingerprintMapEntity
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityGroup
-import io.github.sds100.keymapper.util.BackupRequest
 import io.github.sds100.keymapper.util.MigrationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -70,36 +68,31 @@ class DataStoreFingerprintMapRepository(
             || group.swipeRight.version < FingerprintMapEntity.CURRENT_VERSION
     }
 
-    override val requestAutomaticBackup =
-        MutableLiveData<BackupRequest<Map<String, FingerprintMapEntity>>>()
+    override val requestBackup = MutableSharedFlow<FingerprintMapEntityGroup>()
 
-    override fun restore(id: String, fingerprintMapJson: String) {
-        //TODO
-//            val rootElement = jsonParser.parse(fingerprintMapJson)
-//            val initialVersion =
-//                rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt
-//                    ?: 0
-//
-//            val migratedJson = MigrationUtils.migrate(
-//                gson,
-//                MIGRATIONS,
-//                initialVersion,
-//                fingerprintMapJson,
-//                FingerprintMapEntity.CURRENT_VERSION
-//            )
+    override suspend fun restore(id: String, fingerprintMapJson: String) {
+            val rootElement = jsonParser.parse(fingerprintMapJson)
+            val initialVersion =
+                rootElement.asJsonObject.get(FingerprintMapEntity.NAME_VERSION).nullInt
+                    ?: 0
 
+            val migratedJson = MigrationUtils.migrate(
+                gson,
+                MIGRATIONS,
+                initialVersion,
+                fingerprintMapJson,
+                FingerprintMapEntity.CURRENT_VERSION
+            )
 
-        //TODO
-//            setGesture(id, migratedJson)    }
+            //deserialize it to ensure that the json is valid
+            val fingerprintMap = gson.fromJson<FingerprintMapEntity>(migratedJson)
+
+            updateSuspend(id, fingerprintMap)
     }
 
     override fun update(id: String, fingerprintMap: FingerprintMapEntity) {
         coroutineScope.launch {
-            dataStore.edit { prefs ->
-                val key = PREF_KEYS_MAP[id]!!
-
-                prefs[key] = gson.toJson(fingerprintMap)
-            }
+            updateSuspend(id, fingerprintMap)
 
             requestBackup()
         }
@@ -112,20 +105,26 @@ class DataStoreFingerprintMapRepository(
                     prefs.remove(it)
                 }
             }
+
+            requestBackup()
         }
     }
 
     override fun enableFingerprintMap(id: String) {
         coroutineScope.launch {
             val fingerprintMap = fingerprintMaps.firstOrNull()?.get(id) ?: return@launch
-            update(id, fingerprintMap.copy(isEnabled = true))
+            updateSuspend(id, fingerprintMap.copy(isEnabled = true))
+
+            requestBackup()
         }
     }
 
     override fun disableFingerprintMap(id: String) {
         coroutineScope.launch {
             val fingerprintMap = fingerprintMaps.firstOrNull()?.get(id) ?: return@launch
-            update(id, fingerprintMap.copy(isEnabled = false))
+            updateSuspend(id, fingerprintMap.copy(isEnabled = false))
+
+            requestBackup()
         }
     }
 
@@ -153,6 +152,8 @@ class DataStoreFingerprintMapRepository(
                 prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
                     gson.toJson(newGroup.swipeRight)
             }
+
+            requestBackup()
         }
     }
 
@@ -180,30 +181,23 @@ class DataStoreFingerprintMapRepository(
                 prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
                     gson.toJson(newGroup.swipeRight)
             }
+
+            requestBackup()
         }
     }
 
-    private suspend fun setGesture(
-        gestureId: String,
-        fingerprintMapJson: String
-    ) {
+    private suspend fun updateSuspend(id: String, fingerprintMap: FingerprintMapEntity) {
         dataStore.edit { prefs ->
-            val key = PREF_KEYS_MAP[gestureId]!!
-            prefs[key] = fingerprintMapJson
-        }
+            val key = PREF_KEYS_MAP[id]!!
 
-        requestBackup()
+            prefs[key] = gson.toJson(fingerprintMap)
+        }
     }
 
     private suspend fun requestBackup() {
-        val maps = PREF_KEYS_MAP.mapValues { (_, preferenceKey) ->
-            dataStore.data.firstOrNull()?.getGesture(preferenceKey) ?: FingerprintMapEntity()
-        }
-
-        //don't back up if they haven't been migrated
-        if (maps.any { it.value.version < FingerprintMapEntity.CURRENT_VERSION }) return
-
-        requestAutomaticBackup.value = BackupRequest(maps)
+        val maps = fingerprintMaps.first()
+        Timber.e("request backup $maps")
+        requestBackup.emit(maps)
     }
 
     private suspend fun Preferences.getGesture(key: Preferences.Key<String>): FingerprintMapEntity {
@@ -222,7 +216,9 @@ class DataStoreFingerprintMapRepository(
         )
 
         if (initialVersion < FingerprintMapEntity.CURRENT_VERSION) {
-            setGesture(key.name, migratedJson)
+            //deserialize it to ensure that the json is valid
+            val fingerprintMap = gson.fromJson<FingerprintMapEntity>(migratedJson)
+            updateSuspend(key.name, fingerprintMap)
         }
 
         return gson.fromJson(migratedJson)

@@ -54,7 +54,7 @@ sealed class Error : Result<Nothing>() {
     object NoMediaSessions : Error()
     data class UnknownFileLocation(val path: String) : Error()
     object BackupVersionTooNew : Error()
-    object CorruptJsonFile : Error()
+    data class CorruptJsonFile(val reason: String) : Error()
     object CorruptActionError : Error()
     object Duplicate : Error()
     data class ImeNotFoundForPackage(val packageName: String) : Error()

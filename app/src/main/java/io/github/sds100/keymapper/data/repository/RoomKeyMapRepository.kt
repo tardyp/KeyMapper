@@ -1,9 +1,15 @@
 package io.github.sds100.keymapper.data.repository
 
+import com.github.salomonbrys.kotson.fromJson
+import com.google.gson.Gson
+import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.db.dao.KeyMapDao
+import io.github.sds100.keymapper.data.db.migration.JsonMigration
+import io.github.sds100.keymapper.data.db.migration.keymaps.Migration_9_10
 import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.domain.utils.State
+import io.github.sds100.keymapper.util.MigrationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,21 +22,32 @@ class RoomKeyMapRepository(
     private val dao: KeyMapDao,
     private val coroutineScope: CoroutineScope
 ) : KeyMapRepository {
-    //TODO implement automatic backing up stuff
+
+    companion object {
+        private val MIGRATIONS = listOf(
+            JsonMigration(9, 10) { gson, json -> Migration_9_10.migrateJson(gson, json) }
+        )
+    }
 
     override val keyMapList = dao.getAllFlow()
         .map { State.Data(it) }
-        .stateIn(coroutineScope, SharingStarted.Lazily, State.Loading)
+        .stateIn(coroutineScope, SharingStarted.Eagerly, State.Loading)
 
-    override fun insert(keymap: KeyMapEntity) {
+    override val requestBackup = MutableSharedFlow<List<KeyMapEntity>>()
+
+    private val gson = Gson()
+
+    override fun insert(vararg keyMap: KeyMapEntity) {
         coroutineScope.launch {
-            dao.insert(keymap)
+            dao.insert(*keyMap)
+            requestBackup()
         }
     }
 
-    override fun update(keymap: KeyMapEntity) {
+    override fun update(vararg keyMap: KeyMapEntity) {
         coroutineScope.launch {
-            dao.update(keymap)
+            dao.update(*keyMap)
+            requestBackup()
         }
     }
 
@@ -41,7 +58,27 @@ class RoomKeyMapRepository(
     override fun delete(vararg uid: String) {
         coroutineScope.launch {
             dao.deleteById(*uid)
+            requestBackup()
         }
+    }
+
+    override suspend fun restore(dbVersion: Int, keyMapJsonList: List<String>) {
+        val migratedKeymapList = keyMapJsonList.map {
+            val migratedJson = MigrationUtils.migrate(
+                gson,
+                MIGRATIONS,
+                dbVersion,
+                it,
+                AppDatabase.DATABASE_VERSION
+            )
+
+            val keyMap = gson.fromJson<KeyMapEntity>(migratedJson)
+
+            keyMap.copy(id = 0, uid = UUID.randomUUID().toString())
+        }
+
+        //use dao directly so inserting happens in the same coroutine as the backup and restore
+        dao.insert(*migratedKeymapList.toTypedArray())
     }
 
     override fun duplicate(vararg uid: String) {
@@ -54,30 +91,42 @@ class RoomKeyMapRepository(
             }
 
             dao.insert(*keymaps.toTypedArray())
+            requestBackup()
         }
     }
 
     override fun enableById(vararg uid: String) {
         coroutineScope.launch {
             dao.enableKeymapByUid(*uid)
+            requestBackup()
         }
     }
 
     override fun disableById(vararg uid: String) {
         coroutineScope.launch {
             dao.disableKeymapByUid(*uid)
+            requestBackup()
         }
     }
 
     override fun enableAll() {
         coroutineScope.launch {
             dao.enableAll()
+            requestBackup()
         }
     }
 
     override fun disableAll() {
         coroutineScope.launch {
             dao.disableAll()
+            requestBackup()
+        }
+    }
+
+    private fun requestBackup() {
+        coroutineScope.launch {
+            val keyMapList = keyMapList.first { it is State.Data } as State.Data
+            requestBackup.emit(keyMapList.data)
         }
     }
 }

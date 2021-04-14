@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.home
 
 import android.os.Build
 import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.domain.BackupManager
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
@@ -19,8 +20,10 @@ import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -33,19 +36,19 @@ class HomeScreenUseCaseImpl(
     private val serviceAdapter: ServiceAdapter,
     private val permissionAdapter: PermissionAdapter,
     private val inputMethodAdapter: InputMethodAdapter,
+    private val backupManager: BackupManager,
     displayKeyMapUseCase: DisplayKeyMapUseCase,
     displaySimpleMappingUseCase: DisplaySimpleMappingUseCase
 ) : HomeScreenUseCase,
     DisplayKeyMapUseCase by displayKeyMapUseCase {
 
-    override val keyMapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList
-        .map { state ->
-            state.mapData { keymapList ->
-                keymapList.map {
-                    KeyMapEntityMapper.fromEntity(it)
-                }
+    override val keyMapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList.map { state ->
+        state.mapData { keyMapList ->
+            keyMapList.map {
+                KeyMapEntityMapper.fromEntity(it)
             }
-        }.flowOn(Dispatchers.Default)
+        }
+    }.flowOn(Dispatchers.Default)
 
     override val fingerprintMaps: Flow<FingerprintMapGroup> =
         fingerprintMapRepository.fingerprintMaps
@@ -98,12 +101,24 @@ class HomeScreenUseCaseImpl(
         fingerprintMapRepository.disableAll()
     }
 
+    override val onBackupResult: Flow<Result<*>> = backupManager.onBackupResult
+    override val onRestoreResult: Flow<Result<*>> = backupManager.onRestoreResult
+    override val onAutomaticBackupResult: Flow<Result<*>> = backupManager.onAutomaticBackupResult
+
+    override fun backupKeyMaps(vararg uid: String, uri: String) {
+        backupManager.backupKeyMaps(uri, uid.asList())
+    }
+
+    override fun backupFingerprintMaps(uri: String) {
+        backupManager.backupFingerprintMaps(uri)
+    }
+
     override fun backupAllMappings(uri: String) {
-        TODO("Not yet implemented")
+        backupManager.backupMappings(uri)
     }
 
     override fun restoreMappings(uri: String) {
-        TODO("Not yet implemented")
+        backupManager.restoreMappings(uri)
     }
 
     override fun showInputMethodPicker() {
@@ -152,11 +167,17 @@ interface HomeScreenUseCase : DisplayKeyMapUseCase, DisplaySimpleMappingUseCase 
     fun enableKeyMap(vararg uid: String)
     fun disableKeyMap(vararg uid: String)
     fun duplicateKeyMap(vararg uid: String)
+    fun backupKeyMaps(vararg uid: String, uri: String)
 
     val fingerprintMaps: Flow<FingerprintMapGroup>
     fun enableFingerprintMap(id: FingerprintMapId)
     fun disableFingerprintMap(id: FingerprintMapId)
     fun resetFingerprintMaps()
+    fun backupFingerprintMaps(uri: String)
+
+    val onBackupResult: Flow<Result<*>>
+    val onRestoreResult: Flow<Result<*>>
+    val onAutomaticBackupResult: Flow<Result<*>>
 
     fun enableAllMappings()
     fun disableAllMappings()

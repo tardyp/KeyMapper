@@ -177,6 +177,7 @@ object InjectorUtils {
                 displayKeyMapUseCase = UseCases.displayKeyMap(ctx),
                 displaySimpleMappingUseCase = UseCases.displaySimpleMapping(ctx),
                 inputMethodAdapter = ServiceLocator.inputMethodAdapter(ctx),
+                backupManager = ServiceLocator.backupManager(ctx)
             ),
             UseCases.onboarding(ctx),
             ServiceLocator.resourceProvider(ctx)

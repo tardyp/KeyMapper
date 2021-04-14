@@ -88,7 +88,23 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
     }
 
     override fun showImePicker(fromForeground: Boolean) {
-        TODO("Not yet implemented")
+        if (fromForeground) {
+            inputMethodManager.showInputMethodPicker()
+        } else {
+            when {
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 -> {
+                    inputMethodManager.showInputMethodPicker()
+                }
+
+                (Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT) -> {
+                    val command =
+                        "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
+                    RootUtils.executeRootCommand(command)
+                }
+
+                else -> ctx.toast(R.string.error_this_is_unsupported)
+            }
+        }
     }
 
     override fun isImeEnabledById(imeId: String): Boolean {

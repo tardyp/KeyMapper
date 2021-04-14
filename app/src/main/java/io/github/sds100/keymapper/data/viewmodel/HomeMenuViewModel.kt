@@ -37,7 +37,7 @@ class HomeMenuViewModel(
             }
 
             val tint = when {
-                !isPaused || !isServiceEnabled -> getColor(R.color.red)
+                !isServiceEnabled || !isPaused -> getColor(R.color.red)
                 else -> getColor(R.color.green)
             }
 
@@ -63,6 +63,9 @@ class HomeMenuViewModel(
     private val _chooseRestoreFile = MutableSharedFlow<Unit>()
     val chooseRestoreFile = _chooseRestoreFile.asSharedFlow()
 
+    private val _dismiss = MutableSharedFlow<Unit>()
+    val dismiss = _dismiss
+
     fun onToggleMappingsButtonClick() {
         coroutineScope.launch {
             val areMappingsPaused = useCase.areMappingsPaused.first()
@@ -76,38 +79,49 @@ class HomeMenuViewModel(
     }
 
     fun onEnableAllClick() {
+        runBlocking { _dismiss.emit(Unit) }
         useCase.enableAllMappings()
     }
 
     fun onDisableAllClick() {
+        runBlocking { _dismiss.emit(Unit) }
         useCase.disableAllMappings()
     }
 
     fun onShowInputMethodPickerClick() {
+        runBlocking { _dismiss.emit(Unit) }
         useCase.showInputMethodPicker()
     }
 
     fun onOpenSettingsClick() {
+        runBlocking { _dismiss.emit(Unit) }
         runBlocking { _openSettings.emit(Unit) }
     }
 
     fun onOpenAboutClick() {
+        runBlocking { _dismiss.emit(Unit) }
         runBlocking { _openAbout.emit(Unit) }
     }
 
     fun onBackupAllClick() {
-        runBlocking { _chooseBackupFile.emit(Unit) }
+        runBlocking {
+            _dismiss.emit(Unit)
+            _chooseBackupFile.emit(Unit)
+        }
     }
 
     fun onRestoreClick() {
-        runBlocking { _chooseRestoreFile.emit(Unit) }
+        runBlocking {
+            _dismiss.emit(Unit)
+            _chooseRestoreFile.emit(Unit)
+        }
     }
 
-    fun onChoseRestoreFile(uri: String){
+    fun onChoseRestoreFile(uri: String) {
         useCase.restoreMappings(uri)
     }
 
-    fun onChoseBackupFile(uri: String){
+    fun onChoseBackupFile(uri: String) {
         useCase.backupAllMappings(uri)
     }
 

@@ -11,6 +11,7 @@ import androidx.multidex.MultiDexApplication
 import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
 import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
+import io.github.sds100.keymapper.files.AndroidFileAdapter
 import io.github.sds100.keymapper.framework.adapters.*
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.INotificationController
@@ -26,8 +27,7 @@ import java.io.OutputStream
 /**
  * Created by sds100 on 19/05/2020.
  */
-class KeyMapperApp : MultiDexApplication(),
-    IContentResolver, INotificationManagerWrapper, INotificationController {
+class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotificationController {
     val appCoroutineScope = MainScope()
 
     val notificationController by lazy {
@@ -76,6 +76,8 @@ class KeyMapperApp : MultiDexApplication(),
         RecordTriggerController(appCoroutineScope, serviceAdapter)
     }
 
+    val fileAdapter by lazy { AndroidFileAdapter(this) }
+
     private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
 
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
@@ -106,21 +108,6 @@ class KeyMapperApp : MultiDexApplication(),
                 }
             }
         })
-    }
-
-    override fun openOutputStream(uriString: String): Result<OutputStream> {
-        val uri = Uri.parse(uriString)
-
-        return try {
-            val outputStream = contentResolver.openOutputStream(uri)!!
-
-            Success(outputStream)
-        } catch (e: Exception) {
-            when (e) {
-                is SecurityException -> Error.FileAccessDenied
-                else -> Error.GenericError(e)
-            }
-        }
     }
 
     override fun showNotification(notification: AppNotification) {

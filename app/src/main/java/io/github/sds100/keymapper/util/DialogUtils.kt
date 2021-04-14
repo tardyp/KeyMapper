@@ -45,6 +45,10 @@ suspend fun Context.materialAlertDialog(
         show().apply {
             resumeNullOnDismiss(continuation)
             dismissOnDestroy(lifecycleOwner)
+
+            continuation.invokeOnCancellation {
+                dismiss()
+            }
         }
     }
 }
@@ -217,11 +221,13 @@ suspend fun Context.editTextNumberAlertDialog(
 
 suspend fun Context.okDialog(
     lifecycleOwner: LifecycleOwner,
-    message: String
-) = suspendCancellableCoroutine<GetUserResponse.OkResponse?> { continuation ->
+    message: String,
+    title: String? =null,
+    ) = suspendCancellableCoroutine<GetUserResponse.OkResponse?> { continuation ->
 
     val alertDialog = materialAlertDialog {
 
+        setTitle(title)
         setMessage(message)
 
         okButton {

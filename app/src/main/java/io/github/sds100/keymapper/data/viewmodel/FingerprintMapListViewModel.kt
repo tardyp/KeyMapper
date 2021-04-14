@@ -13,13 +13,12 @@ import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListI
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 class FingerprintMapListViewModel(
     private val coroutineScope: CoroutineScope,
     private val useCase: HomeScreenUseCase,
     resourceProvider: ResourceProvider,
-) : BaseMappingListViewModel(coroutineScope,useCase, resourceProvider) {
+) : BaseMappingListViewModel(coroutineScope, useCase, resourceProvider) {
 
     private val listItemCreator = FingerprintMapListItemCreator(
         useCase,
@@ -31,6 +30,9 @@ class FingerprintMapListViewModel(
 
     private val _launchConfigFingerprintMap = MutableSharedFlow<FingerprintMapId>()
     val launchConfigFingerprintMap = _launchConfigFingerprintMap.asSharedFlow()
+
+    private val _requestFingerprintMapsBackup = MutableSharedFlow<Unit>()
+    val requestFingerprintMapsBackup = _requestFingerprintMapsBackup.asSharedFlow()
 
     init {
         val rebuildUiState = MutableSharedFlow<FingerprintMapGroup>()
@@ -45,7 +47,8 @@ class FingerprintMapListViewModel(
                         ),
                         listItemCreator.create(
                             FingerprintMapId.SWIPE_UP,
-                            fingerprintMaps.swipeUp),
+                            fingerprintMaps.swipeUp
+                        ),
                         listItemCreator.create(
                             FingerprintMapId.SWIPE_LEFT,
                             fingerprintMaps.swipeLeft
@@ -67,7 +70,7 @@ class FingerprintMapListViewModel(
 
         coroutineScope.launch {
             useCase.invalidateErrors.collectLatest {
-                rebuildUiState.emit(useCase.fingerprintMaps.firstOrNull()?:return@collectLatest)
+                rebuildUiState.emit(useCase.fingerprintMaps.firstOrNull() ?: return@collectLatest)
             }
         }
     }
@@ -80,12 +83,12 @@ class FingerprintMapListViewModel(
         }
     }
 
-    fun onCardClick(id: FingerprintMapId){
+    fun onCardClick(id: FingerprintMapId) {
         runBlocking { _launchConfigFingerprintMap.emit(id) }
     }
 
     fun onBackupAllClick() {
-        TODO()
+        runBlocking { _requestFingerprintMapsBackup.emit(Unit) }
     }
 
     fun onResetClick() {
