@@ -16,7 +16,8 @@ data class KeyMapListItem(
         val constraintChipList: List<ChipUi>,
         val triggerDescription: String,
         val optionsDescription: String,
-        val extraInfo: String
+        val extraInfo: String,
+        val triggerErrorChipList: List<ChipUi>
     ) {
         val hasTrigger: Boolean
             get() = triggerDescription.isNotBlank()

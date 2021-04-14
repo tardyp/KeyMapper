@@ -24,7 +24,7 @@ object MigrationUtils {
                     outputJson = it.migrate(gson, outputJson)
                     version = it.versionAfter
                 }
-                ?: throw Exception("No migration for this version $version")
+                ?: throw Exception("No migration for version $version to $outputVersion")
         }
 
         return outputJson

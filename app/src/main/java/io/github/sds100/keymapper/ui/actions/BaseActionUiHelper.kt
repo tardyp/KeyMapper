@@ -206,7 +206,7 @@ abstract class BaseActionUiHelper<MAPPING: Mapping<A>,A: Action>(
             getString(resId, action.description)
         }
 
-        is PhoneCallAction -> getString(R.string.action_type_phone_call, action.number)
+        is PhoneCallAction -> getString(R.string.description_phone_call, action.number)
 
         is TapCoordinateAction -> if (action.description.isNullOrBlank()) {
             getString(

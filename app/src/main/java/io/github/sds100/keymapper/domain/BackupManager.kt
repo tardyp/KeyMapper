@@ -103,8 +103,6 @@ class BackupManagerImpl(
                         backupAsync(outputStream, backupData).await()
                     }
 
-                Timber.e("result $result")
-
                 onAutomaticBackupResult.emit(result)
             }
         }
@@ -112,7 +110,6 @@ class BackupManagerImpl(
         coroutineScope.launch {
             keyMapRepository.requestBackup.collectLatest { keyMapList ->
 
-                Timber.e("backup key maps")
                 doAutomaticBackup.emit(
                     BackupData(
                         keyMapList = keyMapList,
@@ -124,7 +121,6 @@ class BackupManagerImpl(
 
         coroutineScope.launch {
             fingerprintMapRepository.requestBackup.collectLatest { fingerprintMaps ->
-                Timber.e("backup fingerprint maps")
                 doAutomaticBackup.emit(
                     BackupData(
                         keyMapList = keyMapRepository.keyMapList.firstOrNull()?.dataOrNull(),
@@ -136,7 +132,6 @@ class BackupManagerImpl(
 
         //automatically back up when the location changes
         preferenceRepository.get(Keys.automaticBackupLocation).drop(1).onEach {
-            Timber.e("on automatic backup change")
             val data = BackupData(
                 keyMapList = keyMapRepository.keyMapList.firstOrNull()?.dataOrNull(),
                 fingerprintMaps = fingerprintMapRepository.fingerprintMaps.firstOrNull()
@@ -202,7 +197,6 @@ class BackupManagerImpl(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override fun restoreMappings(uri: String) {
-        Timber.e("restore mappings")
         coroutineScope.launch(dispatchers.default()) {
             val result = fileAdapter
                 .openInputStream(uri)

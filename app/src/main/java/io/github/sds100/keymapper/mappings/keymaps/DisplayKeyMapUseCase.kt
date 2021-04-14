@@ -25,7 +25,7 @@ class DisplayKeyMapUseCaseImpl(
         )
     }
 
-    override fun getTriggerError(trigger: KeyMapTrigger): List<KeyMapTriggerError> {
+    override fun getTriggerErrors(trigger: KeyMapTrigger): List<KeyMapTriggerError> {
         val errors = mutableListOf<KeyMapTriggerError>()
 
         if (trigger.keys.any { it.keyCode in keysThatRequireDndAccess }) {
@@ -40,6 +40,6 @@ class DisplayKeyMapUseCaseImpl(
     }
 }
 
-interface DisplayKeyMapUseCase : DisplayActionUseCase, DisplayConstraintUseCase {
-    fun getTriggerError(trigger: KeyMapTrigger): List<KeyMapTriggerError>
+interface DisplayKeyMapUseCase : DisplaySimpleMappingUseCase {
+    fun getTriggerErrors(trigger: KeyMapTrigger): List<KeyMapTriggerError>
 }

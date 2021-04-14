@@ -196,7 +196,6 @@ class DataStoreFingerprintMapRepository(
 
     private suspend fun requestBackup() {
         val maps = fingerprintMaps.first()
-        Timber.e("request backup $maps")
         requestBackup.emit(maps)
     }
 

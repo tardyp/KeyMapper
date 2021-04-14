@@ -276,7 +276,7 @@ class ConfigKeyMapTriggerViewModel(
         val errorListItems: List<TextListItem.Error> by lazy {
             if (triggerState !is State.Data) return@lazy emptyList()
 
-            displayKeyMap.getTriggerError(triggerState.data).map { error ->
+            displayKeyMap.getTriggerErrors(triggerState.data).map { error ->
                 when (error) {
                     KeyMapTriggerError.DND_ACCESS_DENIED -> TextListItem.Error(
                         id = error.toString(),

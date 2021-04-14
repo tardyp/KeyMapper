@@ -93,6 +93,7 @@
     <string name="check_box_key_event_option_use_shell">Use shell (ROOT only)</string>
 
     <string name="trigger_error_dnd_access_denied">If you are remapping a volume button you need to grant Key Mapper permission to modify the Do Not Disturb mode if you want the buttons to work as expected in Do Not Disturb mode!</string>
+    <string name="trigger_error_dnd_access_denied_short">This trigger will not work as expected in Do Not Disturb mode!</string>
     <string name="home_error_is_battery_optimised">Your mappings will stop working randomly! Tap \'Fix\' to fix this.</string>
     <string name="home_error_accessibility_service_is_disabled">The accessibility service needs to be turned on for your mappings to work!</string>
     <string name="home_success_accessibility_service_is_enabled">The accessibility service is enabled! Your mappings should work.</string>

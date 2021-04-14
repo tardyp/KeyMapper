@@ -39,8 +39,7 @@ class HomeScreenUseCaseImpl(
     private val backupManager: BackupManager,
     displayKeyMapUseCase: DisplayKeyMapUseCase,
     displaySimpleMappingUseCase: DisplaySimpleMappingUseCase
-) : HomeScreenUseCase,
-    DisplayKeyMapUseCase by displayKeyMapUseCase {
+) : HomeScreenUseCase, DisplayKeyMapUseCase by displayKeyMapUseCase {
 
     override val keyMapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList.map { state ->
         state.mapData { keyMapList ->

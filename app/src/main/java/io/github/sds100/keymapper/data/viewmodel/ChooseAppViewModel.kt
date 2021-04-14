@@ -64,13 +64,13 @@ class ChooseAppViewModel internal constructor(
 
             when (packagesToFilter) {
                 is State.Data -> {
-                    val filteredListItems = packagesToFilter.data.filterByQuery(query).first()
-
-                    _state.value = AppListState(
-                        filteredListItems,
-                        showHiddenAppsButton = true,
-                        isHiddenAppsChecked = showHiddenApps
-                    )
+                    packagesToFilter.data.filterByQuery(query).collectLatest { filteredListItems ->
+                        _state.value = AppListState(
+                            filteredListItems,
+                            showHiddenAppsButton = true,
+                            isHiddenAppsChecked = showHiddenApps
+                        )
+                    }
                 }
 
                 is State.Loading -> _state.value =

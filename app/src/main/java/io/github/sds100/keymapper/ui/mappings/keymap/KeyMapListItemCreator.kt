@@ -8,15 +8,19 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevic
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapTriggerError
+import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
 import io.github.sds100.keymapper.util.KeyEventUtils
+import io.github.sds100.keymapper.util.result.FixableError
 
 /**
  * Created by sds100 on 19/03/2021.
  */
 class KeyMapListItemCreator(
-    private val displayMapping: DisplaySimpleMappingUseCase,
+    private val displayMapping: DisplayKeyMapUseCase,
     resourceProvider: ResourceProvider
 ) : BaseMappingListItemCreator<KeyMap, KeyMapAction>(
     displayMapping,
@@ -47,7 +51,7 @@ class KeyMapListItemCreator(
                     ClickType.DOUBLE_PRESS -> append(doublePressString)
                 }
 
-                append(" ${KeyEventUtils.keycodeToString(key.keyCode)}")
+                append(KeyEventUtils.keycodeToString(key.keyCode))
 
                 val deviceName = when (key.device) {
                     is TriggerKeyDevice.Internal -> getString(R.string.this_device)
@@ -92,6 +96,19 @@ class KeyMapListItemCreator(
             }
         }
 
+        val triggerErrors = displayMapping.getTriggerErrors(keyMap.trigger)
+
+        val triggerErrorChips = triggerErrors.map {
+            when(it){
+                KeyMapTriggerError.DND_ACCESS_DENIED ->
+                    ChipUi.FixableError(
+                        id = KeyMapTriggerError.DND_ACCESS_DENIED.toString(),
+                        text = getString(R.string.trigger_error_dnd_access_denied_short),
+                        error = FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
+                    )
+            }
+        }
+
         return KeyMapListItem.KeyMapUiState(
             uid = keyMap.uid,
             actionChipList = actionChipList,
@@ -99,6 +116,7 @@ class KeyMapListItemCreator(
             triggerDescription = triggerDescription,
             optionsDescription = optionsDescription,
             extraInfo = extraInfo,
+            triggerErrorChipList = triggerErrorChips
         )
     }
 

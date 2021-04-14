@@ -34,6 +34,12 @@ abstract class BaseMappingListViewModel(
         }
     }
 
+    fun onTriggerErrorChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
     fun onConstraintsChipClick(chipModel: ChipUi) {
         if (chipModel is ChipUi.FixableError) {
             showSnackBarAndFixError(chipModel.error)

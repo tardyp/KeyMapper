@@ -58,6 +58,12 @@ class KeymapListFragment : SimpleRecyclerViewFragment<KeyMapListItem>() {
 
                     selectionState(listItem.selectionUiState)
 
+                    onTriggerErrorClick(object : OnChipClickCallback{
+                        override fun onChipClick(chipModel: ChipUi) {
+                           viewModel.onTriggerErrorChipClick(chipModel)
+                        }
+                    })
+
                     onActionChipClick(object : OnChipClickCallback {
                         override fun onChipClick(chipModel: ChipUi) {
                             viewModel.onActionChipClick(chipModel)

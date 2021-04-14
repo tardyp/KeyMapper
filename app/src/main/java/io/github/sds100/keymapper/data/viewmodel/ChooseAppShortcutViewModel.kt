@@ -63,7 +63,9 @@ class ChooseAppShortcutViewModel internal constructor(
         ) { query, listItems ->
             when (listItems) {
                 is State.Data -> {
-                    listItems.data.filterByQuery(query).collect { _state.value = it }
+                    listItems.data.filterByQuery(query).collect {
+                        _state.value = it
+                    }
                 }
                 State.Loading -> _state.value = ListUiState.Loading
             }
