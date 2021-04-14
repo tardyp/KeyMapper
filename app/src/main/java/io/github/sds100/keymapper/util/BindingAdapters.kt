@@ -87,7 +87,7 @@ fun Slider.enabled(enabled: Boolean) {
 }
 
 @BindingAdapter("app:customBackgroundTint")
-fun MaterialButton.backgroundTint(@ColorInt color: Int) {
+fun View.backgroundTint(@ColorInt color: Int) {
     backgroundTintList = ColorStateList.valueOf(color)
 }
 

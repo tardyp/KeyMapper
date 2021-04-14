@@ -27,7 +27,7 @@ class CreateKeymapShortcutActivity : AppCompatActivity() {
             R.layout.activity_create_keymap_shortcut
         )
 
-        requestPermissionDelegate = RequestPermissionDelegate(this)
+        requestPermissionDelegate = RequestPermissionDelegate(this, showDialogs = true)
 
         addRepeatingJob(Lifecycle.State.RESUMED) {
             ServiceLocator.permissionAdapter(this@CreateKeymapShortcutActivity).request

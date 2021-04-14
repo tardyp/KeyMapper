@@ -26,6 +26,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import splitties.bitflags.hasFlag
 import splitties.toast.toast
 import timber.log.Timber
@@ -342,7 +343,7 @@ class AccessibilityServiceController(
             /* Don't update whether fingerprint gesture detection is supported if it has
             * been supported at some point. Just in case the fingerprint reader is being
             * used while this is called. */
-            if (!areFingerprintGesturesSupported.isSupported.firstBlocking()) {
+            if (!areFingerprintGesturesSupported.isSupported.map { it == true }.firstBlocking()) {
                 preferenceRepository.set(
                     Keys.fingerprintGesturesAvailable,
                     isGestureDetectionAvailable

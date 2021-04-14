@@ -4,6 +4,7 @@ import android.content.Context
 import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
@@ -69,4 +70,7 @@ object UseCases {
 
     fun isAccessibilityServiceEnabled(ctx: Context) =
         IsAccessibilityServiceEnabledUseCaseImpl(ServiceLocator.serviceAdapter(ctx))
+
+    fun fingerprintGesturesSupported(ctx: Context)=
+        AreFingerprintGesturesSupportedUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
 }

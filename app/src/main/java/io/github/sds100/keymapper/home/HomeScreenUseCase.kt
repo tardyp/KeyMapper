@@ -23,7 +23,7 @@ import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 
 /**
  * Created by sds100 on 04/04/2021.
@@ -41,13 +41,23 @@ class HomeScreenUseCaseImpl(
     displaySimpleMappingUseCase: DisplaySimpleMappingUseCase
 ) : HomeScreenUseCase, DisplayKeyMapUseCase by displayKeyMapUseCase {
 
-    override val keyMapList: Flow<State<List<KeyMap>>> = keyMapRepository.keyMapList.map { state ->
-        state.mapData { keyMapList ->
-            keyMapList.map {
-                KeyMapEntityMapper.fromEntity(it)
+    override val keyMapList: Flow<State<List<KeyMap>>> = channelFlow {
+        send(State.Loading)
+
+        keyMapRepository.keyMapList.collectLatest { keyMapEntitiesState ->
+            send(State.Loading)
+
+            withContext(Dispatchers.Default) {
+                val keyMaps = keyMapEntitiesState.mapData { keyMapEntities ->
+                    keyMapEntities.map {
+                        KeyMapEntityMapper.fromEntity(it)
+                    }
+                }
+
+                send(keyMaps)
             }
         }
-    }.flowOn(Dispatchers.Default)
+    }
 
     override val fingerprintMaps: Flow<FingerprintMapGroup> =
         fingerprintMapRepository.fingerprintMaps

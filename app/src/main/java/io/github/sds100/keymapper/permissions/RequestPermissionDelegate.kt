@@ -28,8 +28,8 @@ import splitties.toast.toast
  */
 class RequestPermissionDelegate(
     private val activity: AppCompatActivity,
+    val showDialogs: Boolean
 ) {
-
     private val startActivityForResultLauncher =
         activity.activityResultRegistry.register(
             "start_activity",
@@ -48,7 +48,7 @@ class RequestPermissionDelegate(
             ServiceLocator.permissionAdapter(activity).onPermissionsChanged()
         }
 
-     fun requestPermission(permission: Permission, navController: NavController) {
+    fun requestPermission(permission: Permission, navController: NavController?) {
         when (permission) {
             Permission.WRITE_SETTINGS ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -108,6 +108,7 @@ class RequestPermissionDelegate(
                 }
 
             Permission.WRITE_SECURE_SETTINGS -> {
+                require(navController != null) { "nav controller can't be null!" }
                 activity.materialAlertDialog {
                     messageResource = R.string.dialog_message_write_secure_settings
 
@@ -141,46 +142,67 @@ class RequestPermissionDelegate(
                 requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
 
             Permission.ROOT -> {
-                activity.materialAlertDialog {
-                    titleResource = R.string.dialog_title_root_prompt
-                    messageResource = R.string.dialog_message_root_prompt
-                    setIcon(R.drawable.ic_baseline_warning_24)
+                require(navController != null) { "nav controller can't be null!" }
 
-                    okButton {
-                        navController.navigate(R.id.action_global_settingsFragment)
-                        Shell.run("su")
+                if (showDialogs) {
+                    activity.materialAlertDialog {
+                        titleResource = R.string.dialog_title_root_prompt
+                        messageResource = R.string.dialog_message_root_prompt
+                        setIcon(R.drawable.ic_baseline_warning_24)
+
+                        okButton {
+                            navController.navigate(R.id.action_global_settingsFragment)
+                            Shell.run("su")
+                        }
+
+                        cancelButton()
+
+                        show()
                     }
-
-                    cancelButton()
-
-                    show()
+                } else {
+                    navController.navigate(R.id.action_global_settingsFragment)
+                    Shell.run("su")
                 }
             }
 
             Permission.IGNORE_BATTERY_OPTIMISATION ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    activity.materialAlertDialog {
-                        titleResource = R.string.dialog_title_disable_battery_optimisation
-                        messageResource = R.string.dialog_message_disable_battery_optimisation
+                    if (showDialogs) {
+                        activity.materialAlertDialog {
+                            titleResource = R.string.dialog_title_disable_battery_optimisation
+                            messageResource = R.string.dialog_message_disable_battery_optimisation
 
-                        positiveButton(R.string.pos_turn_off) {
-                            try {
-                                val intent =
-                                    Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                            positiveButton(R.string.pos_turn_off) {
+                                try {
+                                    val intent =
+                                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
-                                activity.startActivity(intent)
-                            } catch (e: ActivityNotFoundException) {
-                                longToast(R.string.error_battery_optimisation_activity_not_found)
+                                    activity.startActivity(intent)
+                                } catch (e: ActivityNotFoundException) {
+                                    longToast(R.string.error_battery_optimisation_activity_not_found)
+                                }
                             }
+
+                            cancelButton()
+
+                            neutralButton(R.string.neutral_go_to_dont_kill_my_app) {
+                                UrlUtils.openUrl(
+                                    activity,
+                                    activity.str(R.string.url_dont_kill_my_app)
+                                )
+                            }
+
+                            show()
                         }
+                    } else {
+                        try {
+                            val intent =
+                                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 
-                        cancelButton()
-
-                        neutralButton(R.string.neutral_go_to_dont_kill_my_app) {
-                            UrlUtils.openUrl(activity, activity.str(R.string.url_dont_kill_my_app))
+                            activity.startActivity(intent)
+                        } catch (e: ActivityNotFoundException) {
+                            longToast(R.string.error_battery_optimisation_activity_not_found)
                         }
-
-                        show()
                     }
                 }
         }

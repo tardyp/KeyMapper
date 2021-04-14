@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        requestPermissionDelegate = RequestPermissionDelegate(this)
+        requestPermissionDelegate = RequestPermissionDelegate(this, showDialogs = true)
 
         addRepeatingJob(Lifecycle.State.RESUMED) {
             ServiceLocator.permissionAdapter(this@MainActivity).request.collectLatest { permission ->

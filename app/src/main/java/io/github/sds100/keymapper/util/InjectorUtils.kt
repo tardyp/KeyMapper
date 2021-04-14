@@ -13,6 +13,9 @@ import io.github.sds100.keymapper.domain.mappings.keymap.*
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
 import io.github.sds100.keymapper.home.HomeScreenUseCaseImpl
+import io.github.sds100.keymapper.onboarding.AppIntroSlide
+import io.github.sds100.keymapper.onboarding.AppIntroUseCase
+import io.github.sds100.keymapper.onboarding.AppIntroUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
@@ -209,15 +212,17 @@ object InjectorUtils {
         )
     }
 
-    fun provideAppIntroViewModel(context: Context): AppIntroViewModel.Factory {
+    fun provideAppIntroViewModel(context: Context, slides: List<AppIntroSlide>): AppIntroViewModel.Factory {
         return AppIntroViewModel.Factory(
-            OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(context))
-        )
-    }
-
-    fun provideFingerprintGestureIntroViewModel(context: Context): FingerprintGestureMapIntroViewModel.Factory {
-        return FingerprintGestureMapIntroViewModel.Factory(
-            OnboardingUseCaseImpl(ServiceLocator.preferenceRepository(context))
+            AppIntroUseCaseImpl(
+                ServiceLocator.permissionAdapter(context),
+                ServiceLocator.serviceAdapter(context),
+                ServiceLocator.systemFeatureAdapter(context),
+                ServiceLocator.preferenceRepository(context),
+                UseCases.fingerprintGesturesSupported(context)
+            ),
+            slides,
+            ServiceLocator.resourceProvider(context)
         )
     }
 

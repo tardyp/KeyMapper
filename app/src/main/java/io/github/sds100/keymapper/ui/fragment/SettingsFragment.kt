@@ -20,6 +20,7 @@ import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
 import io.github.sds100.keymapper.mappings.common.OptionMinimums
+import io.github.sds100.keymapper.ui.SliderMaximums
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
 import splitties.alertdialog.appcompat.*
@@ -503,7 +504,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             addPreference(this)
         }
 
-        //TODO dont use R.integers
         //repeat delay
         SeekBarPreference(requireContext()).apply {
             key = Keys.defaultRepeatDelay.name
@@ -511,8 +511,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_repeat_delay)
             setSummary(R.string.summary_pref_repeat_delay)
-            min = int(R.integer.repeat_delay_min)
-            max = int(R.integer.repeat_delay_max)
+            min = OptionMinimums.ACTION_REPEAT_DELAY
+            max = SliderMaximums.ACTION_REPEAT_DELAY
             showSeekBarValue = true
 
             addPreference(this)
@@ -525,8 +525,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
             setTitle(R.string.title_pref_repeat_rate)
             setSummary(R.string.summary_pref_repeat_rate)
-            min = int(R.integer.repeat_rate_min)
-            max = int(R.integer.repeat_rate_max)
+            min = OptionMinimums.ACTION_REPEAT_RATE
+            max = SliderMaximums.ACTION_REPEAT_RATE
             showSeekBarValue = true
 
             addPreference(this)
