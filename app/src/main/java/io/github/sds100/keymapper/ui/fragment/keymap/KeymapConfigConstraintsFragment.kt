@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.ui.fragment.ConfigConstraintsFragment
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 
 /**
  * Created by sds100 on 30/11/20.
@@ -22,7 +22,7 @@ class KeymapConfigConstraintsFragment : ConfigConstraintsFragment() {
 
     private val configKeyMapViewModel: ConfigKeyMapViewModel
         by navGraphViewModels(R.id.nav_config_keymap) {
-            InjectorUtils.provideConfigKeyMapViewModel(requireContext())
+            Inject.configKeyMapViewModel(requireContext())
         }
 
     override val configConstraintsViewModel: ConfigConstraintsViewModel

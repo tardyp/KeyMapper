@@ -128,64 +128,6 @@ class DataStoreFingerprintMapRepository(
         }
     }
 
-    override fun enableAll() {
-        coroutineScope.launch {
-            val group = fingerprintMaps.firstOrNull() ?: return@launch
-
-            val newGroup = group.copy(
-                swipeDown = group.swipeDown.copy(isEnabled = true),
-                swipeUp = group.swipeUp.copy(isEnabled = true),
-                swipeLeft = group.swipeLeft.copy(isEnabled = true),
-                swipeRight = group.swipeRight.copy(isEnabled = true),
-            )
-
-            dataStore.edit { prefs ->
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] =
-                    gson.toJson(newGroup.swipeDown)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] =
-                    gson.toJson(newGroup.swipeUp)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] =
-                    gson.toJson(newGroup.swipeLeft)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
-                    gson.toJson(newGroup.swipeRight)
-            }
-
-            requestBackup()
-        }
-    }
-
-    override fun disableAll() {
-        coroutineScope.launch {
-            val group = fingerprintMaps.firstOrNull() ?: return@launch
-
-            val newGroup = group.copy(
-                swipeDown = group.swipeDown.copy(isEnabled = false),
-                swipeUp = group.swipeUp.copy(isEnabled = false),
-                swipeLeft = group.swipeLeft.copy(isEnabled = false),
-                swipeRight = group.swipeRight.copy(isEnabled = false),
-            )
-
-            dataStore.edit { prefs ->
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_DOWN] =
-                    gson.toJson(newGroup.swipeDown)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_UP] =
-                    gson.toJson(newGroup.swipeUp)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_LEFT] =
-                    gson.toJson(newGroup.swipeLeft)
-
-                prefs[PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT] =
-                    gson.toJson(newGroup.swipeRight)
-            }
-
-            requestBackup()
-        }
-    }
-
     private suspend fun updateSuspend(id: String, fingerprintMap: FingerprintMapEntity) {
         dataStore.edit { prefs ->
             val key = PREF_KEYS_MAP[id]!!

@@ -10,7 +10,8 @@ import io.github.sds100.keymapper.util.*
 /**
  * Created by sds100 on 01/01/21.
  */
-class IntentActionTypeViewModel : ViewModel() {
+//TODO
+class ConfigIntentViewModel : ViewModel() {
     val targetActivity = MutableLiveData(false)
     val targetBroadcastReceiver = MutableLiveData(false)
     val targetService = MutableLiveData(false)
@@ -127,7 +128,7 @@ class IntentActionTypeViewModel : ViewModel() {
     class Factory : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return IntentActionTypeViewModel() as T
+            return ConfigIntentViewModel() as T
         }
     }
 }

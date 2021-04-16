@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.int
 import io.github.sds100.keymapper.util.intArray
 import kotlinx.coroutines.flow.collectLatest
@@ -28,7 +28,7 @@ class ConfigKeymapFragment : ConfigMappingFragment() {
     private val args by navArgs<ConfigKeymapFragmentArgs>()
 
     override val viewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
-        InjectorUtils.provideConfigKeyMapViewModel(requireContext())
+        Inject.configKeyMapViewModel(requireContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

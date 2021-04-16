@@ -23,7 +23,7 @@ import io.github.sds100.keymapper.ui.fragment.RecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.collectWhenStarted
 import io.github.sds100.keymapper.util.str
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +50,7 @@ class TriggerFragment : RecyclerViewFragment<TriggerKeyListItem, FragmentTrigger
 
     private val configKeyMapTriggerViewModel: ConfigKeyMapTriggerViewModel by lazy {
         navGraphViewModels<ConfigKeyMapViewModel>(R.id.nav_config_keymap) {
-            InjectorUtils.provideConfigKeyMapViewModel(requireContext())
+            Inject.configKeyMapViewModel(requireContext())
         }.value.configTriggerViewModel
     }
 

@@ -11,7 +11,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentKeyActionTypeBinding
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 
 /**
  * Created by sds100 on 30/03/2020.
@@ -24,7 +24,7 @@ class KeyActionTypeFragment : Fragment() {
     }
 
     private val viewModel: KeyActionTypeViewModel by activityViewModels {
-        InjectorUtils.provideKeyActionTypeViewModel()
+        Inject.keyActionTypeViewModel()
     }
 
     /**

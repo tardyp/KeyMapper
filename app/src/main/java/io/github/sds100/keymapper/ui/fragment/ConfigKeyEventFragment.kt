@@ -31,7 +31,7 @@ class ConfigKeyEventFragment : Fragment() {
     }
 
     private val viewModel: ConfigKeyEventViewModel by activityViewModels {
-        InjectorUtils.provideKeyEventActionTypeViewModel(requireContext())
+        Inject.configKeyEventViewModel(requireContext())
     }
 
     /**

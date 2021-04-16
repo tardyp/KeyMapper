@@ -1,13 +1,10 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
-import android.Manifest
 import android.os.Build
 import android.view.KeyEvent
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
-import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
-import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.permissions.Permission
 
 /**

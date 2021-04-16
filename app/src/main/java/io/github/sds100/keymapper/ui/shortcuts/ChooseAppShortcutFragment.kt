@@ -40,7 +40,7 @@ class ChooseAppShortcutFragment : SimpleRecyclerViewFragment<AppShortcutListItem
     override var searchStateKey: String? = SEARCH_STATE_KEY
 
     private val viewModel: ChooseAppShortcutViewModel by activityViewModels {
-        InjectorUtils.provideAppShortcutListViewModel(requireContext())
+        Inject.chooseAppShortcutViewModel(requireContext())
     }
 
     override val listItems: Flow<ListUiState<AppShortcutListItem>>

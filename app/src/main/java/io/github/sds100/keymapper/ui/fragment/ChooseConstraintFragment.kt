@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.showUserResponseRequests
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.decodeFromString
@@ -35,7 +35,7 @@ class ChooseConstraintFragment
     private val navArgs by navArgs<ChooseConstraintFragmentArgs>()
 
     private val viewModel: ChooseConstraintViewModel by viewModels {
-        InjectorUtils.provideChooseConstraintListViewModel(requireContext())
+        Inject.chooseConstraintListViewModel(requireContext())
     }
 
     override val listItems: Flow<ListUiState<ChooseConstraintListItem>>

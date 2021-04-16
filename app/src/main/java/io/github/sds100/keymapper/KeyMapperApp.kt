@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper
 
-import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Lifecycle
@@ -17,12 +16,8 @@ import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.INotificationController
 import io.github.sds100.keymapper.ui.NotificationViewModel
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.MainScope
 import timber.log.Timber
-import java.io.OutputStream
 
 /**
  * Created by sds100 on 19/05/2020.
@@ -78,7 +73,7 @@ class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotifi
 
     val fileAdapter by lazy { AndroidFileAdapter(this) }
 
-    private val applicationViewModel by lazy { InjectorUtils.provideApplicationViewModel(this) }
+    private val applicationViewModel by lazy { Inject.keyMapperAppViewModel(this) }
 
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
 

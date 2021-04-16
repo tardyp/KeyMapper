@@ -7,8 +7,9 @@ import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCaseImpl
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCaseImpl
+import io.github.sds100.keymapper.mappings.PauseMappingsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppsUseCase
@@ -73,4 +74,7 @@ object UseCases {
 
     fun fingerprintGesturesSupported(ctx: Context)=
         AreFingerprintGesturesSupportedUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
+
+    fun pauseMappings(ctx: Context)=
+        PauseMappingsUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
 }

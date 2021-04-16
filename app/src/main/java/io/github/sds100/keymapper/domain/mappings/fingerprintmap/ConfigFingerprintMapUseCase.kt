@@ -2,11 +2,10 @@ package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.actions.ActionData
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.ifIsData
-import io.github.sds100.keymapper.mappings.common.BaseConfigMappingUseCase
-import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
+import io.github.sds100.keymapper.mappings.BaseConfigMappingUseCase
+import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 
 /**
  * Created by sds100 on 16/02/2021.
@@ -80,7 +79,7 @@ class ConfigFingerprintMapUseCaseImpl : BaseConfigMappingUseCase<FingerprintMapA
     }
 }
 
-interface ConfigFingerprintMapUseCase : ConfigMappingUseCase<FingerprintMapAction, FingerprintMap>{
+interface ConfigFingerprintMapUseCase : ConfigMappingUseCase<FingerprintMapAction, FingerprintMap> {
     fun setVibrateEnabled(enabled: Boolean)
     fun setVibrationDuration(duration: Defaultable<Int>)
     fun setShowToastEnabled(enabled: Boolean)

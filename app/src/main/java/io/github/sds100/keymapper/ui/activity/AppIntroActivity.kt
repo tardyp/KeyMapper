@@ -7,15 +7,13 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
-import androidx.navigation.findNavController
 import com.github.appintro.AppIntro2
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.viewmodel.AppIntroViewModel
 import io.github.sds100.keymapper.onboarding.AppIntroScrollableFragment
 import io.github.sds100.keymapper.onboarding.AppIntroSlide
 import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.UrlUtils
 import kotlinx.coroutines.flow.collectLatest
 
@@ -32,7 +30,7 @@ class AppIntroActivity : AppIntro2() {
     private val viewModel by viewModels<AppIntroViewModel> {
         val slides = intent.getStringArrayExtra(EXTRA_SLIDES)?.map { AppIntroSlide.valueOf(it) }
 
-        InjectorUtils.provideAppIntroViewModel(this, slides!!)
+        Inject.appIntroViewModel(this, slides!!)
     }
 
     private lateinit var requestPermissionDelegate: RequestPermissionDelegate

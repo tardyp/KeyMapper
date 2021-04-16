@@ -44,7 +44,7 @@ import java.util.*
 class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
-        InjectorUtils.provideHomeViewModel(requireContext())
+        Inject.homeViewModel(requireContext())
     }
 
     /**

@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.data.model.UnsupportedActionListItem
 import io.github.sds100.keymapper.data.viewmodel.UnsupportedActionListViewModel
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.TintType
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +17,7 @@ class UnsupportedActionListFragment
     : SimpleRecyclerViewFragment<UnsupportedActionListItem>() {
 
     private val viewModel: UnsupportedActionListViewModel by activityViewModels {
-        InjectorUtils.provideUnsupportedActionListViewModel(requireContext())
+        Inject.unsupportedActionListViewModel(requireContext())
     }
 
     override val listItems: Flow<ListUiState<UnsupportedActionListItem>>

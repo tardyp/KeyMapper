@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.dataOrNull
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.OptionMinimums
+import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase

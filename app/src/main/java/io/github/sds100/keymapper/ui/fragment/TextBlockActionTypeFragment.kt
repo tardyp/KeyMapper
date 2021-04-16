@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.TextBlockActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentEdittextBinding
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -26,7 +26,7 @@ class TextBlockActionTypeFragment : Fragment() {
     }
 
     private val viewModel: TextBlockActionTypeViewModel by activityViewModels {
-        InjectorUtils.provideTextBlockActionTypeViewModel()
+        Inject.textBlockActionTypeViewModel()
     }
 
     /**

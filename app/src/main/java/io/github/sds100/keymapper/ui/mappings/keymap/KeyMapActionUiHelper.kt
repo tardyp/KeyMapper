@@ -4,7 +4,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
+import io.github.sds100.keymapper.mappings.DisplayActionUseCase
 import io.github.sds100.keymapper.ui.actions.BaseActionUiHelper
 
 /**

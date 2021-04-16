@@ -134,7 +134,7 @@ class ChooseActionFragment : Fragment() {
 
         setFragmentResultListener(KeyCodeListFragment.REQUEST_KEY) { _, result ->
             val keyEventViewModel by activityViewModels<ConfigKeyEventViewModel> {
-                InjectorUtils.provideKeyEventActionTypeViewModel(requireContext())
+                Inject.configKeyEventViewModel(requireContext())
             }
 
             result.getInt(KeyCodeListFragment.EXTRA_KEYCODE).let {

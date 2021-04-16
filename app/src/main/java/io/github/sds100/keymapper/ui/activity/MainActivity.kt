@@ -16,12 +16,10 @@ import io.github.sds100.keymapper.databinding.ActivityMainBinding
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.Error
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
 import splitties.snackbar.snack
-import splitties.toast.toast
 
 /**
  * Created by sds100 on 19/02/2020.
@@ -35,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val keyActionTypeViewModel: KeyActionTypeViewModel by viewModels {
-        InjectorUtils.provideKeyActionTypeViewModel()
+        Inject.keyActionTypeViewModel()
     }
 
     private lateinit var requestPermissionDelegate: RequestPermissionDelegate

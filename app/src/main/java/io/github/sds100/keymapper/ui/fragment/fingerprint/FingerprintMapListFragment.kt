@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.ui.fragment.fingerprint
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import splitties.alertdialog.appcompat.*
 
 /**
  * Created by sds100 on 11/12/2020.
@@ -32,7 +30,7 @@ class FingerprintMapListFragment :
     RecyclerViewFragment<FingerprintMapListItem, FragmentFingerprintMapListBinding>() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
-        InjectorUtils.provideHomeViewModel(requireContext())
+        Inject.homeViewModel(requireContext())
     }
 
     private val viewModel by lazy { homeViewModel.fingerprintMapListViewModel }

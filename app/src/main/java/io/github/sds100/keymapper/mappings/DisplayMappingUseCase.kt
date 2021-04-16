@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 import android.graphics.drawable.Drawable
 import android.os.Build

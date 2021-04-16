@@ -3,8 +3,8 @@ package io.github.sds100.keymapper.data.viewmodel
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.home.HomeScreenUseCase
-import io.github.sds100.keymapper.mappings.common.BaseMappingListViewModel
+import io.github.sds100.keymapper.mappings.BaseMappingListViewModel
+import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCase
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.createListState
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 class KeyMapListViewModel internal constructor(
     private val coroutineScope: CoroutineScope,
-    private val useCase: HomeScreenUseCase,
+    private val useCase: ListKeyMapsUseCase,
     resourceProvider: ResourceProvider,
     private val multiSelectProvider: MultiSelectProvider
 ) : BaseMappingListViewModel(coroutineScope, useCase, resourceProvider) {

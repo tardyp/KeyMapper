@@ -21,7 +21,7 @@ import splitties.alertdialog.appcompat.positiveButton
 class CreateKeymapShortcutFragment : DefaultRecyclerViewFragment<List<KeyMapListItem>>() {
 
     private val viewModel by activityViewModels<CreateKeymapShortcutViewModel> {
-        InjectorUtils.provideCreateActionShortcutViewModel(requireContext())
+        Inject.createActionShortcutViewModel(requireContext())
     }
 
     override val modelState: ModelState<List<KeyMapListItem>>

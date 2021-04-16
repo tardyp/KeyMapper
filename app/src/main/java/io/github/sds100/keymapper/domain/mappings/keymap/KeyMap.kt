@@ -5,10 +5,9 @@ import io.github.sds100.keymapper.data.model.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapActionEntityMapper
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeymapTriggerEntityMapper
-import io.github.sds100.keymapper.mappings.common.Mapping
+import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.util.delegate.KeymapDetectionDelegate
 import kotlinx.serialization.Serializable
 import java.util.*

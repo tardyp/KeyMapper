@@ -2,8 +2,11 @@ package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.backup.BackupRestoreMappingsUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.home.HomeScreenUseCase
+import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCase
+import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCase
+import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl
 import io.github.sds100.keymapper.ui.dialogs.DialogResponse
@@ -20,14 +23,17 @@ import kotlinx.coroutines.runBlocking
  */
 class HomeMenuViewModel(
     private val coroutineScope: CoroutineScope,
-    private val useCase: HomeScreenUseCase,
+    private val showAlerts: ShowHomeScreenAlertsUseCase,
+    private val pauseMappings: PauseMappingsUseCase,
+    private val backupRestore: BackupRestoreMappingsUseCase,
+    private val showImePicker: ShowInputMethodPickerUseCase,
     resourceProvider: ResourceProvider
 ) : ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
 
     val toggleMappingsButtonState: StateFlow<ToggleMappingsButtonState?> =
         combine(
-            useCase.areMappingsPaused,
-            useCase.isAccessibilityServiceEnabled
+            pauseMappings.isPaused,
+            showAlerts.isAccessibilityServiceEnabled
         ) { isPaused, isServiceEnabled ->
             val text = when {
                 //must be first
@@ -68,29 +74,19 @@ class HomeMenuViewModel(
 
     fun onToggleMappingsButtonClick() {
         coroutineScope.launch {
-            val areMappingsPaused = useCase.areMappingsPaused.first()
+            val areMappingsPaused = pauseMappings.isPaused.first()
 
             when {
-                !useCase.isAccessibilityServiceEnabled.first() -> useCase.enableAccessibilityService()
-                areMappingsPaused -> useCase.resumeMappings()
-                !areMappingsPaused -> useCase.pauseMappings()
+                !showAlerts.isAccessibilityServiceEnabled.first() -> showAlerts.enableAccessibilityService()
+                areMappingsPaused -> pauseMappings.resume()
+                !areMappingsPaused -> pauseMappings.pause()
             }
         }
     }
 
-    fun onEnableAllClick() {
-        runBlocking { _dismiss.emit(Unit) }
-        useCase.enableAllMappings()
-    }
-
-    fun onDisableAllClick() {
-        runBlocking { _dismiss.emit(Unit) }
-        useCase.disableAllMappings()
-    }
-
     fun onShowInputMethodPickerClick() {
         runBlocking { _dismiss.emit(Unit) }
-        useCase.showInputMethodPicker()
+        showImePicker.show()
     }
 
     fun onOpenSettingsClick() {
@@ -118,11 +114,11 @@ class HomeMenuViewModel(
     }
 
     fun onChoseRestoreFile(uri: String) {
-        useCase.restoreMappings(uri)
+        backupRestore.restoreMappings(uri)
     }
 
     fun onChoseBackupFile(uri: String) {
-        useCase.backupAllMappings(uri)
+        backupRestore.backupAllMappings(uri)
     }
 
     fun onSendFeedbackClick() {

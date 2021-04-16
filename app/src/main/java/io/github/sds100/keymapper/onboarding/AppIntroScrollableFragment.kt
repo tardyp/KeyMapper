@@ -1,9 +1,7 @@
 package io.github.sds100.keymapper.onboarding
 
-import android.media.AudioManager
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -13,10 +11,8 @@ import androidx.lifecycle.addRepeatingJob
 import io.github.sds100.keymapper.data.viewmodel.AppIntroViewModel
 import io.github.sds100.keymapper.databinding.FragmentAppIntroSlideBinding
 import io.github.sds100.keymapper.ui.activity.AppIntroActivity
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.collectLatest
-import splitties.systemservices.audioManager
-import timber.log.Timber
 
 class AppIntroScrollableFragment : Fragment() {
 
@@ -35,7 +31,7 @@ class AppIntroScrollableFragment : Fragment() {
         val slides = requireActivity().intent.getStringArrayExtra(AppIntroActivity.EXTRA_SLIDES)
             ?.map { AppIntroSlide.valueOf(it) }
 
-        InjectorUtils.provideAppIntroViewModel(requireContext(), slides!!)
+        Inject.appIntroViewModel(requireContext(), slides!!)
     }
 
     private val slide: AppIntroSlide by lazy {

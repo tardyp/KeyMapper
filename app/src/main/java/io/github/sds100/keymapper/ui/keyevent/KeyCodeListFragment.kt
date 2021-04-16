@@ -2,11 +2,11 @@ package io.github.sds100.keymapper.ui.keyevent
 
 import androidx.fragment.app.activityViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.viewmodel.KeyCodeListViewModel
+import io.github.sds100.keymapper.data.viewmodel.ChooseKeyCodeViewModel
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,8 +23,8 @@ class KeyCodeListFragment : SimpleRecyclerViewFragment<KeyCodeListItem>() {
     override var searchStateKey: String? = SEARCH_STATE_KEY
     override var requestKey: String? = REQUEST_KEY
 
-    private val viewModel: KeyCodeListViewModel by activityViewModels {
-        InjectorUtils.provideKeycodeListViewModel()
+    private val viewModel: ChooseKeyCodeViewModel by activityViewModels {
+        Inject.chooseKeyCodeViewModel()
     }
 
     override val listItems: Flow<ListUiState<KeyCodeListItem>>

@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapA
 import io.github.sds100.keymapper.ui.fragment.ConfigActionsFragment
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 
 /**
  * Created by sds100 on 22/11/20.
@@ -27,7 +27,7 @@ class FingerprintConfigActionsFragment :
     override var isAppBarVisible = false
 
     private val viewModel: ConfigFingerprintMapViewModel by navGraphViewModels(R.id.nav_config_fingerprint_map) {
-        InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
+        Inject.configFingerprintMapViewModel(requireContext())
     }
 
     override val configActionsViewModel: ConfigActionsViewModel<FingerprintMapAction, FingerprintMap>

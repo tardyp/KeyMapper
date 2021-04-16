@@ -19,7 +19,7 @@ import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
-import io.github.sds100.keymapper.mappings.common.OptionMinimums
+import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.ui.SliderMaximums
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
@@ -91,7 +91,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
     private val viewModel by viewModels<SettingsViewModel> {
-        InjectorUtils.provideSettingsViewModel(requireContext())
+        Inject.settingsViewModel(requireContext())
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

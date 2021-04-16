@@ -8,9 +8,9 @@ import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.mapData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
-import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
-import io.github.sds100.keymapper.mappings.common.Mapping
+import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
+import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
+import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.constraints.ConstraintListItem

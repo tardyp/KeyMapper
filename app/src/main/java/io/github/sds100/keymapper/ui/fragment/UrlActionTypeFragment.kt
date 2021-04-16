@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.UrlActionTypeViewModel
 import io.github.sds100.keymapper.databinding.FragmentEdittextBinding
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -27,7 +27,7 @@ class UrlActionTypeFragment : Fragment() {
     }
 
     private val viewModel: UrlActionTypeViewModel by activityViewModels {
-        InjectorUtils.provideUrlActionTypeViewModel()
+        Inject.urlActionTypeViewModel()
     }
 
     /**

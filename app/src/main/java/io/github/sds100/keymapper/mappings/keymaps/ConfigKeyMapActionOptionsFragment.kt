@@ -4,10 +4,10 @@ import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
-import io.github.sds100.keymapper.mappings.common.ConfigActionOptionsViewModel
-import io.github.sds100.keymapper.mappings.common.OptionsBottomSheetFragment
+import io.github.sds100.keymapper.mappings.ConfigActionOptionsViewModel
+import io.github.sds100.keymapper.mappings.OptionsBottomSheetFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.str
 
 /**
@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.util.str
 class ConfigKeyMapActionOptionsFragment : OptionsBottomSheetFragment() {
 
     private val configKeyMapViewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
-        InjectorUtils.provideConfigKeyMapViewModel(requireContext())
+        Inject.configKeyMapViewModel(requireContext())
     }
 
     override val viewModel: ConfigActionOptionsViewModel<KeyMap, KeyMapAction>

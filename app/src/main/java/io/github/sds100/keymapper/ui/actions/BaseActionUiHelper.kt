@@ -4,8 +4,8 @@ import android.view.KeyEvent
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
-import io.github.sds100.keymapper.mappings.common.Mapping
+import io.github.sds100.keymapper.mappings.DisplayActionUseCase
+import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.IntentTarget

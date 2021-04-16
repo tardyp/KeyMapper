@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapActionOptionsViewModel
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapOptionsViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModel

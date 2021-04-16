@@ -32,7 +32,7 @@ class OnlineFileFragment : BottomSheetDialogFragment() {
     private val header by lazy { str(args.StringNavArgHeader) }
 
     private val viewModel by viewModels<OnlineFileViewModel> {
-        InjectorUtils.provideOnlineViewModel(requireContext(), fileUrl, alternateUrl, header)
+        Inject.onlineFileViewModel(requireContext(), fileUrl, alternateUrl, header)
     }
 
     /**

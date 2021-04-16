@@ -8,8 +8,8 @@ import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.OptionsUiState
-import io.github.sds100.keymapper.mappings.common.OptionsViewModel
+import io.github.sds100.keymapper.mappings.OptionsUiState
+import io.github.sds100.keymapper.mappings.OptionsViewModel
 import io.github.sds100.keymapper.ui.CheckBoxListItem
 import io.github.sds100.keymapper.ui.ListItem
 import io.github.sds100.keymapper.ui.RadioButtonTripleListItem

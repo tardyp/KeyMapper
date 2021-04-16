@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.actions.Action
@@ -10,13 +10,13 @@ import io.github.sds100.keymapper.domain.utils.ifIsData
 import io.github.sds100.keymapper.domain.utils.moveElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import timber.log.Timber
 
 /**
  * Created by sds100 on 04/04/2021.
  */
 
-abstract class BaseConfigMappingUseCase<ACTION : Action, T : Mapping<ACTION>> : ConfigMappingUseCase<ACTION, T> {
+abstract class BaseConfigMappingUseCase<ACTION : Action, T : Mapping<ACTION>> :
+    ConfigMappingUseCase<ACTION, T> {
 
     override val mapping = MutableStateFlow<State<T>>(State.Loading)
 

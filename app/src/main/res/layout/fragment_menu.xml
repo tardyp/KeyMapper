@@ -107,39 +107,9 @@
             android:layout_marginEnd="8dp"
             android:onClick="@{() -> viewModel.onBackupAllClick()}"
             android:text="@string/action_backup_everything"
-            app:layout_constraintBottom_toTopOf="@id/buttonEnableAll"
+            app:layout_constraintBottom_toTopOf="@id/buttonToggleKeymaps"
             app:layout_constraintEnd_toStartOf="@id/buttonRestore"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonEnableAll"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:onClick="@{() -> viewModel.onEnableAllClick()}"
-            android:text="@string/action_enable_all_keymaps"
-            android:textColor="@color/greenVibrant"
-            app:layout_constraintBottom_toTopOf="@id/buttonToggleKeymaps"
-            app:layout_constraintEnd_toStartOf="@+id/buttonDisableAll"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonDisableAll"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            android:onClick="@{() -> viewModel.onDisableAllClick()}"
-            android:text="@string/action_disable_all_keymaps"
-            android:textColor="@color/red"
-            app:layout_constraintBottom_toTopOf="@id/buttonToggleKeymaps"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonEnableAll" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

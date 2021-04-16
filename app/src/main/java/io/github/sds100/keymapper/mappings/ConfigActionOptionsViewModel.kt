@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.utils.State

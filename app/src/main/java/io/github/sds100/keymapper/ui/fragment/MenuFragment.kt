@@ -1,7 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment
 
-import android.content.*
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,21 +12,17 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.github.sds100.keymapper.NavAppDirections
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.HomeMenuViewModel
 import io.github.sds100.keymapper.data.viewmodel.HomeViewModel
 import io.github.sds100.keymapper.databinding.FragmentMenuBinding
-import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.showUserResponseRequests
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import splitties.alertdialog.appcompat.*
 
 class MenuFragment : BottomSheetDialogFragment() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
-        InjectorUtils.provideHomeViewModel(requireContext())
+        Inject.homeViewModel(requireContext())
     }
 
     private val viewModel: HomeMenuViewModel

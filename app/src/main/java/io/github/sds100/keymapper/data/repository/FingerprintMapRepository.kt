@@ -14,9 +14,6 @@ interface FingerprintMapRepository {
 
     fun enableFingerprintMap(id: String)
     fun disableFingerprintMap(id: String)
-    fun enableAll()
-    fun disableAll()
-
     fun update(id: String, fingerprintMap: FingerprintMapEntity)
 
     suspend fun restore(id: String, fingerprintMapJson: String)

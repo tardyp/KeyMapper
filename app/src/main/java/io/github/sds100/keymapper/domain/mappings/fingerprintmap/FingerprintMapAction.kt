@@ -6,8 +6,7 @@ import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ActionDataEntityMapper
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.mappings.common.isDelayBeforeNextActionAllowed
+import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable
 import splitties.bitflags.hasFlag

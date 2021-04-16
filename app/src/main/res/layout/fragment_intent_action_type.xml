@@ -29,7 +29,7 @@
 
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.IntentActionTypeViewModel" />
+            type="io.github.sds100.keymapper.data.viewmodel.ConfigIntentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

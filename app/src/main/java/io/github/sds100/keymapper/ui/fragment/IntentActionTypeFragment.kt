@@ -19,7 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.viewmodel.IntentActionTypeViewModel
+import io.github.sds100.keymapper.data.viewmodel.ConfigIntentViewModel
 import io.github.sds100.keymapper.databinding.FragmentIntentActionTypeBinding
 import io.github.sds100.keymapper.databinding.ListItemIntentExtraBoolBinding
 import io.github.sds100.keymapper.intentExtraBool
@@ -63,8 +63,8 @@ class IntentActionTypeFragment : Fragment() {
         )
     }
 
-    private val viewModel: IntentActionTypeViewModel by activityViewModels {
-        InjectorUtils.provideIntentActionTypeViewModel()
+    private val viewModel: ConfigIntentViewModel by activityViewModels {
+        Inject.configIntentViewModel()
     }
 
     /**

@@ -37,7 +37,7 @@ class PickDisplayCoordinateFragment : Fragment() {
     }
 
     private val viewModel: PickDisplayCoordinateViewModel by activityViewModels {
-        InjectorUtils.provideTapCoordinateActionTypeViewModel(requireContext())
+        Inject.tapCoordinateActionTypeViewModel(requireContext())
     }
 
     private val screenshotLauncher =

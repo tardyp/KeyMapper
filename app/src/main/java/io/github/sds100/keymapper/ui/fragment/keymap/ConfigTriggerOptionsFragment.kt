@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerOptionsV
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredSlider
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.UrlUtils
 import io.github.sds100.keymapper.util.str
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +31,7 @@ class ConfigTriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
     )
 
     private val configKeyMapViewModel: ConfigKeyMapViewModel by navGraphViewModels(R.id.nav_config_keymap) {
-        InjectorUtils.provideConfigKeyMapViewModel(requireContext())
+        Inject.configKeyMapViewModel(requireContext())
     }
 
     private val viewModel: ConfigKeyMapTriggerOptionsViewModel

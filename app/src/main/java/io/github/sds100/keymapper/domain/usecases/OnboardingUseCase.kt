@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.map
 /**
  * Created by sds100 on 14/02/21.
  */
-//TODO delete. move stuff to other view models
 class OnboardingUseCaseImpl(
     private val preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository, OnboardingUseCase {

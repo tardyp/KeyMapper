@@ -30,7 +30,7 @@ class SystemActionListFragment : SimpleRecyclerViewFragment<ListItem>() {
     }
 
     private val viewModel: SystemActionListViewModel by activityViewModels {
-        InjectorUtils.provideSystemActionListViewModel(requireContext())
+        Inject.systemActionListViewModel(requireContext())
     }
 
     override var searchStateKey: String? = SEARCH_STATE_KEY

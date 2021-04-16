@@ -9,8 +9,8 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKey
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.utils.*
-import io.github.sds100.keymapper.mappings.common.BaseConfigMappingUseCase
-import io.github.sds100.keymapper.mappings.common.ConfigMappingUseCase
+import io.github.sds100.keymapper.mappings.BaseConfigMappingUseCase
+import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 import io.github.sds100.keymapper.util.KeyEventUtils
 
 /**

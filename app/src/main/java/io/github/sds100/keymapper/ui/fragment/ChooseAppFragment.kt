@@ -9,7 +9,7 @@ import io.github.sds100.keymapper.data.viewmodel.ChooseAppViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseAppBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.util.InjectorUtils
+import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -28,7 +28,7 @@ class ChooseAppFragment : RecyclerViewFragment<AppListItem, FragmentChooseAppBin
     override var requestKey: String? = REQUEST_KEY
 
     private val viewModel: ChooseAppViewModel by activityViewModels {
-        InjectorUtils.provideAppListViewModel(requireContext())
+        Inject.chooseAppViewModel(requireContext())
     }
 
     override val listItems: Flow<ListUiState<AppListItem>>

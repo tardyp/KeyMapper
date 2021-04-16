@@ -20,6 +20,4 @@ interface KeyMapRepository {
     fun duplicate(vararg uid: String)
     fun enableById(vararg uid: String)
     fun disableById(vararg uid: String)
-    fun enableAll()
-    fun disableAll()
 }

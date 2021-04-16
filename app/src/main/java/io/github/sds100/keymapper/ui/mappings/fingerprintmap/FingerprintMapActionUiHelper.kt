@@ -4,7 +4,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplayActionUseCase
+import io.github.sds100.keymapper.mappings.DisplayActionUseCase
 import io.github.sds100.keymapper.ui.actions.BaseActionUiHelper
 
 /**

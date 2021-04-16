@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.ui.fragment.keymap
 
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
@@ -17,7 +16,6 @@ import io.github.sds100.keymapper.ui.fragment.HomeFragmentDirections
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.util.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -27,7 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 class KeymapListFragment : SimpleRecyclerViewFragment<KeyMapListItem>() {
 
     private val homeViewModel: HomeViewModel by activityViewModels {
-        InjectorUtils.provideHomeViewModel(requireContext())
+        Inject.homeViewModel(requireContext())
     }
 
     private val viewModel: KeyMapListViewModel

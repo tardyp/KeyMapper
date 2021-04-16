@@ -4,13 +4,10 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.constraints.Constraint
 import io.github.sds100.keymapper.domain.utils.Orientation
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplayConstraintUseCase
+import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.util.TintType
-import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.handle
-import io.github.sds100.keymapper.util.result.success
-import kotlinx.coroutines.flow.map
 
 /**
  * Created by sds100 on 18/03/2021.

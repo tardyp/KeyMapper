@@ -4,7 +4,9 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.*
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
+import io.github.sds100.keymapper.mappings.Mapping
+import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.IconInfo
 import io.github.sds100.keymapper.ui.actions.ActionUiHelper

@@ -11,14 +11,13 @@ import io.github.sds100.keymapper.util.filterByQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 /**
  * Created by sds100 on 31/03/2020.
  */
 
-class KeyCodeListViewModel : ViewModel() {
+class ChooseKeyCodeViewModel : ViewModel() {
 
     val searchQuery = MutableStateFlow<String?>(null)
 
@@ -53,7 +52,7 @@ class KeyCodeListViewModel : ViewModel() {
     class Factory : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return KeyCodeListViewModel() as T
+            return ChooseKeyCodeViewModel() as T
         }
     }
 }

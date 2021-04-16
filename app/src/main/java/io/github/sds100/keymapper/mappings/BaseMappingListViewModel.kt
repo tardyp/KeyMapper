@@ -1,8 +1,7 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.UserResponseViewModel
 import io.github.sds100.keymapper.ui.UserResponseViewModelImpl

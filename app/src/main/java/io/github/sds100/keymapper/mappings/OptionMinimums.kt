@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 /**
  * Created by sds100 on 12/04/2021.

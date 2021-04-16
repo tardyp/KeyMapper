@@ -109,20 +109,6 @@ class RoomKeyMapRepository(
         }
     }
 
-    override fun enableAll() {
-        coroutineScope.launch {
-            dao.enableAll()
-            requestBackup()
-        }
-    }
-
-    override fun disableAll() {
-        coroutineScope.launch {
-            dao.disableAll()
-            requestBackup()
-        }
-    }
-
     private fun requestBackup() {
         coroutineScope.launch {
             val keyMapList = keyMapList.first { it is State.Data } as State.Data

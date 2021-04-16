@@ -37,7 +37,6 @@ import splitties.bitflags.withFlag
 import splitties.systemservices.displayManager
 import splitties.systemservices.vibrator
 import splitties.toast.toast
-import java.lang.Exception
 
 /**
  * Created by sds100 on 05/04/2020.
@@ -205,7 +204,7 @@ class MyAccessibilityService : AccessibilityService(),
         lifecycleRegistry = LifecycleRegistry(this)
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
-        actionPerformerDelegate = InjectorUtils.providePerformActionsDelegate(this)
+        actionPerformerDelegate = Inject.performActionsDelegate(this)
 
         IntentFilter().apply {
             addAction(ACTION_SHOW_KEYBOARD)
@@ -247,7 +246,7 @@ class MyAccessibilityService : AccessibilityService(),
             }
         }
 
-        controller = InjectorUtils.provideAccessibilityServiceController(this)
+        controller = Inject.accessibilityServiceController(this)
 
         controller.eventStream.observe(this, Observer {
             onControllerEvent(it)

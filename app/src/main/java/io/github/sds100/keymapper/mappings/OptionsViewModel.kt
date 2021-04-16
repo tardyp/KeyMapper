@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.mappings.common
+package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.domain.utils.Defaultable
 import io.github.sds100.keymapper.ui.ListItem

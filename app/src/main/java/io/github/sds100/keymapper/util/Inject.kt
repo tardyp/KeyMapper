@@ -5,16 +5,24 @@ import io.github.sds100.keymapper.KeyMapperApp
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCaseImpl
+import io.github.sds100.keymapper.backup.BackupRestoreMappingsUseCaseImpl
 import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
-import io.github.sds100.keymapper.domain.mappings.keymap.*
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.*
-import io.github.sds100.keymapper.home.HomeScreenUseCaseImpl
+import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCaseImpl
+import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ListFingerprintMapsUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.onboarding.AppIntroSlide
-import io.github.sds100.keymapper.onboarding.AppIntroUseCase
 import io.github.sds100.keymapper.onboarding.AppIntroUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.service.AccessibilityServiceController
@@ -27,33 +35,32 @@ import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
  * Created by sds100 on 26/01/2020.
  */
 
-//TODO rename to Inject. remove provide prefix from functions
-object InjectorUtils {
+object Inject {
 
-    fun provideAppListViewModel(context: Context): ChooseAppViewModel.Factory {
+    fun chooseAppViewModel(context: Context): ChooseAppViewModel.Factory {
         return ChooseAppViewModel.Factory(
             UseCases.displayPackages(context)
         )
     }
 
-    fun provideAppShortcutListViewModel(context: Context): ChooseAppShortcutViewModel.Factory {
+    fun chooseAppShortcutViewModel(context: Context): ChooseAppShortcutViewModel.Factory {
         return ChooseAppShortcutViewModel.Factory(
-           DisplayAppShortcutsUseCaseImpl(
-               ServiceLocator.appShortcutAdapter(context)
-           ),
+            DisplayAppShortcutsUseCaseImpl(
+                ServiceLocator.appShortcutAdapter(context)
+            ),
             ServiceLocator.resourceProvider(context)
         )
     }
 
-    fun provideChooseConstraintListViewModel(ctx: Context): ChooseConstraintViewModel.Factory {
+    fun chooseConstraintListViewModel(ctx: Context): ChooseConstraintViewModel.Factory {
         return ChooseConstraintViewModel.Factory(ServiceLocator.resourceProvider(ctx))
     }
 
-    fun provideKeyActionTypeViewModel(): KeyActionTypeViewModel.Factory {
+    fun keyActionTypeViewModel(): KeyActionTypeViewModel.Factory {
         return KeyActionTypeViewModel.Factory()
     }
 
-    fun provideKeyEventActionTypeViewModel(
+    fun configKeyEventViewModel(
         context: Context
     ): ConfigKeyEventViewModel.Factory {
         return ConfigKeyEventViewModel.Factory(
@@ -62,29 +69,29 @@ object InjectorUtils {
         )
     }
 
-    fun provideKeycodeListViewModel(): KeyCodeListViewModel.Factory {
-        return KeyCodeListViewModel.Factory()
+    fun chooseKeyCodeViewModel(): ChooseKeyCodeViewModel.Factory {
+        return ChooseKeyCodeViewModel.Factory()
     }
 
-    fun provideIntentActionTypeViewModel(): IntentActionTypeViewModel.Factory {
-        return IntentActionTypeViewModel.Factory()
+    fun configIntentViewModel(): ConfigIntentViewModel.Factory {
+        return ConfigIntentViewModel.Factory()
     }
 
-    fun provideTextBlockActionTypeViewModel(): TextBlockActionTypeViewModel.Factory {
+    fun textBlockActionTypeViewModel(): TextBlockActionTypeViewModel.Factory {
         return TextBlockActionTypeViewModel.Factory()
     }
 
-    fun provideUrlActionTypeViewModel(): UrlActionTypeViewModel.Factory {
+    fun urlActionTypeViewModel(): UrlActionTypeViewModel.Factory {
         return UrlActionTypeViewModel.Factory()
     }
 
-    fun provideTapCoordinateActionTypeViewModel(context: Context): PickDisplayCoordinateViewModel.Factory {
+    fun tapCoordinateActionTypeViewModel(context: Context): PickDisplayCoordinateViewModel.Factory {
         return PickDisplayCoordinateViewModel.Factory(
             ServiceLocator.resourceProvider(context)
         )
     }
 
-    fun provideSystemActionListViewModel(ctx: Context): SystemActionListViewModel.Factory {
+    fun systemActionListViewModel(ctx: Context): SystemActionListViewModel.Factory {
         return SystemActionListViewModel.Factory(
             CreateSystemActionUseCaseImpl(
                 ServiceLocator.systemFeatureAdapter(ctx),
@@ -96,7 +103,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideUnsupportedActionListViewModel(
+    fun unsupportedActionListViewModel(
         context: Context
     ): UnsupportedActionListViewModel.Factory {
         return UnsupportedActionListViewModel.Factory(
@@ -105,15 +112,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideFingerprintActionOptionsViewModel(): FingerprintActionOptionsViewModel.Factory {
-        return FingerprintActionOptionsViewModel.Factory()
-    }
-
-    fun provideTriggerKeyOptionsViewModel(): TriggerKeyOptionsViewModel.Factory {
-        return TriggerKeyOptionsViewModel.Factory()
-    }
-
-    fun provideOnlineViewModel(
+    fun onlineFileViewModel(
         context: Context,
         fileUrl: String,
         alternateUrl: String? = null,
@@ -127,10 +126,11 @@ object InjectorUtils {
         )
     }
 
-    fun provideConfigKeyMapViewModel(
+    fun configKeyMapViewModel(
         ctx: Context
     ): ConfigKeyMapViewModel.Factory {
-        val configKeymapUseCase = ConfigKeyMapUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx))
+        val configKeymapUseCase =
+            ConfigKeyMapUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx))
 
         return ConfigKeyMapViewModel.Factory(
             SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
@@ -145,7 +145,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideConfigFingerprintMapViewModel(
+    fun configFingerprintMapViewModel(
         ctx: Context
     ): ConfigFingerprintMapViewModel.Factory {
         val configUseCase = ConfigFingerprintMapUseCaseImpl()
@@ -160,7 +160,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideCreateActionShortcutViewModel(
+    fun createActionShortcutViewModel(
         context: Context
     ): CreateKeymapShortcutViewModel.Factory {
         return CreateKeymapShortcutViewModel.Factory(
@@ -169,25 +169,39 @@ object InjectorUtils {
         )
     }
 
-    fun provideHomeViewModel(ctx: Context): HomeViewModel.Factory {
+    fun homeViewModel(ctx: Context): HomeViewModel.Factory {
         return HomeViewModel.Factory(
-            HomeScreenUseCaseImpl(
-                keyMapRepository = ServiceLocator.roomKeymapRepository(ctx),
-                fingerprintMapRepository = ServiceLocator.fingerprintMapRepository(ctx),
-                preferenceRepository = ServiceLocator.preferenceRepository(ctx),
-                serviceAdapter = ServiceLocator.serviceAdapter(ctx),
-                permissionAdapter = ServiceLocator.permissionAdapter(ctx),
-                displayKeyMapUseCase = UseCases.displayKeyMap(ctx),
-                displaySimpleMappingUseCase = UseCases.displaySimpleMapping(ctx),
-                inputMethodAdapter = ServiceLocator.inputMethodAdapter(ctx),
-                backupManager = ServiceLocator.backupManager(ctx)
+            ListKeyMapsUseCaseImpl(
+                ServiceLocator.roomKeymapRepository(ctx),
+                ServiceLocator.backupManager(ctx),
+                UseCases.displayKeyMap(ctx)
+            ),
+            ListFingerprintMapsUseCaseImpl(
+                ServiceLocator.fingerprintMapRepository(ctx),
+                ServiceLocator.backupManager(ctx),
+                ServiceLocator.preferenceRepository(ctx),
+                UseCases.displaySimpleMapping(ctx)
+            ),
+            UseCases.pauseMappings(ctx),
+            BackupRestoreMappingsUseCaseImpl(
+                ServiceLocator.roomKeymapRepository(ctx),
+                ServiceLocator.fingerprintMapRepository(ctx),
+                ServiceLocator.backupManager(ctx)
+            ),
+            ShowHomeScreenAlertsUseCaseImpl(
+                ServiceLocator.preferenceRepository(ctx),
+                ServiceLocator.permissionAdapter(ctx),
+                ServiceLocator.serviceAdapter(ctx)
+            ),
+            ShowInputMethodPickerUseCaseImpl(
+                ServiceLocator.inputMethodAdapter(ctx)
             ),
             UseCases.onboarding(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
     }
 
-    fun provideApplicationViewModel(context: Context): ApplicationViewModel {
+    fun keyMapperAppViewModel(context: Context): ApplicationViewModel {
         val preferenceRepository = ServiceLocator.preferenceRepository(context)
         val keyboardController = ServiceLocator.inputMethodAdapter(context)
         val bluetoothMonitor = ServiceLocator.bluetoothMonitor(context)
@@ -206,13 +220,16 @@ object InjectorUtils {
         )
     }
 
-    fun provideSettingsViewModel(context: Context): SettingsViewModel.Factory {
+    fun settingsViewModel(context: Context): SettingsViewModel.Factory {
         return SettingsViewModel.Factory(
             ConfigSettingsUseCaseImpl(ServiceLocator.preferenceRepository(context))
         )
     }
 
-    fun provideAppIntroViewModel(context: Context, slides: List<AppIntroSlide>): AppIntroViewModel.Factory {
+    fun appIntroViewModel(
+        context: Context,
+        slides: List<AppIntroSlide>
+    ): AppIntroViewModel.Factory {
         return AppIntroViewModel.Factory(
             AppIntroUseCaseImpl(
                 ServiceLocator.permissionAdapter(context),
@@ -226,7 +243,7 @@ object InjectorUtils {
         )
     }
 
-    fun providePerformActionsDelegate(service: MyAccessibilityService): ActionPerformerDelegate {
+    fun performActionsDelegate(service: MyAccessibilityService): ActionPerformerDelegate {
         return ActionPerformerDelegate(
             context = service,
             iAccessibilityService = service,
@@ -236,7 +253,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideAccessibilityServiceController(service: MyAccessibilityService)
+    fun accessibilityServiceController(service: MyAccessibilityService)
         : AccessibilityServiceController {
         val preferenceRepository = ServiceLocator.preferenceRepository(service)
 
@@ -259,7 +276,7 @@ object InjectorUtils {
         )
     }
 
-    fun provideChooseBluetoothDevicesViewModel(ctx: Context): ChooseBluetoothDeviceViewModel.Factory{
+    fun chooseBluetoothDeviceViewModel(ctx: Context): ChooseBluetoothDeviceViewModel.Factory {
         return ChooseBluetoothDeviceViewModel.Factory(
             ChooseBluetoothDeviceUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx)),
             ServiceLocator.resourceProvider(ctx)

@@ -4,9 +4,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.viewmodel.ChooseBluetoothDeviceViewModel
-import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.devices.BluetoothDeviceInfo
 import io.github.sds100.keymapper.simple
@@ -27,7 +25,7 @@ class ChooseBluetoothDeviceFragment : SimpleRecyclerViewFragment<BluetoothDevice
     }
 
     private val viewModel: ChooseBluetoothDeviceViewModel by viewModels {
-        InjectorUtils.provideChooseBluetoothDevicesViewModel(requireContext())
+        Inject.chooseBluetoothDeviceViewModel(requireContext())
     }
 
     override var requestKey: String? = REQUEST_KEY

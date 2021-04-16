@@ -5,8 +5,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.common.DisplaySimpleMappingUseCase
-import io.github.sds100.keymapper.ui.ChipUi
+import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.ui.mappings.common.BaseMappingListItemCreator
 
 /**

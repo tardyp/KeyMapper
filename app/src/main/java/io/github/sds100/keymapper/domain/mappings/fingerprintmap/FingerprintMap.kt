@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.data.model.getData
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper
-import io.github.sds100.keymapper.mappings.common.Mapping
+import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable
 import splitties.bitflags.hasFlag

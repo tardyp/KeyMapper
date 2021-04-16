@@ -4,9 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.backup.BackupRestoreMappingsUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.home.HomeScreenUseCase
+import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCase
+import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCase
+import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ListFingerprintMapsUseCase
+import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCase
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.DialogResponse
 import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
@@ -20,13 +25,17 @@ import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Created by sds100 on 18/01/21.
  */
 class HomeViewModel(
-    private val useCase: HomeScreenUseCase,
+    private val listKeyMaps: ListKeyMapsUseCase,
+    private val listFingerprintMaps: ListFingerprintMapsUseCase,
+    private val pauseMappings: PauseMappingsUseCase,
+    private val backupRestore: BackupRestoreMappingsUseCase,
+    private val showAlertsUseCase: ShowHomeScreenAlertsUseCase,
+    private val showImePicker: ShowInputMethodPickerUseCase,
     private val onboarding: OnboardingUseCase,
     resourceProvider: ResourceProvider,
 ) : ViewModel(),
@@ -40,18 +49,25 @@ class HomeViewModel(
 
     private val multiSelectProvider: MultiSelectProvider = MultiSelectProviderImpl()
 
-    val menuViewModel = HomeMenuViewModel(viewModelScope, useCase, resourceProvider)
+    val menuViewModel = HomeMenuViewModel(
+        viewModelScope,
+        showAlertsUseCase,
+        pauseMappings,
+        backupRestore,
+        showImePicker,
+        resourceProvider
+    )
 
     val keymapListViewModel = KeyMapListViewModel(
         viewModelScope,
-        useCase,
+        listKeyMaps,
         resourceProvider,
         multiSelectProvider
     )
 
     val fingerprintMapListViewModel = FingerprintMapListViewModel(
         viewModelScope,
-        useCase,
+        listFingerprintMaps,
         resourceProvider
     )
 
@@ -60,10 +76,6 @@ class HomeViewModel(
 
     private val _openSettings = MutableSharedFlow<Unit>()
     val openSettings = _openSettings.asSharedFlow()
-
-    private val isBatteryOptimised = useCase.invalidateErrors.map {
-        useCase.isBatteryOptimised()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, useCase.isBatteryOptimised())
 
     val onboardingState = combine(
         onboarding.showGuiKeyboardAdFlow,
@@ -96,13 +108,13 @@ class HomeViewModel(
     val tabsState =
         combine(
             multiSelectProvider.state,
-            useCase.areFingerprintGesturesSupported
-        ) { selectionState, areFingerprintGesturesSupported ->
+            listFingerprintMaps.showFingerprintMaps
+        ) { selectionState, showFingerprintMaps ->
 
             val tabs = sequence {
                 yield(HomeTab.KEY_EVENTS)
 
-                if (areFingerprintGesturesSupported) {
+                if (showFingerprintMaps) {
                     yield(HomeTab.FINGERPRINT_MAPS)
                 }
             }.toSet()
@@ -142,9 +154,9 @@ class HomeViewModel(
     )
 
     val errorListState = combine(
-        isBatteryOptimised,
-        useCase.isAccessibilityServiceEnabled,
-        useCase.hideHomeScreenAlerts
+        showAlertsUseCase.isBatteryOptimised,
+        showAlertsUseCase.isAccessibilityServiceEnabled,
+        showAlertsUseCase.hideAlerts
     ) { isBatteryOptimised, isServiceEnabled, isHidden ->
         val listItems = sequence {
             if (isServiceEnabled) {
@@ -187,7 +199,7 @@ class HomeViewModel(
 
     init {
         viewModelScope.launch {
-            useCase.onBackupResult.collectLatest { result ->
+            backupRestore.onBackupResult.collectLatest { result ->
                 when (result) {
                     is Success -> {
                         getUserResponse(
@@ -208,7 +220,7 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
-            useCase.onRestoreResult.collectLatest { result ->
+            backupRestore.onRestoreResult.collectLatest { result ->
                 when (result) {
                     is Success -> {
                         getUserResponse(
@@ -229,8 +241,7 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
-            useCase.onAutomaticBackupResult.collectLatest { result ->
-                Timber.e("automatic backup $result")
+            backupRestore.onAutomaticBackupResult.collectLatest { result ->
                 when (result) {
                     is Success -> {
                         getUserResponse(
@@ -259,11 +270,17 @@ class HomeViewModel(
         }
     }
 
-    fun approvedGuiKeyboardAd() = run { onboarding.shownGuiKeyboardAd() }
+    fun approvedGuiKeyboardAd() {
+        onboarding.shownGuiKeyboardAd()
+    }
 
-    fun approvedWhatsNew() = onboarding.showedOnboardingAfterUpdateHomeScreen()
+    fun approvedWhatsNew() {
+        onboarding.showedOnboardingAfterUpdateHomeScreen()
+    }
 
-    fun approvedQuickStartGuideTapTarget() = onboarding.shownQuickStartGuideHint()
+    fun approvedQuickStartGuideTapTarget() {
+        onboarding.shownQuickStartGuideHint()
+    }
 
     fun onAppBarNavigationButtonClick() {
         viewModelScope.launch {
@@ -290,7 +307,7 @@ class HomeViewModel(
             if (multiSelectProvider.state.value is SelectionState.Selecting) {
                 multiSelectProvider.state.value.apply {
                     if (this is SelectionState.Selecting) {
-                        useCase.deleteKeyMap(*selectedIds.toTypedArray())
+                        listKeyMaps.deleteKeyMap(*selectedIds.toTypedArray())
                     }
                 }
                 multiSelectProvider.stopSelecting()
@@ -307,26 +324,26 @@ class HomeViewModel(
     fun onEnableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            useCase.enableKeyMap(*selectedIds.toTypedArray())
+            listKeyMaps.enableKeyMap(*selectedIds.toTypedArray())
         }
     }
 
     fun onDisableSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            useCase.disableKeyMap(*selectedIds.toTypedArray())
+            listKeyMaps.disableKeyMap(*selectedIds.toTypedArray())
         }
     }
 
     fun onDuplicateSelectedKeymapsClick() {
         multiSelectProvider.state.value.apply {
             if (this !is SelectionState.Selecting) return
-            useCase.duplicateKeyMap(*selectedIds.toTypedArray())
+            listKeyMaps.duplicateKeyMap(*selectedIds.toTypedArray())
         }
     }
 
     fun backupFingerprintMaps(uri: String) {
-        useCase.backupFingerprintMaps(uri)
+        listFingerprintMaps.backupFingerprintMaps(uri)
     }
 
     fun backupSelectedKeyMaps(uri: String) {
@@ -337,7 +354,7 @@ class HomeViewModel(
 
             val selectedIds = selectionState.selectedIds
 
-            useCase.backupKeyMaps(*selectedIds.toTypedArray(), uri = uri)
+            listKeyMaps.backupKeyMaps(*selectedIds.toTypedArray(), uri = uri)
 
             multiSelectProvider.stopSelecting()
         }
@@ -346,21 +363,35 @@ class HomeViewModel(
     fun onFixErrorListItemClick(id: String) {
         viewModelScope.launch {
             when (id) {
-                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> useCase.enableAccessibilityService()
-                ID_BATTERY_OPTIMISATION_LIST_ITEM -> useCase.ignoreBatteryOptimisation()
+                ID_ACCESSIBILITY_SERVICE_LIST_ITEM -> showAlertsUseCase.enableAccessibilityService()
+                ID_BATTERY_OPTIMISATION_LIST_ITEM -> showAlertsUseCase.disableBatteryOptimisation()
             }
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val useCase: HomeScreenUseCase,
+        private val listKeyMaps: ListKeyMapsUseCase,
+        private val listFingerprintMaps: ListFingerprintMapsUseCase,
+        private val pauseMappings: PauseMappingsUseCase,
+        private val backupRestore: BackupRestoreMappingsUseCase,
+        private val showAlertsUseCase: ShowHomeScreenAlertsUseCase,
+        private val showImePicker: ShowInputMethodPickerUseCase,
         private val onboarding: OnboardingUseCase,
         private val resourceProvider: ResourceProvider,
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return HomeViewModel(useCase, onboarding, resourceProvider) as T
+            return HomeViewModel(
+                listKeyMaps,
+                listFingerprintMaps,
+                pauseMappings,
+                backupRestore,
+                showAlertsUseCase,
+                showImePicker,
+                onboarding,
+                resourceProvider
+            ) as T
         }
     }
 }

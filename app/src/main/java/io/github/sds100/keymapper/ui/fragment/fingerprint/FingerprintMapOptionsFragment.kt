@@ -1,32 +1,17 @@
 package io.github.sds100.keymapper.ui.fragment.fingerprint
 
-import android.content.ClipData
 import androidx.navigation.navGraphViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.options.FingerprintMapOptions
-import io.github.sds100.keymapper.data.model.options.OptionsListModel
-import io.github.sds100.keymapper.data.viewmodel.BaseOptionsViewModel
-import io.github.sds100.keymapper.databinding.FragmentRecyclerviewBinding
-import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapActionOptionsViewModel
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapOptionsViewModel
-import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.fragment.DefaultRecyclerViewFragment
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerOptionsViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredSlider
 import io.github.sds100.keymapper.util.FragmentInfo
-import io.github.sds100.keymapper.util.InjectorUtils
-import io.github.sds100.keymapper.util.UrlUtils
-import io.github.sds100.keymapper.util.delegate.ModelState
-import io.github.sds100.keymapper.util.str
+import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.Flow
-import splitties.systemservices.clipboardManager
-import splitties.toast.toast
 
 /**
  * Created by sds100 on 29/11/20.
@@ -40,7 +25,7 @@ class FingerprintMapOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
     )
 
     private val configViewModel: ConfigFingerprintMapViewModel by navGraphViewModels(R.id.nav_config_fingerprint_map) {
-        InjectorUtils.provideConfigFingerprintMapViewModel(requireContext())
+        Inject.configFingerprintMapViewModel(requireContext())
     }
 
     private val viewModel: ConfigFingerprintMapOptionsViewModel
