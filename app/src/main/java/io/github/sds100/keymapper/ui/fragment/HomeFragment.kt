@@ -225,28 +225,14 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            homeViewModel.onboardingState.collectLatest {
-                if (it.showQuickStartGuideTapTarget) {
-                    if (quickStartGuideTapTarget?.state != MaterialTapTargetPrompt.STATE_REVEALED) {
-                        quickStartGuideTapTarget?.dismiss()
+            homeViewModel.showQuickStartGuideHint.collectLatest {show ->
+                if (show && quickStartGuideTapTarget?.state != MaterialTapTargetPrompt.STATE_REVEALED) {
+                    quickStartGuideTapTarget?.dismiss()
 
-                        delay(200)
-
-                        quickStartGuideTapTarget =
-                            QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
-                                homeViewModel.approvedQuickStartGuideTapTarget()
-                            }
-                    }
-                }
-
-                if (it.showWhatsNew) {
-                    val direction = NavAppDirections.actionGlobalOnlineFileFragment(
-                        R.string.whats_new,
-                        R.string.url_changelog
-                    )
-                    findNavController().navigate(direction)
-
-                    homeViewModel.approvedWhatsNew()
+                    quickStartGuideTapTarget =
+                        QuickStartGuideTapTarget().show(this@HomeFragment, R.id.action_help) {
+                            homeViewModel.approvedQuickStartGuideTapTarget()
+                        }
                 }
             }
         }

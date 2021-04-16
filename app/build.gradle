@@ -66,6 +66,8 @@ android {
     kapt {
         correctErrorTypes = true
     }
+
+    kotlinOptions.useIR = true
 }
 
 android.sourceSets {

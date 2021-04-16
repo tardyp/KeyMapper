@@ -55,7 +55,6 @@ data class ImitateButtonPress(
 ) : Event()
 
 class ChoosePackage : Event()
-class ChooseBluetoothDevice : Event()
 class OpenUrl(val url: String) : Event()
 class OpenUrlRes(@StringRes val url: Int) : Event()
 class CloseDialog : Event()
@@ -127,29 +126,8 @@ class EditActionOptions(val options: BaseOptions<ActionEntity>) : Event()
 class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)
 class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
-//fingerprint gesture maps
-class BuildFingerprintMapModels(
-    val maps: Map<String, FingerprintMapEntity>,
-    val deviceInfoList: List<DeviceInfoEntity>,
-    val hasRootPermission: Boolean,
-    val showDeviceDescriptors: Boolean
-) : Event()
-
-class BackupFingerprintMaps : Event()
-class RequestFingerprintMapReset : Event()
-
-//menu
-class OpenSettings : Event()
-class OpenAbout : Event()
-class ChooseKeyboard : Event()
-class SendFeedback : Event()
-class EnableAccessibilityService : Event()
-
 //notifications
 object ShowFingerprintFeatureNotification : Event(), UpdateNotificationEvent
 object DismissFingerprintFeatureNotification : Event(), UpdateNotificationEvent
 class DismissNotification(val id: Int) : Event(), UpdateNotificationEvent
 interface UpdateNotificationEvent
-
-//home
-object ShowWhatsNewEvent : Event()

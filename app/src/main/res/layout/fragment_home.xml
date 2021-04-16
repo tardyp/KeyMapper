@@ -76,7 +76,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="@{getNewGuiKeyboard}"
-                android:visibility="@{viewModel.onboardingState.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.showGuiKeyboardAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardViewRecyclerViewErrors"

@@ -15,6 +15,7 @@ import io.github.sds100.keymapper.ui.utils.SnackBarUtils
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 /**
  * Created by sds100 on 23/03/2021.
@@ -26,9 +27,12 @@ class UserResponseViewModelImpl : UserResponseViewModel {
     override val onUserResponse = _onUserResponse.asSharedFlow()
 
     private val _getUserResponse = MutableSharedFlow<RequestUserResponseEvent>()
-    override val requestUserResponse = _getUserResponse.asSharedFlow()
+    override val getUserResponse = _getUserResponse.asSharedFlow()
 
     override suspend fun getUserResponse(event: RequestUserResponseEvent) {
+        //wait for the view to collect so no dialogs are missed
+        _getUserResponse.subscriptionCount.first { it > 0 }
+
         _getUserResponse.emit(event)
     }
 
@@ -38,7 +42,7 @@ class UserResponseViewModelImpl : UserResponseViewModel {
 }
 
 interface UserResponseViewModel {
-    val requestUserResponse: SharedFlow<RequestUserResponseEvent>
+    val getUserResponse: SharedFlow<RequestUserResponseEvent>
     val onUserResponse: SharedFlow<UserResponseEvent>
 
     suspend fun getUserResponse(event: RequestUserResponseEvent)
@@ -60,7 +64,7 @@ suspend inline fun <reified R : UserResponse> UserResponseViewModel.getUserRespo
     dialog is shown with the same key
      */
     return merge(
-        requestUserResponse.dropWhile { it.key != key }.map { null },
+        getUserResponse.dropWhile { it.key != key }.map { null },
         onUserResponse.dropWhile { it.response !is R? && it.key != key }.map { it.response }
     ).first() as R?
 }
@@ -73,7 +77,7 @@ fun UserResponseViewModel.showUserResponseRequests(
     val ctx = fragment.requireContext()
 
     lifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-        requestUserResponse.collectLatest { event ->
+        getUserResponse.collectLatest { event ->
             var responded = false
 
             lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {

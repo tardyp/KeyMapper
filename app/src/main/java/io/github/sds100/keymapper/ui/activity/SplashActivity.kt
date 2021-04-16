@@ -20,10 +20,7 @@ class SplashActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val preferenceRepository = ServiceLocator.preferenceRepository(this)
-
-        val shownAppIntro =
-            preferenceRepository.get(Keys.shownAppIntro).map { it ?: false }.firstBlocking()
+        val shownAppIntro = UseCases.onboarding(this).shownAppIntro
 
         val approvedFingerprintGestureFeaturePrompt =
             UseCases.fingerprintGesturesSupported(this).isSupported

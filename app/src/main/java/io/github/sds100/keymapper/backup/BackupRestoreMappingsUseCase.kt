@@ -11,20 +11,8 @@ import kotlinx.coroutines.flow.Flow
  */
 
 class BackupRestoreMappingsUseCaseImpl(
-    private val keyMapRepository: KeyMapRepository,
-    private val fingerprintMapRepository: FingerprintMapRepository,
     private val backupManager: BackupManager,
 ): BackupRestoreMappingsUseCase{
-
-    override fun enableAllMappings() {
-        keyMapRepository.enableAll()
-        fingerprintMapRepository.enableAll()
-    }
-
-    override fun disableAllMappings() {
-        keyMapRepository.disableAll()
-        fingerprintMapRepository.disableAll()
-    }
 
     override val onBackupResult: Flow<Result<*>> = backupManager.onBackupResult
     override val onRestoreResult: Flow<Result<*>> = backupManager.onRestoreResult
@@ -43,9 +31,6 @@ interface BackupRestoreMappingsUseCase {
     val onBackupResult: Flow<Result<*>>
     val onRestoreResult: Flow<Result<*>>
     val onAutomaticBackupResult: Flow<Result<*>>
-
-    fun enableAllMappings()
-    fun disableAllMappings()
     fun backupAllMappings(uri: String)
     fun restoreMappings(uri: String)
 }

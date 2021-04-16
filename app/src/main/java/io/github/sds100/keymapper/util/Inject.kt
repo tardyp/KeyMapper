@@ -183,11 +183,7 @@ object Inject {
                 UseCases.displaySimpleMapping(ctx)
             ),
             UseCases.pauseMappings(ctx),
-            BackupRestoreMappingsUseCaseImpl(
-                ServiceLocator.roomKeymapRepository(ctx),
-                ServiceLocator.fingerprintMapRepository(ctx),
-                ServiceLocator.backupManager(ctx)
-            ),
+            BackupRestoreMappingsUseCaseImpl(ServiceLocator.backupManager(ctx)),
             ShowHomeScreenAlertsUseCaseImpl(
                 ServiceLocator.preferenceRepository(ctx),
                 ServiceLocator.permissionAdapter(ctx),

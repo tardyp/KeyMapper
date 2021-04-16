@@ -48,7 +48,7 @@ class OnboardingUseCaseImpl(
             val oldVersionCode = get(Keys.lastInstalledVersionCodeAccessibilityService)
                 .firstBlocking() ?: -1
 
-            val handledUpdateInHomeScreen = !showOnboardingAfterUpdateHomeScreen.firstBlocking()
+            val handledUpdateInHomeScreen = !showWhatsNew.firstBlocking()
 
             return oldVersionCode < FingerprintMapUtils.FINGERPRINT_GESTURES_MIN_VERSION
                 && !handledUpdateInHomeScreen
@@ -58,10 +58,10 @@ class OnboardingUseCaseImpl(
         set(Keys.lastInstalledVersionCodeAccessibilityService, Constants.VERSION_CODE)
     }
 
-    override val showOnboardingAfterUpdateHomeScreen = get(Keys.lastInstalledVersionCodeHomeScreen)
+    override val showWhatsNew = get(Keys.lastInstalledVersionCodeHomeScreen)
         .map { it ?: -1 < Constants.VERSION_CODE }
 
-    override fun showedOnboardingAfterUpdateHomeScreen() {
+    override fun showedWhatsNew() {
         set(Keys.lastInstalledVersionCodeHomeScreen, Constants.VERSION_CODE)
     }
 
@@ -92,8 +92,8 @@ interface OnboardingUseCase {
     val showFingerprintFeatureNotificationIfAvailable: Boolean
     fun showedFingerprintFeatureNotificationIfAvailable()
 
-    val showOnboardingAfterUpdateHomeScreen: Flow<Boolean>
-    fun showedOnboardingAfterUpdateHomeScreen()
+    val showWhatsNew: Flow<Boolean>
+    fun showedWhatsNew()
 
     val showQuickStartGuideHint: Flow<Boolean>
     fun shownQuickStartGuideHint()

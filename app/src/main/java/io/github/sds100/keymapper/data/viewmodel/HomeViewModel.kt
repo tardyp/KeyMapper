@@ -25,6 +25,7 @@ import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 18/01/21.
@@ -77,13 +78,11 @@ class HomeViewModel(
     private val _openSettings = MutableSharedFlow<Unit>()
     val openSettings = _openSettings.asSharedFlow()
 
-    val onboardingState = combine(
-        onboarding.showGuiKeyboardAdFlow,
-        onboarding.showOnboardingAfterUpdateHomeScreen,
-        onboarding.showQuickStartGuideHint
-    ) { showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint ->
-        HomeOnboardingState(showGuiKeyboardAd, showWhatsNew, showQuickStartGuideHint)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, HomeOnboardingState())
+    val showGuiKeyboardAd: StateFlow<Boolean> =
+        onboarding.showGuiKeyboardAdFlow.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private val _showQuickStartGuideHint = MutableStateFlow(false)
+    val showQuickStartGuideHint = _showQuickStartGuideHint.asStateFlow()
 
     val selectionCountViewState = multiSelectProvider.state.map {
         when (it) {
@@ -268,14 +267,32 @@ class HomeViewModel(
                 }
             }
         }
+
+        combine(
+            onboarding.showWhatsNew,
+            onboarding.showQuickStartGuideHint
+        ) { showWhatsNew, showQuickStartGuideHint ->
+
+            if (showWhatsNew) {
+                val dialog = GetUserResponse.Dialog(
+                    title = getString(R.string.whats_new),
+                    message = "whats new stub. TODO in #649",
+                    positiveButtonText = getString(R.string.pos_ok)
+                )
+
+                getUserResponse("whats-new", dialog) //TODO #649
+                //suspends
+
+                onboarding.showedWhatsNew()
+            }
+
+            _showQuickStartGuideHint.value = showQuickStartGuideHint
+
+        }.launchIn(viewModelScope)
     }
 
     fun approvedGuiKeyboardAd() {
         onboarding.shownGuiKeyboardAd()
-    }
-
-    fun approvedWhatsNew() {
-        onboarding.showedOnboardingAfterUpdateHomeScreen()
     }
 
     fun approvedQuickStartGuideTapTarget() {
@@ -404,12 +421,6 @@ data class SelectionCountViewState(
 enum class HomeAppBarState {
     NORMAL, MULTI_SELECTING
 }
-
-data class HomeOnboardingState(
-    val showGuiKeyboardAd: Boolean = false,
-    val showWhatsNew: Boolean = false,
-    val showQuickStartGuideTapTarget: Boolean = false,
-)
 
 data class HomeTabsState(
     val enableViewPagerSwiping: Boolean = true,
