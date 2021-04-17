@@ -10,10 +10,9 @@ import kotlinx.coroutines.flow.map
 /**
  * Created by sds100 on 14/02/2021.
  */
-class ConfigSettingsUseCaseImpl(private val preferenceRepository: PreferenceRepository) :
-    PreferenceRepository by preferenceRepository, ConfigSettingsUseCase {
-
-    override val hasRootPermission by FlowPrefDelegate(Keys.hasRootPermission, false)
+class ConfigSettingsUseCaseImpl(
+    private val preferenceRepository: PreferenceRepository
+) : ConfigSettingsUseCase {
 
     override fun <T> getPreference(key: Preferences.Key<T>) =
         preferenceRepository.get(key)
@@ -34,7 +33,6 @@ class ConfigSettingsUseCaseImpl(private val preferenceRepository: PreferenceRepo
 }
 
 interface ConfigSettingsUseCase {
-    val hasRootPermission: Flow<Boolean>
     fun <T> getPreference(key: Preferences.Key<T>): Flow<T?>
     fun <T> setPreference(key: Preferences.Key<T>, value: T?)
     val automaticBackupLocation: Flow<String>

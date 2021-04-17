@@ -5,8 +5,10 @@ import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
 import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCaseImpl
-import io.github.sds100.keymapper.domain.permissions.IsAccessibilityServiceEnabledUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
+import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCase
+import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCaseImpl
+import io.github.sds100.keymapper.inputmethod.ToggleCompatibleImeUseCaseImpl
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCaseImpl
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCaseImpl
@@ -14,6 +16,10 @@ import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppsUseCase
 import io.github.sds100.keymapper.packages.DisplayAppsUseCaseImpl
+import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCaseImpl
+import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCase
+import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCaseImpl
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCaseImpl
 
 /**
@@ -69,12 +75,32 @@ object UseCases {
     fun isSystemActionSupported(ctx: Context) =
         IsSystemActionSupportedUseCaseImpl(ServiceLocator.systemFeatureAdapter(ctx))
 
-    fun isAccessibilityServiceEnabled(ctx: Context) =
-        IsAccessibilityServiceEnabledUseCaseImpl(ServiceLocator.serviceAdapter(ctx))
-
-    fun fingerprintGesturesSupported(ctx: Context)=
+    fun fingerprintGesturesSupported(ctx: Context) =
         AreFingerprintGesturesSupportedUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
 
-    fun pauseMappings(ctx: Context)=
+    fun pauseMappings(ctx: Context) =
         PauseMappingsUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
+
+    fun checkRootPermission(ctx: Context): CheckRootPermissionUseCase {
+        return CheckRootPermissionUseCaseImpl(
+            ServiceLocator.preferenceRepository(ctx)
+        )
+    }
+
+    fun showImePicker(ctx: Context): ShowInputMethodPickerUseCase {
+        return ShowInputMethodPickerUseCaseImpl(
+            ServiceLocator.inputMethodAdapter(ctx)
+        )
+    }
+
+    fun controlAccessibilityService(ctx: Context): ControlAccessibilityServiceUseCase {
+        return ControlAccessibilityServiceUseCaseImpl(
+            ServiceLocator.serviceAdapter(ctx)
+        )
+    }
+
+    fun toggleCompatibleIme(ctx: Context) =
+        ToggleCompatibleImeUseCaseImpl(
+            ServiceLocator.inputMethodAdapter(ctx)
+        )
 }

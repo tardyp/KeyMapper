@@ -27,6 +27,7 @@ import io.github.sds100.keymapper.onboarding.AppIntroUseCaseImpl
 import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
+import io.github.sds100.keymapper.ui.NotificationController
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
 import io.github.sds100.keymapper.util.delegate.ActionPerformerDelegate
@@ -187,11 +188,9 @@ object Inject {
             ShowHomeScreenAlertsUseCaseImpl(
                 ServiceLocator.preferenceRepository(ctx),
                 ServiceLocator.permissionAdapter(ctx),
-                ServiceLocator.serviceAdapter(ctx)
+                UseCases.controlAccessibilityService(ctx)
             ),
-            ShowInputMethodPickerUseCaseImpl(
-                ServiceLocator.inputMethodAdapter(ctx)
-            ),
+           UseCases.showImePicker(ctx),
             UseCases.onboarding(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
@@ -218,7 +217,8 @@ object Inject {
 
     fun settingsViewModel(context: Context): SettingsViewModel.Factory {
         return SettingsViewModel.Factory(
-            ConfigSettingsUseCaseImpl(ServiceLocator.preferenceRepository(context))
+            ConfigSettingsUseCaseImpl(ServiceLocator.preferenceRepository(context)),
+            UseCases.checkRootPermission(context)
         )
     }
 

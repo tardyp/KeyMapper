@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.onEach
 /**
  * Created by sds100 on 14/02/2021.
  */
+
+//TODO rename as a controller and remove interface
 class ControlKeyboardOnBluetoothEventUseCaseImpl(
-   private val inputMethodAdapter: InputMethodAdapter,
+    private val inputMethodAdapter: InputMethodAdapter,
     private val preferenceRepository: PreferenceRepository,
     private val bluetoothMonitor: BluetoothMonitor
 ) : PreferenceRepository by preferenceRepository, ControlKeyboardOnBluetoothEventUseCase {
@@ -32,7 +34,7 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
     override fun start(coroutineScope: CoroutineScope) {
         bluetoothMonitor.onDeviceConnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
-                imeManager.chooseCompatibleInputMethod(fromForeground = true)
+                imeManager.chooseCompatibleInputMethod(fromForeground = false)
             }
 
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {

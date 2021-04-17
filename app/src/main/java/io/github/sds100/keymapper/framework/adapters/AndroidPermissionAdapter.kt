@@ -125,7 +125,7 @@ class AndroidPermissionAdapter(
     }
 
     fun onPermissionsChanged() {
-        runBlocking {
+        coroutineScope.launch {
             onPermissionsUpdate.emit(Unit)
         }
     }

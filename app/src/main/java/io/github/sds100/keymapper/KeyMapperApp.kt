@@ -1,41 +1,37 @@
 package io.github.sds100.keymapper
 
-import android.os.Build
+import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
-import io.github.sds100.keymapper.data.repository.AndroidAppRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerController
-import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCase
+import io.github.sds100.keymapper.domain.usecases.ManageNotificationsUseCaseImpl
 import io.github.sds100.keymapper.files.AndroidFileAdapter
 import io.github.sds100.keymapper.framework.adapters.*
+import io.github.sds100.keymapper.inputmethod.ShowHideInputMethodUseCaseImpl
+import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.permissions.Permission
-import io.github.sds100.keymapper.ui.INotificationController
-import io.github.sds100.keymapper.ui.NotificationViewModel
+import io.github.sds100.keymapper.ui.NotificationController
+import io.github.sds100.keymapper.ui.activity.SplashActivity
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
  * Created by sds100 on 19/05/2020.
  */
-class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotificationController {
+class KeyMapperApp : MultiDexApplication() {
     val appCoroutineScope = MainScope()
 
-    val notificationController by lazy {
-        NotificationViewModel(
-            appCoroutineScope,
-            manager = this,
-            ManageNotificationsUseCase(ServiceLocator.preferenceRepository(this)),
-            iNotificationController = this,
-            isServiceEnabled = UseCases.isAccessibilityServiceEnabled(this)
-        )
-    }
+    val notificationAdapter by lazy { AndroidNotificationAdapter(this, appCoroutineScope) }
 
-    val appRepository by lazy { AndroidAppRepository(packageManager) }
+    lateinit var notificationController: NotificationController
+
     val resourceProvider by lazy { ResourceProviderImpl(this) }
 
     val bluetoothMonitor by lazy { AndroidBluetoothMonitor(this, appCoroutineScope) }
@@ -47,7 +43,13 @@ class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotifi
         )
     }
 
-    val inputMethodAdapter by lazy { AndroidInputMethodAdapter(this) }
+    val inputMethodAdapter by lazy {
+        AndroidInputMethodAdapter(
+            this,
+            serviceAdapter,
+            permissionAdapter
+        )
+    }
     val externalDevicesAdapter by lazy {
         AndroidExternalDevicesAdapter(
             this,
@@ -89,7 +91,22 @@ class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotifi
             Timber.plant(Timber.DebugTree())
         }
 
-        initialiseManagers()
+        notificationController = NotificationController(
+            appCoroutineScope,
+            ManageNotificationsUseCaseImpl(
+                ServiceLocator.preferenceRepository(this),
+                notificationAdapter,
+                UseCases.checkRootPermission(this)
+            ),
+            UseCases.pauseMappings(this),
+            UseCases.showImePicker(this),
+            UseCases.controlAccessibilityService(this),
+            UseCases.toggleCompatibleIme(this),
+            ShowHideInputMethodUseCaseImpl(ServiceLocator.serviceAdapter(this)),
+            UseCases.fingerprintGesturesSupported(this),
+            UseCases.onboarding(this),
+            ServiceLocator.resourceProvider(this)
+        )
 
         processLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -97,41 +114,22 @@ class KeyMapperApp : MultiDexApplication(), INotificationManagerWrapper, INotifi
                 //when the user returns to the app let everything know that the permissions could have changed
                 permissionAdapter.onPermissionsChanged()
                 serviceAdapter.updateWhetherServiceIsEnabled()
+                notificationController.onOpenApp()
 
                 if (BuildConfig.DEBUG && permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
                     serviceAdapter.enableService()
                 }
             }
         })
-    }
 
-    override fun showNotification(notification: AppNotification) {
-        NotificationUtils.showNotification(this, notification)
-    }
+        appCoroutineScope.launch {
+            notificationController.openApp.collectLatest {
+                Intent(this@KeyMapperApp, SplashActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
-    override fun dismissNotification(notificationId: Int) {
-        NotificationUtils.dismissNotification(this, notificationId)
-    }
-
-    override fun createChannel(vararg channelId: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationUtils.createChannel(this, *channelId)
+                    startActivity(this)
+                }
+            }
         }
-    }
-
-    override fun deleteChannel(channelId: String) {
-        NotificationUtils.deleteChannel(this, channelId)
-    }
-
-    override fun isAccessibilityServiceEnabled(): Boolean {
-        return AccessibilityUtils.isServiceEnabled(this)
-    }
-
-    override fun haveWriteSecureSettingsPermission(): Boolean {
-        return PermissionUtils.haveWriteSecureSettingsPermission(this)
-    }
-
-    private fun initialiseManagers() {
-        ServiceLocator.backupManager(this)
     }
 }

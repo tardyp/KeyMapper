@@ -111,8 +111,18 @@ data class OnIncrementRecordTriggerTimer(val timeLeft: Int) : Event()
 object OnStoppedRecordingTrigger : Event()
 object OnAccessibilityServiceStarted : Event(), UpdateNotificationEvent
 object OnAccessibilityServiceStopped : Event(), UpdateNotificationEvent
-object OnHideKeyboard : Event(), UpdateNotificationEvent
-object OnShowKeyboard : Event(), UpdateNotificationEvent
+
+@Serializable
+object OnHideKeyboardEvent : Event(), UpdateNotificationEvent
+
+@Serializable
+object OnShowKeyboardEvent : Event(), UpdateNotificationEvent
+
+@Serializable
+object HideKeyboardEvent: Event()
+
+@Serializable
+object ShowKeyboardEvent: Event()
 
 //trigger
 
@@ -127,7 +137,7 @@ class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)
 class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
 //notifications
-object ShowFingerprintFeatureNotification : Event(), UpdateNotificationEvent
-object DismissFingerprintFeatureNotification : Event(), UpdateNotificationEvent
 class DismissNotification(val id: Int) : Event(), UpdateNotificationEvent
+
+//TODO delete
 interface UpdateNotificationEvent

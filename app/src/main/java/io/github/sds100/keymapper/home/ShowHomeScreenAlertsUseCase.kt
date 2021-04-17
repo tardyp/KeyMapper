@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.map
 class ShowHomeScreenAlertsUseCaseImpl(
     private val preferences: PreferenceRepository,
     private val permissions: PermissionAdapter,
-    private val serviceAdapter: ServiceAdapter
+    private val controlService: ControlAccessibilityServiceUseCase
 ) : ShowHomeScreenAlertsUseCase {
     override val hideAlerts: Flow<Boolean> =
         preferences.get(Keys.hideHomeScreenAlerts).map { it ?: false }
@@ -34,9 +35,9 @@ class ShowHomeScreenAlertsUseCaseImpl(
         permissions.request(Permission.IGNORE_BATTERY_OPTIMISATION)
     }
 
-    override val isAccessibilityServiceEnabled: Flow<Boolean> = serviceAdapter.isEnabled
+    override val isAccessibilityServiceEnabled: Flow<Boolean> = controlService.isEnabled
     override fun enableAccessibilityService() {
-        serviceAdapter.enableService()
+        controlService.enable()
     }
 }
 

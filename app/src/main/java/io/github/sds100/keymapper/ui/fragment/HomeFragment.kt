@@ -329,9 +329,6 @@ class HomeFragment : Fragment() {
         ) {
             ServiceLocator.preferenceRepository(requireContext()).set(Keys.showGuiKeyboardAd, false)
         }
-
-        ServiceLocator.notificationController(requireContext())
-            .onEvent(DismissFingerprintFeatureNotification)
     }
 
     override fun onDestroyView() {

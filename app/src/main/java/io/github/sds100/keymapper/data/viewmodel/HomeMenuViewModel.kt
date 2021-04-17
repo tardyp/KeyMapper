@@ -86,7 +86,7 @@ class HomeMenuViewModel(
 
     fun onShowInputMethodPickerClick() {
         runBlocking { _dismiss.emit(Unit) }
-        showImePicker.show()
+        showImePicker.show(fromForeground = true)
     }
 
     fun onOpenSettingsClick() {

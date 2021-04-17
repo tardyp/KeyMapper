@@ -24,6 +24,7 @@ import io.github.sds100.keymapper.util.str
 /**
  * Created by sds100 on 12/06/2020.
  */
+//TODO
 @RequiresApi(Build.VERSION_CODES.N)
 class ToggleKeymapsTile : TileService(), LifecycleOwner {
 
@@ -45,8 +46,8 @@ class ToggleKeymapsTile : TileService(), LifecycleOwner {
             intent ?: return
 
             when (intent.action) {
-                MyAccessibilityService.ACTION_ON_START,
-                MyAccessibilityService.ACTION_ON_STOP -> invalidateTile()
+//                MyAccessibilityService.ACTION_ON_START,
+//                MyAccessibilityService.ACTION_ON_STOP -> invalidateTile()
             }
         }
     }
@@ -58,8 +59,8 @@ class ToggleKeymapsTile : TileService(), LifecycleOwner {
         lifecycleRegistry = LifecycleRegistry(this)
 
         IntentFilter().apply {
-            addAction(MyAccessibilityService.ACTION_ON_START)
-            addAction(MyAccessibilityService.ACTION_ON_STOP)
+//            addAction(MyAccessibilityService.ACTION_ON_START)
+//            addAction(MyAccessibilityService.ACTION_ON_STOP)
 
             registerReceiver(broadcastReceiver, this)
         }

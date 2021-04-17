@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
  * Created by sds100 on 14/02/2021.
  */
 interface InputMethodAdapter {
+    val canChangeImeWithoutUserInput: Flow<Boolean>
     fun showImePicker(fromForeground: Boolean)
 
     fun isImeEnabledById(imeId: String): Boolean

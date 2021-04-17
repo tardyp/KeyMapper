@@ -407,7 +407,7 @@
 
     <!-- Notification strings -->
     <string name="notification_channel_ime_picker">Keyboard picker</string>
-    <string name="notification_channel_toggle_remaps">Pause/Resume key maps</string>
+    <string name="notification_channel_toggle_mappings">Pause/Resume mappings</string>
     <string name="notification_channel_keyboard_hidden">Keyboard is hidden warning</string>
     <string name="notification_channel_toggle_keyboard">Toggle Key Mapper keyboard</string>
     <string name="notification_channel_new_features">New features</string>
@@ -416,10 +416,10 @@
     <string name="notification_ime_persistent_title">Keyboard picker</string>
 
     <string name="notification_keymaps_resumed_title">Running</string>
-    <string name="notification_keymaps_resumed_text">Tap to pause your key maps.</string>
+    <string name="notification_keymaps_resumed_text">Tap to pause your mappings.</string>
 
     <string name="notification_keymaps_paused_title">Paused</string>
-    <string name="notification_keymaps_paused_text">Tap to resume your key maps.</string>
+    <string name="notification_keymaps_paused_text">Tap to resume your mappings.</string>
 
     <string name="notification_action_dismiss">Dismiss</string>
 
@@ -435,6 +435,7 @@
 
     <string name="notification_toggle_keyboard_title">Toggle Key Mapper keyboard</string>
     <string name="notification_toggle_keyboard_text">Tap to switch to and from the Key Mapper keyboard.</string>
+    <string name="notification_toggle_keyboard_action">Toggle</string>
     <string name="notification_ime_service_disabled_title">Key Mapper keyboard disabled!</string>
     <string name="notification_ime_service_disabled_text">Tap to enable the Key Mapper keyboard.</string>
 

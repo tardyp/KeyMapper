@@ -27,7 +27,10 @@ class KeyMapperImeHelper(val adapter: InputMethodAdapter) {
     //TODO
     fun chooseCompatibleInputMethod(fromForeground: Boolean) {}
     fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean) {}
-    fun toggleCompatibleInputMethod() {}
+
+    fun toggleCompatibleInputMethod() {
+
+    }
 
     fun isCompatibleImeChosen(): Boolean {
         KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->

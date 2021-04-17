@@ -16,16 +16,13 @@ import kotlinx.coroutines.flow.map
  */
 class SplashActivity : FragmentActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val shownAppIntro = UseCases.onboarding(this).shownAppIntro
 
         val approvedFingerprintGestureFeaturePrompt =
-            UseCases.fingerprintGesturesSupported(this).isSupported
-                .map { it ?: false }
-                .firstBlocking()
+            UseCases.onboarding(this).approvedFingerprintFeaturePrompt
 
         val appIntroSlides: List<AppIntroSlide> = when {
             !shownAppIntro -> listOf(

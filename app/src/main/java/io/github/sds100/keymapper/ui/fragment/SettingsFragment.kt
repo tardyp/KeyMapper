@@ -20,6 +20,7 @@ import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.utils.ThemeUtils
 import io.github.sds100.keymapper.mappings.OptionMinimums
+import io.github.sds100.keymapper.ui.NotificationController
 import io.github.sds100.keymapper.ui.SliderMaximums
 import io.github.sds100.keymapper.ui.view.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
@@ -236,7 +237,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     NotificationUtils.openChannelSettings(
                         requireContext(),
-                        NotificationUtils.CHANNEL_TOGGLE_KEYMAPS
+                        NotificationController.CHANNEL_TOGGLE_KEYMAPS
                     )
 
                     true
@@ -311,7 +312,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     NotificationUtils.openChannelSettings(
                         requireContext(),
-                        NotificationUtils.CHANNEL_IME_PICKER
+                        NotificationController.CHANNEL_IME_PICKER
                     )
 
                     true
@@ -385,7 +386,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     NotificationUtils.openChannelSettings(
                         requireContext(),
-                        NotificationUtils.CHANNEL_TOGGLE_KEYBOARD
+                        NotificationController.CHANNEL_TOGGLE_KEYBOARD
                     )
 
                     true
@@ -424,7 +425,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setOnPreferenceClickListener {
                     NotificationUtils.openChannelSettings(
                         requireContext(),
-                        NotificationUtils.CHANNEL_IME_PICKER
+                        NotificationController.CHANNEL_IME_PICKER
                     )
 
                     true

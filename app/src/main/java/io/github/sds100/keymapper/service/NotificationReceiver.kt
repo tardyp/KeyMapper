@@ -9,8 +9,6 @@ import androidx.annotation.RequiresApi
 /**
  * Created by sds100 on 14/11/20.
  */
-@Suppress("RedundantOverride")
-@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 class NotificationReceiver : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)

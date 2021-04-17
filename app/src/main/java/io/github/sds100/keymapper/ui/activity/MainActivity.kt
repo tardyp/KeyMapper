@@ -69,32 +69,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        ServiceLocator.notificationController(this).invalidateNotifications()
-    }
-
-    override fun onDestroy() {
-        ServiceLocator.release()
-
-        super.onDestroy()
-    }
-
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         event?.let { keyActionTypeViewModel.onKeyDown(it.keyCode) }
 
         return super.onKeyUp(keyCode, event)
-    }
-
-    //TODO replace this
-    private fun showFileAccessDeniedSnackBar() {
-        coordinatorLayout.snack(R.string.error_file_access_denied_automatic_backup).apply {
-            setAction(R.string.reset) {
-                container.findNavController().navigate(R.id.action_global_settingsFragment)
-            }
-
-            show()
-        }
     }
 }

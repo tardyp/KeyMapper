@@ -44,6 +44,7 @@ object KeyboardUtils {
 
     private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
 
+    //TODO remove
     val CAN_ACCESSIBILITY_SERVICE_SWITCH_KEYBOARD =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
@@ -259,13 +260,11 @@ object KeyboardUtils {
 @RequiresApi(Build.VERSION_CODES.N)
 fun AccessibilityService.SoftKeyboardController.hide(ctx: Context) {
     showMode = AccessibilityService.SHOW_MODE_HIDDEN
-    ServiceLocator.notificationController(ctx).onEvent(OnHideKeyboard)
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
 fun AccessibilityService.SoftKeyboardController.show(ctx: Context) {
     showMode = AccessibilityService.SHOW_MODE_AUTO
-    ServiceLocator.notificationController(ctx).onEvent(OnShowKeyboard)
 }
 
 @RequiresApi(Build.VERSION_CODES.N)

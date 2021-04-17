@@ -16,6 +16,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
+import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.domain.ime.ImeInfo
 import io.github.sds100.keymapper.framework.JobSchedulerHelper
 import io.github.sds100.keymapper.permissions.Permission
@@ -24,7 +25,8 @@ import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import io.github.sds100.keymapper.util.result.onSuccess
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import splitties.toast.toast
 import timber.log.Timber
 
@@ -33,7 +35,11 @@ import timber.log.Timber
  */
 
 //TODO inject root process delegate
-class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
+class AndroidInputMethodAdapter(
+    context: Context,
+    serviceAdapter: ServiceAdapter,
+    permissionAdapter: PermissionAdapter
+) : InputMethodAdapter {
 
     companion object {
         private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
@@ -43,7 +49,34 @@ class AndroidInputMethodAdapter(context: Context) : InputMethodAdapter {
 
     override val enabledInputMethods by lazy { MutableStateFlow(getEnabledInputMethods()) }
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
+    override val canChangeImeWithoutUserInput: Flow<Boolean> = channelFlow {
+        suspend fun invalidate() {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                    && serviceAdapter.isEnabled.first() -> send(true)
+
+                permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS) -> send(true)
+
+                else -> send(false)
+            }
+        }
+
+        invalidate()
+
+        launch {
+            permissionAdapter.onPermissionsUpdate.collectLatest {
+                invalidate()
+            }
+        }
+
+        launch {
+            serviceAdapter.isEnabled.collectLatest {
+                invalidate()
+            }
+        }
+    }
+
+    val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent ?: return
             context ?: return

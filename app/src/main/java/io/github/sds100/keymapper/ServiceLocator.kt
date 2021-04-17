@@ -13,10 +13,14 @@ import io.github.sds100.keymapper.domain.BackupManagerImpl
 import io.github.sds100.keymapper.domain.adapter.*
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.usecases.BackupRestoreUseCase
 import io.github.sds100.keymapper.files.FileAdapter
-import io.github.sds100.keymapper.framework.adapters.*
-import io.github.sds100.keymapper.ui.NotificationViewModel
+import io.github.sds100.keymapper.framework.adapters.AccessibilityServiceAdapter
+import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
+import io.github.sds100.keymapper.framework.adapters.AppShortcutAdapter
+import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
+import io.github.sds100.keymapper.notifications.NotificationAdapter
+import io.github.sds100.keymapper.ui.NotificationController
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -187,7 +191,7 @@ object ServiceLocator {
         }
     }
 
-    fun fileAdapter(context: Context):FileAdapter{
+    fun fileAdapter(context: Context): FileAdapter {
         return (context.applicationContext as KeyMapperApp).fileAdapter
     }
 
@@ -203,16 +207,12 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).bluetoothMonitor
     }
 
-    fun notificationController(context: Context): NotificationViewModel {
+    fun notificationController(context: Context): NotificationController {
         return (context.applicationContext as KeyMapperApp).notificationController
     }
 
     fun resourceProvider(context: Context): ResourceProvider {
         return (context.applicationContext as KeyMapperApp).resourceProvider
-    }
-
-    fun appRepository(context: Context): AppRepository {
-        return (context.applicationContext as KeyMapperApp).appRepository
     }
 
     fun packageManagerAdapter(context: Context): PackageManagerAdapter {
@@ -237,6 +237,10 @@ object ServiceLocator {
 
     fun appShortcutAdapter(context: Context): AppShortcutAdapter {
         return (context.applicationContext as KeyMapperApp).appShortcutAdapter
+    }
+
+    fun notificationAdapter(context: Context): AndroidNotificationAdapter {
+        return (context.applicationContext as KeyMapperApp).notificationAdapter
     }
 
     @VisibleForTesting
@@ -278,11 +282,5 @@ object ServiceLocator {
          * Keep this note at the bottom */
         database = result
         return result
-    }
-
-    fun release() {
-        synchronized(this) {
-            packageRepository = null
-        }
     }
 }

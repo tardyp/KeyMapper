@@ -9,11 +9,11 @@ import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 class ShowInputMethodPickerUseCaseImpl(
     private val inputMethodAdapter: InputMethodAdapter
 ) : ShowInputMethodPickerUseCase {
-    override fun show() {
-        inputMethodAdapter.showImePicker(fromForeground = true)
+    override fun show(fromForeground: Boolean) {
+        inputMethodAdapter.showImePicker(fromForeground = fromForeground)
     }
 }
 
 interface ShowInputMethodPickerUseCase {
-    fun show()
+    fun show(fromForeground: Boolean)
 }

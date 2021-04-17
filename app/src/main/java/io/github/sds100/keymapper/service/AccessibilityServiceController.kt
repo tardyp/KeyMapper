@@ -46,7 +46,7 @@ class AccessibilityServiceController(
     private val performActionsUseCase: PerformActionsUseCase,
     private val fingerprintMapRepository: FingerprintMapRepository,
     private val keymapRepository: GlobalKeymapUseCase,
-    private val preferenceRepository: PreferenceRepository,
+    private val preferenceRepository: PreferenceRepository, //TODO replace with use case for isfingerprintgestureavailable
     private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
 ) : FingerprintGestureDetectionState by fingerprintGestureDetectionState,
     LifecycleOwner by lifecycleOwner {
@@ -108,6 +108,12 @@ class AccessibilityServiceController(
         }
     )
 
+    private val _hideKeyboard = MutableSharedFlow<Unit>()
+    val hideKeyboard = _hideKeyboard.asSharedFlow()
+
+    private val _showKeyboard = MutableSharedFlow<Unit>()
+    val showKeyboard = _showKeyboard.asSharedFlow()
+
     //TODO delete
     private val _eventStream = LiveEvent<Event>().apply {
         //vibrate
@@ -153,23 +159,11 @@ class AccessibilityServiceController(
 
     val eventStream: LiveData<Event> = _eventStream
 
+    //TODO remove controller should take serviceadapter as a dependency
     private val _sendEventToUi = MutableSharedFlow<Event>()
     val sendEventToUi: SharedFlow<Event> = _sendEventToUi.asSharedFlow()
 
     init {
-        requestFingerprintGestureDetection()
-
-        if (onboarding.showFingerprintFeatureNotificationIfAvailable) {
-
-            if (isGestureDetectionAvailable) {
-                lifecycleScope.launchWhenStarted {
-                    _eventStream.value = ShowFingerprintFeatureNotification
-                }
-            }
-        }
-
-        denyFingerprintGestureDetection()
-        onboarding.showedFingerprintFeatureNotificationIfAvailable()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -304,7 +298,17 @@ class AccessibilityServiceController(
             is StartRecordingTrigger -> startRecordingTrigger()
             is StopRecordingTrigger -> stopRecordingTrigger()
             is PingService -> runBlocking { _sendEventToUi.emit(PingServiceResponse(event.key)) }
+            is HideKeyboardEvent -> runBlocking { _hideKeyboard.emit(Unit) }
+            is ShowKeyboardEvent -> runBlocking { _showKeyboard.emit(Unit) }
         }
+    }
+
+    fun onHideKeyboard(){
+        lifecycleScope.launchWhenStarted { _sendEventToUi.emit(OnHideKeyboardEvent) }
+    }
+
+    fun onShowKeyboard(){
+        lifecycleScope.launchWhenStarted { _sendEventToUi.emit(OnShowKeyboardEvent) }
     }
 
     private fun recordTriggerJob() = lifecycleScope.launchWhenStarted {
@@ -343,7 +347,7 @@ class AccessibilityServiceController(
             /* Don't update whether fingerprint gesture detection is supported if it has
             * been supported at some point. Just in case the fingerprint reader is being
             * used while this is called. */
-            if (!areFingerprintGesturesSupported.isSupported.map { it == true }.firstBlocking()) {
+            if (areFingerprintGesturesSupported.isSupported.firstBlocking() != true) {
                 preferenceRepository.set(
                     Keys.fingerprintGesturesAvailable,
                     isGestureDetectionAvailable

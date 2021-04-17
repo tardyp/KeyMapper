@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.domain.utils.PrefDelegate
  * Created by sds100 on 14/02/21.
  */
 
+//TODO should the action performer delegate need to check for root permission???
 internal class PerformActionsUseCaseImpl(
     preferenceRepository: PreferenceRepository
 ) : PreferenceRepository by preferenceRepository, PerformActionsUseCase {

@@ -12,11 +12,13 @@ import io.github.sds100.keymapper.util.OnBootEvent
 
 class BootBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        /* don't show the toggle remappings notification here since it will start when the accessibility service
-        starts on boot */
         context ?: return
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            ServiceLocator.notificationController(context).onEvent(OnBootEvent)
+            /*
+            Initializing the controller will update any notifications since it will collect the values
+            in the constructor
+             */
+            ServiceLocator.notificationController(context)
         }
     }
 }

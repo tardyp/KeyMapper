@@ -18,12 +18,12 @@ import androidx.lifecycle.*
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
-import io.github.sds100.keymapper.ui.NotificationViewModel
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.data.*
 import io.github.sds100.keymapper.data.model.ActionEntity
 import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.ui.NotificationController
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
@@ -37,6 +37,7 @@ import splitties.bitflags.withFlag
 import splitties.systemservices.displayManager
 import splitties.systemservices.vibrator
 import splitties.toast.toast
+import timber.log.Timber
 
 /**
  * Created by sds100 on 05/04/2020.
@@ -51,8 +52,6 @@ class MyAccessibilityService : AccessibilityService(),
 
     companion object {
 
-        const val ACTION_START_SERVICE = "$PACKAGE_NAME.START_ACCESSIBILITY_SERVICE"
-        const val ACTION_STOP_SERVICE = "$PACKAGE_NAME.STOP_ACCESSIBILITY_SERVICE"
         const val ACTION_SHOW_KEYBOARD = "$PACKAGE_NAME.SHOW_KEYBOARD"
         const val ACTION_RECORD_TRIGGER = "$PACKAGE_NAME.RECORD_TRIGGER"
         const val ACTION_TEST_ACTION = "$PACKAGE_NAME.TEST_ACTION"
@@ -61,9 +60,8 @@ class MyAccessibilityService : AccessibilityService(),
             "$PACKAGE_NAME.RECORD_TRIGGER_TIMER_INCREMENTED"
         const val ACTION_STOP_RECORDING_TRIGGER = "$PACKAGE_NAME.STOP_RECORDING_TRIGGER"
         const val ACTION_STOPPED_RECORDING_TRIGGER = "$PACKAGE_NAME.STOPPED_RECORDING_TRIGGER"
-        const val ACTION_ON_START = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_START"
-        const val ACTION_ON_STOP = "$PACKAGE_NAME.ON_ACCESSIBILITY_SERVICE_STOP"
-        const val ACTION_UPDATE_KEYMAP_LIST_CACHE = "$PACKAGE_NAME.UPDATE_KEYMAP_LIST_CACHE" //TODO just observe it in the repository
+        const val ACTION_UPDATE_KEYMAP_LIST_CACHE =
+            "$PACKAGE_NAME.UPDATE_KEYMAP_LIST_CACHE" //TODO just observe it in the repository
         const val ACTION_SEND_EVENT = "$PACKAGE_NAME.ACTION_EVENT"
         const val KEY_EVENT = "$PACKAGE_NAME.EXTRA_EVENT"
 
@@ -165,6 +163,7 @@ class MyAccessibilityService : AccessibilityService(),
     override val currentPackageName: String?
         get() = rootInActiveWindow?.packageName?.toString()
 
+    //TODO remove and create DisplayAdapter that checks orientation and whether screen is on/off
     private var _isScreenOn = true
     override val isScreenOn: Boolean
         get() = _isScreenOn
@@ -192,9 +191,6 @@ class MyAccessibilityService : AccessibilityService(),
 
     private val isCompatibleImeChosen
         get() = KeyboardUtils.KEY_MAPPER_IME_PACKAGE_LIST.contains(chosenImePackageName)
-
-    private val notificationViewModel: NotificationViewModel
-        get() = ServiceLocator.notificationController(this)
 
     private lateinit var controller: AccessibilityServiceController
 
@@ -224,9 +220,6 @@ class MyAccessibilityService : AccessibilityService(),
             registerReceiver(broadcastReceiver, this)
         }
 
-        notificationViewModel.onEvent(OnAccessibilityServiceStarted)
-        sendPackageBroadcast(ACTION_ON_START)
-
         chosenImePackageName = KeyboardUtils.getChosenInputMethodPackageName(this).valueOrNull()
 
         if (VERSION.SDK_INT >= VERSION_CODES.O) {
@@ -246,6 +239,15 @@ class MyAccessibilityService : AccessibilityService(),
             }
         }
 
+        if (VERSION.SDK_INT >= VERSION_CODES.N) {
+            keyboardController?.addOnShowModeChangedListener { controller, showMode ->
+               when(showMode){
+                    SHOW_MODE_AUTO -> this.controller.onShowKeyboard()
+                    SHOW_MODE_HIDDEN -> this.controller.onHideKeyboard()
+                }
+            }
+        }
+
         controller = Inject.accessibilityServiceController(this)
 
         controller.eventStream.observe(this, Observer {
@@ -259,6 +261,18 @@ class MyAccessibilityService : AccessibilityService(),
 
             sendPackageBroadcast(ACTION_SEND_EVENT, bundle)
         }.launchIn(lifecycleScope)
+
+        controller.hideKeyboard.onEach {
+            if (VERSION.SDK_INT >= VERSION_CODES.N) {
+                softKeyboardController.hide(this)
+            }
+        }.launchIn(lifecycleScope)
+
+        controller.showKeyboard.onEach {
+            if (VERSION.SDK_INT >= VERSION_CODES.N) {
+                softKeyboardController.show(this)
+            }
+        }.launchIn(lifecycleScope)
     }
 
     override fun onInterrupt() {}
@@ -268,10 +282,6 @@ class MyAccessibilityService : AccessibilityService(),
         if (::lifecycleRegistry.isInitialized) {
             lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         }
-
-        notificationViewModel.onEvent(OnAccessibilityServiceStopped)
-
-        sendPackageBroadcast(ACTION_ON_STOP)
 
         unregisterReceiver(broadcastReceiver)
 
@@ -354,9 +364,6 @@ class MyAccessibilityService : AccessibilityService(),
                 ACTION_RECORD_TRIGGER_TIMER_INCREMENTED,
                 bundleOf(EXTRA_TIME_LEFT to event.timeLeft)
             )
-
-            is ShowFingerprintFeatureNotification ->
-                notificationViewModel.onEvent(ShowFingerprintFeatureNotification)
 
             is OnStoppedRecordingTrigger ->
                 sendPackageBroadcast(ACTION_STOPPED_RECORDING_TRIGGER)
