@@ -16,10 +16,9 @@ import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import io.github.sds100.keymapper.files.FileAdapter
 import io.github.sds100.keymapper.framework.adapters.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
-import io.github.sds100.keymapper.framework.adapters.AppShortcutAdapter
+import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
-import io.github.sds100.keymapper.notifications.NotificationAdapter
 import io.github.sds100.keymapper.ui.NotificationController
 import kotlinx.coroutines.runBlocking
 
@@ -241,6 +240,18 @@ object ServiceLocator {
 
     fun notificationAdapter(context: Context): AndroidNotificationAdapter {
         return (context.applicationContext as KeyMapperApp).notificationAdapter
+    }
+
+    fun popupMessageAdapter(context: Context): PopupMessageAdapter {
+        return (context.applicationContext as KeyMapperApp).popupMessageAdapter
+    }
+
+    fun vibratorAdapter(context: Context): VibratorAdapter {
+        return (context.applicationContext as KeyMapperApp).vibratorAdapter
+    }
+
+    fun displayAdapter(context: Context): DisplayAdapter {
+        return (context.applicationContext as KeyMapperApp).displayAdapter
     }
 
     @VisibleForTesting

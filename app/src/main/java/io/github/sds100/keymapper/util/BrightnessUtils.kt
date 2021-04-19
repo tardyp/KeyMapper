@@ -8,6 +8,8 @@ import androidx.annotation.IntDef
 /**
  * Created by sds100 on 31/10/2018.
  */
+
+//TODO move to DisplayAdapter
 object BrightnessUtils {
     @IntDef(value = [
         SCREEN_BRIGHTNESS_MODE_AUTOMATIC,

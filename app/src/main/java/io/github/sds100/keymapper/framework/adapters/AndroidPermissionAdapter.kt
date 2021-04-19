@@ -51,7 +51,7 @@ class AndroidPermissionAdapter(
     }
 
     override fun request(permission: Permission) {
-        runBlocking { _request.emit(permission) }
+        coroutineScope.launch { _request.emit(permission) }
     }
 
     override fun isGranted(permission: Permission): Boolean {

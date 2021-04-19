@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
 import android.os.Build
+import androidx.datastore.preferences.core.preferencesKey
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,10 @@ class AreFingerprintGesturesSupportedUseCaseImpl(
 
             it
         }
+
+    override fun setSupported(supported: Boolean) {
+
+    }
 }
 
 interface AreFingerprintGesturesSupportedUseCase {
@@ -25,4 +30,6 @@ interface AreFingerprintGesturesSupportedUseCase {
      * Is null if support is unknown
      */
     val isSupported: Flow<Boolean?>
+
+    fun setSupported(supported: Boolean)
 }

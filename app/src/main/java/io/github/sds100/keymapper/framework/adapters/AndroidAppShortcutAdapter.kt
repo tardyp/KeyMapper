@@ -10,6 +10,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
+import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
 import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.ui.activity.LaunchKeymapShortcutActivity
@@ -17,9 +18,7 @@ import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.success
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import java.util.*
 
 /**

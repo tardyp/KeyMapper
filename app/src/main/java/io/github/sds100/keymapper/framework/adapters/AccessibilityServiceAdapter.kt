@@ -36,27 +36,11 @@ class AccessibilityServiceAdapter(
     private val ctx = context.applicationContext
     override val eventReceiver = MutableSharedFlow<Event>()
 
+    val serviceOutputEvents = MutableSharedFlow<Event>()
+
     override val isEnabled = MutableStateFlow(getIsEnabled())
 
     private val permissionAdapter: PermissionAdapter by lazy { ServiceLocator.permissionAdapter(ctx) }
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            context ?: return
-            intent ?: return
-
-            when (intent.action) {
-                MyAccessibilityService.ACTION_SEND_EVENT ->
-                    coroutineScope.launch {
-                        val event =
-                            intent.extras?.getJsonSerializable<Event>(MyAccessibilityService.KEY_EVENT)
-                        event ?: return@launch
-
-                        eventReceiver.emit(event)
-                    }
-            }
-        }
-    }
 
     init {
         //use job scheduler because there is there is a much shorter delay when the app is in the background
@@ -74,11 +58,6 @@ class AccessibilityServiceAdapter(
 
             ctx.contentResolver.registerContentObserver(uri, false, observer)
         }
-
-        IntentFilter().apply {
-            addAction(MyAccessibilityService.ACTION_SEND_EVENT)
-            ctx.registerReceiver(broadcastReceiver, this)
-        }
     }
 
     override fun send(event: Event): Result<Unit> {
@@ -87,11 +66,9 @@ class AccessibilityServiceAdapter(
             return FixableError.AccessibilityServiceDisabled
         }
 
-        val bundle = Bundle().apply {
-            putJsonSerializable(MyAccessibilityService.KEY_EVENT, event)
+        coroutineScope.launch {
+            serviceOutputEvents.emit(event)
         }
-
-        ctx.sendPackageBroadcast(MyAccessibilityService.ACTION_SEND_EVENT, bundle)
 
         return Success(Unit)
     }

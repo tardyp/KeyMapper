@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.options.KeymapActionOptions
 import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
@@ -15,7 +14,7 @@ import io.github.sds100.keymapper.util.Inject
  * Created by sds100 on 22/11/20.
  */
 
-class KeyMapConfigActionsFragment : ConfigActionsFragment<KeymapActionOptions, KeyMapAction>() {
+class KeyMapConfigActionsFragment : ConfigActionsFragment<KeyMapAction>() {
 
     class Info : FragmentInfo(
         R.string.action_list_header,

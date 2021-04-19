@@ -2,54 +2,35 @@ package io.github.sds100.keymapper.service
 
 import android.os.Build
 import android.view.KeyEvent
-import androidx.annotation.RequiresApi
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.lifecycleScope
-import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
-import io.github.sds100.keymapper.data.usecase.GlobalKeymapUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.usecases.DetectKeymapsUseCase
-import io.github.sds100.keymapper.domain.usecases.GetKeymapsPausedUseCase
-import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
+import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
+import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
+import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
+import io.github.sds100.keymapper.mappings.fingerprintmaps.DetectFingerprintMapsUseCase
+import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCase
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.delegate.*
+import io.github.sds100.keymapper.util.delegate.FingerprintGestureMapController
+import io.github.sds100.keymapper.util.delegate.GetEventDelegate
+import io.github.sds100.keymapper.util.delegate.KeyMapController
+import io.github.sds100.keymapper.util.delegate.TriggerKeyMapFromOtherAppsController
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
-import splitties.bitflags.hasFlag
-import splitties.toast.toast
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 /**
- * Created by sds100 on 18/01/21.
+ * Created by sds100 on 17/04/2021.
  */
 class AccessibilityServiceController(
-    lifecycleOwner: LifecycleOwner,
-    constraintState: IConstraintState,
-    clock: IClock,
-    actionError: IActionError,
-    fingerprintGestureDetectionState: FingerprintGestureDetectionState,
-    private val getKeymapsPaused: GetKeymapsPausedUseCase,
-    onboarding: OnboardingUseCase,
-    private val detectKeymapsUseCase: DetectKeymapsUseCase,
-    private val performActionsUseCase: PerformActionsUseCase,
-    private val fingerprintMapRepository: FingerprintMapRepository,
-    private val keymapRepository: GlobalKeymapUseCase,
-    private val preferenceRepository: PreferenceRepository, //TODO replace with use case for isfingerprintgestureavailable
-    private val areFingerprintGesturesSupported: AreFingerprintGesturesSupportedUseCase
-) : FingerprintGestureDetectionState by fingerprintGestureDetectionState,
-    LifecycleOwner by lifecycleOwner {
+    val coroutineScope: CoroutineScope,
+    val accessibilityService: IAccessibilityService,
+    val inputEvents: SharedFlow<Event>,
+    val outputEvents: MutableSharedFlow<Event>,
+    val detectConstraintsUseCase: DetectConstraintsUseCase,
+    val performActionsUseCase: PerformActionsUseCase,
+    val detectKeyMapsUseCase: DetectKeyMapsUseCase,
+    val detectFingerprintMapsUseCase: DetectFingerprintMapsUseCase,
+    val pauseMappingsUseCase: PauseMappingsUseCase
+) {
 
     companion object {
         /**
@@ -58,31 +39,43 @@ class AccessibilityServiceController(
         private const val RECORD_TRIGGER_TIMER_LENGTH = 5
     }
 
-    private val constraintDelegate = ConstraintDelegate(constraintState)
 
-    private val triggerKeymapByIntentController = TriggerKeymapByIntentController(
-        lifecycleScope,
+    private val triggerKeyMapFromOtherAppsController = TriggerKeyMapFromOtherAppsController(
+        coroutineScope,
+        detectKeyMapsUseCase,
         performActionsUseCase,
-        constraintDelegate,
-        actionError
+        detectConstraintsUseCase
     )
 
-    private val fingerprintGestureMapController = FingerprintGestureMapController(
-        lifecycleScope,
+    private val fingerprintMapController = FingerprintGestureMapController(
+        coroutineScope,
+        detectFingerprintMapsUseCase,
         performActionsUseCase,
-        constraintDelegate,
-        actionError
+        detectConstraintsUseCase
+    )
+
+    private val keymapDetectionDelegate = KeyMapController(
+        coroutineScope,
+        detectKeyMapsUseCase,
+        performActionsUseCase,
+        detectConstraintsUseCase
     )
 
     private var recordingTriggerJob: Job? = null
-
     private val recordingTrigger: Boolean
         get() = recordingTriggerJob != null && recordingTriggerJob?.isActive == true
+
+    private val isPaused: StateFlow<Boolean> = pauseMappingsUseCase.isPaused
+        .stateIn(coroutineScope, SharingStarted.Eagerly, false)
+
+    private val screenOffTriggersEnabled: StateFlow<Boolean> =
+        detectKeyMapsUseCase.detectScreenOffTriggers
+            .stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
     private val getEventDelegate =
         GetEventDelegate { keyCode, action, deviceDescriptor, isExternal, deviceId ->
 
-            if (!getKeymapsPaused().firstBlocking()) {
+            if (!isPaused.value) {
                 withContext(Dispatchers.Main.immediate) {
                     keymapDetectionDelegate.onKeyEvent(
                         keyCode,
@@ -96,93 +89,53 @@ class AccessibilityServiceController(
             }
         }
 
-    private var screenOffTriggersEnabled = false
-
-    private val keymapDetectionDelegate = KeymapDetectionDelegate(
-        lifecycleScope,
-        getKeymapDetectionDelegatePreferences(),
-        clock,
-        constraintDelegate,
-        canActionBePerformed = { action ->
-            actionError.canActionBePerformed(action, performActionsUseCase.hasRootPermission)
-        }
-    )
-
-    private val _hideKeyboard = MutableSharedFlow<Unit>()
-    val hideKeyboard = _hideKeyboard.asSharedFlow()
-
-    private val _showKeyboard = MutableSharedFlow<Unit>()
-    val showKeyboard = _showKeyboard.asSharedFlow()
-
-    //TODO delete
-    private val _eventStream = LiveEvent<Event>().apply {
-        //vibrate
-        addSource(keymapDetectionDelegate.vibrate) {
-            value = it
-        }
-
-        addSource(fingerprintGestureMapController.vibrateEvent) {
-            value = it
-        }
-
-        addSource(triggerKeymapByIntentController.vibrateEvent) {
-            value = it
-        }
-
-        //perform action
-        addSource(keymapDetectionDelegate.performAction) {
-            value = it
-        }
-
-        addSource(fingerprintGestureMapController.performAction) {
-            value = it
-        }
-
-        addSource(triggerKeymapByIntentController.performAction) {
-            value = it
-        }
-
-        //show triggered keymap toast
-        addSource(keymapDetectionDelegate.showTriggeredKeymapToast) {
-            value = it
-        }
-
-        addSource(triggerKeymapByIntentController.showTriggeredToastEvent) {
-            value = it
-        }
-
-        addSource(fingerprintGestureMapController.showTriggeredToastEvent) {
-            value = it
-        }
-
-    }
-
-    val eventStream: LiveData<Event> = _eventStream
-
-    //TODO remove controller should take serviceadapter as a dependency
-    private val _sendEventToUi = MutableSharedFlow<Event>()
-    val sendEventToUi: SharedFlow<Event> = _sendEventToUi.asSharedFlow()
-
     init {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             checkFingerprintGesturesAvailability()
 
-            observeFingerprintMaps()
+            combine(
+                detectFingerprintMapsUseCase.fingerprintMaps,
+                isPaused
+            ) { fingerprintMaps, isPaused ->
+                if (fingerprintMaps.toList()
+                        .any { it.isEnabled && it.actionList.isNotEmpty() } && !isPaused
+                ) {
+                    accessibilityService.requestFingerprintGestureDetection()
+                } else {
+                    accessibilityService.denyFingerprintGestureDetection()
+                }
+
+            }.launchIn(coroutineScope)
         }
 
-        lifecycleScope.launchWhenStarted {
-            val keymapList = withContext(Dispatchers.Default) {
-                keymapRepository.getKeymaps()
-            }
+        pauseMappingsUseCase.isPaused.distinctUntilChanged().onEach {
+            keymapDetectionDelegate.reset()
+            fingerprintMapController.reset()
+            triggerKeyMapFromOtherAppsController.reset()
+        }.launchIn(coroutineScope)
 
-            withContext(Dispatchers.Main) {
-                updateKeymapListCache(keymapList)
+        detectKeyMapsUseCase.isScreenOn.distinctUntilChanged().onEach { isScreenOn ->
+            if (isScreenOn) {
+                if (screenOffTriggersEnabled.value) {
+                    getEventDelegate.startListening(coroutineScope)
+                }
+            } else {
+                getEventDelegate.stopListening()
             }
-        }
+        }.launchIn(coroutineScope)
 
-        subscribeToPreferenceChanges()
+        inputEvents.onEach {
+            onEventFromUi(it)
+        }.launchIn(coroutineScope)
+
+        accessibilityService.onKeyboardHiddenChange.onEach { isHidden ->
+            if (isHidden) {
+                outputEvents.emit(OnHideKeyboardEvent)
+            } else {
+                outputEvents.emit(OnShowKeyboardEvent)
+            }
+        }.launchIn(coroutineScope)
     }
 
     fun onKeyEvent(
@@ -198,8 +151,8 @@ class AccessibilityServiceController(
 
         if (recordingTrigger) {
             if (action == KeyEvent.ACTION_DOWN) {
-                lifecycleScope.launchWhenStarted {
-                    _sendEventToUi.emit(
+                coroutineScope.launch {
+                    outputEvents.emit(
                         RecordedTriggerKeyEvent(
                             keyCode,
                             deviceName,
@@ -213,7 +166,7 @@ class AccessibilityServiceController(
             return true
         }
 
-        if (!getKeymapsPaused().firstBlocking()) {
+        if (!isPaused.value) {
             try {
                 val consume = keymapDetectionDelegate.onKeyEvent(
                     keyCode,
@@ -235,183 +188,70 @@ class AccessibilityServiceController(
         return false
     }
 
-    fun onFingerprintGesture(sdkGestureId: Int) {
-        fingerprintGestureMapController.onGesture(sdkGestureId)
+    fun onFingerprintGesture(id: FingerprintMapId) {
+        fingerprintMapController.onGesture(id)
     }
 
-    fun onScreenOn() {
-        getEventDelegate.stopListening()
+    fun triggerKeyMapFromIntent(uid: String) {
+        triggerKeyMapFromOtherAppsController.onDetected(uid)
     }
 
-    fun onScreenOff() {
-        val hasRootPermission = performActionsUseCase.hasRootPermission
-
-        if (hasRootPermission && screenOffTriggersEnabled) {
-            if (!getEventDelegate.startListening(lifecycleScope)) {
-                toast(R.string.error_failed_execute_getevent)
-            }
-        }
-    }
-
-    fun triggerKeymapByIntent(uid: String) {
-        triggerKeymapByIntentController.onDetected(uid)
-    }
-
-    fun startRecordingTrigger() {
-        //don't start recording if a trigger is being recorded
-        if (!recordingTrigger) {
-            recordingTriggerJob = recordTriggerJob()
-        }
-    }
-
-    fun stopRecordingTrigger() {
-        val wasRecordingTrigger = recordingTrigger
-
-        recordingTriggerJob?.cancel()
-        recordingTriggerJob = null
-
-        if (wasRecordingTrigger) {
-            lifecycleScope.launchWhenStarted {
-                _sendEventToUi.emit(OnStoppedRecordingTrigger)
-            }
-
-            _eventStream.value = OnStoppedRecordingTrigger
-        }
-    }
-
-    fun updateKeymapListCache(keymapList: List<KeyMapEntity>) {
-        keymapDetectionDelegate.keymapListCache = keymapList
-
-        screenOffTriggersEnabled = keymapList.any { keymap ->
-            keymap.trigger.flags.hasFlag(TriggerEntity.TRIGGER_FLAG_SCREEN_OFF_TRIGGERS)
-        }
-
-        triggerKeymapByIntentController.onKeymapListUpdate(keymapList)
-    }
-
-    fun testAction(action: ActionEntity) {
-        _eventStream.value = PerformAction(action)
-    }
-
-    fun onReceiveEvent(event: Event) {
+    private fun onEventFromUi(event: Event) {
         when (event) {
-            is StartRecordingTrigger -> startRecordingTrigger()
-            is StopRecordingTrigger -> stopRecordingTrigger()
-            is PingService -> runBlocking { _sendEventToUi.emit(PingServiceResponse(event.key)) }
-            is HideKeyboardEvent -> runBlocking { _hideKeyboard.emit(Unit) }
-            is ShowKeyboardEvent -> runBlocking { _showKeyboard.emit(Unit) }
-        }
-    }
+            is StartRecordingTrigger ->
+                if (!recordingTrigger) {
+                    recordingTriggerJob = recordTriggerJob()
+                }
 
-    fun onHideKeyboard(){
-        lifecycleScope.launchWhenStarted { _sendEventToUi.emit(OnHideKeyboardEvent) }
-    }
+            is StopRecordingTrigger -> {
+                val wasRecordingTrigger = recordingTrigger
 
-    fun onShowKeyboard(){
-        lifecycleScope.launchWhenStarted { _sendEventToUi.emit(OnShowKeyboardEvent) }
-    }
+                recordingTriggerJob?.cancel()
+                recordingTriggerJob = null
 
-    private fun recordTriggerJob() = lifecycleScope.launchWhenStarted {
-        repeat(RECORD_TRIGGER_TIMER_LENGTH) { iteration ->
-            if (isActive) {
-                val timeLeft = RECORD_TRIGGER_TIMER_LENGTH - iteration
-                _sendEventToUi.emit(OnIncrementRecordTriggerTimer(timeLeft))
-                _eventStream.value = OnIncrementRecordTriggerTimer(timeLeft)
-
-                delay(1000)
+                if (wasRecordingTrigger) {
+                    coroutineScope.launch {
+                        outputEvents.emit(OnStoppedRecordingTrigger)
+                    }
+                }
             }
+
+            is TestActionEvent -> performActionsUseCase.performAction(event.action)
+
+            is PingService -> coroutineScope.launch { outputEvents.emit(PingServiceResponse(event.key)) }
+            is HideKeyboardEvent -> accessibilityService.hideKeyboard()
+            is ShowKeyboardEvent -> accessibilityService.showKeyboard()
         }
-
-        _eventStream.value = OnStoppedRecordingTrigger
-        _sendEventToUi.emit(OnStoppedRecordingTrigger)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun observeFingerprintMaps() {
-        //TODO
-//        fingerprintMapRepository.fingerprintGestureMaps.collectWhenStarted(this, { maps ->
-//            fingerprintGestureMapController.setFingerprintMaps() = maps
-//
-//            if (maps.any { it.value.isEnabled && it.value.actionList.isNotEmpty() } && !getKeymapsPaused().firstBlocking()) {
-//                requestFingerprintGestureDetection()
-//            } else {
-//                denyFingerprintGestureDetection()
-//            }        })
     }
 
     private fun checkFingerprintGesturesAvailability() {
-        requestFingerprintGestureDetection()
+        accessibilityService.requestFingerprintGestureDetection()
 
         //this is important
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             /* Don't update whether fingerprint gesture detection is supported if it has
             * been supported at some point. Just in case the fingerprint reader is being
             * used while this is called. */
-            if (areFingerprintGesturesSupported.isSupported.firstBlocking() != true) {
-                preferenceRepository.set(
-                    Keys.fingerprintGesturesAvailable,
-                    isGestureDetectionAvailable
+            if (detectFingerprintMapsUseCase.isSupported.firstBlocking() != true) {
+                detectFingerprintMapsUseCase.setSupported(
+                    accessibilityService.isGestureDetectionAvailable
                 )
             }
         }
 
-        denyFingerprintGestureDetection()
+        accessibilityService.denyFingerprintGestureDetection()
     }
 
-    private fun getKeymapDetectionDelegatePreferences() = KeymapDetectionPreferences(
-        detectKeymapsUseCase.defaultLongPressDelay.firstBlocking(),
-        detectKeymapsUseCase.defaultDoublePressDelay.firstBlocking(),
-        detectKeymapsUseCase.defaultRepeatDelay.firstBlocking(),
-        detectKeymapsUseCase.defaultRepeatRate.firstBlocking(),
-        detectKeymapsUseCase.defaultSequenceTriggerTimeout.firstBlocking(),
-        detectKeymapsUseCase.defaultVibrateDuration.firstBlocking(),
-        detectKeymapsUseCase.defaultHoldDownDuration.firstBlocking(),
-        detectKeymapsUseCase.forceVibrate.firstBlocking()
-    )
+    private fun recordTriggerJob() = coroutineScope.launch {
+        repeat(RECORD_TRIGGER_TIMER_LENGTH) { iteration ->
+            if (isActive) {
+                val timeLeft = RECORD_TRIGGER_TIMER_LENGTH - iteration
+                outputEvents.emit(OnIncrementRecordTriggerTimer(timeLeft))
 
-    private fun subscribeToPreferenceChanges() {
-        detectKeymapsUseCase.defaultLongPressDelay.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultLongPressDelay = it
-        }
-
-        detectKeymapsUseCase.defaultDoublePressDelay.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultDoublePressDelay = it
-        }
-
-        detectKeymapsUseCase.defaultRepeatDelay.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultRepeatDelay = it
-        }
-
-        detectKeymapsUseCase.defaultRepeatRate.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultRepeatRate = it
-        }
-
-        detectKeymapsUseCase.defaultSequenceTriggerTimeout.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultSequenceTriggerTimeout = it
-        }
-
-        detectKeymapsUseCase.defaultVibrateDuration.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultVibrateDuration = it
-        }
-
-        detectKeymapsUseCase.defaultHoldDownDuration.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.defaultHoldDownDuration = it
-        }
-
-        detectKeymapsUseCase.forceVibrate.collectWhenStarted(this) {
-            keymapDetectionDelegate.preferences.forceVibrate = it
-        }
-
-        getKeymapsPaused().collectWhenStarted(this) { paused ->
-            keymapDetectionDelegate.reset()
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (paused) {
-                    denyFingerprintGestureDetection()
-                } else {
-                    requestFingerprintGestureDetection()
-                }
+                delay(1000)
             }
         }
+
+        outputEvents.emit(OnStoppedRecordingTrigger)
     }
 }

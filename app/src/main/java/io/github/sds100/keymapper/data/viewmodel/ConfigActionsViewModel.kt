@@ -76,7 +76,7 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
                 val actionData = data.actionList.singleOrNull { it.uid == uid }?.data
                     ?: return@launch
 
-                val error = displayActionUseCase.getActionError(actionData)
+                val error = displayActionUseCase.getError(actionData)
 
                 when (error) {
                     null -> testAction(actionData)

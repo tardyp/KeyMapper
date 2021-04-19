@@ -7,10 +7,13 @@ import io.github.sds100.keymapper.domain.actions.Action
  * Created by sds100 on 04/04/2021.
  */
 
-interface Mapping<ACTION: Action> {
+interface Mapping<ACTION : Action> {
     val isEnabled: Boolean
     val constraintState: ConstraintState
     val actionList: List<ACTION>
+    val showToast: Boolean
+    val vibrate: Boolean
+    val vibrateDuration: Int?
 }
 
 fun Mapping<*>.isDelayBeforeNextActionAllowed(): Boolean {

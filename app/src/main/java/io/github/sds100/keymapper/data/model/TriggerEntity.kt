@@ -128,8 +128,3 @@ data class TriggerEntity(
     @IntDef(value = [UNDETERMINED, SHORT_PRESS, LONG_PRESS, DOUBLE_PRESS])
     annotation class ClickType
 }
-
-//TODO move to test class
-fun sequenceTrigger(vararg key: TriggerEntity.KeyEntity, flags: Int = 0) = TriggerEntity(key.toList(), mode = TriggerEntity.SEQUENCE, flags = flags)
-fun undefinedTrigger(key: TriggerEntity.KeyEntity, flags: Int = 0) = TriggerEntity(listOf(key), mode = TriggerEntity.UNDEFINED, flags = flags)
-fun parallelTrigger(vararg key: TriggerEntity.KeyEntity, flags: Int = 0) = TriggerEntity(key.toList(), mode = TriggerEntity.PARALLEL, flags = flags)

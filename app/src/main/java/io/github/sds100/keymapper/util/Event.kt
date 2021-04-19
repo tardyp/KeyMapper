@@ -21,6 +21,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.data.model.options.BaseOptions
 import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
+import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.android.parcel.Parcelize
@@ -40,7 +41,7 @@ open class MessageEvent(@StringRes val textRes: Int) : Event()
 class FixFailure(val error: Error) : Event()
 class VibrateEvent(val duration: Long) : Event()
 object ShowTriggeredKeymapToast : Event()
-data class PerformAction(
+data class PerformActionEvent(
     val action: ActionEntity,
     val additionalMetaState: Int = 0,
     val keyEventAction: InputEventType = InputEventType.DOWN_UP
@@ -138,6 +139,8 @@ class SelectConstraint(val constraint: ConstraintEntity) : Event()
 
 //notifications
 class DismissNotification(val id: Int) : Event(), UpdateNotificationEvent
+
+data class TestActionEvent(val action: ActionData): Event()
 
 //TODO delete
 interface UpdateNotificationEvent

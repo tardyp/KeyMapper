@@ -74,6 +74,9 @@ class KeyMapperApp : MultiDexApplication() {
     }
 
     val fileAdapter by lazy { AndroidFileAdapter(this) }
+    val popupMessageAdapter by lazy { AndroidToastAdapter(this) }
+    val vibratorAdapter by lazy { AndroidVibratorAdapter(this) }
+    val displayAdapter by lazy { AndroidDisplayAdapter(this) }
 
     private val applicationViewModel by lazy { Inject.keyMapperAppViewModel(this) }
 

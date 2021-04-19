@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.ui.shortcuts
 import androidx.core.os.bundleOf
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
-import io.github.sds100.keymapper.framework.adapters.AppShortcutAdapter
+import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.service.MyAccessibilityService

@@ -6,7 +6,8 @@ import androidx.lifecycle.LiveData
  * Created by sds100 on 23/12/20.
  */
 
-class LiveDataTestWrapper<T>(liveData: LiveData<T>) {
+//TODO remove
+class TestFlow<T>(liveData: LiveData<T>) {
     private val _history = mutableListOf<T>()
     val history
         get() = _history.toList()

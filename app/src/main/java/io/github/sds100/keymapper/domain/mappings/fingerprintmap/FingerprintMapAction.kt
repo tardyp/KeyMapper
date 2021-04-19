@@ -24,10 +24,16 @@ data class FingerprintMapAction(
     override val delayBeforeNextAction: Int? = null,
     override val multiplier: Int? = null,
     val repeatUntilSwipedAgain: Boolean = false,
-    val repeatRate: Int? = null,
+    override val repeatRate: Int? = null,
     val holdDownUntilSwipedAgain: Boolean = false,
-    val holdDownDuration: Int? = null
-) : Action
+    override val holdDownDuration: Int? = null
+) : Action {
+    override val repeat: Boolean
+        get() = repeatUntilSwipedAgain
+
+    override val holdDown: Boolean
+        get() = holdDownUntilSwipedAgain
+}
 
 object FingerprintMapActionEntityMapper {
     fun fromEntity(entity: ActionEntity): FingerprintMapAction? {
@@ -66,43 +72,54 @@ object FingerprintMapActionEntityMapper {
         )
     }
 
-    fun toEntity(fingerprintMap: FingerprintMap): List<ActionEntity> = fingerprintMap.actionList.mapNotNull { action ->
-        val base = ActionDataEntityMapper.toEntity(action.data) ?: return@mapNotNull null
+    fun toEntity(fingerprintMap: FingerprintMap): List<ActionEntity> =
+        fingerprintMap.actionList.mapNotNull { action ->
+            val base = ActionDataEntityMapper.toEntity(action.data) ?: return@mapNotNull null
 
-        val extras = mutableListOf<Extra>().apply {
-            if (fingerprintMap.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
-                add(Extra(ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION, action.delayBeforeNextAction.toString()))
+            val extras = mutableListOf<Extra>().apply {
+                if (fingerprintMap.isDelayBeforeNextActionAllowed() && action.delayBeforeNextAction != null) {
+                    add(
+                        Extra(
+                            ActionEntity.EXTRA_DELAY_BEFORE_NEXT_ACTION,
+                            action.delayBeforeNextAction.toString()
+                        )
+                    )
+                }
+
+                if (action.multiplier != null) {
+                    add(Extra(ActionEntity.EXTRA_MULTIPLIER, action.multiplier.toString()))
+                }
+
+                if (fingerprintMap.isHoldingDownActionBeforeRepeatingAllowed(action) && action.holdDownDuration != null) {
+                    add(
+                        Extra(
+                            ActionEntity.EXTRA_HOLD_DOWN_DURATION,
+                            action.holdDownDuration.toString()
+                        )
+                    )
+                }
+
+                if (fingerprintMap.isChangingActionRepeatRateAllowed(action) && action.repeatRate != null) {
+                    add(Extra(ActionEntity.EXTRA_REPEAT_RATE, action.repeatRate.toString()))
+                }
             }
 
-            if (action.multiplier != null) {
-                add(Extra(ActionEntity.EXTRA_MULTIPLIER, action.multiplier.toString()))
+            var flags = 0
+
+            if (fingerprintMap.isRepeatingActionUntilSwipedAgainAllowed() && action.repeatUntilSwipedAgain) {
+                flags = flags.withFlag(ActionEntity.ACTION_FLAG_REPEAT)
             }
 
-            if (fingerprintMap.isHoldingDownActionBeforeRepeatingAllowed(action) && action.holdDownDuration != null) {
-                add(Extra(ActionEntity.EXTRA_HOLD_DOWN_DURATION, action.holdDownDuration.toString()))
+            if (fingerprintMap.isHoldingDownActionUntilSwipedAgainAllowed(action) && action.holdDownUntilSwipedAgain) {
+                flags = flags.withFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)
             }
 
-            if (fingerprintMap.isChangingActionRepeatRateAllowed(action) && action.repeatRate != null) {
-                add(Extra(ActionEntity.EXTRA_REPEAT_RATE, action.repeatRate.toString()))
-            }
+            return@mapNotNull ActionEntity(
+                type = base.type,
+                data = base.data,
+                extras = base.extras.plus(extras),
+                flags = base.flags.withFlag(flags),
+                uid = action.uid
+            )
         }
-
-        var flags = 0
-
-        if (fingerprintMap.isRepeatingActionUntilSwipedAgainAllowed() && action.repeatUntilSwipedAgain) {
-            flags = flags.withFlag(ActionEntity.ACTION_FLAG_REPEAT)
-        }
-
-        if (fingerprintMap.isHoldingDownActionUntilSwipedAgainAllowed(action) && action.holdDownUntilSwipedAgain) {
-            flags = flags.withFlag(ActionEntity.ACTION_FLAG_HOLD_DOWN)
-        }
-
-        return@mapNotNull ActionEntity(
-            type = base.type,
-            data = base.data,
-            extras = base.extras.plus(extras),
-            flags = base.flags.withFlag(flags),
-            uid = action.uid
-        )
-    }
 }

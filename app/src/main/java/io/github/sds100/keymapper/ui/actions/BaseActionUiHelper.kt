@@ -267,8 +267,6 @@ abstract class BaseActionUiHelper<MAPPING: Mapping<A>,A: Action>(
         is TextAction -> null
         is UrlAction -> null
     }
-
-    override fun getError(action: ActionData): Error? = getActionError(action)
 }
 
 interface ActionUiHelper<MAPPING: Mapping<A>, A: Action> {

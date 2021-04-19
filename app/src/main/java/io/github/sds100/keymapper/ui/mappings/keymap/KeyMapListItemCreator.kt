@@ -43,7 +43,7 @@ class KeyMapListItemCreator(
 
             keyMap.trigger.keys.forEachIndexed { index, key ->
                 if (index > 0) {
-                    append("  $separator ")
+                    append(" $separator ")
                 }
 
                 when (key.clickType) {
@@ -51,7 +51,7 @@ class KeyMapListItemCreator(
                     ClickType.DOUBLE_PRESS -> append(doublePressString)
                 }
 
-                append(KeyEventUtils.keycodeToString(key.keyCode))
+                append(" ${KeyEventUtils.keycodeToString(key.keyCode)}")
 
                 val deviceName = when (key.device) {
                     is TriggerKeyDevice.Internal -> getString(R.string.this_device)

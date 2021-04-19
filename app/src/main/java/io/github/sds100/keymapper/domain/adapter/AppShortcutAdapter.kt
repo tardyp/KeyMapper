@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.framework.adapters
+package io.github.sds100.keymapper.domain.adapter
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle

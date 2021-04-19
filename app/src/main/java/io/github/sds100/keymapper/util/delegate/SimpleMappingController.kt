@@ -1,44 +1,66 @@
 package io.github.sds100.keymapper.util.delegate
 
 import androidx.annotation.MainThread
-import com.hadilq.liveevent.LiveEvent
+import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
 import io.github.sds100.keymapper.data.model.*
+import io.github.sds100.keymapper.domain.actions.Action
+import io.github.sds100.keymapper.domain.mappings.DetectMappingUseCase
+import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
+import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.isError
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * Created by sds100 on 10/01/21.
  */
 abstract class SimpleMappingController(
     private val coroutineScope: CoroutineScope,
-    private val useCase: PerformActionsUseCase,
-    iConstraintDelegate: IConstraintDelegate,
-    iActionError: IActionError
-) : IActionError by iActionError, IConstraintDelegate by iConstraintDelegate {
-
+    private val detectMappingUseCase: DetectMappingUseCase,
+    private val performActionsUseCase: PerformActionsUseCase,
+    private val detectConstraintsUseCase: DetectConstraintsUseCase
+) {
     private val repeatJobs = mutableMapOf<String, List<RepeatJob>>()
     private val performActionJobs = mutableMapOf<String, Job>()
-    private val actionsBeingHeldDown = mutableListOf<ActionEntity>()
+    private val actionsBeingHeldDown = mutableListOf<Action>()
 
-    val performAction = LiveEvent<PerformAction>()
-    val vibrateEvent: LiveEvent<VibrateEvent> = LiveEvent()
-    val showTriggeredToastEvent = LiveEvent<ShowTriggeredKeymapToast>()
+    private val defaultRepeatRate: StateFlow<Long> =
+        detectMappingUseCase.defaultRepeatRate.stateIn(
+            coroutineScope,
+            SharingStarted.Eagerly,
+            PreferenceDefaults.REPEAT_RATE.toLong()
+        )
+
+    private val forceVibrate: StateFlow<Boolean> =
+        detectMappingUseCase.forceVibrate.stateIn(
+            coroutineScope,
+            SharingStarted.Eagerly,
+            PreferenceDefaults.FORCE_VIBRATE
+        )
+    private val defaultHoldDownDuration: StateFlow<Long> =
+        detectMappingUseCase.defaultHoldDownDuration.stateIn(
+            coroutineScope,
+            SharingStarted.Eagerly,
+            PreferenceDefaults.HOLD_DOWN_DURATION.toLong()
+        )
+
+    private val defaultVibrateDuration: StateFlow<Long> =
+        detectMappingUseCase.defaultVibrateDuration.stateIn(
+            coroutineScope,
+            SharingStarted.Eagerly,
+            PreferenceDefaults.VIBRATION_DURATION.toLong()
+        )
 
     fun onDetected(
         mappingId: String,
-        actionList: List<ActionEntity>,
-        constraintList: List<ConstraintEntity>,
-        constraintMode: Int,
-        isEnabled: Boolean,
-        extras: List<Extra>,
-        vibrate: Boolean,
-        showTriggeredToast: Boolean
+        mapping: Mapping<*>
     ) {
-        if (!isEnabled) return
-        if (actionList.isEmpty()) return
-        if (!constraintList.toTypedArray().constraintsSatisfied(constraintMode)) return
+        if (!mapping.isEnabled) return
+        if (mapping.actionList.isEmpty()) return
+        if (!detectConstraintsUseCase.isSatisfied(mapping.constraintState)) return
 
         repeatJobs[mappingId]?.forEach { it.cancel() }
 
@@ -47,14 +69,14 @@ abstract class SimpleMappingController(
         performActionJobs[mappingId] = coroutineScope.launch {
             val repeatJobs = mutableListOf<RepeatJob>()
 
-            actionList.forEach {
-                if (canActionBePerformed(it, useCase.hasRootPermission).isError) return@forEach
+            mapping.actionList.forEach { action ->
+                if (performActionsUseCase.getError(action.data) != null) return@forEach
 
-                if (it.repeat) {
+                if (action.repeat) {
                     var alreadyRepeating = false
 
                     for (job in this@SimpleMappingController.repeatJobs[mappingId] ?: emptyList()) {
-                        if (job.actionUuid == it.uid) {
+                        if (job.actionUid == action.uid) {
                             alreadyRepeating = true
                             job.cancel()
                             break
@@ -62,70 +84,60 @@ abstract class SimpleMappingController(
                     }
 
                     if (!alreadyRepeating) {
-                        val job = RepeatJob(it.uid) { repeatAction(it) }
+                        val job = RepeatJob(action.uid) { repeatAction(action) }
                         repeatJobs.add(job)
                         job.start()
                     }
                 } else {
 
-                    val alreadyBeingHeldDown =
-                        actionsBeingHeldDown.any { action -> action.uid == it.uid }
+                    val alreadyBeingHeldDown = actionsBeingHeldDown.any { action.uid == it.uid }
 
                     val keyEventAction = when {
-                        it.holdDown && !alreadyBeingHeldDown -> InputEventType.DOWN
+                        action.holdDown && !alreadyBeingHeldDown -> InputEventType.DOWN
                         alreadyBeingHeldDown -> InputEventType.UP
                         else -> InputEventType.DOWN_UP
                     }
 
                     when {
-                        it.holdDown -> actionsBeingHeldDown.add(it)
-                        alreadyBeingHeldDown -> actionsBeingHeldDown.remove(it)
+                        action.holdDown -> actionsBeingHeldDown.add(action)
+                        alreadyBeingHeldDown -> actionsBeingHeldDown.remove(action)
                     }
 
-                    performAction(it, keyEventAction)
+                    performAction(action, keyEventAction)
                 }
 
-                delay(it.delayBeforeNextAction?.toLong() ?: 0)
+                delay(action.delayBeforeNextAction?.toLong() ?: 0)
             }
 
             this@SimpleMappingController.repeatJobs[mappingId] = repeatJobs
         }
 
-        //TODO use SimpleMapping interface
-//        if (vibrate) {
-//            val duration = extras
-//                .getData(FingerprintMapEntity.EXTRA_VIBRATION_DURATION)
-//                .valueOrNull()
-//                ?.toLong()
-//                ?: useCase.defaultVibrateDuration.firstBlocking().toLong()
-//
-//            vibrateEvent.value = VibrateEvent(duration)
-//        }
+        if (mapping.vibrate || forceVibrate.value) {
+            detectMappingUseCase.vibrate(
+                mapping.vibrateDuration?.toLong() ?: defaultVibrateDuration.value
+            )
+        }
 
-        if (showTriggeredToast) {
-            showTriggeredToastEvent.value = ShowTriggeredKeymapToast
+        if (mapping.showToast) {
+            detectMappingUseCase.showTriggeredToast()
         }
     }
 
     @MainThread
     private fun performAction(
-        action: ActionEntity,
-        keyEventAction: InputEventType = InputEventType.DOWN_UP
+        action: Action,
+        inputEventType: InputEventType = InputEventType.DOWN_UP
     ) {
         repeat(action.multiplier ?: 1) {
-            performAction.value = PerformAction(
-                action,
-                0,
-                keyEventAction)
+            performAction(action, inputEventType)
         }
     }
 
-    private fun repeatAction(action: ActionEntity) = coroutineScope.launch(start = CoroutineStart.LAZY) {
-        val repeatRate = action.repeatRate?.toLong() ?: 500L
-//            ?: useCase.defaultRepeatRate.firstBlocking().toLong() TODO
+    private fun repeatAction(action: Action) = coroutineScope.launch(start = CoroutineStart.LAZY) {
+        val repeatRate = action.repeatRate?.toLong() ?: defaultRepeatRate.value
 
-        val holdDownDuration = action.holdDownDuration?.toLong()?: 400L
-//            ?: useCase.defaultHoldDownDuration.firstBlocking().toLong() TODO
+        val holdDownDuration =
+            action.holdDownDuration?.toLong() ?: defaultHoldDownDuration.value
 
         val holdDown = action.holdDown
 
@@ -166,5 +178,5 @@ abstract class SimpleMappingController(
         actionsBeingHeldDown.clear()
     }
 
-    private class RepeatJob(val actionUuid: String, launch: () -> Job) : Job by launch.invoke()
+    private class RepeatJob(val actionUid: String, launch: () -> Job) : Job by launch.invoke()
 }

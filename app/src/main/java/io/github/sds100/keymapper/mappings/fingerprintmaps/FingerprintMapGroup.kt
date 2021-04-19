@@ -18,4 +18,6 @@ data class FingerprintMapGroup(val swipeDown: FingerprintMap,
             FingerprintMapId.SWIPE_RIGHT -> swipeRight
         }
     }
+
+    fun toList(): List<FingerprintMap> = listOf(swipeDown, swipeLeft,swipeUp,swipeRight)
 }

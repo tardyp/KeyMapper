@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 /**
  * Created by sds100 on 22/11/20.
  */
-abstract class ConfigActionsFragment<O : BaseOptions<ActionEntity>, A : Action>
+abstract class ConfigActionsFragment< A : Action>
     : RecyclerViewFragment<ActionListItem, FragmentActionListBinding>() {
 
     companion object {

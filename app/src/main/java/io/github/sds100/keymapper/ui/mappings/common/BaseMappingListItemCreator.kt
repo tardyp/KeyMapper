@@ -60,7 +60,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
 
             val icon: IconInfo? = actionUiHelper.getIcon(action.data)
 
-            val error: Error? = displayMapping.getActionError(action.data)
+            val error: Error? = displayMapping.getError(action.data)
 
             if (error == null) {
                 val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)

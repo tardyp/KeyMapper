@@ -22,9 +22,9 @@ data class FingerprintMap(
     override val actionList: List<FingerprintMapAction> = emptyList(),
     override val constraintState: ConstraintState = ConstraintState(),
     override val isEnabled: Boolean = true,
-    val vibrate: Boolean = false,
-    val vibrateDuration: Int? = null,
-    val showToast: Boolean = false
+ override   val vibrate: Boolean = false,
+   override val vibrateDuration: Int? = null,
+ override   val showToast: Boolean = false
 ) : Mapping<FingerprintMapAction> {
 
     fun isRepeatingActionUntilSwipedAgainAllowed(): Boolean {

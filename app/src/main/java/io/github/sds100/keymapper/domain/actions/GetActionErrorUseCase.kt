@@ -13,7 +13,9 @@ import io.github.sds100.keymapper.util.SystemActionUtils
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 /**
  * Created by sds100 on 15/02/2021.
@@ -28,42 +30,33 @@ class GetActionErrorUseCaseImpl(
 ) : GetActionErrorUseCase {
 
     private val isSystemActionSupported = IsSystemActionSupportedUseCaseImpl(systemFeatureAdapter)
-    private val keyMapperImeManager = KeyMapperImeHelper(inputMethodAdapter)
+    private val keyMapperImeHelper = KeyMapperImeHelper(inputMethodAdapter)
 
-    override val invalidateErrors = combine(inputMethodAdapter.chosenIme) {}
+    override val invalidateErrors = merge(
+        inputMethodAdapter.chosenIme.drop(1).map { },
+        permissionAdapter.onPermissionsUpdate
+    )
 
     override fun getError(action: ActionData): Error? {
         if (action.requiresImeToPerform()) {
-            if (!keyMapperImeManager.isCompatibleImeEnabled()) {
+            if (!keyMapperImeHelper.isCompatibleImeEnabled()) {
                 return FixableError.NoCompatibleImeEnabled
             }
 
-            if (!keyMapperImeManager.isCompatibleImeChosen()) {
+            if (!keyMapperImeHelper.isCompatibleImeChosen()) {
                 return FixableError.NoCompatibleImeChosen
             }
         }
 
         when (action) {
             is OpenAppAction -> {
-                if (!packageManager.isAppEnabled(action.packageName)) {
-                    return FixableError.AppDisabled(action.packageName)
-                }
-
-                if (!packageManager.isAppInstalled(action.packageName)) {
-                    return FixableError.AppNotFound(action.packageName)
-                }
+                return getAppError(action.packageName)
             }
 
             is OpenAppShortcutAction -> {
                 action.packageName ?: return null
 
-                if (!packageManager.isAppEnabled(action.packageName)) {
-                    return FixableError.AppDisabled(action.packageName)
-                }
-
-                if (!packageManager.isAppInstalled(action.packageName)) {
-                    return FixableError.AppNotFound(action.packageName)
-                }
+                return getAppError(action.packageName)
             }
 
             is KeyEventAction ->
@@ -85,6 +78,18 @@ class GetActionErrorUseCaseImpl(
                 }
 
             is SystemAction -> return action.getError()
+        }
+
+        return null
+    }
+
+    private fun getAppError(packageName: String): Error? {
+        if (!packageManager.isAppEnabled(packageName)) {
+            return FixableError.AppDisabled(packageName)
+        }
+
+        if (!packageManager.isAppInstalled(packageName)) {
+            return FixableError.AppNotFound(packageName)
         }
 
         return null

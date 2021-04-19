@@ -1,28 +1,37 @@
-package io.github.sds100.keymapper.domain.constraints
+package io.github.sds100.keymapper.constraints
 
-import android.Manifest
-import io.github.sds100.keymapper.Constants
+import android.os.Build
+import io.github.sds100.keymapper.domain.actions.*
+import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
 import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
+import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
+import io.github.sds100.keymapper.domain.constraints.Constraint
+import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
+import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
 import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
+import kotlinx.coroutines.flow.Flow
 
 /**
- * Created by sds100 on 20/03/2021.
+ * Created by sds100 on 17/04/2021.
  */
 
 class GetConstraintErrorUseCaseImpl(
     private val packageManager: PackageManagerAdapter,
     private val permissionAdapter: PermissionAdapter,
-    systemFeatureAdapter: SystemFeatureAdapter,
-) : GetConstraintErrorUseCase {
-    private val isSupportedByDevice =
+    private val systemFeatureAdapter: SystemFeatureAdapter,
+):GetConstraintErrorUseCase{
+
+    override val invalidateErrors: Flow<Unit> = permissionAdapter.onPermissionsUpdate
+
+    private val isConstraintSupportedByDevice =
         IsConstraintSupportedByDeviceUseCaseImpl(systemFeatureAdapter)
 
-    override fun invoke(constraint: Constraint): Error? {
-        isSupportedByDevice.invoke(constraint)?.let { return it }
+    override fun getConstraintError(constraint: Constraint): Error? {
+        isConstraintSupportedByDevice(constraint)?.let { return it }
 
         when (constraint) {
             is Constraint.AppInForeground -> return getAppError(constraint.packageName)
@@ -66,8 +75,11 @@ class GetConstraintErrorUseCaseImpl(
 
         return null
     }
+
 }
 
 interface GetConstraintErrorUseCase {
-    operator fun invoke(constraint: Constraint): Error?
+    val invalidateErrors: Flow<Unit>
+
+    fun getConstraintError(constraint: Constraint): Error?
 }

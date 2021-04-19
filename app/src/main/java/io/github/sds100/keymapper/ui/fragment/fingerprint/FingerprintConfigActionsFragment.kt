@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.util.Inject
  */
 
 class FingerprintConfigActionsFragment :
-    ConfigActionsFragment<FingerprintActionOptions, FingerprintMapAction>() {
+    ConfigActionsFragment<FingerprintMapAction>() {
 
     class Info : FragmentInfo(
         R.string.action_list_header,

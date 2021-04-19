@@ -7,6 +7,7 @@ package io.github.sds100.keymapper.domain.preferences
 internal object PreferenceDefaults {
     const val DARK_THEME = "2"
 
+    const val FORCE_VIBRATE = false
     const val LONG_PRESS_DELAY = 500
     const val DOUBLE_PRESS_DELAY = 300
     const val VIBRATION_DURATION = 200
