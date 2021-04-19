@@ -6,12 +6,14 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapI
 /**
  * Created by sds100 on 04/04/2021.
  */
-data class FingerprintMapGroup(val swipeDown: FingerprintMap,
-                               val swipeUp: FingerprintMap,
-                               val swipeLeft: FingerprintMap,
-                               val swipeRight: FingerprintMap){
-    fun get(fingerprintMapId: FingerprintMapId): FingerprintMap{
-        return when(fingerprintMapId){
+data class FingerprintMapGroup(
+    val swipeDown: FingerprintMap = FingerprintMap(),
+    val swipeUp: FingerprintMap = FingerprintMap(),
+    val swipeLeft: FingerprintMap = FingerprintMap(),
+    val swipeRight: FingerprintMap = FingerprintMap()
+) {
+    fun get(fingerprintMapId: FingerprintMapId): FingerprintMap {
+        return when (fingerprintMapId) {
             FingerprintMapId.SWIPE_DOWN -> swipeDown
             FingerprintMapId.SWIPE_UP -> swipeUp
             FingerprintMapId.SWIPE_LEFT -> swipeLeft
@@ -19,5 +21,5 @@ data class FingerprintMapGroup(val swipeDown: FingerprintMap,
         }
     }
 
-    fun toList(): List<FingerprintMap> = listOf(swipeDown, swipeLeft,swipeUp,swipeRight)
+    fun toList(): List<FingerprintMap> = listOf(swipeDown, swipeLeft, swipeUp, swipeRight)
 }

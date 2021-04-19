@@ -14,7 +14,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerpri
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeyMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEventUseCaseImpl
@@ -134,7 +134,7 @@ object Inject {
 
         return ConfigKeyMapViewModel.Factory(
             SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
-            GetKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            GetKeyMapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             configKeymapUseCase,
             TestActionUseCaseImpl(ServiceLocator.serviceAdapter(ctx)),
             UseCases.onboarding(ctx),

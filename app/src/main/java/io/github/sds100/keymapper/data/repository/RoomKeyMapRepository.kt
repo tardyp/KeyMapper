@@ -24,7 +24,7 @@ class RoomKeyMapRepository(
 ) : KeyMapRepository {
 
     companion object {
-        private val MIGRATIONS = listOf(
+        val MIGRATIONS = listOf(
             JsonMigration(9, 10) { gson, json -> Migration_9_10.migrateJson(gson, json) }
         )
     }

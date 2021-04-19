@@ -39,7 +39,7 @@ class DataStoreFingerprintMapRepository(
             FingerprintMapEntity.ID_SWIPE_RIGHT to PreferenceKeys.FINGERPRINT_GESTURE_SWIPE_RIGHT
         )
 
-        private val MIGRATIONS = listOf(
+        val MIGRATIONS = listOf(
             JsonMigration(0, 1) { gson, json -> Migration_0_1.migrate(gson, json) }
         )
     }

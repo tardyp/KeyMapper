@@ -8,10 +8,9 @@ import io.github.sds100.keymapper.constraints.ConstraintUtils
 import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeyMapActionOptionsViewModel
-import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeymapUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.GetKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
@@ -28,7 +27,6 @@ import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /**
@@ -37,7 +35,7 @@ import kotlinx.coroutines.launch
 
 class ConfigKeyMapViewModel(
     private val save: SaveKeymapUseCase,
-    private val get: GetKeymapUseCase,
+    private val get: GetKeyMapUseCase,
     private val config: ConfigKeyMapUseCase,
     private val testAction: TestActionUseCase,
     private val onboard: OnboardingUseCase,
@@ -131,7 +129,7 @@ class ConfigKeyMapViewModel(
 
     class Factory(
         private val save: SaveKeymapUseCase,
-        private val get: GetKeymapUseCase,
+        private val get: GetKeyMapUseCase,
         private val config: ConfigKeyMapUseCase,
         private val testAction: TestActionUseCase,
         private val onboard: OnboardingUseCase,

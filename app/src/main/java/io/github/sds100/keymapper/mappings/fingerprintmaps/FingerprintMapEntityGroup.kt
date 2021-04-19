@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapI
 /**
  * Created by sds100 on 04/04/2021.
  */
-data class FingerprintMapEntityGroup(val swipeDown: FingerprintMapEntity,
-                                     val swipeUp: FingerprintMapEntity,
-                                     val swipeLeft: FingerprintMapEntity,
-                                     val swipeRight: FingerprintMapEntity)
+data class FingerprintMapEntityGroup(val swipeDown: FingerprintMapEntity = FingerprintMapEntity(),
+                                     val swipeUp: FingerprintMapEntity= FingerprintMapEntity(),
+                                     val swipeLeft: FingerprintMapEntity= FingerprintMapEntity(),
+                                     val swipeRight: FingerprintMapEntity= FingerprintMapEntity())

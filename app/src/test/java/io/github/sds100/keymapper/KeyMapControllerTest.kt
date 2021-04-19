@@ -13,7 +13,7 @@ import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
 import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCase
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCase
-import io.github.sds100.keymapper.util.InputEventType
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.delegate.KeyMapController
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
@@ -1950,40 +1950,5 @@ class KeyMapControllerTest {
             is TriggerKeyDevice.External -> device.descriptor
             TriggerKeyDevice.Internal -> null
         }
-    }
-
-    private fun singleKeyTrigger(key: TriggerKey): KeyMapTrigger {
-        return KeyMapTrigger(
-            keys = listOf(key),
-            mode = TriggerMode.Undefined
-        )
-    }
-
-    private fun parallelTrigger(vararg keys: TriggerKey): KeyMapTrigger {
-        return KeyMapTrigger(
-            keys = keys.toList(),
-            mode = TriggerMode.Parallel(keys[0].clickType)
-        )
-    }
-
-    private fun sequenceTrigger(vararg keys: TriggerKey): KeyMapTrigger {
-        return KeyMapTrigger(
-            keys = keys.toList(),
-            mode = TriggerMode.Sequence
-        )
-    }
-
-    private fun triggerKey(
-        keyCode: Int,
-        device: TriggerKeyDevice = TriggerKeyDevice.Internal,
-        clickType: ClickType = ClickType.SHORT_PRESS,
-        consume: Boolean = true
-    ): TriggerKey {
-        return TriggerKey(
-            keyCode = keyCode,
-            device = device,
-            clickType = clickType,
-            consumeKeyEvent = consume
-        )
     }
 }

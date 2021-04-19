@@ -43,7 +43,6 @@ import java.io.OutputStream
  * Created by sds100 on 16/03/2021.
  */
 
-//ensure is singleton
 class BackupManagerImpl(
     private val coroutineScope: CoroutineScope,
     private val fileAdapter: FileAdapter,
@@ -173,6 +172,7 @@ class BackupManagerImpl(
 
                     backupAsync(outputStream, data).await()
                 }
+
 
             onBackupResult.emit(result)
         }

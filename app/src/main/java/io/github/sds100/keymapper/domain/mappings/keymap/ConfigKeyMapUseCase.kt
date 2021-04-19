@@ -301,7 +301,7 @@ class ConfigKeyMapUseCaseImpl(
         if (data is KeyEventAction) {
             if (KeyEventUtils.isModifierKey(data.keyCode)) {
                 holdDown = true
-                repeat = true
+                repeat = false
             } else {
                 repeat = true
             }
