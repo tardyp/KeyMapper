@@ -58,6 +58,7 @@ sealed class Error : Result<Nothing>() {
     object CorruptActionError : Error()
     object Duplicate : Error()
     data class ImeNotFoundForPackage(val packageName: String) : Error()
+    object LauncherShortcutsNotSupported: Error()
 }
 
 //TODO move these to Error and create isFixable extension function for Error.
@@ -103,7 +104,7 @@ inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {
     return this
 }
 
-infix fun <T, U> Result<T>.onFailure(f: (error: Error) -> U): Result<T> {
+inline fun <T, U> Result<T>.onFailure(f: (error: Error) -> U): Result<T> {
     if (this is Error) {
         f(this)
     }

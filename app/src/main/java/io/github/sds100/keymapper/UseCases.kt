@@ -20,8 +20,8 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.DetectFingerprintMaps
 import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
-import io.github.sds100.keymapper.packages.DisplayAppsUseCase
-import io.github.sds100.keymapper.packages.DisplayAppsUseCaseImpl
+import io.github.sds100.keymapper.apps.DisplayAppsUseCase
+import io.github.sds100.keymapper.apps.DisplayAppsUseCaseImpl
 import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCase
 import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCaseImpl
 import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCase

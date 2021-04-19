@@ -5,8 +5,7 @@ import androidx.datastore.preferences.core.preferencesKey
 import com.github.salomonbrys.kotson.get
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.repository.DataStoreFingerprintMapRepository
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.data.repositories.DataStoreFingerprintMapRepository
 import io.github.sds100.keymapper.util.JsonTestUtils
 import io.github.sds100.keymapper.util.MigrationUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi

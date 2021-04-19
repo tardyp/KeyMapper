@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.ui.keyevent
 
 import androidx.fragment.app.activityViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.viewmodel.ChooseKeyCodeViewModel
+import io.github.sds100.keymapper.keyevents.ChooseKeyCodeViewModel
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.fragment.SimpleRecyclerViewFragment

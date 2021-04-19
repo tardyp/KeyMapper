@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
-import io.github.sds100.keymapper.data.model.TriggerEntity
+import io.github.sds100.keymapper.data.entities.TriggerEntity
 import io.github.sds100.keymapper.domain.utils.ClickType
 import kotlinx.serialization.Serializable
 import splitties.bitflags.hasFlag

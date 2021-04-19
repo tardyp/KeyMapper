@@ -5,11 +5,11 @@ import com.github.salomonbrys.kotson.contains
 import com.github.salomonbrys.kotson.get
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.db.AppDatabase
-import io.github.sds100.keymapper.data.model.FingerprintMapEntity
-import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.data.repository.DeviceInfoCache
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntity
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
+import io.github.sds100.keymapper.devices.DeviceInfoCache
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.BackupManagerImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
@@ -374,7 +374,7 @@ class BackupManagerTest {
 
             assertThat(
                 rootElement["keymap_db_version"].asInt,
-                `is`(AppDatabase.DATABASE_VERSION)
+                `is`(KeyMapDatabase.DATABASE_VERSION)
             )
         }
 

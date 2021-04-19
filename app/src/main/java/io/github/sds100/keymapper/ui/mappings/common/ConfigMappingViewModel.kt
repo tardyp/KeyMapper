@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.ui.mappings.common
 
 import android.os.Bundle
-import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
+import io.github.sds100.keymapper.actions.ConfigActionsViewModel
+import io.github.sds100.keymapper.constraints.ConfigConstraintsViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 /**

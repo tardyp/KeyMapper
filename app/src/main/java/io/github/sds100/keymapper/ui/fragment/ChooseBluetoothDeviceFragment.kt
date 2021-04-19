@@ -4,7 +4,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.viewmodel.ChooseBluetoothDeviceViewModel
+import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.devices.BluetoothDeviceInfo
 import io.github.sds100.keymapper.simple

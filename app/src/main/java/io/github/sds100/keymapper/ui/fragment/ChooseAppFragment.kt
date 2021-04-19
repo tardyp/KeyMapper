@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.model.AppListItem
-import io.github.sds100.keymapper.data.viewmodel.ChooseAppViewModel
+import io.github.sds100.keymapper.apps.AppListItem
+import io.github.sds100.keymapper.apps.ChooseAppViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseAppBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState

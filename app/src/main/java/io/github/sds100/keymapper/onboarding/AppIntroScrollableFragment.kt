@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
-import io.github.sds100.keymapper.data.viewmodel.AppIntroViewModel
 import io.github.sds100.keymapper.databinding.FragmentAppIntroSlideBinding
-import io.github.sds100.keymapper.ui.activity.AppIntroActivity
 import io.github.sds100.keymapper.util.Inject
 import kotlinx.coroutines.flow.collectLatest
 

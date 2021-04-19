@@ -2,12 +2,14 @@ package io.github.sds100.keymapper
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import androidx.datastore.preferences.createDataStore
 import androidx.room.Room
-import io.github.sds100.keymapper.data.db.AppDatabase
-import io.github.sds100.keymapper.data.db.DefaultDataStoreManager
-import io.github.sds100.keymapper.data.db.IDataStoreManager
-import io.github.sds100.keymapper.data.preferences.DataStorePreferenceRepository
-import io.github.sds100.keymapper.data.repository.*
+import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
+import io.github.sds100.keymapper.data.repositories.DataStorePreferenceRepository
+import io.github.sds100.keymapper.data.repositories.DataStoreFingerprintMapRepository
+import io.github.sds100.keymapper.data.repositories.RoomDeviceInfoCache
+import io.github.sds100.keymapper.data.repositories.RoomKeyMapRepository
+import io.github.sds100.keymapper.devices.DeviceInfoCache
 import io.github.sds100.keymapper.domain.BackupManager
 import io.github.sds100.keymapper.domain.BackupManagerImpl
 import io.github.sds100.keymapper.domain.adapter.*
@@ -17,7 +19,9 @@ import io.github.sds100.keymapper.files.FileAdapter
 import io.github.sds100.keymapper.framework.adapters.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
 import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
+import io.github.sds100.keymapper.framework.adapters.FileRepository
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
 import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.ui.NotificationController
 import kotlinx.coroutines.runBlocking
@@ -28,25 +32,7 @@ import kotlinx.coroutines.runBlocking
 object ServiceLocator {
 
     private val lock = Any()
-    private var database: AppDatabase? = null
-
-    @Volatile
-    private var keymapRepository: DefaultKeymapRepository? = null
-
-    fun defaultKeymapRepository(context: Context): DefaultKeymapRepository {
-        synchronized(this) {
-            return keymapRepository ?: createKeymapRepository(context)
-        }
-    }
-
-    private fun createKeymapRepository(context: Context): DefaultKeymapRepository {
-        val database = database ?: createDatabase(context.applicationContext)
-        keymapRepository = DefaultKeymapRepository(
-            database.keymapDao(),
-            (context.applicationContext as KeyMapperApp).appCoroutineScope
-        )
-        return keymapRepository!!
-    }
+    private var database: KeyMapDatabase? = null
 
     @Volatile
     private var deviceInfoRepository: DeviceInfoCache? = null
@@ -83,21 +69,6 @@ object ServiceLocator {
     }
 
     @Volatile
-    private var dataStoreManager: IDataStoreManager? = null
-
-    private fun dataStoreManager(context: Context): IDataStoreManager {
-        synchronized(this) {
-            return dataStoreManager ?: createDataStoreManager(context)
-        }
-    }
-
-    private fun createDataStoreManager(context: Context): IDataStoreManager {
-        return dataStoreManager ?: DefaultDataStoreManager(context.applicationContext).also {
-            this.dataStoreManager = it
-        }
-    }
-
-    @Volatile
     private var fingerprintMapRepository: FingerprintMapRepository? = null
 
     fun fingerprintMapRepository(context: Context): FingerprintMapRepository {
@@ -107,7 +78,7 @@ object ServiceLocator {
     }
 
     private fun createFingerprintMapRepository(context: Context): FingerprintMapRepository {
-        val dataStore = dataStoreManager(context).fingerprintGestureDataStore
+        val dataStore = context.createDataStore("fingerprint_gestures")
         val scope = (context.applicationContext as KeyMapperApp).appCoroutineScope
 
         return fingerprintMapRepository
@@ -129,22 +100,6 @@ object ServiceLocator {
         return fileRepository
             ?: FileRepository(context.applicationContext).also {
                 this.fileRepository = it
-            }
-    }
-
-    @Volatile
-    private var packageRepository: AndroidAppRepository? = null
-
-    fun packageRepository(context: Context): AppRepository {
-        synchronized(this) {
-            return packageRepository ?: createPackageRepository(context)
-        }
-    }
-
-    private fun createPackageRepository(context: Context): AppRepository {
-        return packageRepository
-            ?: AndroidAppRepository(context.packageManager).also {
-                this.packageRepository = it
             }
     }
 
@@ -254,40 +209,21 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).displayAdapter
     }
 
-    @VisibleForTesting
-    fun resetKeymapRepository() {
-        synchronized(lock) {
-            runBlocking {
-                keymapRepository?.deleteAll()
-                deviceInfoRepository?.deleteAll()
-            }
-
-            database?.apply {
-                clearAllTables()
-                close()
-            }
-
-            database = null
-            keymapRepository = null
-            deviceInfoRepository = null
-        }
-    }
-
-    private fun createDatabase(context: Context): AppDatabase {
+    private fun createDatabase(context: Context): KeyMapDatabase {
         val result = Room.databaseBuilder(
             context.applicationContext,
-            AppDatabase::class.java,
-            AppDatabase.DATABASE_NAME
+            KeyMapDatabase::class.java,
+            KeyMapDatabase.DATABASE_NAME
         ).addMigrations(
-            AppDatabase.MIGRATION_1_2,
-            AppDatabase.MIGRATION_2_3,
-            AppDatabase.MIGRATION_3_4,
-            AppDatabase.MIGRATION_4_5,
-            AppDatabase.MIGRATION_5_6,
-            AppDatabase.MIGRATION_6_7,
-            AppDatabase.MIGRATION_7_8,
-            AppDatabase.MIGRATION_8_9,
-            AppDatabase.MIGRATION_9_10
+            KeyMapDatabase.MIGRATION_1_2,
+            KeyMapDatabase.MIGRATION_2_3,
+            KeyMapDatabase.MIGRATION_3_4,
+            KeyMapDatabase.MIGRATION_4_5,
+            KeyMapDatabase.MIGRATION_5_6,
+            KeyMapDatabase.MIGRATION_6_7,
+            KeyMapDatabase.MIGRATION_7_8,
+            KeyMapDatabase.MIGRATION_8_9,
+            KeyMapDatabase.MIGRATION_9_10
         ).build()
         /* REMINDER!!!! Need to migrate fingerprint maps and other stuff???
          * Keep this note at the bottom */

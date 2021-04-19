@@ -16,11 +16,11 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.viewmodel.ChooseActionViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
+import io.github.sds100.keymapper.actions.ChooseActionViewModel
+import io.github.sds100.keymapper.keyevents.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentChooseActionBinding
 import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.packages.ChooseAppShortcutResult
+import io.github.sds100.keymapper.apps.ChooseAppShortcutResult
 import io.github.sds100.keymapper.ui.adapter.ChooseActionPagerAdapter
 import io.github.sds100.keymapper.ui.keyevent.ConfigKeyEventResult
 import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment

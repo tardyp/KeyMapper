@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.TabFragmentModel
+import io.github.sds100.keymapper.util.TabFragmentModel
 import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.keyevent.KeyCodeListFragment
 import io.github.sds100.keymapper.ui.shortcuts.ChooseAppShortcutFragment

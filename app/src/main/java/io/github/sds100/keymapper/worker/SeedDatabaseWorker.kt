@@ -6,10 +6,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.data.model.ConstraintEntity
-import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.data.model.TriggerEntity
+import io.github.sds100.keymapper.data.entities.ActionEntity
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
+import io.github.sds100.keymapper.data.entities.TriggerEntity
 import kotlinx.coroutines.coroutineScope
 
 /**
@@ -23,16 +22,18 @@ class SeedDatabaseWorker(
         try {
             val keymaps = sequence {
                 for (i in 1..100) {
-                    yield(KeyMapEntity(
+                    yield(
+                        KeyMapEntity(
                         id = 0,
                         trigger = createRandomTrigger(),
                         actionList = createRandomActionList(),
                         flags = 0
-                    ))
+                    )
+                    )
                 }
             }.toList().toTypedArray()
 
-            ServiceLocator.defaultKeymapRepository(applicationContext).insertKeymap(*keymaps)
+            ServiceLocator.roomKeymapRepository(applicationContext).insert(*keymaps)
 
             Result.success()
         } catch (e: Exception) {
@@ -42,17 +43,20 @@ class SeedDatabaseWorker(
 
     private fun createRandomTrigger(): TriggerEntity {
         val keys = sequence {
-            yield(TriggerEntity.KeyEntity(
+            yield(
+                TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_CTRL_LEFT,
                 TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE,
                 TriggerEntity.SHORT_PRESS
             ))
-            yield(TriggerEntity.KeyEntity(
+            yield(
+                TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_ALT_LEFT,
                 TriggerEntity.KeyEntity.DEVICE_ID_ANY_DEVICE,
                 TriggerEntity.LONG_PRESS
             ))
-            yield(TriggerEntity.KeyEntity(
+            yield(
+                TriggerEntity.KeyEntity(
                 KeyEvent.KEYCODE_DEL,
                 TriggerEntity.KeyEntity.DEVICE_ID_THIS_DEVICE,
                 TriggerEntity.SHORT_PRESS
@@ -64,14 +68,18 @@ class SeedDatabaseWorker(
 
     private fun createRandomActionList(): List<ActionEntity> {
         return sequence {
-            yield(ActionEntity(
+            yield(
+                ActionEntity(
                 type = ActionEntity.Type.APP,
                 data = Constants.PACKAGE_NAME
-            ))
-            yield(ActionEntity(
+            )
+            )
+            yield(
+                ActionEntity(
                 type = ActionEntity.Type.APP,
                 data = "this.app.doesnt.exist"
-            ))
+            )
+            )
         }.toList()
     }
 }

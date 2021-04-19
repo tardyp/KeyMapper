@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.constraints.ConstraintUtils
-import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
+import io.github.sds100.keymapper.actions.ConfigActionsViewModel
+import io.github.sds100.keymapper.constraints.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.data.viewmodel.ConfigKeyMapActionOptionsViewModel
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.GetKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCase
+import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.trigger.RecordTriggerUseCase
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
 import io.github.sds100.keymapper.domain.utils.State
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
  */
 
 class ConfigKeyMapViewModel(
-    private val save: SaveKeymapUseCase,
+    private val save: SaveKeyMapUseCase,
     private val get: GetKeyMapUseCase,
     private val config: ConfigKeyMapUseCase,
     private val testAction: TestActionUseCase,
@@ -128,7 +128,7 @@ class ConfigKeyMapViewModel(
     }
 
     class Factory(
-        private val save: SaveKeymapUseCase,
+        private val save: SaveKeyMapUseCase,
         private val get: GetKeyMapUseCase,
         private val config: ConfigKeyMapUseCase,
         private val testAction: TestActionUseCase,

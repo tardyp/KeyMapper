@@ -3,8 +3,6 @@ package io.github.sds100.keymapper.ui.fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.airbnb.epoxy.EpoxyController
@@ -15,15 +13,12 @@ import io.github.sds100.keymapper.ActionBindingModel_
 import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.action
-import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.data.model.options.BaseOptions
-import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
+import io.github.sds100.keymapper.actions.ConfigActionsViewModel
 import io.github.sds100.keymapper.databinding.FragmentActionListBinding
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.ui.ListUiState
 import io.github.sds100.keymapper.ui.actions.ActionListItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Created by sds100 on 22/11/20.

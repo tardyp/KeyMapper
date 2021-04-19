@@ -11,13 +11,13 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.MalformedJsonException
-import io.github.sds100.keymapper.data.db.AppDatabase
-import io.github.sds100.keymapper.data.model.DeviceInfoEntity
-import io.github.sds100.keymapper.data.model.FingerprintMapEntity
-import io.github.sds100.keymapper.data.model.KeyMapEntity
-import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.data.repository.DeviceInfoCache
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
+import io.github.sds100.keymapper.devices.DeviceInfoEntity
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntity
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
+import io.github.sds100.keymapper.data.entities.TriggerEntity
+import io.github.sds100.keymapper.devices.DeviceInfoCache
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
@@ -35,7 +35,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.FileOutputStream
 import java.io.OutputStream
 
@@ -227,7 +226,7 @@ class BackupManagerImpl(
                 gson.fromJson<List<DeviceInfoEntity>>(deviceInfoJsonArray ?: JsonArray())
 
             //started storing database version at db version 10
-            if (keymapDbVersion > AppDatabase.DATABASE_VERSION) {
+            if (keymapDbVersion > KeyMapDatabase.DATABASE_VERSION) {
                 return Error.BackupVersionTooNew
             }
 
@@ -306,7 +305,7 @@ class BackupManagerImpl(
                 .map { id -> allDeviceInfoList.single { it.descriptor == id } }
                 .takeIf { it.isNotEmpty() }
 
-            val keyMapDbVersion = data.keyMapList?.let { AppDatabase.DATABASE_VERSION }
+            val keyMapDbVersion = data.keyMapList?.let { KeyMapDatabase.DATABASE_VERSION }
 
             outputStream.bufferedWriter().use { writer ->
 

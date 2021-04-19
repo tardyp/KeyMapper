@@ -1,16 +1,18 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.BaseMappingListViewModel
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapGroup
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ListFingerprintMapsUseCase
-import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItem
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItemCreator
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -18,7 +20,7 @@ class FingerprintMapListViewModel(
     private val coroutineScope: CoroutineScope,
     private val useCase: ListFingerprintMapsUseCase,
     resourceProvider: ResourceProvider,
-) : BaseMappingListViewModel(coroutineScope, useCase, resourceProvider) {
+) : UserResponseViewModel by UserResponseViewModelImpl(), ResourceProvider by resourceProvider {
 
     private val listItemCreator = FingerprintMapListItemCreator(
         useCase,
@@ -93,5 +95,31 @@ class FingerprintMapListViewModel(
 
     fun onResetClick() {
         useCase.resetFingerprintMaps()
+    }
+
+
+    fun onActionChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
+    fun onConstraintsChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
+    private fun showSnackBarAndFixError(error: FixableError) {
+        coroutineScope.launch {
+            val snackBar = GetUserResponse.SnackBar(
+                title = error.getFullMessage(this@FingerprintMapListViewModel),
+                actionText = getString(R.string.snackbar_fix)
+            )
+
+            getUserResponse("fix_error", snackBar) ?: return@launch
+
+            useCase.fixError(error)
+        }
     }
 }

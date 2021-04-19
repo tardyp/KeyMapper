@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.constraints
 
-import io.github.sds100.keymapper.data.model.ConstraintEntity
-import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.constraints.ConstraintEntity
+import io.github.sds100.keymapper.data.entities.Extra
+import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.domain.utils.Orientation
 import io.github.sds100.keymapper.util.result.valueOrNull
 import kotlinx.serialization.Serializable

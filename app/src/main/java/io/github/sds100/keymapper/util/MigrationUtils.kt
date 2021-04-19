@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.util
 
 import com.google.gson.Gson
-import io.github.sds100.keymapper.data.db.migration.JsonMigration
 
 /**
  * Created by sds100 on 24/01/21.

@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.actions
 
-import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.data.entities.ActionEntity
+import io.github.sds100.keymapper.data.entities.Extra
+import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.domain.devices.InputDeviceInfo
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.util.IntentTarget
@@ -348,7 +348,8 @@ object ActionDataEntityMapper {
         )
 
         is CycleRotationsSystemAction -> listOf(
-            Extra(ActionEntity.EXTRA_ORIENTATIONS,
+            Extra(
+                ActionEntity.EXTRA_ORIENTATIONS,
                 data.orientations.joinToString(",") { ORIENTATION_MAP[it]!! })
         )
 

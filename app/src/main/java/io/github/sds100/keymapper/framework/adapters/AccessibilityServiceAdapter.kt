@@ -12,9 +12,7 @@ import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
 import io.github.sds100.keymapper.framework.JobSchedulerHelper
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.activity.MainActivity
-import io.github.sds100.keymapper.ui.utils.getJsonSerializable
-import io.github.sds100.keymapper.ui.utils.putJsonSerializable
+import io.github.sds100.keymapper.MainActivity
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
@@ -23,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Created by sds100 on 17/03/2021.

@@ -1,28 +1,31 @@
 package io.github.sds100.keymapper.data.viewmodel
 
+import androidx.lifecycle.ViewModel
+import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
-import io.github.sds100.keymapper.mappings.BaseMappingListViewModel
 import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCase
-import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.createListState
+import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItemCreator
 import io.github.sds100.keymapper.ui.utils.SelectionState
 import io.github.sds100.keymapper.util.MultiSelectProvider
+import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class KeyMapListViewModel internal constructor(
+open class KeyMapListViewModel constructor(
     private val coroutineScope: CoroutineScope,
     private val useCase: ListKeyMapsUseCase,
     resourceProvider: ResourceProvider,
     private val multiSelectProvider: MultiSelectProvider
-) : BaseMappingListViewModel(coroutineScope, useCase, resourceProvider) {
+) : ViewModel(),UserResponseViewModel by UserResponseViewModelImpl(), ResourceProvider by resourceProvider{
 
     private val listItemCreator = KeyMapListItemCreator(useCase, resourceProvider)
 
@@ -139,6 +142,37 @@ class KeyMapListViewModel internal constructor(
                         .toTypedArray())
                 }
             }
+        }
+    }
+
+    fun onActionChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
+    fun onTriggerErrorChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
+    fun onConstraintsChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.FixableError) {
+            showSnackBarAndFixError(chipModel.error)
+        }
+    }
+
+    private fun showSnackBarAndFixError(error: FixableError) {
+        coroutineScope.launch {
+            val snackBar = GetUserResponse.SnackBar(
+                title = error.getFullMessage(this@KeyMapListViewModel),
+                actionText = getString(R.string.snackbar_fix)
+            )
+
+            getUserResponse("fix_error", snackBar) ?: return@launch
+
+            useCase.fixError(error)
         }
     }
 }

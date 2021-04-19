@@ -5,7 +5,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.SystemActionListItem
+import io.github.sds100.keymapper.actions.SystemActionListItem
 import io.github.sds100.keymapper.data.viewmodel.SystemActionListViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.sectionHeader

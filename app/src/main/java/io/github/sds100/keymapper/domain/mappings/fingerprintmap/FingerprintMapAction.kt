@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
-import io.github.sds100.keymapper.data.model.ActionEntity
-import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.data.entities.ActionEntity
+import io.github.sds100.keymapper.data.entities.Extra
+import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.actions.ActionData
 import io.github.sds100.keymapper.domain.actions.ActionDataEntityMapper

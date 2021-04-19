@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.util.delegate
 
 import androidx.annotation.MainThread
 import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
-import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.domain.actions.Action
 import io.github.sds100.keymapper.domain.mappings.DetectMappingUseCase
 import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
@@ -123,13 +122,12 @@ abstract class SimpleMappingController(
         }
     }
 
-    @MainThread
     private fun performAction(
         action: Action,
         inputEventType: InputEventType = InputEventType.DOWN_UP
     ) {
         repeat(action.multiplier ?: 1) {
-            performAction(action, inputEventType)
+            performActionsUseCase.performAction(action.data, inputEventType)
         }
     }
 

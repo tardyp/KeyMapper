@@ -2,9 +2,9 @@ package io.github.sds100.keymapper.util.delegate
 
 import android.view.KeyEvent
 import androidx.collection.*
+import io.github.sds100.keymapper.data.entities.ActionEntity
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
-import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.domain.actions.KeyEventAction
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction

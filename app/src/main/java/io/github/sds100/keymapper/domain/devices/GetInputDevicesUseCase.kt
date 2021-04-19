@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.devices
 
-import io.github.sds100.keymapper.data.repository.DeviceInfoCache
+import io.github.sds100.keymapper.devices.DeviceInfoCache
 import io.github.sds100.keymapper.domain.adapter.ExternalDevicesAdapter
 import io.github.sds100.keymapper.domain.preferences.Keys
 import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
@@ -12,7 +12,6 @@ import io.github.sds100.keymapper.util.result.Success
 import io.github.sds100.keymapper.util.result.otherwise
 import io.github.sds100.keymapper.util.result.then
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.map
 

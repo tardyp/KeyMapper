@@ -18,12 +18,12 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.viewmodel.ConfigIntentViewModel
+import io.github.sds100.keymapper.intents.ConfigIntentViewModel
 import io.github.sds100.keymapper.databinding.FragmentIntentActionTypeBinding
 import io.github.sds100.keymapper.databinding.ListItemIntentExtraBoolBinding
 import io.github.sds100.keymapper.intentExtraBool
 import io.github.sds100.keymapper.intentExtraGeneric
+import io.github.sds100.keymapper.intents.*
 import io.github.sds100.keymapper.util.*
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.message
@@ -158,14 +158,15 @@ class IntentActionTypeFragment : Fragment() {
             }
         }
 
-        viewModel.eventStream.observe(viewLifecycleOwner, { event ->
-            when (event) {
-                is BuildIntentExtraListItemModels -> viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-                    val models = event.extraModels.map { it.toListItemModel() }
-                    viewModel.setListItemModels(models)
-                }
-            }
-        })
+        //TODO
+//        viewModel.eventStream.observe(viewLifecycleOwner, { event ->
+//            when (event) {
+//                is BuildIntentExtraListItemModels -> viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+//                    val models = event.extraModels.map { it.toListItemModel() }
+//                    viewModel.setListItemModels(models)
+//                }
+//            }
+//        })
 
         subscribeExtrasList()
     }

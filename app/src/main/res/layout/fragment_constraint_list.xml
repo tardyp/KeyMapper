@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel" />
+            type="io.github.sds100.keymapper.constraints.ConfigConstraintsViewModel" />
 
         <variable
             name="onAddConstraintClick"

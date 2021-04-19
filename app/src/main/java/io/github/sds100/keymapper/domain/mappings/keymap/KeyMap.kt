@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
 import io.github.sds100.keymapper.constraints.ConstraintState
-import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
 import io.github.sds100.keymapper.domain.actions.canBeHeldDown
 import io.github.sds100.keymapper.domain.constraints.ConstraintEntityMapper
 import io.github.sds100.keymapper.domain.constraints.ConstraintModeEntityMapper

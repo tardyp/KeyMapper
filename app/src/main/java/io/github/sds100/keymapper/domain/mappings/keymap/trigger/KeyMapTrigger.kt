@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.domain.mappings.keymap.trigger
 
-import io.github.sds100.keymapper.data.model.Extra
-import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.data.model.getData
+import io.github.sds100.keymapper.data.entities.Extra
+import io.github.sds100.keymapper.data.entities.TriggerEntity
+import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.domain.utils.ClickType
 import io.github.sds100.keymapper.util.delegate.GetEventDelegate
 import io.github.sds100.keymapper.util.result.valueOrNull

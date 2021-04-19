@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.SliderModel
+import io.github.sds100.keymapper.util.SliderModel
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction

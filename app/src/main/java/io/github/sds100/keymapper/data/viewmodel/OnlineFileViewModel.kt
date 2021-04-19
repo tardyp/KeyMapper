@@ -3,8 +3,7 @@
 package io.github.sds100.keymapper.data.viewmodel
 
 import androidx.lifecycle.*
-import com.hadilq.liveevent.LiveEvent
-import io.github.sds100.keymapper.data.repository.FileRepository
+import io.github.sds100.keymapper.framework.adapters.FileRepository
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.handle
@@ -13,6 +12,7 @@ import io.github.sds100.keymapper.util.result.handle
  * Created by sds100 on 04/04/2020.
  */
 
+//TODO use FileAdapter
 class OnlineFileViewModel(
     private val repository: FileRepository,
     private val fileUrl: String,
@@ -47,7 +47,7 @@ class OnlineFileViewModel(
         }
     }
 
-    private val _eventStream = LiveEvent<Event>()
+    private val _eventStream = MutableLiveData<Event>()
     val eventStream: LiveData<Event> = _eventStream
 
     class Factory(

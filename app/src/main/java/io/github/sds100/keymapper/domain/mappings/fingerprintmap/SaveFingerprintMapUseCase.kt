@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.fingerprintmap
 
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
 
 /**
  * Created by sds100 on 08/03/2021.

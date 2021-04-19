@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.ui.fragment.keymap
 import androidx.navigation.navGraphViewModels
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
+import io.github.sds100.keymapper.constraints.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.ui.fragment.ConfigConstraintsFragment
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.Inject

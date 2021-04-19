@@ -9,8 +9,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.AppShortcutListItem
-import io.github.sds100.keymapper.data.viewmodel.ChooseAppShortcutViewModel
+import io.github.sds100.keymapper.apps.AppShortcutListItem
+import io.github.sds100.keymapper.apps.ChooseAppShortcutViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.simple

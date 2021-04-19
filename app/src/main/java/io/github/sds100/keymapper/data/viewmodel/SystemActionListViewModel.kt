@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCase
-import io.github.sds100.keymapper.data.model.SystemActionListItem
+import io.github.sds100.keymapper.actions.SystemActionListItem
 import io.github.sds100.keymapper.domain.actions.*
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider

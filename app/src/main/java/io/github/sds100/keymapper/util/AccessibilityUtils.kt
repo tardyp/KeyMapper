@@ -7,7 +7,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.activity.MainActivity
+import io.github.sds100.keymapper.MainActivity
 
 /**
  * Created by sds100 on 06/08/2019.

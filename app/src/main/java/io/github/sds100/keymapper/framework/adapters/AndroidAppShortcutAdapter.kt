@@ -14,9 +14,7 @@ import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
 import io.github.sds100.keymapper.domain.shortcuts.AppShortcutInfo
 import io.github.sds100.keymapper.domain.utils.State
 import io.github.sds100.keymapper.ui.activity.LaunchKeymapShortcutActivity
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.success
+import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
@@ -47,8 +45,8 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
     override val areLauncherShortcutsSupported: Boolean
         get() = ShortcutManagerCompat.isRequestPinShortcutSupported(ctx)
 
-    override fun createLauncherShortcut(icon: Drawable, label: String, intentAction: String, intentExtras: Bundle) {
-        ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
+    override fun createLauncherShortcut(icon: Drawable, label: String, intentAction: String, intentExtras: Bundle): ShortcutInfoCompat {
+       val builder =  ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
             setIcon(IconCompat.createWithBitmap(icon.toBitmap()))
             setShortLabel(label)
 
@@ -59,9 +57,23 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
 
                 setIntent(this)
             }
-
-            ShortcutManagerCompat.requestPinShortcut(ctx, this.build(), null)
         }
+
+        return builder.build()
+    }
+
+    override fun pinShortcut(shortcut: ShortcutInfoCompat): Result<*> {
+        val supported = ShortcutManagerCompat.requestPinShortcut(ctx, shortcut, null)
+
+        if (!supported){
+            return Error.LauncherShortcutsNotSupported
+        }else{
+            return Success(Unit)
+        }
+    }
+
+    override fun createShortcutResultIntent(shortcut: ShortcutInfoCompat): Intent {
+        return ShortcutManagerCompat.createShortcutResultIntent(ctx, shortcut)
     }
 
     override fun getShortcutName(info: AppShortcutInfo): Result<String> {

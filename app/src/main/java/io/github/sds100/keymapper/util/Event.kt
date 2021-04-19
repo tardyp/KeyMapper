@@ -18,12 +18,13 @@ package io.github.sds100.keymapper.util
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.*
-import io.github.sds100.keymapper.data.model.options.BaseOptions
-import io.github.sds100.keymapper.data.model.options.TriggerKeyOptions
+import io.github.sds100.keymapper.data.entities.ActionEntity
+import io.github.sds100.keymapper.constraints.ConstraintEntity
+import io.github.sds100.keymapper.devices.DeviceInfoEntity
 import io.github.sds100.keymapper.domain.actions.ActionData
+import io.github.sds100.keymapper.intents.IntentExtraModel
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
 import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
 import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -124,14 +125,6 @@ object HideKeyboardEvent: Event()
 
 @Serializable
 object ShowKeyboardEvent: Event()
-
-//trigger
-
-class EditTriggerKeyOptions(val options: TriggerKeyOptions) : Event()
-
-//action list
-
-class EditActionOptions(val options: BaseOptions<ActionEntity>) : Event()
 
 //constraints
 class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)

@@ -9,8 +9,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.NavAppDirections
-import io.github.sds100.keymapper.data.model.ChooseConstraintListItem
-import io.github.sds100.keymapper.data.viewmodel.ChooseConstraintViewModel
+import io.github.sds100.keymapper.constraints.ChooseConstraintListItem
+import io.github.sds100.keymapper.constraints.ChooseConstraintViewModel
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState

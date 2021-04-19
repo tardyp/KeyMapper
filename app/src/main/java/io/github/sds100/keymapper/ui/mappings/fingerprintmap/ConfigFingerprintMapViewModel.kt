@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.constraints.ConstraintUtils
-import io.github.sds100.keymapper.data.viewmodel.ConfigActionsViewModel
-import io.github.sds100.keymapper.data.viewmodel.ConfigConstraintsViewModel
+import io.github.sds100.keymapper.actions.ConfigActionsViewModel
+import io.github.sds100.keymapper.constraints.ConfigConstraintsViewModel
 import io.github.sds100.keymapper.domain.actions.TestActionUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.*
 import io.github.sds100.keymapper.domain.utils.State

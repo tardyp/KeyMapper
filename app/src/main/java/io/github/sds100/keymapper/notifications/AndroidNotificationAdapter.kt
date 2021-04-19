@@ -8,7 +8,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.broadcastreceiver.NotificationClickReceiver
+import io.github.sds100.keymapper.framework.receivers.NotificationClickReceiver
 import io.github.sds100.keymapper.util.color
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow

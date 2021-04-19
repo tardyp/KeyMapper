@@ -14,7 +14,6 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.*
 import io.github.sds100.keymapper.ui.ChipUi
 import io.github.sds100.keymapper.ui.callback.OnChipClickCallback
 import io.github.sds100.keymapper.ui.view.SquareImageButton

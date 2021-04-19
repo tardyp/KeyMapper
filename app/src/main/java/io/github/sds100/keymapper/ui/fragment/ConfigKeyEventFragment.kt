@@ -14,7 +14,7 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.checkbox
-import io.github.sds100.keymapper.data.viewmodel.ConfigKeyEventViewModel
+import io.github.sds100.keymapper.keyevents.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.databinding.FragmentConfigKeyEventBinding
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*

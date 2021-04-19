@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.backup
 
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.BackupManager
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.flow.Flow
 

@@ -1,120 +1,14 @@
 package io.github.sds100.keymapper.util
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.data.model.OptionType
-import io.github.sds100.keymapper.data.model.SystemActionDef
-import io.github.sds100.keymapper.data.model.SystemActionOption
 import io.github.sds100.keymapper.domain.actions.SystemActionCategory
 import io.github.sds100.keymapper.domain.actions.SystemActionId
 import io.github.sds100.keymapper.permissions.Permission
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_BLUETOOTH
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_FLASHLIGHT
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_KEYBOARD
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_MEDIA
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_MOBILE_DATA
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_NAVIGATION
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_NFC
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_OTHER
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_SCREEN_ROTATION
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_STATUS_BAR
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_VOLUME
-import io.github.sds100.keymapper.util.OldSystemAction.CATEGORY_WIFI
-import io.github.sds100.keymapper.util.OldSystemAction.COLLAPSE_STATUS_BAR
-import io.github.sds100.keymapper.util.OldSystemAction.CONSUME_KEY_EVENT
-import io.github.sds100.keymapper.util.OldSystemAction.CYCLE_ROTATIONS
-import io.github.sds100.keymapper.util.OldSystemAction.DECREASE_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_BLUETOOTH
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_NFC
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_WIFI
-import io.github.sds100.keymapper.util.OldSystemAction.DISABLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_BLUETOOTH
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_NFC
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_WIFI
-import io.github.sds100.keymapper.util.OldSystemAction.ENABLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.EXPAND_NOTIFICATION_DRAWER
-import io.github.sds100.keymapper.util.OldSystemAction.EXPAND_QUICK_SETTINGS
-import io.github.sds100.keymapper.util.OldSystemAction.FAST_FORWARD
-import io.github.sds100.keymapper.util.OldSystemAction.FAST_FORWARD_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.GO_BACK
-import io.github.sds100.keymapper.util.OldSystemAction.GO_HOME
-import io.github.sds100.keymapper.util.OldSystemAction.GO_LAST_APP
-import io.github.sds100.keymapper.util.OldSystemAction.HIDE_KEYBOARD
-import io.github.sds100.keymapper.util.OldSystemAction.INCREASE_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.LANDSCAPE_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.LOCK_DEVICE
-import io.github.sds100.keymapper.util.OldSystemAction.LOCK_DEVICE_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.MOVE_CURSOR_TO_END
-import io.github.sds100.keymapper.util.OldSystemAction.NEXT_TRACK
-import io.github.sds100.keymapper.util.OldSystemAction.NEXT_TRACK_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_CAMERA
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_DEVICE_ASSISTANT
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_MENU
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_RECENTS
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_SETTINGS
-import io.github.sds100.keymapper.util.OldSystemAction.OPEN_VOICE_ASSISTANT
-import io.github.sds100.keymapper.util.OldSystemAction.PAUSE_MEDIA
-import io.github.sds100.keymapper.util.OldSystemAction.PAUSE_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.PLAY_MEDIA
-import io.github.sds100.keymapper.util.OldSystemAction.PLAY_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.PLAY_PAUSE_MEDIA
-import io.github.sds100.keymapper.util.OldSystemAction.PLAY_PAUSE_MEDIA_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.PORTRAIT_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.POWER_ON_OFF_DEVICE
-import io.github.sds100.keymapper.util.OldSystemAction.PREVIOUS_TRACK
-import io.github.sds100.keymapper.util.OldSystemAction.PREVIOUS_TRACK_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.REWIND
-import io.github.sds100.keymapper.util.OldSystemAction.REWIND_PACKAGE
-import io.github.sds100.keymapper.util.OldSystemAction.SCREENSHOT
-import io.github.sds100.keymapper.util.OldSystemAction.SCREENSHOT_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.SECURE_LOCK_DEVICE
-import io.github.sds100.keymapper.util.OldSystemAction.SELECT_WORD_AT_CURSOR
-import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD
-import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD_PICKER
-import io.github.sds100.keymapper.util.OldSystemAction.SHOW_KEYBOARD_PICKER_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.SHOW_POWER_MENU
-import io.github.sds100.keymapper.util.OldSystemAction.SWITCH_KEYBOARD
-import io.github.sds100.keymapper.util.OldSystemAction.SWITCH_ORIENTATION
-import io.github.sds100.keymapper.util.OldSystemAction.TEXT_COPY
-import io.github.sds100.keymapper.util.OldSystemAction.TEXT_CUT
-import io.github.sds100.keymapper.util.OldSystemAction.TEXT_PASTE
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AIRPLANE_MODE
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AUTO_BRIGHTNESS
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_AUTO_ROTATE
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_BLUETOOTH
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_KEYBOARD
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_MOBILE_DATA
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_NFC
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_NOTIFICATION_DRAWER
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_QUICK_SETTINGS_DRAWER
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_SPLIT_SCREEN
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_WIFI
-import io.github.sds100.keymapper.util.OldSystemAction.TOGGLE_WIFI_ROOT
-import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_MUTE
-import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_TOGGLE_MUTE
-import io.github.sds100.keymapper.util.OldSystemAction.VOLUME_UNMUTE
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
-import java.util.*
 
 /**
  * Created by sds100 on 01/08/2018.
@@ -629,33 +523,4 @@ object SystemActionUtils {
 
         return emptyList()
     }
-
-    /**
-     * @return null if the action is supported.
-     */
-    private fun SystemActionDef.isSupported(ctx: Context): Result<SystemActionDef> {
-        if (Build.VERSION.SDK_INT < minApi) {
-            return Error.SdkVersionTooLow(minApi)
-        }
-
-        for (feature in features) {
-            if (!ctx.packageManager.hasSystemFeature(feature)) {
-                return Error.FeatureUnavailable(feature)
-            }
-        }
-
-        if (Build.VERSION.SDK_INT > maxApi) {
-            return Error.SdkVersionTooHigh(maxApi)
-        }
-
-        return Success(this)
-    }
-
-    private suspend fun getPackagesSortedByName(ctx: Context) =
-        ServiceLocator.packageRepository(ctx).let { repository ->
-            repository.getLaunchableAppList()
-                .sortedBy { repository.getAppName(it).toLowerCase(Locale.getDefault()) }
-                .map { it.packageName }
-                .let { Success(it) }
-        }
 }

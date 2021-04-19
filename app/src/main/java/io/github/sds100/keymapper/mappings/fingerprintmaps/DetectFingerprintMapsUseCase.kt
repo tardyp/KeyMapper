@@ -1,12 +1,8 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
-import io.github.sds100.keymapper.data.repository.FingerprintMapRepository
 import io.github.sds100.keymapper.domain.mappings.DetectMappingUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapEntityMapper
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn

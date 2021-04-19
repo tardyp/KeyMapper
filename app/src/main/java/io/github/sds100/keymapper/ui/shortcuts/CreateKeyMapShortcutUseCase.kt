@@ -1,13 +1,18 @@
 package io.github.sds100.keymapper.ui.shortcuts
 
+import android.content.Intent
+import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.os.bundleOf
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
 import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
+import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.mappings.keymap.KeyMapActionUiHelper
+import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.result.then
 
 /**
  * Created by sds100 on 23/03/2021.
@@ -23,13 +28,36 @@ class CreateKeyMapShortcutUseCaseImpl(
     override val isSupported: Boolean
         get() = adapter.areLauncherShortcutsSupported
 
-    override fun createForSingleAction(keyMapUid: String, action: KeyMapAction) {
-        if (!adapter.areLauncherShortcutsSupported) return
+    override fun pinShortcutForSingleAction(keyMapUid: String, action: KeyMapAction): Result<*> {
+        return adapter.pinShortcut(createShortcutForSingleAction(keyMapUid, action))
+    }
 
+    override fun pinShortcutForMultipleActions(
+        keyMapUid: String,
+        shortcutLabel: String
+    ): Result<*> {
+        return adapter.pinShortcut(createShortcutForMultipleActions(keyMapUid, shortcutLabel))
+    }
+
+    override fun createIntentForSingleAction(
+        keyMapUid: String,
+        action: KeyMapAction
+    ): Intent {
+        return adapter.createShortcutResultIntent(createShortcutForSingleAction(keyMapUid, action))
+    }
+
+    override fun createIntentForMultipleActions(keyMapUid: String, shortcutLabel: String): Intent {
+        return adapter.createShortcutResultIntent(createShortcutForMultipleActions(keyMapUid, shortcutLabel))
+    }
+
+    private fun createShortcutForSingleAction(
+        keyMapUid: String,
+        action: KeyMapAction
+    ): ShortcutInfoCompat {
         val icon = actionUiHelper.getIcon(action.data)?.drawable
             ?: getDrawable(R.mipmap.ic_launcher_round)
 
-        adapter.createLauncherShortcut(
+        return adapter.createLauncherShortcut(
             icon = icon,
             label = actionUiHelper.getTitle(action.data),
             intentAction = MyAccessibilityService.ACTION_TRIGGER_KEYMAP_BY_UID,
@@ -37,10 +65,11 @@ class CreateKeyMapShortcutUseCaseImpl(
         )
     }
 
-    override fun createForMultipleActions(keyMapUid: String, shortcutLabel: String) {
-        if (!adapter.areLauncherShortcutsSupported) return
-
-        adapter.createLauncherShortcut(
+    private fun createShortcutForMultipleActions(
+        keyMapUid: String,
+        shortcutLabel: String
+    ): ShortcutInfoCompat {
+        return adapter.createLauncherShortcut(
             icon = getDrawable(R.mipmap.ic_launcher_round),
             label = shortcutLabel,
             intentAction = MyAccessibilityService.ACTION_TRIGGER_KEYMAP_BY_UID,
@@ -52,13 +81,23 @@ class CreateKeyMapShortcutUseCaseImpl(
 interface CreateKeyMapShortcutUseCase {
     val isSupported: Boolean
 
-    fun createForSingleAction(
+    fun pinShortcutForSingleAction(
         keyMapUid: String,
         action: KeyMapAction
-    )
+    ): Result<*>
 
-    fun createForMultipleActions(
+    fun pinShortcutForMultipleActions(
         keyMapUid: String,
         shortcutLabel: String
-    )
+    ): Result<*>
+
+    fun createIntentForSingleAction(
+        keyMapUid: String,
+        action: KeyMapAction
+    ): Intent
+
+    fun createIntentForMultipleActions(
+        keyMapUid: String,
+        shortcutLabel: String
+    ): Intent
 }

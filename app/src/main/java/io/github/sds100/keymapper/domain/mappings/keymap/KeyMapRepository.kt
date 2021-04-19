@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.domain.mappings.keymap
 
-import io.github.sds100.keymapper.data.model.KeyMapEntity
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
 import io.github.sds100.keymapper.domain.utils.State
 import kotlinx.coroutines.flow.Flow
 

@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.SliderModel
+import io.github.sds100.keymapper.util.SliderModel
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCase
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction

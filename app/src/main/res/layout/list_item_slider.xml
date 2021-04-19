@@ -11,7 +11,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.data.model.SliderModel" />
+            type="io.github.sds100.keymapper.util.SliderModel" />
 
         <variable
             name="onSliderChangeListener"

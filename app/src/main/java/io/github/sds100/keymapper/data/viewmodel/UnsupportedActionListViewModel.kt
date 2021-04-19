@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.UnsupportedActionListItem
+import io.github.sds100.keymapper.actions.UnsupportedActionListItem
 import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCase
 import io.github.sds100.keymapper.domain.actions.SystemActionId
 import io.github.sds100.keymapper.framework.adapters.ResourceProvider
@@ -16,7 +16,6 @@ import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.getFullMessage
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 31/03/2020.

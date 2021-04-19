@@ -1,8 +1,6 @@
 package io.github.sds100.keymapper.util
 
-import android.view.KeyEvent
-import io.github.sds100.keymapper.data.model.TriggerEntity
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKey
+import io.github.sds100.keymapper.data.entities.TriggerEntity
 import splitties.bitflags.hasFlag
 
 /**

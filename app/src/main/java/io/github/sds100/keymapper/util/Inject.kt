@@ -2,30 +2,39 @@ package io.github.sds100.keymapper.util
 
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
+import io.github.sds100.keymapper.ApplicationViewModel
 import io.github.sds100.keymapper.KeyMapperApp
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
 import io.github.sds100.keymapper.actions.CreateSystemActionUseCaseImpl
+import io.github.sds100.keymapper.apps.ChooseAppShortcutViewModel
+import io.github.sds100.keymapper.apps.ChooseAppViewModel
+import io.github.sds100.keymapper.apps.DisplayAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.backup.BackupRestoreMappingsUseCaseImpl
+import io.github.sds100.keymapper.constraints.ChooseConstraintViewModel
 import io.github.sds100.keymapper.data.viewmodel.*
 import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCaseImpl
+import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceViewModel
 import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCaseImpl
 import io.github.sds100.keymapper.domain.mappings.keymap.GetKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeymapUseCaseImpl
+import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeyMapUseCaseImpl
 import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEventUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnToggleKeymapsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.GetThemeUseCase
 import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCaseImpl
+import io.github.sds100.keymapper.intents.ConfigIntentViewModel
+import io.github.sds100.keymapper.keyevents.ChooseKeyCodeViewModel
+import io.github.sds100.keymapper.keyevents.ConfigKeyEventViewModel
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ListFingerprintMapsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.onboarding.AppIntroSlide
 import io.github.sds100.keymapper.onboarding.AppIntroUseCaseImpl
-import io.github.sds100.keymapper.packages.DisplayAppShortcutsUseCaseImpl
+import io.github.sds100.keymapper.onboarding.AppIntroViewModel
 import io.github.sds100.keymapper.service.AccessibilityServiceController
 import io.github.sds100.keymapper.service.MyAccessibilityService
 import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
@@ -133,7 +142,7 @@ object Inject {
             ConfigKeyMapUseCaseImpl(ServiceLocator.externalDevicesAdapter(ctx))
 
         return ConfigKeyMapViewModel.Factory(
-            SaveKeymapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            SaveKeyMapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             GetKeyMapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
             configKeymapUseCase,
             TestActionUseCaseImpl(ServiceLocator.serviceAdapter(ctx)),
@@ -161,11 +170,17 @@ object Inject {
     }
 
     fun createActionShortcutViewModel(
-        context: Context
-    ): CreateKeymapShortcutViewModel.Factory {
-        return CreateKeymapShortcutViewModel.Factory(
-            ServiceLocator.defaultKeymapRepository(context),
-            UseCases.getActionError(context)
+        ctx: Context
+    ): CreateKeyMapShortcutViewModel.Factory {
+        return CreateKeyMapShortcutViewModel.Factory(
+            SaveKeyMapUseCaseImpl(ServiceLocator.roomKeymapRepository(ctx)),
+            ListKeyMapsUseCaseImpl(
+                ServiceLocator.roomKeymapRepository(ctx),
+                ServiceLocator.backupManager(ctx),
+                UseCases.displayKeyMap(ctx)
+            ),
+            UseCases.createKeymapShortcut(ctx),
+            ServiceLocator.resourceProvider(ctx)
         )
     }
 

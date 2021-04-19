@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.ui.mappings.keymap
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.data.model.SliderModel
 import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCase
 import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
 import io.github.sds100.keymapper.domain.usecases.OnboardingUseCase
@@ -13,7 +12,10 @@ import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
 import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCase
+import io.github.sds100.keymapper.util.SliderModel
 import io.github.sds100.keymapper.util.UserResponse
+import io.github.sds100.keymapper.util.result.getFullMessage
+import io.github.sds100.keymapper.util.result.onFailure
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -46,8 +48,6 @@ class ConfigKeyMapTriggerOptionsViewModel(
 
     private val _state = MutableStateFlow(buildUiState(State.Loading))
     val state = _state.asStateFlow()
-
-    private var createLauncherShortcutJob: Job? = null
 
     init {
         coroutineScope.launch {
@@ -87,13 +87,12 @@ class ConfigKeyMapTriggerOptionsViewModel(
     }
 
     fun createLauncherShortcut() {
-        createLauncherShortcutJob?.cancel()
-        createLauncherShortcutJob = coroutineScope.launch {
+        coroutineScope.launch {
             val mapping = config.mapping.firstOrNull()?.dataOrNull() ?: return@launch
             val keyMapUid = mapping.uid
 
-            if (mapping.actionList.size == 1) {
-                createKeyMapShortcut.createForSingleAction(keyMapUid, mapping.actionList[0])
+            val result = if (mapping.actionList.size == 1) {
+                createKeyMapShortcut.pinShortcutForSingleAction(keyMapUid, mapping.actionList[0])
             } else {
 
                 val key = "create_launcher_shortcut"
@@ -105,10 +104,18 @@ class ConfigKeyMapTriggerOptionsViewModel(
                     )
                 ) ?: return@launch
 
-                createKeyMapShortcut.createForMultipleActions(
+                createKeyMapShortcut.pinShortcutForMultipleActions(
                     keyMapUid = keyMapUid,
                     shortcutLabel = response.text
                 )
+            }
+
+            result.onFailure { error ->
+                val snackBar = GetUserResponse.SnackBar(
+                    title = error.getFullMessage(this@ConfigKeyMapTriggerOptionsViewModel)
+                )
+
+                getUserResponse("create_shortcut_result", snackBar)
             }
         }
     }

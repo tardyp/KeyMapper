@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.ui.fragment
 
 import androidx.fragment.app.activityViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
-import io.github.sds100.keymapper.data.model.UnsupportedActionListItem
+import io.github.sds100.keymapper.actions.UnsupportedActionListItem
 import io.github.sds100.keymapper.data.viewmodel.UnsupportedActionListViewModel
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.ui.ListUiState

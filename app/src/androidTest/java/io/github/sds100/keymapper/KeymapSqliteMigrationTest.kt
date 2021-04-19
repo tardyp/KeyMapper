@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.data.db.AppDatabase
+import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
 import io.github.sds100.keymapper.util.JsonTestUtils
 import org.hamcrest.Matchers
 import org.junit.Rule
@@ -105,7 +105,7 @@ class KeymapSqliteMigrationTest {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
+        KeyMapDatabase::class.java.canonicalName,
         FrameworkSQLiteOpenHelperFactory()
     )
 
@@ -128,7 +128,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 10, true, AppDatabase.Companion.MIGRATION_9_10)
+        db = helper.runMigrationsAndValidate(TEST_DB, 10, true, KeyMapDatabase.Companion.MIGRATION_9_10)
 
         testColumnsMatch(db, MIGRATION_9_10_EXPECTED_DATA)
     }
@@ -150,7 +150,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, AppDatabase.MIGRATION_5_6)
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, KeyMapDatabase.MIGRATION_5_6)
 
         testColumnsMatch(db, MIGRATION_5_6_EXPECTED_DATA)
     }
@@ -172,7 +172,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, AppDatabase.MIGRATION_4_5)
+        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, KeyMapDatabase.MIGRATION_4_5)
 
         testColumnsMatch(db, MIGRATION_4_5_EXPECTED_DATA)
     }
@@ -194,7 +194,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 4, true, AppDatabase.MIGRATION_3_4)
+        db = helper.runMigrationsAndValidate(TEST_DB, 4, true, KeyMapDatabase.MIGRATION_3_4)
 
         testColumnsMatch(db, MIGRATION_3_4_EXPECTED_DATA)
     }
@@ -216,7 +216,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 3, true, AppDatabase.MIGRATION_2_3)
+        db = helper.runMigrationsAndValidate(TEST_DB, 3, true, KeyMapDatabase.MIGRATION_2_3)
 
         testColumnsMatch(db, MIGRATION_2_3_EXPECTED_DATA)
     }
@@ -240,7 +240,7 @@ class KeymapSqliteMigrationTest {
             close()
         }
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 2, true, AppDatabase.MIGRATION_1_2)
+        db = helper.runMigrationsAndValidate(TEST_DB, 2, true, KeyMapDatabase.MIGRATION_1_2)
         testColumnsMatch(db, MIGRATION_1_2_EXPECTED_DATA)
     }
 

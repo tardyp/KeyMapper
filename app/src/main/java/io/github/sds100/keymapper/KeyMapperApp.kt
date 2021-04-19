@@ -15,7 +15,6 @@ import io.github.sds100.keymapper.inputmethod.ShowHideInputMethodUseCaseImpl
 import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.permissions.Permission
 import io.github.sds100.keymapper.ui.NotificationController
-import io.github.sds100.keymapper.ui.activity.SplashActivity
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
