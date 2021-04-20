@@ -10,10 +10,8 @@ import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.util.InputEventType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 /**
  * Created by sds100 on 17/04/2021.
@@ -32,12 +30,12 @@ class DetectKeyMapsUseCaseImpl(
             .dropWhile { it !is State.Data }
             .map { state ->
                 (state as State.Data).data.map { KeyMapEntityMapper.fromEntity(it) }
-            }
+            }.flowOn(Dispatchers.Default)
 
     override val keyMapsToTriggerFromOtherApps: Flow<List<KeyMap>> =
         allKeyMapList.map { keyMapList ->
             keyMapList.filter { it.trigger.triggerFromOtherApps }
-        }
+        }.flowOn(Dispatchers.Default)
 
     override val detectScreenOffTriggers: Flow<Boolean> =
         combine(
@@ -45,7 +43,7 @@ class DetectKeyMapsUseCaseImpl(
             checkRootPermission.isGranted
         ) { keyMapList, isRootPermissionGranted ->
             keyMapList.any { it.trigger.screenOffTrigger } && isRootPermissionGranted
-        }
+        }.flowOn(Dispatchers.Default)
 
     override val defaultLongPressDelay: Flow<Long> =
         preferenceRepository.get(Keys.defaultLongPressDelay)

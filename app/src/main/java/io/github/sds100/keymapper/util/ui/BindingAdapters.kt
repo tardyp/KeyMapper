@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.util
+package io.github.sds100.keymapper.util.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -15,11 +15,9 @@ import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.system.url.UrlUtils
-import io.github.sds100.keymapper.util.ui.ChipUi
-import io.github.sds100.keymapper.util.ui.OnChipClickCallback
-import io.github.sds100.keymapper.util.ui.SquareImageButton
-import io.github.sds100.keymapper.util.ui.TintType
-import io.noties.markwon.Markwon
+import io.github.sds100.keymapper.util.str
+import io.github.sds100.keymapper.util.styledColor
+import io.github.sds100.keymapper.util.styledColorSL
 
 /**
  * Created by sds100 on 25/01/2020.
@@ -28,17 +26,6 @@ import io.noties.markwon.Markwon
 @BindingAdapter("app:onTextChanged")
 fun EditText.onTextChangedListener(textWatcher: TextWatcher) {
     addTextChangedListener(textWatcher)
-}
-
-@BindingAdapter("app:markdown")
-fun TextView.markdown(markdown: OldDataState<String>) {
-    when (markdown) {
-        is Data -> Markwon.create(context).apply {
-            setMarkdown(this@markdown, markdown.data)
-        }
-
-        is Loading, is Empty -> text = ""
-    }
 }
 
 @BindingAdapter("app:tintType")

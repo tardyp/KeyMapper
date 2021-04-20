@@ -23,6 +23,7 @@ import io.github.sds100.keymapper.system.apps.ChooseAppShortcutFragment
 import io.github.sds100.keymapper.system.apps.ChooseAppShortcutResult
 import io.github.sds100.keymapper.system.display.PickDisplayCoordinateFragment
 import io.github.sds100.keymapper.system.intents.ConfigIntentFragment
+import io.github.sds100.keymapper.system.intents.ConfigIntentResult
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.system.keyevents.*
 import io.github.sds100.keymapper.system.phone.ChoosePhoneNumberFragment
@@ -33,6 +34,8 @@ import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.TextBlockActionTypeFragment
 import io.github.sds100.keymapper.util.ui.setCurrentDestinationLiveData
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 /**
  * A placeholder fragment containing a simple view.
@@ -122,13 +125,10 @@ class ChooseActionFragment : Fragment() {
         }
 
         createActionOnResult(ConfigIntentFragment.REQUEST_KEY) { bundle ->
-            val description = bundle.getString(ConfigIntentFragment.EXTRA_DESCRIPTION)!!
-            val target = bundle.getString(ConfigIntentFragment.EXTRA_TARGET)!!.let {
-                IntentTarget.valueOf(it)
-            }
-            val uri = bundle.getString(ConfigIntentFragment.EXTRA_URI)!!
+            val json = bundle.getString(ConfigIntentFragment.EXTRA_RESULT)!!
+           val result: ConfigIntentResult = Json.decodeFromString(json)
 
-            IntentAction(description, target, uri)
+            IntentAction(result.description, result.target, result.uri)
         }
 
         createActionOnResult(ChoosePhoneNumberFragment.REQUEST_KEY) {

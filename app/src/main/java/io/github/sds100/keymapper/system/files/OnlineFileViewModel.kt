@@ -18,34 +18,6 @@ class OnlineFileViewModel(
     private val alternateUrl: String? = null,
     val header: String) : ViewModel() {
 
-    private val markdownResult = liveData {
-        emit(Loading())
-
-        emit(Data(repository.getFile(fileUrl)))
-    }
-
-    val markdownText = markdownResult.map { result ->
-        result.mapData { data ->
-            data.handle(
-                onSuccess = {
-                    it
-                },
-                onError = {
-                    if (it is Error.SSLHandshakeError) {
-                        if (alternateUrl != null) {
-                            _eventStream.value = OpenUrl(alternateUrl)
-                        }
-                    }
-
-                    _eventStream.value = ShowErrorMessage(it)
-                    _eventStream.value = CloseDialog()
-
-                    ""
-                }
-            )
-        }
-    }
-
     private val _eventStream = MutableLiveData<Event>()
     val eventStream: LiveData<Event> = _eventStream
 

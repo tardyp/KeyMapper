@@ -3,13 +3,11 @@ package io.github.sds100.keymapper.mappings.keymaps
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerFromOtherAppsListItem
-import io.github.sds100.keymapper.onboarding.OnboardingUseCase
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.Defaultable
 import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.dataOrNull
-import io.github.sds100.keymapper.util.ifIsData
-import io.github.sds100.keymapper.util.result.getFullMessage
+import io.github.sds100.keymapper.util.getFullMessage
 import io.github.sds100.keymapper.util.result.onFailure
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*

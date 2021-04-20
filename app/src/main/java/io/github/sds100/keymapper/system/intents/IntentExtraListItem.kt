@@ -6,16 +6,16 @@ package io.github.sds100.keymapper.system.intents
 
 // don't factor out properties because otherwise the Epoxyrecyclerview doesn't update when the
 // model changes
-sealed class IntentExtraListItemModel
+sealed class IntentExtraListItem
 
-data class BoolIntentExtraListItemModel(
+data class BoolIntentExtraListItem(
     val uid: String,
     val name: String,
     val value: Boolean,
     val isValid: Boolean
-) : IntentExtraListItemModel()
+) : IntentExtraListItem()
 
-data class GenericIntentExtraListItemModel(
+data class GenericIntentExtraListItem(
     val uid: String,
     val typeString: String,
     val name: String,
@@ -23,4 +23,4 @@ data class GenericIntentExtraListItemModel(
     val isValid: Boolean,
     val exampleString: String,
     val inputType: Int
-) : IntentExtraListItemModel()
+) : IntentExtraListItem()

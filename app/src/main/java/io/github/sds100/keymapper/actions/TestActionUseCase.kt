@@ -18,5 +18,5 @@ class TestActionUseCaseImpl(
 }
 
 interface TestActionUseCase {
-    operator suspend fun invoke(action: ActionData): Result<Unit>
+    suspend operator fun invoke(action: ActionData): Result<Unit>
 }

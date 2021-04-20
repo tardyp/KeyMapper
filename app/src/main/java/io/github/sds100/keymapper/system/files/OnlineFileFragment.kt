@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.github.sds100.keymapper.databinding.FragmentOnlineFileBinding
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.getFullMessage
+import io.github.sds100.keymapper.util.getFullMessage
 import splitties.toast.toast
 
 class OnlineFileFragment : BottomSheetDialogFragment() {
@@ -61,13 +61,13 @@ class OnlineFileFragment : BottomSheetDialogFragment() {
 
         viewModel.eventStream.observe(viewLifecycleOwner, {
             when (it) {
-                is CloseDialog -> dismiss()
-                is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
-                is OpenUrl -> {
-                    Intent(Intent.ACTION_VIEW, Uri.parse(it.url)).apply {
-                        startActivity(this)
-                    }
-                }
+//                is CloseDialog -> dismiss()
+//                is ShowErrorMessage -> toast(it.error.getFullMessage(requireContext()))
+//                is OpenUrl -> {
+//                    Intent(Intent.ACTION_VIEW, Uri.parse(it.url)).apply {
+//                        startActivity(this)
+//                    }
+//                }
             }
         })
     }

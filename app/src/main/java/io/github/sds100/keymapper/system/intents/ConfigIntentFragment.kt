@@ -1,14 +1,11 @@
 package io.github.sds100.keymapper.system.intents
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputType
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,16 +14,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.databinding.FragmentIntentActionTypeBinding
 import io.github.sds100.keymapper.databinding.ListItemIntentExtraBoolBinding
 import io.github.sds100.keymapper.intentExtraBool
 import io.github.sds100.keymapper.intentExtraGeneric
 import io.github.sds100.keymapper.system.intents.*
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ui.showPopups
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.message
-import splitties.alertdialog.appcompat.messageResource
 import splitties.alertdialog.appcompat.okButton
 
 /**
@@ -36,34 +35,11 @@ import splitties.alertdialog.appcompat.okButton
 class ConfigIntentFragment : Fragment() {
     companion object {
         const val REQUEST_KEY = "request_intent"
-        const val EXTRA_DESCRIPTION = "extra_intent_description"
-        const val EXTRA_TARGET = "extra_target"
-        const val EXTRA_URI = "extra_uri"
-
-        private val EXTRA_TYPES = arrayOf(
-            BoolExtraType(),
-            BoolArrayExtraType(),
-            IntExtraType(),
-            IntArrayExtraType(),
-            StringExtraType(),
-            StringArrayExtraType(),
-            LongExtraType(),
-            LongArrayExtraType(),
-            ByteExtraType(),
-            ByteArrayExtraType(),
-            DoubleExtraType(),
-            DoubleArrayExtraType(),
-            CharExtraType(),
-            CharArrayExtraType(),
-            FloatExtraType(),
-            FloatArrayExtraType(),
-            ShortExtraType(),
-            ShortArrayExtraType()
-        )
+        const val EXTRA_RESULT = "extra_config_intent_result"
     }
 
     private val viewModel: ConfigIntentViewModel by activityViewModels {
-        Inject.configIntentViewModel()
+        Inject.configIntentViewModel(requireContext())
     }
 
     /**
@@ -91,84 +67,28 @@ class ConfigIntentFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        binding.setOnDoneClick {
-            val intent = Intent().apply {
-                if (viewModel.action.value?.isNotEmpty() == true) {
-                    this.action = viewModel.action.value
-                }
+        viewModel.showPopups(this, binding)
 
-                viewModel.categoriesList.value?.forEach {
-                    this.addCategory(it)
-                }
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.returnResult.collectLatest { result ->
+                setFragmentResult(
+                    REQUEST_KEY,
+                    bundleOf(EXTRA_RESULT to Json.encodeToString(result))
+                )
 
-                if (viewModel.data.value?.isNotEmpty() == true) {
-                    this.data = viewModel.data.value?.toUri()
-                }
+                findNavController().navigateUp()
+            }
+        }
 
-                if (viewModel.targetPackage.value?.isNotEmpty() == true) {
-                    this.`package` = viewModel.targetPackage.value
-
-                    if (viewModel.targetClass.value?.isNotEmpty() == true) {
-                        this.setClassName(
-                            viewModel.targetPackage.value!!,
-                            viewModel.targetClass.value!!
-                        )
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.extraListItems.collectLatest { listItems ->
+                binding.epoxyRecyclerViewExtras.withModels {
+                    listItems.forEach {
+                        bindExtra(it)
                     }
                 }
-
-                viewModel.extras.value?.forEach { model ->
-                    if (model.name.isEmpty()) return@forEach
-                    if (model.parsedValue == null) return@forEach
-
-                    model.type.putInIntent(this, model.name, model.value)
-                }
-            }
-
-            val uri = intent.toUri(0)
-
-            setFragmentResult(
-                REQUEST_KEY,
-                bundleOf(
-                    EXTRA_DESCRIPTION to viewModel.description.value,
-                    EXTRA_TARGET to viewModel.getTarget().toString(),
-                    EXTRA_URI to uri
-                )
-            )
-
-            findNavController().navigateUp()
-        }
-
-        binding.setOnAddExtraClick {
-            requireContext().alertDialog {
-                val labels = EXTRA_TYPES.map { str(it.labelStringRes) }.toTypedArray()
-
-                setItems(labels) { _, position ->
-                    viewModel.addExtra(EXTRA_TYPES[position])
-                }
-
-                show()
             }
         }
-
-        binding.setOnShowCategoriesExampleClick {
-            requireContext().alertDialog {
-                messageResource = R.string.intent_categories_example
-                okButton()
-                show()
-            }
-        }
-
-        //TODO
-//        viewModel.eventStream.observe(viewLifecycleOwner, { event ->
-//            when (event) {
-//                is BuildIntentExtraListItemModels -> viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-//                    val models = event.extraModels.map { it.toListItemModel() }
-//                    viewModel.setListItemModels(models)
-//                }
-//            }
-//        })
-
-        subscribeExtrasList()
     }
 
     override fun onDestroyView() {
@@ -176,28 +96,9 @@ class ConfigIntentFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun subscribeExtrasList() {
-        viewModel.extrasListItemModels.observe(viewLifecycleOwner, { state ->
-            viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-                binding.epoxyRecyclerViewExtras.withModels {
-
-                    val models = if (state is Data) {
-                        state.data
-                    } else {
-                        emptyList()
-                    }
-
-                    models.forEach {
-                        bindExtra(it)
-                    }
-                }
-            }
-        })
-    }
-
-    private fun EpoxyController.bindExtra(model: IntentExtraListItemModel) {
+    private fun EpoxyController.bindExtra(model: IntentExtraListItem) {
         when (model) {
-            is GenericIntentExtraListItemModel -> intentExtraGeneric {
+            is GenericIntentExtraListItem -> intentExtraGeneric {
 
                 id(model.uid)
 
@@ -208,20 +109,25 @@ class ConfigIntentFragment : Fragment() {
                 }
 
                 onShowExampleClick { _ ->
-                    requireContext().alertDialog {
-                        message = model.exampleString
-                        okButton()
-
-                        show()
-                    }
+                   viewModel.onShowExtraExampleClick(model)
                 }
 
                 valueTextWatcher(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
 
                     }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                     }
 
                     override fun afterTextChanged(s: Editable?) {
@@ -230,11 +136,21 @@ class ConfigIntentFragment : Fragment() {
                 })
 
                 nameTextWatcher(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
 
                     }
 
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
                     }
 
                     override fun afterTextChanged(s: Editable?) {
@@ -243,7 +159,7 @@ class ConfigIntentFragment : Fragment() {
                 })
             }
 
-            is BoolIntentExtraListItemModel -> intentExtraBool {
+            is BoolIntentExtraListItem -> intentExtraBool {
                 id(model.uid)
 
                 model(model)
@@ -267,72 +183,4 @@ class ConfigIntentFragment : Fragment() {
         }
     }
 
-    private fun IntentExtraModel.toListItemModel(): IntentExtraListItemModel {
-        return when (type) {
-            is BoolExtraType -> BoolIntentExtraListItemModel(
-                uid,
-                name,
-                parsedValue?.let { it as Boolean } ?: true,
-                isValidValue
-            )
-
-            else -> {
-                val inputType = when (type) {
-                    is IntExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
-
-                    is IntArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_TEXT
-
-                    is LongExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
-
-                    is LongArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_TEXT
-
-                    is ByteExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
-
-                    is ByteArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_TEXT
-
-                    is DoubleExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED or
-                            InputType.TYPE_NUMBER_FLAG_DECIMAL
-
-                    is DoubleArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_DECIMAL or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or
-                        InputType.TYPE_CLASS_TEXT
-
-                    is FloatExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED or
-                            InputType.TYPE_NUMBER_FLAG_DECIMAL
-
-                    is FloatArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_DECIMAL or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or
-                        InputType.TYPE_CLASS_TEXT
-
-                    is ShortExtraType ->
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
-
-                    is ShortArrayExtraType -> InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_CLASS_TEXT
-
-                    else -> InputType.TYPE_CLASS_TEXT
-                }
-
-                GenericIntentExtraListItemModel(
-                    uid,
-                    str(type.labelStringRes),
-                    name,
-                    value,
-                    isValidValue,
-                    str(type.exampleStringRes),
-                    inputType
-                )
-            }
-        }
-    }
 }

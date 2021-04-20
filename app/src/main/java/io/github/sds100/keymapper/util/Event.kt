@@ -28,7 +28,6 @@ import io.github.sds100.keymapper.util.result.Error
 import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
-//TODO delete unused events
 @Serializable
 sealed class Event
 
@@ -36,60 +35,6 @@ sealed class Event
 data class Ping(val key: String) : Event()
 @Serializable
 data class Pong(val key: String) : Event()
-
-open class MessageEvent(@StringRes val textRes: Int) : Event()
-
-class FixFailure(val error: Error) : Event()
-class VibrateEvent(val duration: Long) : Event()
-object ShowTriggeredKeymapToast : Event()
-data class PerformActionEvent(
-    val action: ActionEntity,
-    val additionalMetaState: Int = 0,
-    val keyEventAction: InputEventType = InputEventType.DOWN_UP
-) : Event()
-
-data class ImitateButtonPress(
-    val keyCode: Int,
-    val metaState: Int = 0,
-    val deviceId: Int = 0,
-    val keyEventAction: InputEventType,
-    val scanCode: Int = 0
-) : Event()
-
-class ChoosePackage : Event()
-class OpenUrl(val url: String) : Event()
-class OpenUrlRes(@StringRes val url: Int) : Event()
-class CloseDialog : Event()
-class ChooseKeycode : Event()
-
-//TODO delete
-class BuildDeviceInfoModels : Event()
-class RequestBackupSelectedKeymaps : Event()
-
-class BuildKeymapListModels(
-    val keymapList: List<KeyMapEntity>,
-    val deviceInfoList: List<DeviceInfoEntity>,
-    val hasRootPermission: Boolean,
-    val showDeviceDescriptors: Boolean
-) : Event()
-
-class OkDialog(val responseKey: String, @StringRes val message: Int) : Event()
-class EnableAccessibilityServicePrompt : Event()
-class BackupRequest<T>(val model: T) : Event()
-class RequestRestore : Event()
-class RequestBackupAll : Event()
-class ShowErrorMessage(val error: Error) : Event()
-class BuildIntentExtraListItemModels(val extraModels: List<IntentExtraModel>) : Event()
-class CreateKeymapShortcutEvent(
-    val uuid: String,
-    val actionList: List<ActionEntity>,
-    val deviceInfoList: List<DeviceInfoEntity>,
-    val showDeviceDescriptors: Boolean
-) : Event()
-
-data class SaveEvent<T>(val model: T) : Event()
-
-object OnBootEvent : Event(), UpdateNotificationEvent
 
 @Parcelize
 @Serializable
@@ -111,14 +56,12 @@ data class OnIncrementRecordTriggerTimer(val timeLeft: Int) : Event()
 
 @Serializable
 object OnStoppedRecordingTrigger : Event()
-object OnAccessibilityServiceStarted : Event(), UpdateNotificationEvent
-object OnAccessibilityServiceStopped : Event(), UpdateNotificationEvent
 
 @Serializable
-object OnHideKeyboardEvent : Event(), UpdateNotificationEvent
+object OnHideKeyboardEvent : Event()
 
 @Serializable
-object OnShowKeyboardEvent : Event(), UpdateNotificationEvent
+object OnShowKeyboardEvent : Event()
 
 @Serializable
 object HideKeyboardEvent: Event()
@@ -126,14 +69,5 @@ object HideKeyboardEvent: Event()
 @Serializable
 object ShowKeyboardEvent: Event()
 
-//constraints
-class DuplicateConstraints : MessageEvent(R.string.error_duplicate_constraint)
-class SelectConstraint(val constraint: ConstraintEntity) : Event()
-
-//notifications
-class DismissNotification(val id: Int) : Event(), UpdateNotificationEvent
-
+@Serializable
 data class TestActionEvent(val action: ActionData): Event()
-
-//TODO delete
-interface UpdateNotificationEvent

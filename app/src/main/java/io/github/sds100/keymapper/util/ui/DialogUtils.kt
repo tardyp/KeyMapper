@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.*
+import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
 import io.github.sds100.keymapper.util.result.*
@@ -183,6 +184,7 @@ suspend fun Context.editTextNumberAlertDialog(
         }
     }
 
+    val resourceProvider = ServiceLocator.resourceProvider(this)
     val text = MutableStateFlow("")
 
     materialAlertDialog {
@@ -212,7 +214,7 @@ suspend fun Context.editTextNumberAlertDialog(
                     .collectLatest { isValid ->
                         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                             isValid.isSuccess
-                        textInputLayout.error = isValid.errorOrNull()?.getFullMessage(context)
+                        textInputLayout.error = isValid.errorOrNull()?.getFullMessage(resourceProvider)
                     }
             }
         }

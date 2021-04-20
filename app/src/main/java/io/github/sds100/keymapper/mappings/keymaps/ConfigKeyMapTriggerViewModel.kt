@@ -10,7 +10,6 @@ import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.ViewPopulated
 import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.mapData
 import io.github.sds100.keymapper.util.result.FixableError

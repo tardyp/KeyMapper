@@ -7,26 +7,6 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.util.OldDataState" />
-
-        <import type="io.github.sds100.keymapper.util.Data" />
-
-        <import type="io.github.sds100.keymapper.util.Loading" />
-
-        <import type="io.github.sds100.keymapper.util.Empty" />
-
-        <variable
-            name="onDoneClick"
-            type="View.OnClickListener" />
-
-        <variable
-            name="onAddExtraClick"
-            type="View.OnClickListener" />
-
-        <variable
-            name="onShowCategoriesExampleClick"
-            type="View.OnClickListener" />
-
         <variable
             name="viewModel"
             type="io.github.sds100.keymapper.system.intents.ConfigIntentViewModel" />
@@ -77,6 +57,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:orientation="horizontal"
+                    android:checkedButton="@{viewModel.checkedTarget}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textInputLayoutDescription">
@@ -85,8 +66,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:onCheckedChanged="@{(view, isChecked) -> viewModel.setActivityTargetChecked(isChecked)}"
                         android:layout_marginEnd="8dp"
-                        android:checked="@={viewModel.targetActivity}"
+                        android:id="@+id/radioButtonTargetActivity"
                         android:text="@string/radio_button_intent_target_activity" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
@@ -94,15 +76,17 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:checked="@={viewModel.targetBroadcastReceiver}"
+                        android:id="@+id/radioButtonTargetBroadcastReceiver"
+                        android:onCheckedChanged="@{(view, isChecked) -> viewModel.setBroadcastReceiverTargetChecked(isChecked)}"
                         android:text="@string/radio_button_intent_target_broadcast_receiver" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:onCheckedChanged="@{(view, isChecked) -> viewModel.setServiceTargetChecked(isChecked)}"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:checked="@={viewModel.targetService}"
+                        android:id="@+id/radioButtonTargetService"
                         android:text="@string/radio_button_intent_target_service" />
                 </RadioGroup>
 
@@ -155,7 +139,7 @@
                     android:layout_height="0dp"
                     android:layout_marginEnd="16dp"
                     android:baselineAlignBottom="true"
-                    android:onClick="@{onShowCategoriesExampleClick}"
+                    android:onClick="@{() -> viewModel.onShowCategoriesExampleClick()}"
                     android:tint="?attr/colorOnSurface"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/textInputLayoutCategories"
@@ -260,7 +244,7 @@
                     android:layout_marginEnd="16dp"
                     android:paddingBottom="16dp"
                     android:text="@string/intent_extras_recycler_view_placeholder"
-                    android:visibility="@{viewModel.extrasListItemModels instanceof Empty ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{viewModel.extraListItems.isEmpty() ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/headerExtras"
@@ -277,7 +261,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:onClick="@{onAddExtraClick}"
+            android:onClick="@{() -> viewModel.onAddExtraClick()}"
             android:text="@string/button_add_intent_extra"
             app:layout_constraintBottom_toTopOf="@id/buttonDone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -292,8 +276,8 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:enabled='@{viewModel.isValid() ? true : false}'
-            android:onClick="@{onDoneClick}"
+            android:enabled='@{viewModel.isDoneButtonEnabled}'
+            android:onClick="@{() -> viewModel.onDoneClick()}"
             android:text="@string/button_done"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

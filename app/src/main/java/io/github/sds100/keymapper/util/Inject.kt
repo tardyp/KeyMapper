@@ -85,8 +85,8 @@ object Inject {
         return ChooseKeyCodeViewModel.Factory()
     }
 
-    fun configIntentViewModel(): ConfigIntentViewModel.Factory {
-        return ConfigIntentViewModel.Factory()
+    fun configIntentViewModel(ctx: Context): ConfigIntentViewModel.Factory {
+        return ConfigIntentViewModel.Factory(ServiceLocator.resourceProvider(ctx))
     }
 
     fun textBlockActionTypeViewModel(): TextBlockActionTypeViewModel.Factory {

@@ -5,6 +5,7 @@ import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
 import io.github.sds100.keymapper.mappings.Mapping
+import io.github.sds100.keymapper.util.getFullMessage
 import io.github.sds100.keymapper.util.ifIsData
 import io.github.sds100.keymapper.util.mapData
 import io.github.sds100.keymapper.util.result.*

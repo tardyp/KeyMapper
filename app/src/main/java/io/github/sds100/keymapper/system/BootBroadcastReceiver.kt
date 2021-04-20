@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.util.OnBootEvent
 
 /**
  * Created by sds100 on 24/03/2019.
