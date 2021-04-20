@@ -638,8 +638,8 @@
     <!-- system action options -->
 
     <!-- Tiles -->
-    <string name="tile_pause">Pause key maps</string>
-    <string name="tile_resume">Resume key maps</string>
+    <string name="tile_pause">Pause mappings</string>
+    <string name="tile_resume">Resume mappings</string>
     <string name="tile_service_disabled">Service Disabled</string>
     <string name="tile_accessibility_service_disabled_content_description">Key Mapper accessibility service is disabled</string>
     <string name="tile_keymapper_keyboard_service_disabled_content_description">Key Mapper keyboard service is disabled</string>

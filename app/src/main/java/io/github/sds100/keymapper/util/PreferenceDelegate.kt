@@ -1,8 +1,7 @@
-package io.github.sds100.keymapper.domain.utils
+package io.github.sds100.keymapper.util
 
 import androidx.datastore.preferences.core.Preferences
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty
@@ -11,7 +10,6 @@ import kotlin.reflect.KProperty
  * Created by sds100 on 14/02/21.
  */
 
-//TODO delete
 class FlowPrefDelegate<T>(
     private val key: Preferences.Key<T>,
     private val defaultValue: T

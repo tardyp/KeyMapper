@@ -7,7 +7,9 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
+import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.mappings.keymaps.trigger.RecordTriggerController
+import io.github.sds100.keymapper.settings.ThemeUtils
 import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCaseImpl
 import io.github.sds100.keymapper.system.files.AndroidFileAdapter
 import io.github.sds100.keymapper.system.AndroidSystemFeatureAdapter
@@ -20,6 +22,7 @@ import io.github.sds100.keymapper.system.devices.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
 import io.github.sds100.keymapper.system.display.AndroidDisplayAdapter
 import io.github.sds100.keymapper.system.inputmethod.AndroidInputMethodAdapter
+import io.github.sds100.keymapper.system.inputmethod.AutoSwitchImeController
 import io.github.sds100.keymapper.system.inputmethod.ShowHideInputMethodUseCaseImpl
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
@@ -30,6 +33,9 @@ import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.ResourceProviderImpl
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -42,6 +48,8 @@ class KeyMapperApp : MultiDexApplication() {
     val notificationAdapter by lazy { AndroidNotificationAdapter(this, appCoroutineScope) }
 
     lateinit var notificationController: NotificationController
+
+    lateinit var autoSwitchImeController: AutoSwitchImeController
 
     val resourceProvider by lazy { ResourceProviderImpl(this) }
 
@@ -76,6 +84,7 @@ class KeyMapperApp : MultiDexApplication() {
             ServiceLocator.preferenceRepository(this)
         )
     }
+
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
     val appShortcutAdapter by lazy { AndroidAppShortcutAdapter(this) }
@@ -89,15 +98,21 @@ class KeyMapperApp : MultiDexApplication() {
     val vibratorAdapter by lazy { AndroidVibratorAdapter(this) }
     val displayAdapter by lazy { AndroidDisplayAdapter(this) }
 
-    private val applicationViewModel by lazy { Inject.keyMapperAppViewModel(this) }
-
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
 
     override fun onCreate() {
 
-        applicationViewModel.theme.observeForever {
-            AppCompatDelegate.setDefaultNightMode(it)
-        }
+        ServiceLocator.preferenceRepository(this).get(Keys.darkTheme)
+            .map { it?.toIntOrNull() }
+            .map {
+                when(it){
+                    ThemeUtils.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                    ThemeUtils.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                }
+            }
+            .onEach { mode -> AppCompatDelegate.setDefaultNightMode(mode) }
+            .launchIn(appCoroutineScope)
 
         super.onCreate()
 
@@ -120,6 +135,14 @@ class KeyMapperApp : MultiDexApplication() {
             UseCases.fingerprintGesturesSupported(this),
             UseCases.onboarding(this),
             ServiceLocator.resourceProvider(this)
+        )
+
+        autoSwitchImeController = AutoSwitchImeController(
+            appCoroutineScope,
+            ServiceLocator.preferenceRepository(this),
+            ServiceLocator.inputMethodAdapter(this),
+            UseCases.pauseMappings(this),
+            bluetoothMonitor
         )
 
         processLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {

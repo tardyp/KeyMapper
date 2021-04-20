@@ -84,31 +84,32 @@ class HomeMenuViewModel(
     }
 
     fun onShowInputMethodPickerClick() {
-        runBlocking { _dismiss.emit(Unit) }
         showImePicker.show(fromForeground = true)
+        runBlocking { _dismiss.emit(Unit) }
     }
 
     fun onOpenSettingsClick() {
-        runBlocking { _dismiss.emit(Unit) }
+        //dismiss afterwards so it is more responsive
         runBlocking { _openSettings.emit(Unit) }
+        runBlocking { _dismiss.emit(Unit) }
     }
 
     fun onOpenAboutClick() {
-        runBlocking { _dismiss.emit(Unit) }
         runBlocking { _openAbout.emit(Unit) }
+        runBlocking { _dismiss.emit(Unit) }
     }
 
     fun onBackupAllClick() {
         runBlocking {
-            _dismiss.emit(Unit)
             _chooseBackupFile.emit(Unit)
+            _dismiss.emit(Unit)
         }
     }
 
     fun onRestoreClick() {
         runBlocking {
-            _dismiss.emit(Unit)
             _chooseRestoreFile.emit(Unit)
+            _dismiss.emit(Unit)
         }
     }
 

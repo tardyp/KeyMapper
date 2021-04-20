@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.system.inputmethod
 
 import io.github.sds100.keymapper.Constants
+import timber.log.Timber
 
 /**
  * Created by sds100 on 16/03/2021.
@@ -23,11 +24,15 @@ class KeyMapperImeHelper(val adapter: InputMethodAdapter) {
     }
 
     //TODO
-    fun chooseCompatibleInputMethod(fromForeground: Boolean) {}
-    fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean) {}
+    fun chooseCompatibleInputMethod(fromForeground: Boolean) {
+        Timber.e("choose compatible ime")
+    }
+    fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean) {
+        Timber.e("choose incompatible ime")
+    }
 
     fun toggleCompatibleInputMethod() {
-
+        Timber.e("toggle incompatible ime")
     }
 
     fun isCompatibleImeChosen(): Boolean {

@@ -138,7 +138,7 @@
         </service>
 
         <service
-            android:name=".system.tiles.ToggleKeyMapsTile"
+            android:name=".system.tiles.ToggleMappingsTile"
             android:icon="@drawable/ic_tile_pause"
             android:label="@string/tile_pause"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">

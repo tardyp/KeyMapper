@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.system.devices
 
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.utils.PrefDelegate
+import io.github.sds100.keymapper.util.PrefDelegate
 import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.result.Result

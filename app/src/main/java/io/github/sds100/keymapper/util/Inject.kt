@@ -2,7 +2,6 @@ package io.github.sds100.keymapper.util
 
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
-import io.github.sds100.keymapper.ApplicationViewModel
 import io.github.sds100.keymapper.KeyMapperApp
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
@@ -23,9 +22,6 @@ import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.GetKeyMapUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.SaveKeyMapUseCaseImpl
 import io.github.sds100.keymapper.settings.ConfigSettingsUseCaseImpl
-import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEventUseCaseImpl
-import io.github.sds100.keymapper.system.inputmethod.ControlKeyboardOnToggleKeymapsUseCaseImpl
-import io.github.sds100.keymapper.settings.GetThemeUseCase
 import io.github.sds100.keymapper.system.files.OnlineFileViewModel
 import io.github.sds100.keymapper.home.HomeViewModel
 import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCaseImpl
@@ -214,25 +210,6 @@ object Inject {
             UseCases.showImePicker(ctx),
             UseCases.onboarding(ctx),
             ServiceLocator.resourceProvider(ctx)
-        )
-    }
-
-    fun keyMapperAppViewModel(context: Context): ApplicationViewModel {
-        val preferenceRepository = ServiceLocator.preferenceRepository(context)
-        val keyboardController = ServiceLocator.inputMethodAdapter(context)
-        val bluetoothMonitor = ServiceLocator.bluetoothMonitor(context)
-
-        return ApplicationViewModel(
-            GetThemeUseCase(preferenceRepository),
-            ControlKeyboardOnToggleKeymapsUseCaseImpl(
-                keyboardController,
-                preferenceRepository
-            ),
-            ControlKeyboardOnBluetoothEventUseCaseImpl(
-                keyboardController,
-                preferenceRepository,
-                bluetoothMonitor
-            )
         )
     }
 

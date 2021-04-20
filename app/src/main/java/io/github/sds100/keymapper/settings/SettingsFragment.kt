@@ -107,7 +107,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        populatePreferenceScreen()
+        viewLifecycleScope.launchWhenResumed {
+            populatePreferenceScreen()
+        }
     }
 
     override fun onResume() {

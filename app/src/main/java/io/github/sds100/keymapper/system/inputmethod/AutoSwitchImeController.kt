@@ -1,26 +1,25 @@
-package io.github.sds100.keymapper.domain.usecases
+package io.github.sds100.keymapper.system.inputmethod
 
-import io.github.sds100.keymapper.system.devices.BluetoothMonitor
-import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
-import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.utils.PrefDelegate
+import io.github.sds100.keymapper.util.PrefDelegate
+import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
+import io.github.sds100.keymapper.system.devices.BluetoothMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 /**
- * Created by sds100 on 14/02/2021.
+ * Created by sds100 on 20/04/2021.
  */
-
-//TODO rename as AutoSwitchImeController and remove interface
-class ControlKeyboardOnBluetoothEventUseCaseImpl(
-    private val inputMethodAdapter: InputMethodAdapter,
+class AutoSwitchImeController(
+    private val coroutineScope: CoroutineScope,
     private val preferenceRepository: PreferenceRepository,
+    private val inputMethodAdapter: InputMethodAdapter,
+    private val pauseMappingsUseCase: PauseMappingsUseCase,
     private val bluetoothMonitor: BluetoothMonitor
-) : PreferenceRepository by preferenceRepository, ControlKeyboardOnBluetoothEventUseCase {
-    private val imeManager = KeyMapperImeHelper(inputMethodAdapter)
+) : PreferenceRepository by preferenceRepository{
+    private val imeHelper = KeyMapperImeHelper(inputMethodAdapter)
 
     private val devicesThatToggleKeyboard
         by PrefDelegate(Keys.bluetoothDevicesThatToggleKeyboard, emptySet())
@@ -31,10 +30,25 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
     private val changeImeOnBtConnect by PrefDelegate(Keys.changeImeOnBtConnect, false)
     private val showImePickerOnBtConnect by PrefDelegate(Keys.showImePickerOnBtConnect, false)
 
-    override fun start(coroutineScope: CoroutineScope) {
+    private val toggleKeyboardOnToggleKeymaps by PrefDelegate(
+        Keys.toggleKeyboardOnToggleKeymaps,
+        false
+    )
+    init {
+        pauseMappingsUseCase.isPaused.onEach { isPaused ->
+
+            if (!toggleKeyboardOnToggleKeymaps) return@onEach
+
+            if (isPaused) {
+                imeHelper.chooseLastUsedIncompatibleInputMethod(fromForeground = false)
+            } else {
+                imeHelper.chooseCompatibleInputMethod(fromForeground = false)
+            }
+        }.launchIn(coroutineScope)
+
         bluetoothMonitor.onDeviceConnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
-                imeManager.chooseCompatibleInputMethod(fromForeground = false)
+                imeHelper.chooseCompatibleInputMethod(fromForeground = false)
             }
 
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
@@ -44,7 +58,7 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
 
         bluetoothMonitor.onDeviceDisconnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
-                imeManager.chooseLastUsedIncompatibleInputMethod(fromForeground = false)
+                imeHelper.chooseLastUsedIncompatibleInputMethod(fromForeground = false)
             }
 
             if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
@@ -52,8 +66,4 @@ class ControlKeyboardOnBluetoothEventUseCaseImpl(
             }
         }.launchIn(coroutineScope)
     }
-}
-
-interface ControlKeyboardOnBluetoothEventUseCase {
-    fun start(coroutineScope: CoroutineScope)
 }
