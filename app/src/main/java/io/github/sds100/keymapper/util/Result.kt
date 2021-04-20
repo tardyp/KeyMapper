@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.util.result
+package io.github.sds100.keymapper.util
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.ui.ResourceProvider
@@ -55,19 +55,16 @@ sealed class Error : Result<Nothing>() {
     object Duplicate : Error()
     data class ImeNotFoundForPackage(val packageName: String) : Error()
     object LauncherShortcutsNotSupported: Error()
-}
 
-//TODO move these to Error and create isFixable extension function for Error.
-sealed class FixableError : Error() {
-    data class AppNotFound(val packageName: String) : FixableError()
-    data class AppDisabled(val packageName: String) : FixableError()
-    object NoCompatibleImeEnabled : FixableError()
-    object NoCompatibleImeChosen : FixableError()
+    data class AppNotFound(val packageName: String) : Error()
+    data class AppDisabled(val packageName: String) : Error()
+    object NoCompatibleImeEnabled : Error()
+    object NoCompatibleImeChosen : Error()
 
-    object AccessibilityServiceDisabled : FixableError()
-    object AccessibilityServiceCrashed : FixableError()
+    object AccessibilityServiceDisabled : Error()
+    object AccessibilityServiceCrashed : Error()
 
-    data class PermissionDenied(val permission: Permission) : FixableError() {
+    data class PermissionDenied(val permission: Permission) : Error() {
         companion object {
 
             fun getMessageForPermission(

@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 
 /**
  * Created by sds100 on 23/03/2021.

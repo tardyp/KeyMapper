@@ -11,8 +11,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
 import io.github.sds100.keymapper.mappings.keymaps.LaunchKeyMapShortcutActivity
-import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
@@ -82,7 +81,7 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
                 .toString()
                 .success()
         } catch (e: PackageManager.NameNotFoundException) {
-            return FixableError.AppNotFound(info.packageName)
+            return Error.AppNotFound(info.packageName)
         }
     }
 
@@ -93,7 +92,7 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
                 .loadIcon(ctx.packageManager)
                 .success()
         } catch (e: PackageManager.NameNotFoundException) {
-            return FixableError.AppNotFound(info.packageName)
+            return Error.AppNotFound(info.packageName)
         }
     }
 }

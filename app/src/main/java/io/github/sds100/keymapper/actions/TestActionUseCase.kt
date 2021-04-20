@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.actions
 
 import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.util.TestActionEvent
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 
 /**
  * Created by sds100 on 20/02/2021.

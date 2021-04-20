@@ -2,10 +2,9 @@ package io.github.sds100.keymapper.system.devices
 
 import android.os.Build
 import android.view.InputDevice
-import io.github.sds100.keymapper.system.devices.DeviceInfoEntity
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 

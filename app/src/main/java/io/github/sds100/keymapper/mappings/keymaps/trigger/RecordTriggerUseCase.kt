@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.mappings.keymaps.trigger
 
 import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

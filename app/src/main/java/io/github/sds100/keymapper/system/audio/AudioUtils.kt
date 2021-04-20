@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.system.audio
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
@@ -8,7 +7,6 @@ import android.media.AudioManager
 import android.os.Build
 import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
-import io.github.sds100.keymapper.system.permissions.PermissionUtils
 import splitties.systemservices.audioManager
 import splitties.systemservices.notificationManager
 
@@ -18,52 +16,53 @@ import splitties.systemservices.notificationManager
 
 object AudioUtils {
     @SuppressLint("InlinedApi")
-    @IntDef(value = [
-        AudioManager.ADJUST_LOWER,
-        AudioManager.ADJUST_RAISE,
-        AudioManager.ADJUST_SAME,
+    @IntDef(
+        value = [
+            AudioManager.ADJUST_LOWER,
+            AudioManager.ADJUST_RAISE,
+            AudioManager.ADJUST_SAME,
 
-        AudioManager.ADJUST_MUTE,
-        AudioManager.ADJUST_UNMUTE,
-        AudioManager.ADJUST_TOGGLE_MUTE
-    ])
+            AudioManager.ADJUST_MUTE,
+            AudioManager.ADJUST_UNMUTE,
+            AudioManager.ADJUST_TOGGLE_MUTE
+        ]
+    )
     @Retention(AnnotationRetention.SOURCE)
     annotation class AdjustMode
 
     @SuppressLint("InlinedApi")
-    @IntDef(value = [
-        AudioManager.STREAM_ACCESSIBILITY,
-        AudioManager.STREAM_ALARM,
-        AudioManager.STREAM_DTMF,
-        AudioManager.STREAM_MUSIC,
-        AudioManager.STREAM_NOTIFICATION,
-        AudioManager.STREAM_RING,
-        AudioManager.STREAM_SYSTEM,
-        AudioManager.STREAM_VOICE_CALL])
+    @IntDef(
+        value = [
+            AudioManager.STREAM_ACCESSIBILITY,
+            AudioManager.STREAM_ALARM,
+            AudioManager.STREAM_DTMF,
+            AudioManager.STREAM_MUSIC,
+            AudioManager.STREAM_NOTIFICATION,
+            AudioManager.STREAM_RING,
+            AudioManager.STREAM_SYSTEM,
+            AudioManager.STREAM_VOICE_CALL]
+    )
     @Retention(AnnotationRetention.SOURCE)
     annotation class StreamType
 
-    @IntDef(value = [
-        AudioManager.RINGER_MODE_NORMAL,
-        AudioManager.RINGER_MODE_VIBRATE,
-        AudioManager.RINGER_MODE_SILENT
-    ])
+    @IntDef(
+        value = [
+            AudioManager.RINGER_MODE_NORMAL,
+            AudioManager.RINGER_MODE_VIBRATE,
+            AudioManager.RINGER_MODE_SILENT
+        ]
+    )
     annotation class RingerMode
 
     /**
      * @param adjustMode must be one of the AudioManager.ADJUST... values
      */
-    fun adjustVolume(ctx: Context,
-                     @AdjustMode adjustMode: Int,
-                     showVolumeUi: Boolean = false) {
-
-        //TODO replace with try catch for dnd access exception
-        if (PermissionUtils.isPermissionGranted(
-                ctx,
-                Manifest.permission.ACCESS_NOTIFICATION_POLICY
-            )
-        ) {
-
+    fun adjustVolume(
+        ctx: Context,
+        @AdjustMode adjustMode: Int,
+        showVolumeUi: Boolean = false
+    ) {
+        try {
             val audioManager = ctx.applicationContext.getSystemService(Context.AUDIO_SERVICE)
                 as AudioManager
 
@@ -74,20 +73,18 @@ object AudioUtils {
             }
 
             audioManager.adjustVolume(adjustMode, flag)
+        } catch (e: SecurityException) {
+
         }
     }
 
-    fun adjustSpecificStream(ctx: Context,
-                             @AdjustMode adjustMode: Int,
-                             showVolumeUi: Boolean = false,
-                             @StreamType streamType: Int) {
-
-        //TODO replace with try catch for dnd access exception
-        if (PermissionUtils.isPermissionGranted(
-                ctx,
-                Manifest.permission.ACCESS_NOTIFICATION_POLICY
-            )
-        ) {
+    fun adjustSpecificStream(
+        ctx: Context,
+        @AdjustMode adjustMode: Int,
+        showVolumeUi: Boolean = false,
+        @StreamType streamType: Int
+    ) {
+        try {
             val audioManager = ctx.applicationContext.getSystemService(Context.AUDIO_SERVICE)
                 as AudioManager
 
@@ -98,15 +95,26 @@ object AudioUtils {
             }
 
             audioManager.adjustStreamVolume(streamType, adjustMode, flag)
+        } catch (e: SecurityException) {
+
         }
     }
 
     fun cycleBetweenVibrateAndRing(ctx: Context) {
         audioManager.apply {
             when (ringerMode) {
-                AudioManager.RINGER_MODE_NORMAL -> changeRingerMode(ctx, AudioManager.RINGER_MODE_VIBRATE)
-                AudioManager.RINGER_MODE_VIBRATE -> changeRingerMode(ctx, AudioManager.RINGER_MODE_NORMAL)
-                AudioManager.RINGER_MODE_SILENT -> changeRingerMode(ctx, AudioManager.RINGER_MODE_NORMAL)
+                AudioManager.RINGER_MODE_NORMAL -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_VIBRATE
+                )
+                AudioManager.RINGER_MODE_VIBRATE -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_NORMAL
+                )
+                AudioManager.RINGER_MODE_SILENT -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_NORMAL
+                )
             }
         }
     }
@@ -115,23 +123,30 @@ object AudioUtils {
         audioManager.apply {
 
             when (ringerMode) {
-                AudioManager.RINGER_MODE_NORMAL -> changeRingerMode(ctx, AudioManager.RINGER_MODE_VIBRATE)
-                AudioManager.RINGER_MODE_VIBRATE -> changeRingerMode(ctx, AudioManager.RINGER_MODE_SILENT)
-                AudioManager.RINGER_MODE_SILENT -> changeRingerMode(ctx, AudioManager.RINGER_MODE_NORMAL)
+                AudioManager.RINGER_MODE_NORMAL -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_VIBRATE
+                )
+                AudioManager.RINGER_MODE_VIBRATE -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_SILENT
+                )
+                AudioManager.RINGER_MODE_SILENT -> changeRingerMode(
+                    ctx,
+                    AudioManager.RINGER_MODE_NORMAL
+                )
             }
         }
     }
 
     fun changeRingerMode(ctx: Context, @RingerMode ringerMode: Int) {
-        if (PermissionUtils.isPermissionGranted(
-                ctx,
-                Manifest.permission.ACCESS_NOTIFICATION_POLICY
-            )
-        ) {
+        try {
             val audioManager = ctx.applicationContext.getSystemService(Context.AUDIO_SERVICE)
                 as AudioManager
 
             audioManager.ringerMode = ringerMode
+        } catch (e: SecurityException) {
+
         }
     }
 

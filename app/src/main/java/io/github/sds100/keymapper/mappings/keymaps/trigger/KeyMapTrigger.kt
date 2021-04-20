@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.data.entities.TriggerEntity
 import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.mappings.ClickType
 import io.github.sds100.keymapper.system.keyevents.GetEventDelegate
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.valueOrNull
 import kotlinx.serialization.Serializable
 import splitties.bitflags.hasFlag
 import splitties.bitflags.withFlag

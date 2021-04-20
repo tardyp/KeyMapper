@@ -4,8 +4,7 @@ import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.Error
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -32,7 +31,7 @@ class GetConstraintErrorUseCaseImpl(
 
             is Constraint.AppPlayingMedia -> {
                 if (!permissionAdapter.isGranted(Permission.NOTIFICATION_LISTENER)) {
-                    return FixableError.PermissionDenied(Permission.NOTIFICATION_LISTENER)
+                    return Error.PermissionDenied(Permission.NOTIFICATION_LISTENER)
                 }
 
                 return getAppError(constraint.packageName)
@@ -42,14 +41,14 @@ class GetConstraintErrorUseCaseImpl(
             Constraint.OrientationLandscape,
             Constraint.OrientationPortrait ->
                 if (!permissionAdapter.isGranted(Permission.WRITE_SETTINGS)) {
-                    return FixableError.PermissionDenied(Permission.WRITE_SETTINGS)
+                    return Error.PermissionDenied(Permission.WRITE_SETTINGS)
                 }
 
 
             Constraint.ScreenOff,
             Constraint.ScreenOn -> {
                 if (!permissionAdapter.isGranted(Permission.ROOT)) {
-                    return FixableError.PermissionDenied(Permission.ROOT)
+                    return Error.PermissionDenied(Permission.ROOT)
                 }
             }
         }
@@ -59,11 +58,11 @@ class GetConstraintErrorUseCaseImpl(
 
     private fun getAppError(packageName: String): Error? {
         if (!packageManager.isAppEnabled(packageName)) {
-            return FixableError.AppDisabled(packageName)
+            return Error.AppDisabled(packageName)
         }
 
         if (!packageManager.isAppInstalled(packageName)) {
-            return FixableError.AppNotFound(packageName)
+            return Error.AppNotFound(packageName)
         }
 
         return null

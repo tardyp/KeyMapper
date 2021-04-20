@@ -11,24 +11,27 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.fragment.findNavController
 import androidx.preference.*
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.backup.BackupUtils
-import io.github.sds100.keymapper.settings.SettingsViewModel
-import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.PreferenceDefaults
-import io.github.sds100.keymapper.settings.ThemeUtils
+import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.mappings.OptionMinimums
+import io.github.sds100.keymapper.settings.SettingsViewModel
+import io.github.sds100.keymapper.settings.ThemeUtils
 import io.github.sds100.keymapper.system.devices.BluetoothUtils
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.notifications.NotificationUtils
-import io.github.sds100.keymapper.system.permissions.PermissionUtils
-import io.github.sds100.keymapper.util.ui.SliderMaximums
-import io.github.sds100.keymapper.util.ui.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ui.CancellableMultiSelectListPreference
+import io.github.sds100.keymapper.util.ui.SliderMaximums
+import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
+import timber.log.Timber
 
 class SettingsFragment : Fragment() {
 
@@ -110,14 +113,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         viewLifecycleScope.launchWhenResumed {
             populatePreferenceScreen()
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        KEYS_REQUIRING_WRITE_SECURE_SETTINGS.forEach {
-            findPreference<Preference>(it.name)?.isEnabled =
-                PermissionUtils.haveWriteSecureSettingsPermission(requireContext())
+        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
+            viewModel.showWriteSecureSettingsSection.collectLatest { show ->
+                KEYS_REQUIRING_WRITE_SECURE_SETTINGS.forEach {
+                    findPreference<Preference>(it.name)?.isEnabled = show
+                }
+            }
         }
     }
 
@@ -360,7 +362,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             isSingleLineTitle = false
             setTitle(R.string.title_pref_auto_change_ime_on_connection)
             setSummary(R.string.summary_pref_auto_change_ime_on_connection)
-            isEnabled = PermissionUtils.haveWriteSecureSettingsPermission(requireContext())
 
             addPreference(this)
         }
@@ -375,7 +376,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             isSingleLineTitle = false
             setTitle(R.string.title_pref_toggle_keyboard_on_toggle_keymaps)
             setSummary(R.string.summary_pref_toggle_keyboard_on_toggle_keymaps)
-            isEnabled = PermissionUtils.haveWriteSecureSettingsPermission(requireContext())
 
             addPreference(this)
         }

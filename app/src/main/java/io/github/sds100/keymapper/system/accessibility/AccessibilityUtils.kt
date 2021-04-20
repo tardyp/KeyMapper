@@ -1,14 +1,6 @@
 package io.github.sds100.keymapper.system.accessibility
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
-import android.provider.Settings
 import android.view.accessibility.AccessibilityNodeInfo
-import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.MainActivity
-import io.github.sds100.keymapper.system.SettingsUtils
-import io.github.sds100.keymapper.system.permissions.PermissionUtils
 
 /**
  * Created by sds100 on 06/08/2019.

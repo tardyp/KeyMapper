@@ -6,15 +6,13 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
 import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.success
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.success
+import io.github.sds100.keymapper.util.Error
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Created by sds100 on 16/03/2021.
@@ -117,7 +115,7 @@ class AndroidPackageManagerAdapter(
                 .toString()
                 .success()
         } catch (e: PackageManager.NameNotFoundException) {
-            return FixableError.AppNotFound(packageName)
+            return Error.AppNotFound(packageName)
         }
     }
 
@@ -128,7 +126,7 @@ class AndroidPackageManagerAdapter(
                 .loadIcon(packageManager)
                 .success()
         } catch (e: PackageManager.NameNotFoundException) {
-            return FixableError.AppNotFound(packageName)
+            return Error.AppNotFound(packageName)
         }
     }
     

@@ -2,7 +2,7 @@ package io.github.sds100.keymapper.constraints
 
 import android.content.pm.PackageManager
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.Error
 
 /**
  * Created by sds100 on 16/03/2021.

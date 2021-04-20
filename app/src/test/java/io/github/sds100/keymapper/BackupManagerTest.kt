@@ -18,9 +18,9 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityG
 import io.github.sds100.keymapper.util.DispatcherProvider
 import io.github.sds100.keymapper.util.FlowUtils.toListWithTimeout
 import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow

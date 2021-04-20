@@ -4,8 +4,6 @@ package io.github.sds100.keymapper.system.files
 
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.handle
 
 /**
  * Created by sds100 on 04/04/2020.

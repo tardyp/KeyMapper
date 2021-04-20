@@ -8,7 +8,7 @@ import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.util.ui.ListUiState
 import io.github.sds100.keymapper.util.ui.createListState
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.getFullMessage
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

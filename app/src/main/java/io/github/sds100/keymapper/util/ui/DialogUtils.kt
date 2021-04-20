@@ -8,7 +8,6 @@ import androidx.lifecycle.*
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.databinding.DialogEdittextNumberBinding
 import io.github.sds100.keymapper.databinding.DialogEdittextStringBinding
-import io.github.sds100.keymapper.util.result.*
 import io.github.sds100.keymapper.util.ui.DialogResponse
 import io.github.sds100.keymapper.util.ui.PopupUi
 import kotlinx.coroutines.CancellableContinuation

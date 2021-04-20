@@ -5,7 +5,7 @@ import io.github.sds100.keymapper.actions.Action
 import io.github.sds100.keymapper.actions.ActionUiHelper
 import io.github.sds100.keymapper.constraints.ConstraintMode
 import io.github.sds100.keymapper.constraints.ConstraintUiHelper
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.ui.ChipUi
 import io.github.sds100.keymapper.util.ui.IconInfo
 import io.github.sds100.keymapper.util.ui.ResourceProvider

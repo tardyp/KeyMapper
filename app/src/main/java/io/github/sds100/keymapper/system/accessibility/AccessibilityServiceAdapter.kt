@@ -19,9 +19,9 @@ import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.util.Event
 import io.github.sds100.keymapper.util.Ping
 import io.github.sds100.keymapper.util.Pong
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Success
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -68,7 +68,7 @@ class AccessibilityServiceAdapter(
     override suspend fun send(event: Event): Result<Unit> {
 
         if (!isEnabled.value) {
-            return FixableError.AccessibilityServiceDisabled
+            return Error.AccessibilityServiceDisabled
         }
 
         val key = "ping_service"
@@ -82,7 +82,7 @@ class AccessibilityServiceAdapter(
         }
 
         if (pong == null) {
-            return FixableError.AccessibilityServiceCrashed
+            return Error.AccessibilityServiceCrashed
         }
 
         coroutineScope.launch {

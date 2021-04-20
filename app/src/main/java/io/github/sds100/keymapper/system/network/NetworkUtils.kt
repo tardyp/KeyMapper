@@ -8,10 +8,9 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import io.github.sds100.keymapper.system.root.RootUtils
-import io.github.sds100.keymapper.util.StateChange
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import kotlinx.coroutines.suspendCancellableCoroutine
 import splitties.systemservices.wifiManager
 import java.io.File
@@ -39,7 +38,6 @@ object NetworkUtils {
                 it.resume(Success(file))
             },
 
-
             { error ->
                 if (error.cause is SSLHandshakeException) {
                     it.resume(Error.SSLHandshakeError)
@@ -56,16 +54,25 @@ object NetworkUtils {
     }
 
     //WiFi stuff
-    @Suppress("DEPRECATION")
-    fun changeWifiStatePreQ(ctx: Context, stateChange: StateChange) {
+    fun enableWifiPreQ(ctx: Context) {
         val wifiManager = ctx.applicationContext
             .getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        when (stateChange) {
-            StateChange.ENABLE -> wifiManager.isWifiEnabled = true
-            StateChange.DISABLE -> wifiManager.isWifiEnabled = false
-            StateChange.TOGGLE -> wifiManager.isWifiEnabled = !isWifiEnabled()
-        }
+        wifiManager.isWifiEnabled = true
+    }
+
+    fun disableWifiPreQ(ctx: Context) {
+        val wifiManager = ctx.applicationContext
+            .getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        wifiManager.isWifiEnabled = false
+    }
+
+    fun toggleWifiPreQ(ctx: Context) {
+        val wifiManager = ctx.applicationContext
+            .getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        wifiManager.isWifiEnabled = !wifiManager.isWifiEnabled
     }
 
     /**

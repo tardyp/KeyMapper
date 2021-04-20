@@ -9,8 +9,8 @@ import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKeyDevice
 import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerMode
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.system.permissions.Permission
-import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.ui.ChipUi
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 
 /**
@@ -101,13 +101,13 @@ class KeyMapListItemCreator(
                     ChipUi.Error(
                         id = KeyMapTriggerError.DND_ACCESS_DENIED.toString(),
                         text = getString(R.string.trigger_error_dnd_access_denied_short),
-                        error = FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
+                        error = Error.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
                     )
 
                 KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED -> ChipUi.Error(
                     id = KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED.toString(),
                     text = getString(R.string.trigger_error_screen_off_root_permission_denied_short),
-                    error = FixableError.PermissionDenied(Permission.ROOT)
+                    error = Error.PermissionDenied(Permission.ROOT)
                 )
             }
         }

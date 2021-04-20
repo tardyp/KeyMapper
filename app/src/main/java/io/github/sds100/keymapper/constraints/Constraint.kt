@@ -4,7 +4,7 @@ import io.github.sds100.keymapper.data.entities.ConstraintEntity
 import io.github.sds100.keymapper.data.entities.Extra
 import io.github.sds100.keymapper.data.entities.getData
 import io.github.sds100.keymapper.system.display.Orientation
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.valueOrNull
 import kotlinx.serialization.Serializable
 import java.util.*
 

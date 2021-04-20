@@ -1,29 +1,26 @@
 package io.github.sds100.keymapper.util
 
-import android.content.Context
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.BuildUtils
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 
 /**
  * Created by sds100 on 29/02/2020.
  */
 
 fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
-    is FixableError.PermissionDenied ->
-        FixableError.PermissionDenied.getMessageForPermission(
+    is Error.PermissionDenied ->
+        Error.PermissionDenied.getMessageForPermission(
             resourceProvider,
             permission
         )
-    is FixableError.AppNotFound -> resourceProvider.getString(
+    is Error.AppNotFound -> resourceProvider.getString(
         R.string.error_app_isnt_installed,
         packageName
     )
-    is FixableError.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
-    is FixableError.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
-    is FixableError.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
+    is Error.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
+    is Error.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
+    is Error.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
     is Error.OptionsNotRequired -> resourceProvider.getString(R.string.error_options_not_required)
     is Error.SystemFeatureNotSupported -> resourceProvider.getString(
         R.string.error_feature_not_available,
@@ -73,16 +70,30 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.NumberTooSmall -> resourceProvider.getString(R.string.error_number_too_small, min)
     is Error.NumberTooBig -> resourceProvider.getString(R.string.error_number_too_big, max)
     is Error.CantBeEmpty -> resourceProvider.getString(R.string.error_cant_be_empty)
-    Error.BackupVersionTooNew ->  resourceProvider.getString(R.string.error_backup_version_too_new)
+    Error.BackupVersionTooNew -> resourceProvider.getString(R.string.error_backup_version_too_new)
     Error.CorruptActionError -> throw Exception()
     is Error.CorruptJsonFile -> reason
     Error.NoIncompatibleKeyboardsInstalled -> throw Exception()
     Error.NoMediaSessions -> throw Exception()
     Error.NoVoiceAssistant -> resourceProvider.getString(R.string.errorvoice_assistant_not_found)
-    is Error.UnknownFileLocation ->throw Exception()
-    FixableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
+    is Error.UnknownFileLocation -> throw Exception()
+    Error.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
     is Error.ImeNotFoundForPackage -> throw Exception()
     Error.LauncherShortcutsNotSupported -> resourceProvider.getString(R.string.error_launcher_shortcuts_not_supported)
-    FixableError.AccessibilityServiceCrashed -> resourceProvider.getString(R.string.error_accessibility_service_crashed)
+    Error.AccessibilityServiceCrashed -> resourceProvider.getString(R.string.error_accessibility_service_crashed)
 }
+
+val Error.isFixable: Boolean
+    get() = when (this) {
+        is Error.AppNotFound,
+        is Error.AppDisabled,
+        Error.NoCompatibleImeEnabled,
+        Error.NoCompatibleImeChosen,
+        Error.AccessibilityServiceDisabled,
+        Error.AccessibilityServiceCrashed,
+        is Error.PermissionDenied
+        -> true
+
+        else -> false
+    }

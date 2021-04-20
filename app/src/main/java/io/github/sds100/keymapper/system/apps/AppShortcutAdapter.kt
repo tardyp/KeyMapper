@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.core.content.pm.ShortcutInfoCompat
 import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,7 +23,7 @@ interface AppShortcutAdapter {
         intentExtras: Bundle
     ): ShortcutInfoCompat
 
-    fun pinShortcut(shortcut: ShortcutInfoCompat):Result<*>
+    fun pinShortcut(shortcut: ShortcutInfoCompat): Result<*>
     fun createShortcutResultIntent(shortcut: ShortcutInfoCompat):Intent
 
     fun getShortcutName(info: AppShortcutInfo): Result<String>

@@ -7,8 +7,8 @@ import io.github.sds100.keymapper.system.inputmethod.ImeInfo
 import io.github.sds100.keymapper.system.apps.PackageInfo
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.util.dataOrNull
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.first
 
 /**

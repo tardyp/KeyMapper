@@ -1,7 +1,5 @@
 package io.github.sds100.keymapper.util.ui
 
-import io.github.sds100.keymapper.util.result.Error
-
 /**
  * Created by sds100 on 18/03/2021.
  */
@@ -17,7 +15,7 @@ sealed class ChipUi {
     data class Error(
         override val id: String,
         val text: String,
-        val error: io.github.sds100.keymapper.util.result.Error
+        val error: io.github.sds100.keymapper.util.Error
     ) : ChipUi()
 
     data class Transparent(override val id: String, val text: String) : ChipUi()

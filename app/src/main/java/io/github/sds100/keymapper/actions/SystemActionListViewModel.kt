@@ -15,7 +15,7 @@ import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.ui.utils.*
 import io.github.sds100.keymapper.util.containsQuery
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.valueOrNull
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

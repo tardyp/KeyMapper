@@ -2,10 +2,9 @@ package io.github.sds100.keymapper.system.files
 
 import android.content.Context
 import android.net.Uri
-import io.github.sds100.keymapper.system.files.FileAdapter
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import java.io.InputStream
 import java.io.OutputStream
 

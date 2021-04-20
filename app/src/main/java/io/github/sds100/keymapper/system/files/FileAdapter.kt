@@ -1,6 +1,6 @@
 package io.github.sds100.keymapper.system.files
 
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 import java.io.InputStream
 import java.io.OutputStream
 

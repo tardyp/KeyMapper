@@ -7,8 +7,7 @@ import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.getFullMessage
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
@@ -73,10 +72,10 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
 
                 val error = displayActionUseCase.getError(actionData)
 
-                when (error) {
-                    null -> testAction(actionData)
-                    is FixableError -> displayActionUseCase.fixError(error)
-                    else -> testAction(actionData)
+
+                when {
+                    error == null -> testAction(actionData)
+                    error.isFixable -> displayActionUseCase.fixError(error)
                 }
             }
         }

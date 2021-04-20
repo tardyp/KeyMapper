@@ -14,7 +14,7 @@ import io.github.sds100.keymapper.util.ui.PopupViewModel
 import io.github.sds100.keymapper.util.ui.PopupViewModelImpl
 import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.ui.showPopup
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.valueOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

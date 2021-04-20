@@ -15,7 +15,6 @@ import io.github.sds100.keymapper.actions.PerformActionsUseCase
 import io.github.sds100.keymapper.mappings.ClickType
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

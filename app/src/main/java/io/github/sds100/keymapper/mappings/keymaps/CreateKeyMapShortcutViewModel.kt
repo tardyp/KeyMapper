@@ -7,9 +7,8 @@ import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.getFullMessage
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -134,7 +133,7 @@ class CreateKeyMapShortcutViewModel(
 
     private fun showSnackBarAndFixError(error: Error) {
         viewModelScope.launch {
-            val actionText = if (error is FixableError){
+            val actionText = if (error.isFixable){
                 getString(R.string.snackbar_fix)
             }else{
                 null
@@ -147,7 +146,7 @@ class CreateKeyMapShortcutViewModel(
 
             showPopup("fix_error", snackBar) ?: return@launch
 
-            if (error is FixableError) {
+            if (error.isFixable) {
                 listUseCase.fixError(error)
             }
         }

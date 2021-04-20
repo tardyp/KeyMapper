@@ -18,8 +18,8 @@ import io.github.sds100.keymapper.util.ui.DialogResponse
 import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.ui.MultiSelectProvider
 import io.github.sds100.keymapper.util.ui.MultiSelectProviderImpl
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Success
 import io.github.sds100.keymapper.util.getFullMessage
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.Dispatchers

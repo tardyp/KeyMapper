@@ -5,10 +5,10 @@ import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.util.PrefDelegate
 import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.dataOrNull
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.result.otherwise
-import io.github.sds100.keymapper.util.result.then
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
+import io.github.sds100.keymapper.util.otherwise
+import io.github.sds100.keymapper.util.then
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.map

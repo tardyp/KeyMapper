@@ -6,9 +6,8 @@ import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.getFullMessage
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -108,7 +107,7 @@ class FingerprintMapListViewModel(
 
     private fun showSnackBarAndFixError(error: Error) {
         coroutineScope.launch {
-            val actionText = if (error is FixableError){
+            val actionText = if (error.isFixable){
                 getString(R.string.snackbar_fix)
             }else{
                 null
@@ -121,7 +120,7 @@ class FingerprintMapListViewModel(
 
             showPopup("fix_error", snackBar) ?: return@launch
 
-            if (error is FixableError) {
+            if (error.isFixable) {
                 useCase.fixError(error)
             }
         }

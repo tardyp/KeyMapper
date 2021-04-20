@@ -8,8 +8,8 @@ import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
-import io.github.sds100.keymapper.util.result.FixableError
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -46,17 +46,17 @@ class DisplaySimpleMappingUseCaseImpl(
     override fun getInputMethodLabel(imeId: String): Result<String> =
         inputMethodAdapter.getLabel(imeId)
 
-    override fun fixError(error: FixableError) {
+    override fun fixError(error: Error) {
         when (error) {
-            FixableError.AccessibilityServiceDisabled -> serviceAdapter.enableService()
-            FixableError.AccessibilityServiceCrashed -> serviceAdapter.restartService()
-            is FixableError.AppDisabled -> packageManager.enableApp(error.packageName)
-            is FixableError.AppNotFound -> packageManager.installApp(error.packageName)
-            FixableError.NoCompatibleImeChosen -> keyMapperImeHelper.chooseCompatibleInputMethod(
+            Error.AccessibilityServiceDisabled -> serviceAdapter.enableService()
+            Error.AccessibilityServiceCrashed -> serviceAdapter.restartService()
+            is Error.AppDisabled -> packageManager.enableApp(error.packageName)
+            is Error.AppNotFound -> packageManager.installApp(error.packageName)
+            Error.NoCompatibleImeChosen -> keyMapperImeHelper.chooseCompatibleInputMethod(
                 fromForeground = true
             )
-            FixableError.NoCompatibleImeEnabled -> keyMapperImeHelper.enableCompatibleInputMethods()
-            is FixableError.PermissionDenied -> permissionAdapter.request(error.permission)
+            Error.NoCompatibleImeEnabled -> keyMapperImeHelper.enableCompatibleInputMethods()
+            is Error.PermissionDenied -> permissionAdapter.request(error.permission)
         }
     }
 }
@@ -67,12 +67,12 @@ interface DisplayActionUseCase : GetActionErrorUseCase {
     fun getAppName(packageName: String): Result<String>
     fun getAppIcon(packageName: String): Result<Drawable>
     fun getInputMethodLabel(imeId: String): Result<String>
-    fun fixError(error: FixableError)
+    fun fixError(error: Error)
 }
 
 interface DisplayConstraintUseCase : GetConstraintErrorUseCase {
     fun getAppName(packageName: String): Result<String>
     fun getAppIcon(packageName: String): Result<Drawable>
     fun getInputMethodLabel(imeId: String): Result<String>
-    fun fixError(error: FixableError)
+    fun fixError(error: Error)
 }

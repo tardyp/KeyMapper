@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.system.accessibility
 
 import io.github.sds100.keymapper.util.Event
-import io.github.sds100.keymapper.util.result.Result
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 

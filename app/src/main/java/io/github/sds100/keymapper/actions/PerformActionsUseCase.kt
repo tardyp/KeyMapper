@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.actions
 
 import io.github.sds100.keymapper.util.InputEventType
-import io.github.sds100.keymapper.util.result.Error
+import io.github.sds100.keymapper.util.Error
 import timber.log.Timber
 
 /**

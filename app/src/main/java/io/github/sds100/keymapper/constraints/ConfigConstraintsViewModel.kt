@@ -1,14 +1,10 @@
 package io.github.sds100.keymapper.constraints
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
 import io.github.sds100.keymapper.mappings.Mapping
-import io.github.sds100.keymapper.util.getFullMessage
-import io.github.sds100.keymapper.util.ifIsData
-import io.github.sds100.keymapper.util.mapData
-import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -86,9 +82,10 @@ class ConfigConstraintsViewModel(
             config.mapping.firstOrNull()?.ifIsData { mapping ->
                 val constraint = mapping.constraintState.constraints.singleOrNull { it.uid == id }
                     ?: return@launch
-                val error = display.getConstraintError(constraint)
 
-                if (error is FixableError) {
+                val error = display.getConstraintError(constraint)?:return@launch
+
+                if (error.isFixable) {
                    display.fixError(error)
                 }
             }

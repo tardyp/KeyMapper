@@ -8,10 +8,9 @@ import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.system.devices.InputDeviceInfo
 import io.github.sds100.keymapper.system.devices.GetInputDevicesUseCase
-import io.github.sds100.keymapper.util.getFullMessage
+import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.util.ui.CheckBoxListItem
-import io.github.sds100.keymapper.util.result.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -28,7 +27,6 @@ class ConfigKeyEventViewModel(
     resourceProvider: ResourceProvider
 ) : ViewModel(), ResourceProvider by resourceProvider {
 
-    //TODO merge into one State class
     private val keyCode = MutableStateFlow<Result<Int>>(Error.CantBeEmpty)
     private val chosenDevice = MutableStateFlow<InputDeviceInfo?>(null)
     private val useShell = MutableStateFlow(false)

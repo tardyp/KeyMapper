@@ -27,10 +27,10 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityG
 import io.github.sds100.keymapper.util.DefaultDispatcherProvider
 import io.github.sds100.keymapper.util.DispatcherProvider
 import io.github.sds100.keymapper.util.dataOrNull
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.result.suspendThen
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
+import io.github.sds100.keymapper.util.suspendThen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*

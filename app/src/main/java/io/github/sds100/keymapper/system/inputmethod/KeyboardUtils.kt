@@ -13,13 +13,9 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.system.SettingsUtils
-import io.github.sds100.keymapper.system.permissions.PermissionUtils
 import io.github.sds100.keymapper.system.root.RootUtils
-import io.github.sds100.keymapper.util.InputEventType
-import io.github.sds100.keymapper.util.result.*
-import io.github.sds100.keymapper.util.str
+import io.github.sds100.keymapper.util.*
 import splitties.systemservices.inputMethodManager
 import splitties.toast.toast
 
@@ -66,7 +62,6 @@ object KeyboardUtils {
         }
     }
 
-
     fun toggleCompatibleIme(ctx: Context) {
         if (!isCompatibleImeEnabled()) {
             ctx.toast(R.string.error_ime_service_disabled)
@@ -92,12 +87,11 @@ object KeyboardUtils {
     /**
      * @return whether the ime was changed successfully
      */
-    @RequiresPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
     fun switchIme(ctx: Context, imeId: String): Boolean {
-        if (!PermissionUtils.haveWriteSecureSettingsPermission(ctx)) {
-            ctx.toast(R.string.error_need_write_secure_settings_permission)
-            return false
-        }
+//        if (!PermissionUtils.haveWriteSecureSettingsPermission(ctx)) {
+//            ctx.toast(R.string.error_need_write_secure_settings_permission)
+//            return false
+//        }
 
         SettingsUtils.putSecureSetting(ctx, Settings.Secure.DEFAULT_INPUT_METHOD, imeId)
         return true

@@ -10,9 +10,9 @@ import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.mapData
-import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -274,7 +274,7 @@ class ConfigKeyMapTriggerViewModel(
                 RecordTriggerState.Stopped -> {
                     val recordResult = recordTrigger.startRecording()
 
-                    if (recordResult is FixableError.AccessibilityServiceDisabled) {
+                    if (recordResult is Error.AccessibilityServiceDisabled) {
 
                         val snackBar = PopupUi.SnackBar(
                             message = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
@@ -284,11 +284,11 @@ class ConfigKeyMapTriggerViewModel(
                         val response = showPopup("enable_service", snackBar)
 
                         if (response != null) {
-                            displayKeyMap.fixError(FixableError.AccessibilityServiceDisabled)
+                            displayKeyMap.fixError(Error.AccessibilityServiceDisabled)
                         }
                     }
 
-                    if (recordResult is FixableError.AccessibilityServiceCrashed) {
+                    if (recordResult is Error.AccessibilityServiceCrashed) {
 
                         val snackBar = PopupUi.SnackBar(
                             message = getString(R.string.dialog_message_restart_accessibility_service_to_record_trigger),
@@ -298,7 +298,7 @@ class ConfigKeyMapTriggerViewModel(
                         val response = showPopup("restart_service", snackBar)
 
                         if (response != null) {
-                            displayKeyMap.fixError(FixableError.AccessibilityServiceCrashed)
+                            displayKeyMap.fixError(Error.AccessibilityServiceCrashed)
                         }
                     }
                 }
@@ -313,12 +313,12 @@ class ConfigKeyMapTriggerViewModel(
             when (KeyMapTriggerError.valueOf(listItemId)) {
                 KeyMapTriggerError.DND_ACCESS_DENIED -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val error =
-                        FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
+                        Error.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
                     displayKeyMap.fixError(error)
                 }
 
                 KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED -> {
-                    val error = FixableError.PermissionDenied(Permission.ROOT)
+                    val error = Error.PermissionDenied(Permission.ROOT)
                     displayKeyMap.fixError(error)
                 }
             }

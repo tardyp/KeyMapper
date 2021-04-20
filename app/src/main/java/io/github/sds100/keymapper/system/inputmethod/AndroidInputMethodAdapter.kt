@@ -19,10 +19,10 @@ import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.system.JobSchedulerHelper
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.root.RootUtils
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
-import io.github.sds100.keymapper.util.result.onSuccess
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
+import io.github.sds100.keymapper.util.onSuccess
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import splitties.toast.toast

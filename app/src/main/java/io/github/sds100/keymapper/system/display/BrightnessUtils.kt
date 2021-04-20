@@ -3,7 +3,6 @@ package io.github.sds100.keymapper.system.display
 import android.content.Context
 import android.provider.Settings.System.*
 import androidx.annotation.IntDef
-import io.github.sds100.keymapper.system.permissions.PermissionUtils
 import io.github.sds100.keymapper.system.SettingsUtils
 
 /**
@@ -55,13 +54,13 @@ object BrightnessUtils {
     }
 
     fun setBrightnessMode(ctx: Context, @BrightnessMode mode: Int) {
-        if (!PermissionUtils.haveWriteSettingsPermission(ctx)) return
+//        if (!PermissionUtils.haveWriteSettingsPermission(ctx)) return
 
         SettingsUtils.putSystemSetting(ctx, SCREEN_BRIGHTNESS_MODE, mode)
     }
 
     fun toggleAutoBrightness(ctx: Context) {
-        if (!PermissionUtils.haveWriteSettingsPermission(ctx)) return
+//        if (!PermissionUtils.haveWriteSettingsPermission(ctx)) return
 
         val currentBrightnessMode = SettingsUtils.getSystemSetting<Int>(ctx, SCREEN_BRIGHTNESS_MODE)
 

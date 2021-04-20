@@ -14,8 +14,8 @@ import io.github.sds100.keymapper.util.ui.IconInfo
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.util.ui.TintType
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.handle
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.handle
 import splitties.bitflags.hasFlag
 
 /**

@@ -9,8 +9,7 @@ import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.system.permissions.Permission
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.FixableError
+import io.github.sds100.keymapper.util.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -39,11 +38,11 @@ class GetActionErrorUseCaseImpl(
     override fun getError(action: ActionData): Error? {
         if (action.requiresImeToPerform()) {
             if (!keyMapperImeHelper.isCompatibleImeEnabled()) {
-                return FixableError.NoCompatibleImeEnabled
+                return Error.NoCompatibleImeEnabled
             }
 
             if (!keyMapperImeHelper.isCompatibleImeChosen()) {
-                return FixableError.NoCompatibleImeChosen
+                return Error.NoCompatibleImeChosen
             }
         }
 
@@ -63,7 +62,7 @@ class GetActionErrorUseCaseImpl(
                     action.useShell
                     && !permissionAdapter.isGranted(Permission.ROOT)
                 ) {
-                    FixableError.PermissionDenied(Permission.ROOT)
+                    Error.PermissionDenied(Permission.ROOT)
                 }
 
             is TapCoordinateAction ->
@@ -73,7 +72,7 @@ class GetActionErrorUseCaseImpl(
 
             is PhoneCallAction ->
                 if (!permissionAdapter.isGranted(Permission.CALL_PHONE)) {
-                    return FixableError.PermissionDenied(Permission.CALL_PHONE)
+                    return Error.PermissionDenied(Permission.CALL_PHONE)
                 }
 
             is SystemAction -> return action.getError()
@@ -84,11 +83,11 @@ class GetActionErrorUseCaseImpl(
 
     private fun getAppError(packageName: String): Error? {
         if (!packageManager.isAppEnabled(packageName)) {
-            return FixableError.AppDisabled(packageName)
+            return Error.AppDisabled(packageName)
         }
 
         if (!packageManager.isAppInstalled(packageName)) {
-            return FixableError.AppNotFound(packageName)
+            return Error.AppNotFound(packageName)
         }
 
         return null
@@ -101,7 +100,7 @@ class GetActionErrorUseCaseImpl(
 
         SystemActionUtils.getRequiredPermissions(this.id).forEach { permission ->
             if (!permissionAdapter.isGranted(permission)) {
-                return FixableError.PermissionDenied(permission)
+                return Error.PermissionDenied(permission)
             }
         }
 

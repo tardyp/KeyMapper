@@ -6,7 +6,7 @@ import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
 import io.github.sds100.keymapper.util.ui.IconInfo
 import io.github.sds100.keymapper.util.ui.TintType
-import io.github.sds100.keymapper.util.result.handle
+import io.github.sds100.keymapper.util.handle
 
 /**
  * Created by sds100 on 18/03/2021.

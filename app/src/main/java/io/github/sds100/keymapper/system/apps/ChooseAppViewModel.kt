@@ -7,7 +7,7 @@ import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.filterByQuery
 import io.github.sds100.keymapper.util.mapData
 import io.github.sds100.keymapper.util.ui.ListUiState
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.valueOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.util.*

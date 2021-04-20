@@ -18,9 +18,9 @@ import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_DO
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_LONG_PRESS_DELAY
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_SEQUENCE_TRIGGER_TIMEOUT
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_VIBRATION_DURATION
-import io.github.sds100.keymapper.util.result.Error
-import io.github.sds100.keymapper.util.result.Result
-import io.github.sds100.keymapper.util.result.Success
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import kotlinx.android.parcel.Parcelize
 
 /**

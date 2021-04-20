@@ -11,9 +11,9 @@ import io.github.sds100.keymapper.system.audio.RingerMode
 import io.github.sds100.keymapper.system.audio.VolumeStream
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.util.getKey
-import io.github.sds100.keymapper.util.result.success
-import io.github.sds100.keymapper.util.result.then
-import io.github.sds100.keymapper.util.result.valueOrNull
+import io.github.sds100.keymapper.util.success
+import io.github.sds100.keymapper.util.then
+import io.github.sds100.keymapper.util.valueOrNull
 import splitties.bitflags.hasFlag
 
 /**
