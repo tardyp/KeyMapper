@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEventUseCase
-import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnToggleKeymapsUseCase
-import io.github.sds100.keymapper.domain.usecases.GetThemeUseCase
-import io.github.sds100.keymapper.domain.utils.ThemeUtils
+import io.github.sds100.keymapper.system.inputmethod.ControlKeyboardOnToggleKeymapsUseCase
+import io.github.sds100.keymapper.settings.GetThemeUseCase
+import io.github.sds100.keymapper.settings.ThemeUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

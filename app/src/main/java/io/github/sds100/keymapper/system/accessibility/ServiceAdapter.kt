@@ -1,0 +1,19 @@
+package io.github.sds100.keymapper.system.accessibility
+
+import io.github.sds100.keymapper.util.Event
+import io.github.sds100.keymapper.util.result.Result
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+
+/**
+ * Created by sds100 on 17/03/2021.
+ */
+interface ServiceAdapter {
+    val isEnabled: StateFlow<Boolean>
+
+    fun enableService()
+    fun disableService()
+
+    fun send(event: Event): Result<Unit>
+    val eventReceiver: SharedFlow<Event>
+}

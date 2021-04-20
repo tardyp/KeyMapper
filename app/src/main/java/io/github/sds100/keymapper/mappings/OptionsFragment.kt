@@ -16,7 +16,8 @@ import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredRadioButtonPair
 import io.github.sds100.keymapper.ui.utils.configuredRadioButtonTriple
 import io.github.sds100.keymapper.ui.utils.configuredSlider
-import io.github.sds100.keymapper.util.UrlUtils
+import io.github.sds100.keymapper.system.url.UrlUtils
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.flow.collectLatest
 
 /**

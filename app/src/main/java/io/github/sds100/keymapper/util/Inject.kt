@@ -6,39 +6,46 @@ import io.github.sds100.keymapper.ApplicationViewModel
 import io.github.sds100.keymapper.KeyMapperApp
 import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.UseCases
-import io.github.sds100.keymapper.actions.CreateSystemActionUseCaseImpl
-import io.github.sds100.keymapper.apps.ChooseAppShortcutViewModel
-import io.github.sds100.keymapper.apps.ChooseAppViewModel
-import io.github.sds100.keymapper.apps.DisplayAppShortcutsUseCaseImpl
+import io.github.sds100.keymapper.actions.*
+import io.github.sds100.keymapper.system.apps.ChooseAppShortcutViewModel
+import io.github.sds100.keymapper.system.apps.ChooseAppViewModel
+import io.github.sds100.keymapper.system.apps.DisplayAppShortcutsUseCaseImpl
 import io.github.sds100.keymapper.backup.BackupRestoreMappingsUseCaseImpl
 import io.github.sds100.keymapper.constraints.ChooseConstraintViewModel
-import io.github.sds100.keymapper.data.viewmodel.*
-import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceUseCaseImpl
-import io.github.sds100.keymapper.devices.ChooseBluetoothDeviceViewModel
-import io.github.sds100.keymapper.domain.actions.TestActionUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.GetFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.SaveFingerprintMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.GetKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.SaveKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.settings.ConfigSettingsUseCaseImpl
+import io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceUseCaseImpl
+import io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceViewModel
+import io.github.sds100.keymapper.actions.PickDisplayCoordinateViewModel
+import io.github.sds100.keymapper.actions.TestActionUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.GetFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.SaveFingerprintMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.GetKeyMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.SaveKeyMapUseCaseImpl
+import io.github.sds100.keymapper.settings.ConfigSettingsUseCaseImpl
 import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnBluetoothEventUseCaseImpl
-import io.github.sds100.keymapper.domain.usecases.ControlKeyboardOnToggleKeymapsUseCaseImpl
-import io.github.sds100.keymapper.domain.usecases.GetThemeUseCase
+import io.github.sds100.keymapper.system.inputmethod.ControlKeyboardOnToggleKeymapsUseCaseImpl
+import io.github.sds100.keymapper.settings.GetThemeUseCase
+import io.github.sds100.keymapper.system.files.OnlineFileViewModel
+import io.github.sds100.keymapper.home.HomeViewModel
 import io.github.sds100.keymapper.home.ShowHomeScreenAlertsUseCaseImpl
-import io.github.sds100.keymapper.intents.ConfigIntentViewModel
-import io.github.sds100.keymapper.keyevents.ChooseKeyCodeViewModel
-import io.github.sds100.keymapper.keyevents.ConfigKeyEventViewModel
+import io.github.sds100.keymapper.system.intents.ConfigIntentViewModel
+import io.github.sds100.keymapper.system.keyevents.ChooseKeyCodeViewModel
+import io.github.sds100.keymapper.system.keyevents.ConfigKeyEventViewModel
+import io.github.sds100.keymapper.system.keyevents.ChooseKeyViewModel
 import io.github.sds100.keymapper.mappings.fingerprintmaps.ListFingerprintMapsUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.CreateKeyMapShortcutViewModel
 import io.github.sds100.keymapper.mappings.keymaps.ListKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.onboarding.AppIntroSlide
 import io.github.sds100.keymapper.onboarding.AppIntroUseCaseImpl
 import io.github.sds100.keymapper.onboarding.AppIntroViewModel
-import io.github.sds100.keymapper.service.AccessibilityServiceController
-import io.github.sds100.keymapper.service.MyAccessibilityService
-import io.github.sds100.keymapper.ui.mappings.fingerprintmap.ConfigFingerprintMapViewModel
-import io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapViewModel
+import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceController
+import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
+import io.github.sds100.keymapper.settings.SettingsViewModel
+import io.github.sds100.keymapper.system.url.ChooseUrlViewModel
+import io.github.sds100.keymapper.mappings.fingerprintmaps.ConfigFingerprintMapViewModel
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapViewModel
+import io.github.sds100.keymapper.util.ui.TextBlockActionTypeViewModel
 
 /**
  * Created by sds100 on 26/01/2020.
@@ -65,8 +72,8 @@ object Inject {
         return ChooseConstraintViewModel.Factory(ServiceLocator.resourceProvider(ctx))
     }
 
-    fun keyActionTypeViewModel(): KeyActionTypeViewModel.Factory {
-        return KeyActionTypeViewModel.Factory()
+    fun keyActionTypeViewModel(): ChooseKeyViewModel.Factory {
+        return ChooseKeyViewModel.Factory()
     }
 
     fun configKeyEventViewModel(
@@ -90,8 +97,8 @@ object Inject {
         return TextBlockActionTypeViewModel.Factory()
     }
 
-    fun urlActionTypeViewModel(): UrlActionTypeViewModel.Factory {
-        return UrlActionTypeViewModel.Factory()
+    fun urlActionTypeViewModel(): ChooseUrlViewModel.Factory {
+        return ChooseUrlViewModel.Factory()
     }
 
     fun tapCoordinateActionTypeViewModel(context: Context): PickDisplayCoordinateViewModel.Factory {

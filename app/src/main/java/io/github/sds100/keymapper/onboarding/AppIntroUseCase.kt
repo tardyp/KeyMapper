@@ -2,13 +2,13 @@ package io.github.sds100.keymapper.onboarding
 
 import android.content.pm.PackageManager
 import android.os.Build
-import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
-import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCase
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
+import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
+import io.github.sds100.keymapper.mappings.fingerprintmaps.AreFingerprintGesturesSupportedUseCase
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.system.permissions.Permission
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.collectLatest
  * Created by sds100 on 14/04/2021.
  */
 class AppIntroUseCaseImpl(
-   private val permissionAdapter: PermissionAdapter,
-   private val serviceAdapter: ServiceAdapter,
-   private val systemFeatureAdapter: SystemFeatureAdapter,
-   private val preferenceRepository: PreferenceRepository,
-   private val fingerprintGesturesSupportedUseCase: AreFingerprintGesturesSupportedUseCase
+    private val permissionAdapter: PermissionAdapter,
+    private val serviceAdapter: ServiceAdapter,
+    private val systemFeatureAdapter: SystemFeatureAdapter,
+    private val preferenceRepository: PreferenceRepository,
+    private val fingerprintGesturesSupportedUseCase: AreFingerprintGesturesSupportedUseCase
 ) : AppIntroUseCase {
     override val isAccessibilityServiceEnabled: Flow<Boolean> = serviceAdapter.isEnabled
 

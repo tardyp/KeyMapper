@@ -1,11 +1,8 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
-import io.github.sds100.keymapper.domain.BackupManager
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapEntityMapper
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.domain.utils.mapData
+import io.github.sds100.keymapper.backup.BackupManager
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.mapData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow

@@ -2,12 +2,12 @@ package io.github.sds100.keymapper.mappings
 
 import android.graphics.drawable.Drawable
 import io.github.sds100.keymapper.constraints.GetConstraintErrorUseCase
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCase
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
-import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
-import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
+import io.github.sds100.keymapper.actions.GetActionErrorUseCase
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.flow.Flow

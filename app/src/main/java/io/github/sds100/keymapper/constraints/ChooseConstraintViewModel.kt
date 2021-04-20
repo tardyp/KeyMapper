@@ -2,12 +2,12 @@ package io.github.sds100.keymapper.constraints
 
 import androidx.lifecycle.*
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.domain.utils.Orientation
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.system.display.Orientation
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.dialogs.GetUserResponse
+import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 class ChooseConstraintViewModel(
     resourceProvider: ResourceProvider
 ) : ViewModel(), ResourceProvider by resourceProvider,
-    UserResponseViewModel by UserResponseViewModelImpl() {
+    PopupViewModel by PopupViewModelImpl() {
 
     companion object {
         private val ALL_CONSTRAINTS_ORDERED: Array<ChooseConstraintType> = arrayOf(
@@ -123,9 +123,9 @@ class ChooseConstraintViewModel(
 
                 ChooseConstraintType.BT_DEVICE_CONNECTED,
                 ChooseConstraintType.BT_DEVICE_DISCONNECTED -> {
-                    val response = getUserResponse(
+                    val response = showPopup(
                         "bluetooth_device_constraint_limitation",
-                        GetUserResponse.Ok(getString(R.string.dialog_message_bt_constraint_limitation))
+                        PopupUi.Ok(getString(R.string.dialog_message_bt_constraint_limitation))
                     )
 
                     response ?: return@launch
@@ -135,9 +135,9 @@ class ChooseConstraintViewModel(
                 }
 
                 ChooseConstraintType.SCREEN_ON -> {
-                    val response = getUserResponse(
+                    val response = showPopup(
                         "screen_on_constraint_limitation",
-                        GetUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
+                        PopupUi.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
                     )
 
                     response ?: return@launch
@@ -146,9 +146,9 @@ class ChooseConstraintViewModel(
                 }
 
                 ChooseConstraintType.SCREEN_OFF -> {
-                    val response = getUserResponse(
+                    val response = showPopup(
                         "screen_off_constraint_limitation",
-                        GetUserResponse.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
+                        PopupUi.Ok(getString(R.string.dialog_message_screen_constraints_limitation))
                     )
 
                     response ?: return@launch

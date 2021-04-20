@@ -7,11 +7,11 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.util.TintType" />
+        <import type="io.github.sds100.keymapper.util.ui.TintType" />
 
         <variable
             name="state"
-            type="io.github.sds100.keymapper.ui.actions.ActionListItem" />
+            type="io.github.sds100.keymapper.actions.ActionListItem" />
 
         <variable
             name="onRemoveClick"
@@ -94,7 +94,7 @@
                     tools:visibility="visible" />
             </LinearLayout>
 
-            <io.github.sds100.keymapper.ui.view.SquareImageButton
+            <io.github.sds100.keymapper.util.ui.SquareImageButton
                 android:id="@+id/buttonDrag"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="40dp"

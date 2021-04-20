@@ -1,21 +1,16 @@
 package io.github.sds100.keymapper.actions
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.domain.utils.ifIsData
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
 import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplayActionUseCase
 import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.ui.actions.ActionListItem
-import io.github.sds100.keymapper.ui.actions.ActionUiHelper
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.getFullMessage
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 

@@ -1,13 +1,13 @@
 package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.constraints.ConstraintState
-import io.github.sds100.keymapper.domain.actions.Action
-import io.github.sds100.keymapper.domain.actions.ActionData
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.domain.constraints.ConstraintMode
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.domain.utils.ifIsData
+import io.github.sds100.keymapper.actions.Action
+import io.github.sds100.keymapper.actions.ActionData
+import io.github.sds100.keymapper.constraints.Constraint
+import io.github.sds100.keymapper.constraints.ConstraintMode
 import io.github.sds100.keymapper.domain.utils.moveElement
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.ifIsData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 

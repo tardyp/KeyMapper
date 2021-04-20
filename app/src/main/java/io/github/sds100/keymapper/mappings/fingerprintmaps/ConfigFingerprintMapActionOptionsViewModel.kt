@@ -1,16 +1,13 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.SliderModel
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapAction
-import io.github.sds100.keymapper.domain.utils.Defaultable
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.util.ui.SliderModel
+import io.github.sds100.keymapper.util.Defaultable
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.mappings.ConfigActionOptionsViewModel
 import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
-import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 
 /**

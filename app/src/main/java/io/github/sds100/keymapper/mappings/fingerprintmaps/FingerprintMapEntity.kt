@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.mappings.fingerprintmaps
 import com.github.salomonbrys.kotson.*
 import com.google.gson.annotations.SerializedName
 import io.github.sds100.keymapper.data.entities.ActionEntity
-import io.github.sds100.keymapper.constraints.ConstraintEntity
+import io.github.sds100.keymapper.data.entities.ConstraintEntity
 import io.github.sds100.keymapper.data.entities.Extra
 
 /**

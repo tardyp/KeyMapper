@@ -9,11 +9,11 @@
 
         <variable
             name="onActionChipClick"
-            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+            type="io.github.sds100.keymapper.util.ui.OnChipClickCallback" />
 
         <variable
             name="onConstraintChipClick"
-            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+            type="io.github.sds100.keymapper.util.ui.OnChipClickCallback" />
 
         <variable
             name="onEnabledSwitchClickListener"
@@ -25,7 +25,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.ui.mappings.fingerprintmap.FingerprintMapListItem" />
+            type="io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapListItem" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

@@ -1,13 +1,13 @@
 package io.github.sds100.keymapper
 
 import android.view.KeyEvent
-import io.github.sds100.keymapper.domain.actions.KeyEventAction
-import io.github.sds100.keymapper.domain.actions.TapCoordinateAction
-import io.github.sds100.keymapper.domain.mappings.keymap.ConfigKeyMapUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapAction
+import io.github.sds100.keymapper.actions.KeyEventAction
+import io.github.sds100.keymapper.actions.TapCoordinateAction
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.KeyMap
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapAction
 import io.github.sds100.keymapper.domain.utils.dataOrNull
-import io.github.sds100.keymapper.util.KeyEventUtils
+import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.util.singleKeyTrigger
 import io.github.sds100.keymapper.util.triggerKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi

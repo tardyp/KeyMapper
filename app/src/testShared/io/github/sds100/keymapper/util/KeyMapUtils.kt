@@ -1,10 +1,10 @@
 package io.github.sds100.keymapper.util
 
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.KeyMapTrigger
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKey
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.domain.mappings.keymap.trigger.TriggerMode
-import io.github.sds100.keymapper.domain.utils.ClickType
+import io.github.sds100.keymapper.mappings.keymaps.trigger.KeyMapTrigger
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKey
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKeyDevice
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerMode
+import io.github.sds100.keymapper.mappings.ClickType
 
 /**
  * Created by sds100 on 19/04/2021.
@@ -33,10 +33,10 @@ import io.github.sds100.keymapper.domain.utils.ClickType
 }
 
  fun triggerKey(
-    keyCode: Int,
-    device: TriggerKeyDevice = TriggerKeyDevice.Internal,
-    clickType: ClickType = ClickType.SHORT_PRESS,
-    consume: Boolean = true
+     keyCode: Int,
+     device: TriggerKeyDevice = TriggerKeyDevice.Internal,
+     clickType: ClickType = ClickType.SHORT_PRESS,
+     consume: Boolean = true
 ): TriggerKey {
     return TriggerKey(
         keyCode = keyCode,

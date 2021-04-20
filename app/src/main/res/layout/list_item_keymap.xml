@@ -9,11 +9,11 @@
 
         <variable
             name="keyMapUiState"
-            type="io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem.KeyMapUiState" />
+            type="io.github.sds100.keymapper.mappings.keymaps.KeyMapListItem.KeyMapUiState" />
 
         <variable
             name="selectionState"
-            type="io.github.sds100.keymapper.ui.mappings.keymap.KeyMapListItem.SelectionUiState" />
+            type="io.github.sds100.keymapper.mappings.keymaps.KeyMapListItem.SelectionUiState" />
 
         <variable
             name="onCardClick"
@@ -25,15 +25,15 @@
 
         <variable
             name="onActionChipClick"
-            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+            type="io.github.sds100.keymapper.util.ui.OnChipClickCallback" />
 
         <variable
             name="onConstraintChipClick"
-            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+            type="io.github.sds100.keymapper.util.ui.OnChipClickCallback" />
 
         <variable
             name="onTriggerErrorClick"
-            type="io.github.sds100.keymapper.ui.callback.OnChipClickCallback" />
+            type="io.github.sds100.keymapper.util.ui.OnChipClickCallback" />
     </data>
 
     <!--    TODO show trigger errors-->

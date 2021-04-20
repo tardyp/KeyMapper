@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.mappings
 
-import io.github.sds100.keymapper.domain.utils.Defaultable
-import io.github.sds100.keymapper.ui.ListItem
+import io.github.sds100.keymapper.util.Defaultable
+import io.github.sds100.keymapper.util.ui.ListItem
 import kotlinx.coroutines.flow.StateFlow
 
 /**

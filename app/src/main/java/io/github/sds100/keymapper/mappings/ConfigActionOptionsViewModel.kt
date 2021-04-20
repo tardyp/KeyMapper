@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.mappings
 
-import io.github.sds100.keymapper.domain.actions.Action
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.ui.ListItem
+import io.github.sds100.keymapper.actions.Action
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.ui.ListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

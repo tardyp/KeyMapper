@@ -1,17 +1,14 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
 import android.os.SystemClock
-import io.github.sds100.keymapper.domain.adapter.DisplayAdapter
-import io.github.sds100.keymapper.domain.mappings.DetectMappingUseCase
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMap
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapEntityMapper
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.preferences.PreferenceDefaults
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCase
-import io.github.sds100.keymapper.service.IAccessibilityService
+import io.github.sds100.keymapper.system.display.DisplayAdapter
+import io.github.sds100.keymapper.mappings.DetectMappingUseCase
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.PreferenceDefaults
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.util.InputEventType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

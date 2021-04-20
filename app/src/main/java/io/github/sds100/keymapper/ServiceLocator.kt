@@ -1,30 +1,35 @@
 package io.github.sds100.keymapper
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.datastore.preferences.createDataStore
 import androidx.room.Room
-import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
+import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.data.repositories.DataStorePreferenceRepository
 import io.github.sds100.keymapper.data.repositories.DataStoreFingerprintMapRepository
 import io.github.sds100.keymapper.data.repositories.RoomDeviceInfoCache
 import io.github.sds100.keymapper.data.repositories.RoomKeyMapRepository
-import io.github.sds100.keymapper.devices.DeviceInfoCache
-import io.github.sds100.keymapper.domain.BackupManager
-import io.github.sds100.keymapper.domain.BackupManagerImpl
-import io.github.sds100.keymapper.domain.adapter.*
-import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.files.FileAdapter
-import io.github.sds100.keymapper.framework.adapters.AccessibilityServiceAdapter
-import io.github.sds100.keymapper.framework.adapters.AndroidPermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.AppShortcutAdapter
-import io.github.sds100.keymapper.framework.adapters.FileRepository
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.system.devices.DeviceInfoCache
+import io.github.sds100.keymapper.backup.BackupManager
+import io.github.sds100.keymapper.backup.BackupManagerImpl
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.system.files.FileAdapter
+import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
+import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
+import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
+import io.github.sds100.keymapper.system.camera.CameraAdapter
+import io.github.sds100.keymapper.system.devices.BluetoothMonitor
+import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
+import io.github.sds100.keymapper.system.files.FileRepository
+import io.github.sds100.keymapper.util.ui.ResourceProvider
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
-import io.github.sds100.keymapper.notifications.AndroidNotificationAdapter
-import io.github.sds100.keymapper.ui.NotificationController
-import kotlinx.coroutines.runBlocking
+import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
+import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
+import io.github.sds100.keymapper.system.notifications.NotificationController
+import io.github.sds100.keymapper.system.display.DisplayAdapter
+import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
+import io.github.sds100.keymapper.system.vibrator.VibratorAdapter
 
 /**
  * Created by sds100 on 17/05/2020.
@@ -32,7 +37,7 @@ import kotlinx.coroutines.runBlocking
 object ServiceLocator {
 
     private val lock = Any()
-    private var database: KeyMapDatabase? = null
+    private var database: AppDatabase? = null
 
     @Volatile
     private var deviceInfoRepository: DeviceInfoCache? = null
@@ -209,21 +214,21 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).displayAdapter
     }
 
-    private fun createDatabase(context: Context): KeyMapDatabase {
+    private fun createDatabase(context: Context): AppDatabase {
         val result = Room.databaseBuilder(
             context.applicationContext,
-            KeyMapDatabase::class.java,
-            KeyMapDatabase.DATABASE_NAME
+            AppDatabase::class.java,
+            AppDatabase.DATABASE_NAME
         ).addMigrations(
-            KeyMapDatabase.MIGRATION_1_2,
-            KeyMapDatabase.MIGRATION_2_3,
-            KeyMapDatabase.MIGRATION_3_4,
-            KeyMapDatabase.MIGRATION_4_5,
-            KeyMapDatabase.MIGRATION_5_6,
-            KeyMapDatabase.MIGRATION_6_7,
-            KeyMapDatabase.MIGRATION_7_8,
-            KeyMapDatabase.MIGRATION_8_9,
-            KeyMapDatabase.MIGRATION_9_10
+            AppDatabase.MIGRATION_1_2,
+            AppDatabase.MIGRATION_2_3,
+            AppDatabase.MIGRATION_3_4,
+            AppDatabase.MIGRATION_4_5,
+            AppDatabase.MIGRATION_5_6,
+            AppDatabase.MIGRATION_6_7,
+            AppDatabase.MIGRATION_7_8,
+            AppDatabase.MIGRATION_8_9,
+            AppDatabase.MIGRATION_9_10
         ).build()
         /* REMINDER!!!! Need to migrate fingerprint maps and other stuff???
          * Keep this note at the bottom */

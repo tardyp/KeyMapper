@@ -1,9 +1,8 @@
 package io.github.sds100.keymapper.actions
 
 import android.graphics.drawable.Drawable
-import io.github.sds100.keymapper.domain.actions.SystemActionId
-import io.github.sds100.keymapper.ui.ListItem
-import io.github.sds100.keymapper.util.ISearchable
+import io.github.sds100.keymapper.util.ui.ListItem
+import io.github.sds100.keymapper.util.ui.ISearchable
 
 /**
  * Created by sds100 on 31/03/2020.

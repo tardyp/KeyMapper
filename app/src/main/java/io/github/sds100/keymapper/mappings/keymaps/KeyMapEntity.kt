@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 import com.github.salomonbrys.kotson.*
 import com.google.gson.annotations.SerializedName
 import io.github.sds100.keymapper.data.entities.ActionEntity
-import io.github.sds100.keymapper.constraints.ConstraintEntity
+import io.github.sds100.keymapper.data.entities.ConstraintEntity
 import io.github.sds100.keymapper.data.entities.TriggerEntity
-import io.github.sds100.keymapper.mappings.keymaps.db.dao.KeyMapDao
+import io.github.sds100.keymapper.data.db.dao.KeyMapDao
 import java.util.*
 
 /**

@@ -1,14 +1,12 @@
 package io.github.sds100.keymapper.actions
 
 import android.os.Build
-import io.github.sds100.keymapper.domain.actions.SystemActionId
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
-import io.github.sds100.keymapper.domain.ime.ImeInfo
-import io.github.sds100.keymapper.domain.packages.PackageInfo
-import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.domain.utils.dataOrNull
-import io.github.sds100.keymapper.util.SystemActionUtils
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
+import io.github.sds100.keymapper.system.inputmethod.ImeInfo
+import io.github.sds100.keymapper.system.apps.PackageInfo
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
+import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.flow.first

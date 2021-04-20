@@ -10,9 +10,9 @@ import androidx.lifecycle.addRepeatingJob
 import com.github.appintro.AppIntro2
 import io.github.sds100.keymapper.MainActivity
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
+import io.github.sds100.keymapper.system.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.Inject
-import io.github.sds100.keymapper.util.UrlUtils
+import io.github.sds100.keymapper.system.url.UrlUtils
 import kotlinx.coroutines.flow.collectLatest
 
 /**

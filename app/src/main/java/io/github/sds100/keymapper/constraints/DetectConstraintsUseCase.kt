@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.constraints
 
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.service.IAccessibilityService
+import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 
 /**
  * Created by sds100 on 17/04/2021.

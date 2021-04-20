@@ -11,7 +11,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.util.SliderModel" />
+            type="io.github.sds100.keymapper.util.ui.SliderModel" />
 
         <variable
             name="onSliderChangeListener"
@@ -45,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Long Press Delay (ms)" />
 
-        <io.github.sds100.keymapper.ui.view.SliderWithLabel
+        <io.github.sds100.keymapper.util.ui.SliderWithLabel
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

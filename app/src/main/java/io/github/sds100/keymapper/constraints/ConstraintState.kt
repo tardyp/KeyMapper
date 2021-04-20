@@ -1,7 +1,5 @@
 package io.github.sds100.keymapper.constraints
 
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.domain.constraints.ConstraintMode
 import kotlinx.serialization.Serializable
 
 /**

@@ -1,0 +1,59 @@
+package io.github.sds100.keymapper.domain.usecases
+
+import io.github.sds100.keymapper.system.devices.BluetoothMonitor
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.domain.utils.PrefDelegate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+/**
+ * Created by sds100 on 14/02/2021.
+ */
+
+//TODO rename as AutoSwitchImeController and remove interface
+class ControlKeyboardOnBluetoothEventUseCaseImpl(
+    private val inputMethodAdapter: InputMethodAdapter,
+    private val preferenceRepository: PreferenceRepository,
+    private val bluetoothMonitor: BluetoothMonitor
+) : PreferenceRepository by preferenceRepository, ControlKeyboardOnBluetoothEventUseCase {
+    private val imeManager = KeyMapperImeHelper(inputMethodAdapter)
+
+    private val devicesThatToggleKeyboard
+        by PrefDelegate(Keys.bluetoothDevicesThatToggleKeyboard, emptySet())
+
+    private val bluetoothDevicesThatShowImePicker
+        by PrefDelegate(Keys.bluetoothDevicesThatShowImePicker, emptySet())
+
+    private val changeImeOnBtConnect by PrefDelegate(Keys.changeImeOnBtConnect, false)
+    private val showImePickerOnBtConnect by PrefDelegate(Keys.showImePickerOnBtConnect, false)
+
+    override fun start(coroutineScope: CoroutineScope) {
+        bluetoothMonitor.onDeviceConnect.onEach { address ->
+            if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
+                imeManager.chooseCompatibleInputMethod(fromForeground = false)
+            }
+
+            if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
+                inputMethodAdapter.showImePicker(fromForeground = false)
+            }
+        }.launchIn(coroutineScope)
+
+        bluetoothMonitor.onDeviceDisconnect.onEach { address ->
+            if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
+                imeManager.chooseLastUsedIncompatibleInputMethod(fromForeground = false)
+            }
+
+            if (showImePickerOnBtConnect && bluetoothDevicesThatShowImePicker.contains(address)) {
+                inputMethodAdapter.showImePicker(fromForeground = false)
+            }
+        }.launchIn(coroutineScope)
+    }
+}
+
+interface ControlKeyboardOnBluetoothEventUseCase {
+    fun start(coroutineScope: CoroutineScope)
+}

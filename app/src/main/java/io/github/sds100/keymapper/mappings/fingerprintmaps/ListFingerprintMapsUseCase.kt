@@ -1,12 +1,9 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
 import android.os.Build
-import io.github.sds100.keymapper.domain.BackupManager
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapEntityMapper
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapId
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMapIdEntityMapper
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
+import io.github.sds100.keymapper.backup.BackupManager
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

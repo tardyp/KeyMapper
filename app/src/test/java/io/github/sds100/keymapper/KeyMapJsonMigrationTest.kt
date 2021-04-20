@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import io.github.sds100.keymapper.data.repositories.RoomKeyMapRepository
 import io.github.sds100.keymapper.util.JsonTestUtils
-import io.github.sds100.keymapper.util.MigrationUtils
+import io.github.sds100.keymapper.data.migration.MigrationUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope

@@ -1,21 +1,14 @@
 package io.github.sds100.keymapper.constraints
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.domain.constraints.*
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.domain.utils.ifIsData
-import io.github.sds100.keymapper.domain.utils.mapData
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplayConstraintUseCase
 import io.github.sds100.keymapper.mappings.Mapping
-import io.github.sds100.keymapper.ui.IconInfo
-import io.github.sds100.keymapper.ui.ListUiState
-import io.github.sds100.keymapper.ui.constraints.ConstraintListItem
-import io.github.sds100.keymapper.ui.constraints.ConstraintUiHelper
-import io.github.sds100.keymapper.ui.createListState
-import io.github.sds100.keymapper.util.TintType
+import io.github.sds100.keymapper.util.ifIsData
+import io.github.sds100.keymapper.util.mapData
 import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

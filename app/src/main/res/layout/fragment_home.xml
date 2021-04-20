@@ -9,7 +9,7 @@
 
         <import type="com.google.android.material.bottomappbar.BottomAppBar" />
 
-        <import type="io.github.sds100.keymapper.data.viewmodel.HomeAppBarState" />
+        <import type="io.github.sds100.keymapper.home.HomeAppBarState" />
 
         <import type="androidx.lifecycle.LiveData" />
 
@@ -19,7 +19,7 @@
 
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.data.viewmodel.HomeViewModel" />
+            type="io.github.sds100.keymapper.home.HomeViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

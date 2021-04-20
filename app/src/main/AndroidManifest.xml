@@ -58,7 +58,7 @@
 
         <!-- Use a different task affinity so this activity doesn't close other activities -->
         <activity
-            android:name=".ui.activity.LaunchKeymapShortcutActivity"
+            android:name=".mappings.keymaps.LaunchKeyMapShortcutActivity"
             android:excludeFromRecents="true"
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
@@ -71,7 +71,7 @@
 
         <!-- Use a different task affinity so this activity can be opened at the same time as others -->
         <activity
-            android:name=".ui.activity.CreateKeymapShortcutActivity"
+            android:name=".mappings.keymaps.CreateKeymapShortcutActivity"
             android:label="@string/shortcut_label_action"
             android:taskAffinity="">
             <intent-filter>
@@ -79,7 +79,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".framework.receivers.NotificationClickReceiver">
+        <receiver android:name=".system.notifications.NotificationClickReceiver">
             <intent-filter>
                 <action android:name="android.hardware.input.action.QUERY_KEYBOARD_LAYOUTS" />
             </intent-filter>
@@ -88,13 +88,13 @@
                 android:resource="@xml/keyboard_layouts" />
         </receiver>
 
-        <receiver android:name=".framework.receivers.BootBroadcastReceiver">
+        <receiver android:name=".system.BootBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".framework.receivers.BluetoothBroadcastReceiver">
+        <receiver android:name=".system.devices.BluetoothBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
@@ -102,7 +102,7 @@
         </receiver>
 
         <receiver
-            android:name=".service.DeviceAdmin"
+            android:name=".system.DeviceAdmin"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data
                 android:name="android.app.device_admin"
@@ -114,7 +114,7 @@
         </receiver>
 
         <service
-            android:name=".service.MyAccessibilityService"
+            android:name=".system.accessibility.MyAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -126,7 +126,7 @@
         </service>
 
         <service
-            android:name=".service.KeyMapperImeService"
+            android:name=".system.inputmethod.KeyMapperImeService"
             android:label="@string/ime_service_label"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -138,7 +138,7 @@
         </service>
 
         <service
-            android:name=".service.tiles.ToggleKeymapsTile"
+            android:name=".system.tiles.ToggleKeyMapsTile"
             android:icon="@drawable/ic_tile_pause"
             android:label="@string/tile_pause"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
@@ -148,7 +148,7 @@
         </service>
 
         <service
-            android:name=".service.tiles.ToggleKeyMapperKeyboardTile"
+            android:name=".system.tiles.ToggleKeyMapperKeyboardTile"
             android:icon="@drawable/ic_tile_keyboard"
             android:label="@string/tile_toggle_keymapper_keyboard"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
@@ -158,7 +158,7 @@
         </service>
 
         <service
-            android:name="io.github.sds100.keymapper.service.NotificationReceiver"
+            android:name="io.github.sds100.keymapper.system.notifications.NotificationReceiver"
             android:label="Key Mapper Notification Receiver"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
@@ -167,11 +167,11 @@
         </service>
 
         <service
-            android:name=".framework.service.ObserveEnabledAccessibilityServicesJob"
+            android:name=".system.accessibility.ObserveEnabledAccessibilityServicesJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".framework.service.ObserveEnabledInputMethodsJob"
+            android:name=".system.inputmethod.ObserveEnabledInputMethodsJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 </manifest>

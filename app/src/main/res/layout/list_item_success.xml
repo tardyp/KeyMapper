@@ -10,7 +10,7 @@
 
         <variable
             name="model"
-            type="io.github.sds100.keymapper.ui.TextListItem.Success" />
+            type="io.github.sds100.keymapper.util.ui.TextListItem.Success" />
     </data>
 
     <com.google.android.material.textview.MaterialTextView

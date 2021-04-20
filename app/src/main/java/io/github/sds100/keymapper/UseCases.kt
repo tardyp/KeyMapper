@@ -3,16 +3,16 @@ package io.github.sds100.keymapper
 import android.content.Context
 import io.github.sds100.keymapper.constraints.DetectConstraintsUseCaseImpl
 import io.github.sds100.keymapper.constraints.GetConstraintErrorUseCaseImpl
-import io.github.sds100.keymapper.domain.actions.GetActionErrorUseCaseImpl
-import io.github.sds100.keymapper.domain.actions.IsSystemActionSupportedUseCaseImpl
-import io.github.sds100.keymapper.domain.devices.GetInputDevicesUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.DetectMappingUseCaseImpl
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.AreFingerprintGesturesSupportedUseCaseImpl
-import io.github.sds100.keymapper.domain.usecases.OnboardingUseCaseImpl
-import io.github.sds100.keymapper.domain.usecases.PerformActionsUseCaseImpl
-import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCase
-import io.github.sds100.keymapper.inputmethod.ShowInputMethodPickerUseCaseImpl
-import io.github.sds100.keymapper.inputmethod.ToggleCompatibleImeUseCaseImpl
+import io.github.sds100.keymapper.actions.GetActionErrorUseCaseImpl
+import io.github.sds100.keymapper.actions.IsSystemActionSupportedUseCaseImpl
+import io.github.sds100.keymapper.system.devices.GetInputDevicesUseCaseImpl
+import io.github.sds100.keymapper.mappings.DetectMappingUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.AreFingerprintGesturesSupportedUseCaseImpl
+import io.github.sds100.keymapper.onboarding.OnboardingUseCaseImpl
+import io.github.sds100.keymapper.actions.PerformActionsUseCaseImpl
+import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCase
+import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCaseImpl
+import io.github.sds100.keymapper.system.inputmethod.ToggleCompatibleImeUseCaseImpl
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCaseImpl
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCaseImpl
@@ -20,14 +20,14 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.DetectFingerprintMaps
 import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
-import io.github.sds100.keymapper.apps.DisplayAppsUseCase
-import io.github.sds100.keymapper.apps.DisplayAppsUseCaseImpl
-import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCase
-import io.github.sds100.keymapper.permissions.CheckRootPermissionUseCaseImpl
-import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCase
-import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCaseImpl
-import io.github.sds100.keymapper.service.IAccessibilityService
-import io.github.sds100.keymapper.ui.shortcuts.CreateKeyMapShortcutUseCaseImpl
+import io.github.sds100.keymapper.system.apps.DisplayAppsUseCase
+import io.github.sds100.keymapper.system.apps.DisplayAppsUseCaseImpl
+import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCaseImpl
+import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCase
+import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCaseImpl
+import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
+import io.github.sds100.keymapper.mappings.keymaps.CreateKeyMapShortcutUseCaseImpl
 
 /**
  * Created by sds100 on 03/03/2021.

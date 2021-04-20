@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.remove
 import androidx.datastore.preferences.createDataStore
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

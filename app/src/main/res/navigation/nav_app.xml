@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/home_fragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.HomeFragment"
+        android:name="io.github.sds100.keymapper.home.HomeFragment"
         tools:layout="@layout/fragment_home">
 
         <action
@@ -105,7 +105,7 @@
 
     <dialog
         android:id="@+id/onlineFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.OnlineFileFragment"
+        android:name="io.github.sds100.keymapper.system.files.OnlineFileFragment"
         android:label="help_fragment"
         tools:layout="@layout/fragment_online_file">
         <argument
@@ -134,7 +134,7 @@
 
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.AboutFragment"
+        android:name="io.github.sds100.keymapper.about.AboutFragment"
         android:label="fragment_about"
         tools:layout="@layout/fragment_about" />
 
@@ -148,7 +148,7 @@
 
     <dialog
         android:id="@+id/menuFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.MenuFragment"
+        android:name="io.github.sds100.keymapper.home.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu" />
 
@@ -159,7 +159,7 @@
 
     <fragment
         android:id="@+id/appListFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.ChooseAppFragment"
+        android:name="io.github.sds100.keymapper.system.apps.ChooseAppFragment"
         android:label="AppListFragment"
         tools:layout="@layout/fragment_recyclerview" />
 
@@ -173,7 +173,7 @@
 
     <fragment
         android:id="@+id/bluetoothDevicesFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.ChooseBluetoothDeviceFragment"
+        android:name="io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceFragment"
         android:label="BlutoothDeviceFragment"
         tools:layout="@layout/fragment_recyclerview" />
 

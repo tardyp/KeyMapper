@@ -1,16 +1,9 @@
 package io.github.sds100.keymapper.constraints
 
-import android.os.Build
-import io.github.sds100.keymapper.domain.actions.*
-import io.github.sds100.keymapper.domain.adapter.InputMethodAdapter
-import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
-import io.github.sds100.keymapper.domain.adapter.SystemFeatureAdapter
-import io.github.sds100.keymapper.domain.constraints.Constraint
-import io.github.sds100.keymapper.domain.constraints.IsConstraintSupportedByDeviceUseCaseImpl
-import io.github.sds100.keymapper.domain.ime.KeyMapperImeHelper
-import io.github.sds100.keymapper.domain.packages.PackageManagerAdapter
-import io.github.sds100.keymapper.permissions.Permission
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
+import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import kotlinx.coroutines.flow.Flow

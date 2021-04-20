@@ -10,10 +10,10 @@ import androidx.lifecycle.addRepeatingJob
 import androidx.navigation.findNavController
 import io.github.sds100.keymapper.*
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
-import io.github.sds100.keymapper.data.viewmodel.KeyActionTypeViewModel
+import io.github.sds100.keymapper.system.keyevents.ChooseKeyViewModel
 import io.github.sds100.keymapper.databinding.ActivityMainBinding
-import io.github.sds100.keymapper.permissions.Permission
-import io.github.sds100.keymapper.permissions.RequestPermissionDelegate
+import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.permissions.RequestPermissionDelegate
 import io.github.sds100.keymapper.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.flow.collectLatest
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             "$PACKAGE_NAME.show_accessibility_settings_not_found_dialog"
     }
 
-    private val keyActionTypeViewModel: KeyActionTypeViewModel by viewModels {
+    private val chooseKeyViewModel: ChooseKeyViewModel by viewModels {
         Inject.keyActionTypeViewModel()
     }
 
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        event?.let { keyActionTypeViewModel.onKeyDown(it.keyCode) }
+        event?.let { chooseKeyViewModel.onKeyDown(it.keyCode) }
 
         return super.onKeyUp(keyCode, event)
     }

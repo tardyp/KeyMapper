@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 

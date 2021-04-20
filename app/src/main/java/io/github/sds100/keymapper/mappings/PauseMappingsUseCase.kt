@@ -1,7 +1,7 @@
 package io.github.sds100.keymapper.mappings
 
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

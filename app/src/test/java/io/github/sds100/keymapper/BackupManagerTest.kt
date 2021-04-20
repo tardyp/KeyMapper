@@ -5,16 +5,15 @@ import com.github.salomonbrys.kotson.contains
 import com.github.salomonbrys.kotson.get
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
+import io.github.sds100.keymapper.data.db.AppDatabase
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntity
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
-import io.github.sds100.keymapper.devices.DeviceInfoCache
+import io.github.sds100.keymapper.system.devices.DeviceInfoCache
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
-import io.github.sds100.keymapper.domain.BackupManagerImpl
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.files.FileAdapter
+import io.github.sds100.keymapper.backup.BackupManagerImpl
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapRepository
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.system.files.FileAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityGroup
 import io.github.sds100.keymapper.util.DispatcherProvider
 import io.github.sds100.keymapper.util.FlowUtils.toListWithTimeout
@@ -374,7 +373,7 @@ class BackupManagerTest {
 
             assertThat(
                 rootElement["keymap_db_version"].asInt,
-                `is`(KeyMapDatabase.DATABASE_VERSION)
+                `is`(AppDatabase.DATABASE_VERSION)
             )
         }
 

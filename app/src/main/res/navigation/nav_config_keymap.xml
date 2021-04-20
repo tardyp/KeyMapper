@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/config_fingerprint_map_fragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.keymap.ConfigKeymapFragment"
+        android:name="io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapFragment"
         android:label="Edit Keymap"
         tools:layout="@layout/fragment_config_mapping">
 
@@ -30,7 +30,7 @@
 
     <dialog
         android:id="@+id/triggerKeyOptionsFragment"
-        android:name="io.github.sds100.keymapper.mappings.keymaps.ConfigTriggerKeyFragment"
+        android:name="io.github.sds100.keymapper.mappings.keymaps.trigger.ConfigTriggerKeyFragment"
         android:label="TriggerKeyOptionsFragment"/>
 
     <dialog

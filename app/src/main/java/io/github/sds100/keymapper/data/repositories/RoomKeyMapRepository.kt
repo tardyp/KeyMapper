@@ -2,14 +2,14 @@ package io.github.sds100.keymapper.data.repositories
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
-import io.github.sds100.keymapper.mappings.keymaps.db.KeyMapDatabase
-import io.github.sds100.keymapper.mappings.keymaps.db.dao.KeyMapDao
-import io.github.sds100.keymapper.util.JsonMigration
-import io.github.sds100.keymapper.mappings.keymaps.migration.Migration_9_10
+import io.github.sds100.keymapper.data.db.AppDatabase
+import io.github.sds100.keymapper.data.db.dao.KeyMapDao
+import io.github.sds100.keymapper.data.migration.JsonMigration
+import io.github.sds100.keymapper.data.migration.keymaps.Migration_9_10
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
-import io.github.sds100.keymapper.domain.mappings.keymap.KeyMapRepository
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.util.MigrationUtils
+import io.github.sds100.keymapper.mappings.keymaps.KeyMapRepository
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.data.migration.MigrationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -69,7 +69,7 @@ class RoomKeyMapRepository(
                 MIGRATIONS,
                 dbVersion,
                 it,
-                KeyMapDatabase.DATABASE_VERSION
+                AppDatabase.DATABASE_VERSION
             )
 
             val keyMap = gson.fromJson<KeyMapEntity>(migratedJson)

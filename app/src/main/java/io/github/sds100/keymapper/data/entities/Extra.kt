@@ -12,8 +12,8 @@ import io.github.sds100.keymapper.data.entities.ActionEntity.Companion.EXTRA_REP
 import io.github.sds100.keymapper.data.entities.ActionEntity.Companion.EXTRA_RINGER_MODE
 import io.github.sds100.keymapper.data.entities.ActionEntity.Companion.EXTRA_SHORTCUT_TITLE
 import io.github.sds100.keymapper.data.entities.ActionEntity.Companion.EXTRA_STREAM_TYPE
-import io.github.sds100.keymapper.constraints.ConstraintEntity.Companion.EXTRA_BT_ADDRESS
-import io.github.sds100.keymapper.constraints.ConstraintEntity.Companion.EXTRA_BT_NAME
+import io.github.sds100.keymapper.data.entities.ConstraintEntity.Companion.EXTRA_BT_ADDRESS
+import io.github.sds100.keymapper.data.entities.ConstraintEntity.Companion.EXTRA_BT_NAME
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_DOUBLE_PRESS_DELAY
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_LONG_PRESS_DELAY
 import io.github.sds100.keymapper.data.entities.TriggerEntity.Companion.EXTRA_SEQUENCE_TRIGGER_TIMEOUT

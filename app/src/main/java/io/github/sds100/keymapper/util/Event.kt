@@ -19,10 +19,10 @@ import android.os.Parcelable
 import androidx.annotation.StringRes
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.data.entities.ActionEntity
-import io.github.sds100.keymapper.constraints.ConstraintEntity
-import io.github.sds100.keymapper.devices.DeviceInfoEntity
-import io.github.sds100.keymapper.domain.actions.ActionData
-import io.github.sds100.keymapper.intents.IntentExtraModel
+import io.github.sds100.keymapper.data.entities.ConstraintEntity
+import io.github.sds100.keymapper.system.devices.DeviceInfoEntity
+import io.github.sds100.keymapper.actions.ActionData
+import io.github.sds100.keymapper.system.intents.IntentExtraModel
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapEntity
 import io.github.sds100.keymapper.util.result.Error
 import kotlinx.android.parcel.Parcelize

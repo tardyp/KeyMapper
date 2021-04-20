@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/createKeymapShortcutFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.CreateKeyMapShortcutFragment" />
+        android:name="io.github.sds100.keymapper.mappings.keymaps.CreateKeyMapShortcutFragment" />
 
     <fragment
         android:id="@+id/settingsFragment"

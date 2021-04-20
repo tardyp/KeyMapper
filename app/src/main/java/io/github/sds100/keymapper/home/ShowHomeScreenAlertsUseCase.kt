@@ -1,11 +1,10 @@
 package io.github.sds100.keymapper.home
 
-import io.github.sds100.keymapper.domain.adapter.PermissionAdapter
-import io.github.sds100.keymapper.domain.adapter.ServiceAdapter
-import io.github.sds100.keymapper.domain.preferences.Keys
-import io.github.sds100.keymapper.domain.repositories.PreferenceRepository
-import io.github.sds100.keymapper.permissions.Permission
-import io.github.sds100.keymapper.service.ControlAccessibilityServiceUseCase
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.data.Keys
+import io.github.sds100.keymapper.data.repositories.PreferenceRepository
+import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest

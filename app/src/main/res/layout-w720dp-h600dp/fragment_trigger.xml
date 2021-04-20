@@ -7,11 +7,11 @@
 
         <import type="android.view.View" />
 
-        <import type="io.github.sds100.keymapper.ui.ListUiState" />
+        <import type="io.github.sds100.keymapper.util.ui.ListUiState" />
 
         <variable
             name="viewModel"
-            type="io.github.sds100.keymapper.ui.mappings.keymap.ConfigKeyMapTriggerViewModel" />
+            type="io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapTriggerViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

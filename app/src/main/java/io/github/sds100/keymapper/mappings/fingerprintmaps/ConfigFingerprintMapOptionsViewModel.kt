@@ -1,14 +1,13 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.SliderModel
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.ConfigFingerprintMapUseCase
-import io.github.sds100.keymapper.domain.mappings.fingerprintmap.FingerprintMap
-import io.github.sds100.keymapper.domain.utils.Defaultable
-import io.github.sds100.keymapper.domain.utils.State
-import io.github.sds100.keymapper.framework.adapters.ResourceProvider
+import io.github.sds100.keymapper.util.ui.SliderModel
+import io.github.sds100.keymapper.util.Defaultable
+import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.mappings.OptionMinimums
 import io.github.sds100.keymapper.ui.*
+import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,15 +23,13 @@ class ConfigFingerprintMapOptionsViewModel(
     private val coroutineScope: CoroutineScope,
     private val config: ConfigFingerprintMapUseCase,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider, UserResponseViewModel by UserResponseViewModelImpl() {
+) : ResourceProvider by resourceProvider, PopupViewModel by PopupViewModelImpl() {
 
     companion object {
         private const val ID_VIBRATE_DURATION = "vibrate_duration"
         private const val ID_VIBRATE = "vibrate"
         private const val ID_SHOW_TOAST = "show_toast"
     }
-
-    //TODO screen off triggers explanation
 
     private val _state = MutableStateFlow(buildUiState(State.Loading))
     val state = _state.asStateFlow()
