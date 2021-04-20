@@ -9,7 +9,8 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.system.accessibility.ObserveEnabledAccessibilityServicesJob
-import io.github.sds100.keymapper.system.inputmethod.ObserveEnabledInputMethodsJob
+import io.github.sds100.keymapper.system.inputmethod.AndroidInputMethodAdapter
+import io.github.sds100.keymapper.system.inputmethod.ObserveInputMethodsJob
 
 /**
  * Created by sds100 on 02/04/2021.
@@ -44,18 +45,23 @@ object JobSchedulerHelper {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun observeEnabledInputMethods(ctx: Context) {
-        val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS)
 
-        val contentUri = JobInfo.TriggerContentUri(
-            uri,
+        val enabledContentUri = JobInfo.TriggerContentUri(
+            Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS),
+            JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS
+        )
+
+        val historyContentUri = JobInfo.TriggerContentUri(
+            Settings.Secure.getUriFor(AndroidInputMethodAdapter.SETTINGS_SECURE_SUBTYPE_HISTORY_KEY),
             JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS
         )
 
         val builder = JobInfo.Builder(
             ID_OBSERVE_ENABLED_INPUT_METHODS,
-            ComponentName(ctx, ObserveEnabledInputMethodsJob::class.java)
+            ComponentName(ctx, ObserveInputMethodsJob::class.java)
         )
-            .addTriggerContentUri(contentUri)
+            .addTriggerContentUri(enabledContentUri)
+            .addTriggerContentUri(historyContentUri)
             .setTriggerContentUpdateDelay(500)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

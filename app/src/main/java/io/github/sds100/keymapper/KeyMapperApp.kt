@@ -10,10 +10,7 @@ import androidx.multidex.MultiDexApplication
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.mappings.keymaps.trigger.RecordTriggerController
 import io.github.sds100.keymapper.settings.ThemeUtils
-import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCaseImpl
-import io.github.sds100.keymapper.system.files.AndroidFileAdapter
 import io.github.sds100.keymapper.system.AndroidSystemFeatureAdapter
-import io.github.sds100.keymapper.system.popup.AndroidToastAdapter
 import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.system.apps.AndroidAppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.AndroidPackageManagerAdapter
@@ -21,22 +18,24 @@ import io.github.sds100.keymapper.system.camera.AndroidCameraAdapter
 import io.github.sds100.keymapper.system.devices.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
 import io.github.sds100.keymapper.system.display.AndroidDisplayAdapter
+import io.github.sds100.keymapper.system.files.AndroidFileAdapter
 import io.github.sds100.keymapper.system.inputmethod.AndroidInputMethodAdapter
 import io.github.sds100.keymapper.system.inputmethod.AutoSwitchImeController
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.system.inputmethod.ShowHideInputMethodUseCaseImpl
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
-import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCaseImpl
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
+import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.popup.AndroidToastAdapter
 import io.github.sds100.keymapper.system.vibrator.AndroidVibratorAdapter
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.ResourceProviderImpl
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import splitties.toast.toast
 import timber.log.Timber
 
 /**
@@ -105,7 +104,7 @@ class KeyMapperApp : MultiDexApplication() {
         ServiceLocator.preferenceRepository(this).get(Keys.darkTheme)
             .map { it?.toIntOrNull() }
             .map {
-                when(it){
+                when (it) {
                     ThemeUtils.DARK -> AppCompatDelegate.MODE_NIGHT_YES
                     ThemeUtils.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -156,6 +155,10 @@ class KeyMapperApp : MultiDexApplication() {
                 if (BuildConfig.DEBUG && permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
                     serviceAdapter.enableService()
                 }
+
+                if (packageManagerAdapter.isAppInstalled(KeyMapperImeHelper.KEY_MAPPER_GUI_IME_PACKAGE)) {
+                    UseCases.onboarding(this@KeyMapperApp).shownGuiKeyboardAd()
+                }
             }
         })
 
@@ -168,5 +171,9 @@ class KeyMapperApp : MultiDexApplication() {
                 }
             }
         }
+
+        notificationController.showToast.onEach {
+            toast(it)
+        }.launchIn(appCoroutineScope)
     }
 }

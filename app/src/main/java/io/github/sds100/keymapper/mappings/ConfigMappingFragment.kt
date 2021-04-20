@@ -23,6 +23,7 @@ import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.util.GenericFragmentPagerAdapter
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ui.showPopups
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.messageResource
@@ -84,6 +85,8 @@ abstract class ConfigMappingFragment : Fragment() {
 
             tab.text = tabTitleRes?.let { str(it) }
         }.attach()
+
+        viewModel.configActionsViewModel.showPopups(this, binding)
 
         viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
             binding.invalidateHelpMenuItemVisibility(

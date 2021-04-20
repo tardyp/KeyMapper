@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.ui.fragment
+package io.github.sds100.keymapper.settings
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -21,8 +21,6 @@ import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.PreferenceDefaults
 import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.mappings.OptionMinimums
-import io.github.sds100.keymapper.settings.SettingsViewModel
-import io.github.sds100.keymapper.settings.ThemeUtils
 import io.github.sds100.keymapper.system.devices.BluetoothUtils
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.notifications.NotificationUtils
@@ -31,7 +29,6 @@ import io.github.sds100.keymapper.util.ui.CancellableMultiSelectListPreference
 import io.github.sds100.keymapper.util.ui.SliderMaximums
 import kotlinx.coroutines.flow.collectLatest
 import splitties.alertdialog.appcompat.*
-import timber.log.Timber
 
 class SettingsFragment : Fragment() {
 

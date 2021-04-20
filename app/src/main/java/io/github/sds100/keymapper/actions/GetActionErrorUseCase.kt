@@ -1,15 +1,16 @@
 package io.github.sds100.keymapper.actions
 
 import android.os.Build
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.system.camera.CameraAdapter
+import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
+import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
-import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
-import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
-import io.github.sds100.keymapper.system.camera.CameraLens
-import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.onFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -105,7 +106,7 @@ class GetActionErrorUseCaseImpl(
         }
 
         when {
-            id == SystemActionId.OPEN_VOICE_ASSISTANT -> if (packageManager.isVoiceAssistantInstalled()) {
+            id == SystemActionId.OPEN_VOICE_ASSISTANT -> if (!packageManager.isVoiceAssistantInstalled()) {
                 return Error.NoVoiceAssistant
             }
 
@@ -118,8 +119,8 @@ class GetActionErrorUseCaseImpl(
                 }
 
             this is SwitchKeyboardSystemAction ->
-                if (!inputMethodAdapter.isImeEnabledById(this.imeId)) {
-                    return Error.ImeNotFound(this.savedImeName)
+                inputMethodAdapter.getInfoById(this.imeId).onFailure {
+                    return it
                 }
         }
 

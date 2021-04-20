@@ -199,6 +199,12 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
     }
 
+    override fun switchIme(imeId: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            softKeyboardController.switchToInputMethod(imeId)
+        }
+    }
+
     override fun tapScreen(x: Int, y: Int, inputEventType: InputEventType) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 

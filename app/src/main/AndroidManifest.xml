@@ -171,7 +171,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".system.inputmethod.ObserveEnabledInputMethodsJob"
+            android:name=".system.inputmethod.ObserveInputMethodsJob"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 </manifest>

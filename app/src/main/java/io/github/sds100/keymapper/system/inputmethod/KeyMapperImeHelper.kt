@@ -1,15 +1,18 @@
 package io.github.sds100.keymapper.system.inputmethod
 
 import io.github.sds100.keymapper.Constants
-import timber.log.Timber
+import io.github.sds100.keymapper.util.*
 
 /**
  * Created by sds100 on 16/03/2021.
  */
 
-class KeyMapperImeHelper(val adapter: InputMethodAdapter) {
-    private companion object {
-        const val KEY_MAPPER_GUI_IME_PACKAGE = "io.github.sds100.keymapper.system.inputmethod.latin"
+class KeyMapperImeHelper(
+    private val imeAdapter: InputMethodAdapter
+) {
+    companion object {
+        const val KEY_MAPPER_GUI_IME_PACKAGE =
+            "io.github.sds100.keymapper.inputmethod.latin"
 
         val KEY_MAPPER_IME_PACKAGE_LIST = arrayOf(
             Constants.PACKAGE_NAME,
@@ -18,40 +21,67 @@ class KeyMapperImeHelper(val adapter: InputMethodAdapter) {
     }
 
     fun enableCompatibleInputMethods() {
-        KeyboardUtils.KEY_MAPPER_IME_PACKAGE_LIST.forEach {
-            adapter.enableImeByPackageName(it)
+        KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->
+            imeAdapter.getInfoByPackageName(packageName).onSuccess {
+                imeAdapter.enableIme(it.id)
+            }
         }
     }
 
-    //TODO
-    fun chooseCompatibleInputMethod(fromForeground: Boolean) {
-        Timber.e("choose compatible ime")
-    }
-    fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean) {
-        Timber.e("choose incompatible ime")
+    suspend fun chooseCompatibleInputMethod(fromForeground: Boolean): Result<ImeInfo> {
+
+        getLastUsedCompatibleImeId().onSuccess {
+            return imeAdapter.chooseIme(it, fromForeground)
+        }
+
+        return imeAdapter.getInfoByPackageName(Constants.PACKAGE_NAME).suspendThen {
+            imeAdapter.chooseIme(it.id, fromForeground)
+        }
     }
 
-    fun toggleCompatibleInputMethod() {
-        Timber.e("toggle incompatible ime")
+    suspend fun chooseLastUsedIncompatibleInputMethod(fromForeground: Boolean): Result<ImeInfo> {
+        return getLastUsedIncompatibleImeId().suspendThen {
+            imeAdapter.chooseIme(it, fromForeground)
+        }
+    }
+
+    suspend fun toggleCompatibleInputMethod(fromForeground: Boolean): Result<ImeInfo> {
+        return if (isCompatibleImeChosen()) {
+            chooseLastUsedIncompatibleInputMethod(fromForeground)
+        } else {
+            chooseCompatibleInputMethod(fromForeground)
+        }
     }
 
     fun isCompatibleImeChosen(): Boolean {
-        KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->
-            if (adapter.isImeChosenByPackageName(packageName)) {
-                return true
-            }
-        }
-
-        return false
+        return imeAdapter.chosenIme.firstBlocking().packageName in KEY_MAPPER_IME_PACKAGE_LIST
     }
 
     fun isCompatibleImeEnabled(): Boolean {
-        KEY_MAPPER_IME_PACKAGE_LIST.forEach { packageName ->
-            if (adapter.isImeEnabledByPackageName(packageName)) {
-                return true
+        return imeAdapter.inputMethods
+            .firstBlocking()
+            .filter { it.isEnabled }
+            .any { it.packageName in KEY_MAPPER_IME_PACKAGE_LIST }
+    }
+
+
+    private fun getLastUsedCompatibleImeId(): Result<String> {
+        for (ime in imeAdapter.inputMethodHistory.firstBlocking()) {
+            if (ime.packageName in KEY_MAPPER_IME_PACKAGE_LIST) {
+                return Success(ime.id)
             }
         }
 
-        return false
+        return imeAdapter.getInfoByPackageName(Constants.PACKAGE_NAME).then { Success(it.id) }
+    }
+
+    private fun getLastUsedIncompatibleImeId(): Result<String> {
+        for (ime in imeAdapter.inputMethodHistory.firstBlocking()) {
+            if (ime.packageName !in KEY_MAPPER_IME_PACKAGE_LIST) {
+                return Success(ime.id)
+            }
+        }
+
+        return Error.NoIncompatibleKeyboardsInstalled
     }
 }

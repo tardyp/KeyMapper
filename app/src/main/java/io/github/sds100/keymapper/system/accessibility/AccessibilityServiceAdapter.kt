@@ -16,12 +16,7 @@ import io.github.sds100.keymapper.system.JobSchedulerHelper
 import io.github.sds100.keymapper.system.SettingsUtils
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
-import io.github.sds100.keymapper.util.Event
-import io.github.sds100.keymapper.util.Ping
-import io.github.sds100.keymapper.util.Pong
-import io.github.sds100.keymapper.util.Result
-import io.github.sds100.keymapper.util.Error
-import io.github.sds100.keymapper.util.Success
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -73,11 +68,8 @@ class AccessibilityServiceAdapter(
 
         val key = "ping_service"
 
-        coroutineScope.launch {
-            serviceOutputEvents.emit(Ping(key))
-        }
-
         val pong: Pong? = withTimeoutOrNull(500L) {
+            serviceOutputEvents.emit(Ping(key))
             eventReceiver.first { it == Pong(key) } as Pong?
         }
 
@@ -105,9 +97,9 @@ class AccessibilityServiceAdapter(
             coroutineScope.launch {
                 val key = "ping_accessibility_service"
 
-                serviceOutputEvents.emit(Ping(key))
 
-                val pong: Pong? = withTimeoutOrNull(1000L) {
+                val pong: Pong? = withTimeoutOrNull(500L) {
+                    serviceOutputEvents.emit(Ping(key))
                     eventReceiver.first { it == Pong(key) } as Pong?
                 }
 

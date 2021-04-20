@@ -50,7 +50,7 @@ class CreateSystemActionUseCaseImpl(
     }
 
     override suspend fun getInputMethods(): List<ImeInfo> {
-        return inputMethodAdapter.enabledInputMethods.first()
+        return inputMethodAdapter.inputMethods.first()
     }
 }
 

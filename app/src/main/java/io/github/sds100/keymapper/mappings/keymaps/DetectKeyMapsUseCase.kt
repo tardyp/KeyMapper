@@ -12,6 +12,7 @@ import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.util.InputEventType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 /**
  * Created by sds100 on 17/04/2021.
@@ -68,6 +69,7 @@ class DetectKeyMapsUseCaseImpl(
     override val currentTime: Long
         get() = SystemClock.elapsedRealtime()
 
+    //TODO
     override fun imitateButtonPress(
         keyCode: Int,
         metaState: Int,
@@ -75,7 +77,7 @@ class DetectKeyMapsUseCaseImpl(
         keyEventAction: InputEventType,
         scanCode: Int
     ) {
-        TODO("Not yet implemented")
+        Timber.e("imitate button press $keyCode")
     }
 
     override val isScreenOn: Flow<Boolean> = displayAdapter.isScreenOn

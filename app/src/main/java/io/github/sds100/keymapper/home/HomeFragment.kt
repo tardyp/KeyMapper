@@ -27,7 +27,6 @@ import io.github.sds100.keymapper.databinding.FragmentHomeBinding
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.system.apps.PackageUtils
 import io.github.sds100.keymapper.system.files.FileUtils
-import io.github.sds100.keymapper.system.inputmethod.KeyboardUtils
 import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.util.ui.TextListItem
 import io.github.sds100.keymapper.util.ui.showPopups
@@ -315,19 +314,6 @@ class HomeFragment : Fragment() {
             homeViewModel.openSettings.collectLatest {
                 findNavController().navigate(NavAppDirections.actionGlobalSettingsFragment())
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (PackageUtils.isAppInstalled(
-                requireContext(),
-                KeyboardUtils.KEY_MAPPER_GUI_IME_PACKAGE
-            )
-            || Build.VERSION.SDK_INT < KeyboardUtils.KEY_MAPPER_GUI_IME_MIN_API
-        ) {
-            ServiceLocator.preferenceRepository(requireContext()).set(Keys.showGuiKeyboardAd, false)
         }
     }
 

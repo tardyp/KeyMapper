@@ -63,3 +63,6 @@ object ShowKeyboardEvent: Event()
 
 @Serializable
 data class TestActionEvent(val action: ActionData): Event()
+
+@Serializable
+data class ChangeIme(val imeId: String): Event()

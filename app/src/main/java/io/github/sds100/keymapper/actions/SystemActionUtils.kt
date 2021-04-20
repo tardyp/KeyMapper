@@ -6,7 +6,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.system.inputmethod.KeyboardUtils
 import io.github.sds100.keymapper.system.permissions.Permission
 
 /**
@@ -500,7 +499,7 @@ object SystemActionUtils {
                     return listOf(Permission.ROOT)
                 }
 
-            SystemActionId.SWITCH_KEYBOARD -> if (!KeyboardUtils.CAN_ACCESSIBILITY_SERVICE_SWITCH_KEYBOARD) {
+            SystemActionId.SWITCH_KEYBOARD -> if (Build.VERSION.SDK_INT <   Build.VERSION_CODES.R) {
                 return listOf(Permission.WRITE_SECURE_SETTINGS)
             }
 

@@ -21,14 +21,11 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
     is Error.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
     is Error.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
-    is Error.OptionsNotRequired -> resourceProvider.getString(R.string.error_options_not_required)
     is Error.SystemFeatureNotSupported -> resourceProvider.getString(
         R.string.error_feature_not_available,
         feature
     )
-    is Error.ConstraintNotFound -> resourceProvider.getString(R.string.error_constraint_not_found)
     is Error.ExtraNotFound -> resourceProvider.getString(R.string.error_extra_not_found, extraId)
-    is Error.NoActionData -> resourceProvider.getString(R.string.error_no_action_data)
     is Error.SdkVersionTooLow -> resourceProvider.getString(
         R.string.error_sdk_version_too_low,
         BuildUtils.getSdkVersionName(minSdk)
@@ -41,16 +38,8 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
         R.string.error_feature_not_available,
         feature
     )
-    is Error.SystemActionNotFound -> resourceProvider.getString(
-        R.string.error_system_action_not_found,
-        id
-    )
     is Error.KeyMapperImeNotFound -> resourceProvider.getString(R.string.error_key_mapper_ime_not_found)
     is Error.InputMethodNotFound -> resourceProvider.getString(R.string.error_ime_not_found, id)
-    is Error.OptionLabelNotFound -> resourceProvider.getString(
-        R.string.error_cant_find_option_label,
-        id
-    )
     is Error.NoEnabledInputMethods -> resourceProvider.getString(R.string.error_no_enabled_imes)
     is Error.FrontFlashNotFound -> resourceProvider.getString(R.string.error_front_flash_not_found)
     is Error.BackFlashNotFound -> resourceProvider.getString(R.string.error_back_flash_not_found)
@@ -71,17 +60,18 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.NumberTooBig -> resourceProvider.getString(R.string.error_number_too_big, max)
     is Error.CantBeEmpty -> resourceProvider.getString(R.string.error_cant_be_empty)
     Error.BackupVersionTooNew -> resourceProvider.getString(R.string.error_backup_version_too_new)
-    Error.CorruptActionError -> throw Exception()
+    Error.CorruptActionError -> resourceProvider.getString(R.string.error_corrupt_action)
     is Error.CorruptJsonFile -> reason
-    Error.NoIncompatibleKeyboardsInstalled -> throw Exception()
-    Error.NoMediaSessions -> throw Exception()
-    Error.NoVoiceAssistant -> resourceProvider.getString(R.string.errorvoice_assistant_not_found)
-    is Error.UnknownFileLocation -> throw Exception()
+    Error.NoIncompatibleKeyboardsInstalled -> resourceProvider.getString(R.string.error_no_incompatible_input_methods_installed)
+    Error.NoMediaSessions -> resourceProvider.getString(R.string.error_no_media_sessions)
+    Error.NoVoiceAssistant -> resourceProvider.getString(R.string.error_voice_assistant_not_found)
+    is Error.UnknownFileLocation -> resourceProvider.getString(R.string.error_unknown_file_location)
     Error.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
-    is Error.ImeNotFoundForPackage -> throw Exception()
     Error.LauncherShortcutsNotSupported -> resourceProvider.getString(R.string.error_launcher_shortcuts_not_supported)
     Error.AccessibilityServiceCrashed -> resourceProvider.getString(R.string.error_accessibility_service_crashed)
+    Error.CantFindImeSettings -> resourceProvider.getString(R.string.error_cant_find_ime_settings)
+    Error.CantShowImePickerInBackground -> resourceProvider.getString(R.string.error_cant_show_ime_picker_in_background)
 }
 
 val Error.isFixable: Boolean

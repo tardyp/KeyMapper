@@ -378,8 +378,11 @@
     <string name="dialog_title_send_feedback">Send feedback</string>
     <string name="dialog_message_view_faq_and_use_discord_over_email">Please check out the FAQ to see if your question has already been answered. If not, then the developer would prefer it if you ask for help and suggest features in the Discord server. If you don\'t have Discord, you can email the developer directly.</string>
 
-    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service.</string>
-    <string name="dialog_message_restart_accessibility_service_to_record_trigger">Restart the accessibility service by turning it off and on.</string>
+    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
+    <string name="dialog_message_restart_accessibility_service_to_record_trigger">Restart the accessibility service by turning it <i>off</i> and <i>on</i> so that you can record a trigger.</string>
+
+    <string name="dialog_message_enable_accessibility_service_to_test_action">Turn on the accessibility service so that you can test the action.</string>
+    <string name="dialog_message_restart_accessibility_service_to_test_action">Restart the accessibility service by turning it <i>off</i> and <i>on</i> so that you can test the action.</string>
 
     <string name="pos_yes">Yes</string>
     <string name="pos_done">Done</string>
@@ -729,21 +732,16 @@
     <string name="error_critical_ime_service_disabled">A Key Mapper keyboard must be enabled and selected for some of your actions to work!</string>
     <string name="error_ime_not_found">Can\'t find the %s input method</string>
     <string name="error_no_enabled_imes">This device has no enabled input methods!</string>
+    <string name="error_cant_show_ime_picker_in_background">The input method picker can\'t be shown!</string>
 
     <string name="error_the_app_wont_work">Your key maps won\'t work! Some things need fixing!</string>
     <string name="error_cant_move_to_end_of_text_in_this_field">You can\'t move to the end of the text in this field!</string>
     <string name="error_battery_optimisation_activity_not_found">Battery optimisation settings not found! If it exists, open it manually.</string>
 
-    <string name="error_cant_find_option_label">error: Can\'t find a label for this option \"%s\"</string>
-    <string name="error_system_action_not_found">System action not found %s!</string>
-    <string name="error_no_action_data">No action data!</string>
     <string name="error_extra_not_found">Extra (%s) not found!</string>
-    <string name="error_constraint_not_found">Constraint not found</string>
     <string name="error_duplicate_constraint">You can\'t have duplicate constraints!</string>
     <string name="error_fingerprint_gesture_map_constraint_exists">This gesture already has this constraint!</string>
     <string name="error_cant_be_empty">Can\'t be empty!</string>
-    <string name="error_invalid_action_type">Invalid action Type: %s</string>
-    <string name="error_options_not_required">Options not required</string>
     <string name="error_key_mapper_ime_not_found">Can\'t find the Key Mapper input method!</string>
     <string name="error_download_failed">Download failed!</string>
     <string name="error_file_not_exists">File doesn\'t exist!</string>
@@ -751,7 +749,6 @@
     <string name="error_file_not_cached">File isn\'t cached! Connect to internet to download it.</string>
     <string name="error_this_is_unsupported">This is unsupported. :(</string>
     <string name="error_device_not_found">Device not found!</string>
-    <string name="error_no_keymaps">No key maps!</string>
     <string name="error_failed_to_pick_file">Failed to pick file</string>
     <string name="error_empty_json">Empty JSON file!</string>
     <string name="error_file_access_denied">File access denied! Is it deleted?</string>
@@ -768,7 +765,13 @@
     <string name="error_denied_call_phone_permission">Denied permission to start phone calls!</string>
     <string name="error_backup_version_too_new">You will need to update Key Mapper to the latest version to use this backup.</string>
     <string name="error_corrupt_json_file">Corrupt JSON file!</string>
-    <string name="errorvoice_assistant_not_found">There is no voice assistant installed!</string>
+    <string name="error_voice_assistant_not_found">There is no voice assistant installed!</string>
+    <string name="error_insufficient_permissions">Insufficient permissions</string>
+    <string name="error_corrupt_action">Corrupt action</string>
+    <string name="error_no_incompatible_input_methods_installed">You only have Key Mapper keyboards installed!</string>
+    <string name="error_no_media_sessions">There are no apps playing media!</string>
+    <string name="error_unknown_file_location">Unknown file location!</string>
+
     <!-- Error messages -->
 
     <!-- System action labels -->

@@ -12,6 +12,9 @@ import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCas
 import io.github.sds100.keymapper.system.inputmethod.ToggleCompatibleImeUseCase
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
 import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCase
+import io.github.sds100.keymapper.util.getFullMessage
+import io.github.sds100.keymapper.util.onFailure
+import io.github.sds100.keymapper.util.onSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -76,6 +79,9 @@ class NotificationController(
     private val _openApp = MutableSharedFlow<Unit>()
     val openApp = _openApp.asSharedFlow()
 
+    private val _showToast= MutableSharedFlow<String>()
+    val showToast = _showToast.asSharedFlow()
+
     init {
         manageNotifications.deleteChannel(CHANNEL_ID_WARNINGS)
         manageNotifications.deleteChannel(CHANNEL_ID_PERSISTENT)
@@ -105,7 +111,7 @@ class NotificationController(
             }
         }.launchIn(coroutineScope)
 
-        toggleCompatibleIme.canWork.onEach { canToggleIme ->
+        toggleCompatibleIme.sufficientPermissions.onEach { canToggleIme ->
             if (canToggleIme) {
                 manageNotifications.createChannel(
                     NotificationChannelModel(
@@ -164,13 +170,15 @@ class NotificationController(
                 ACTION_PAUSE_MAPPINGS -> pauseMappings.pause()
                 ACTION_START_SERVICE -> controlAccessibilityService.enable()
                 ACTION_STOP_SERVICE -> controlAccessibilityService.disable()
-                ACTION_DISMISS_TOGGLE_MAPPINGS -> manageNotifications.dismiss(
-                    ID_TOGGLE_MAPPINGS
-                )
+                ACTION_DISMISS_TOGGLE_MAPPINGS -> manageNotifications.dismiss(ID_TOGGLE_MAPPINGS)
                 ACTION_OPEN_KEY_MAPPER -> _openApp.emit(Unit)
                 ACTION_SHOW_IME_PICKER -> showImePicker.show(fromForeground = false)
                 ACTION_SHOW_KEYBOARD -> hideInputMethod.show()
-                ACTION_TOGGLE_KEYBOARD -> toggleCompatibleIme.toggle()
+                ACTION_TOGGLE_KEYBOARD -> toggleCompatibleIme.toggle().onSuccess {
+                    _showToast.emit(getString(R.string.toast_chose_keyboard, it.label))
+                }.onFailure {
+                    _showToast.emit(it.getFullMessage(this))
+                }
                 ACTION_FINGERPRINT_GESTURE_FEATURE ->{
                     onboardingUseCase.approvedFingerprintFeaturePrompt= true
                     _openApp.emit(Unit)

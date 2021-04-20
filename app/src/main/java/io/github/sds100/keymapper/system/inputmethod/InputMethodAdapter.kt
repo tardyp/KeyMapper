@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.system.inputmethod
 
+import io.github.sds100.keymapper.util.InputEventType
 import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -7,23 +8,29 @@ import kotlinx.coroutines.flow.Flow
  * Created by sds100 on 14/02/2021.
  */
 interface InputMethodAdapter {
-    val canChangeImeWithoutUserInput: Flow<Boolean>
-    fun showImePicker(fromForeground: Boolean)
+    val isUserInputRequiredToChangeIme: Flow<Boolean>
 
-    fun isImeEnabledById(imeId: String): Boolean
-    fun isImeEnabledByPackageName(packageName: String): Boolean
-    fun enableImeById(imeId: String)
-    fun enableImeByPackageName(packageName: String)
+    fun showImePicker(fromForeground: Boolean): Result<Unit>
+    fun enableIme(imeId: String): Result<Unit>
+    suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo>
 
-    fun isImeChosenById(imeId: String): Boolean
-    fun isImeChosenByPackageName(packageName: String): Boolean
-    fun chooseImeById(imeId: String)
-    fun chooseImeByPackageName(packageName: String)
+    fun getInfoById(imeId: String): Result<ImeInfo>
+    fun getInfoByPackageName(packageName: String): Result<ImeInfo>
 
-    fun getLabel(imeId: String): Result<String>
-
-    fun getImeHistory(): List<String>
-
-    val enabledInputMethods: Flow<List<ImeInfo>>
+    /**
+     * The last used input method is first.
+     */
+    val inputMethodHistory: Flow<List<ImeInfo>>
+    val inputMethods: Flow<List<ImeInfo>>
     val chosenIme: Flow<ImeInfo>
+
+    fun inputText(imePackageName: String, text: String)
+    fun inputKeyEvent(
+        imePackageName: String,
+        keyCode: Int,
+        metaState: Int = 0,
+        keyEventAction: InputEventType = InputEventType.DOWN_UP,
+        deviceId: Int,
+        scanCode: Int = 0
+    )
 }

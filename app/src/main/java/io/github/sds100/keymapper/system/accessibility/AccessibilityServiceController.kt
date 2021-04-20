@@ -221,6 +221,7 @@ class AccessibilityServiceController(
             is Ping -> coroutineScope.launch { outputEvents.emit(Pong(event.key)) }
             is HideKeyboardEvent -> accessibilityService.hideKeyboard()
             is ShowKeyboardEvent -> accessibilityService.showKeyboard()
+            is ChangeIme -> accessibilityService.switchIme(event.imeId)
         }
     }
 

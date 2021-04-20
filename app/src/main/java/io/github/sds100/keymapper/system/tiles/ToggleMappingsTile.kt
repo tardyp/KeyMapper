@@ -99,8 +99,6 @@ class ToggleMappingsTile : TileService(), LifecycleOwner {
         } else {
             useCase.pause()
         }
-
-        qsTile?.updateTile()
     }
 
     override fun getLifecycle() = lifecycleRegistry

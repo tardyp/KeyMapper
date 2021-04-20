@@ -19,5 +19,6 @@ interface IAccessibilityService {
 
     fun hideKeyboard()
     fun showKeyboard()
+    fun switchIme(imeId: String)
     val onKeyboardHiddenChange: Flow<Boolean>
 }

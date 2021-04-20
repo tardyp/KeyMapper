@@ -7,8 +7,6 @@ import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.mappings.isDelayBeforeNextActionAllowed
 import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.*
-import io.github.sds100.keymapper.util.Error
-import io.github.sds100.keymapper.util.getFullMessage
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -24,7 +22,7 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
     private val config: ConfigMappingUseCase<A, M>,
     private val uiHelper: ActionUiHelper<M, A>,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider {
+) : ResourceProvider by resourceProvider, PopupViewModel by PopupViewModelImpl() {
 
     private val _state = MutableStateFlow<ListUiState<ActionListItem>>(ListUiState.Loading)
     val state = _state.asStateFlow()
@@ -72,9 +70,38 @@ class ConfigActionsViewModel<A : Action, M : Mapping<A>>(
 
                 val error = displayActionUseCase.getError(actionData)
 
-
                 when {
-                    error == null -> testAction(actionData)
+                    error == null -> testAction(actionData).onFailure { error ->
+
+                        if (error is Error.AccessibilityServiceDisabled) {
+
+                            val snackBar = PopupUi.SnackBar(
+                                message = getString(R.string.dialog_message_enable_accessibility_service_to_test_action),
+                                actionText = getString(R.string.pos_turn_on)
+                            )
+
+                            val response = showPopup("enable_service", snackBar)
+
+                            if (response != null) {
+                                displayActionUseCase.fixError(Error.AccessibilityServiceDisabled)
+                            }
+                        }
+
+                        if (error is Error.AccessibilityServiceCrashed) {
+
+                            val snackBar = PopupUi.SnackBar(
+                                message = getString(R.string.dialog_message_restart_accessibility_service_to_test_action),
+                                actionText = getString(R.string.pos_restart)
+                            )
+
+                            val response = showPopup("restart_service", snackBar)
+
+                            if (response != null) {
+                                displayActionUseCase.fixError(Error.AccessibilityServiceCrashed)
+                            }
+                        }
+                    }
+
                     error.isFixable -> displayActionUseCase.fixError(error)
                 }
             }

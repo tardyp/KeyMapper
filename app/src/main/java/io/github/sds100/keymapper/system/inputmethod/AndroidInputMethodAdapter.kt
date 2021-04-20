@@ -9,45 +9,58 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
+import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
-import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.system.permissions.PermissionAdapter
-import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.system.JobSchedulerHelper
+import io.github.sds100.keymapper.system.SettingsUtils
+import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.system.root.RootUtils
-import io.github.sds100.keymapper.util.Error
-import io.github.sds100.keymapper.util.Result
-import io.github.sds100.keymapper.util.Success
-import io.github.sds100.keymapper.util.onSuccess
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import splitties.toast.toast
-import timber.log.Timber
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 14/02/2021.
  */
 
-//TODO inject root process delegate
 class AndroidInputMethodAdapter(
     context: Context,
-    serviceAdapter: ServiceAdapter,
+    private val serviceAdapter: ServiceAdapter,
     permissionAdapter: PermissionAdapter
 ) : InputMethodAdapter {
 
     companion object {
-        private const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
+        const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
+
+        //DON'T CHANGE THESE!!!
+        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP =
+            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_DOWN_UP"
+        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN =
+            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_DOWN"
+        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP =
+            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_UP"
+        private const val KEY_MAPPER_INPUT_METHOD_ACTION_TEXT =
+            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_TEXT"
+
+        private const val KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT =
+            "io.github.sds100.keymapper.system.inputmethod.EXTRA_KEY_EVENT"
+        private const val KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT =
+            "io.github.sds100.keymapper.system.inputmethod.EXTRA_TEXT"
     }
 
     override val chosenIme by lazy { MutableStateFlow(getChosenIme()) }
 
-    override val enabledInputMethods by lazy { MutableStateFlow(getEnabledInputMethods()) }
+    override val inputMethodHistory by lazy { MutableStateFlow(getInputMethods()) }
+    override val inputMethods by lazy { MutableStateFlow(getInputMethods()) }
 
-    override val canChangeImeWithoutUserInput: Flow<Boolean> = channelFlow {
+    override val isUserInputRequiredToChangeIme: Flow<Boolean> = channelFlow {
         suspend fun invalidate() {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
@@ -99,16 +112,25 @@ class AndroidInputMethodAdapter(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             JobSchedulerHelper.observeEnabledInputMethods(ctx)
         } else {
-            val uri = Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS)
             val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
                 override fun onChange(selfChange: Boolean, uri: Uri?) {
                     super.onChange(selfChange, uri)
 
-                    onEnabledInputMethodsUpdate()
+                    onInputMethodsUpdate()
                 }
             }
 
-            ctx.contentResolver.registerContentObserver(uri, false, observer)
+            ctx.contentResolver.registerContentObserver(
+                Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS),
+                false,
+                observer
+            )
+
+            ctx.contentResolver.registerContentObserver(
+                Settings.Secure.getUriFor(
+                    SETTINGS_SECURE_SUBTYPE_HISTORY_KEY
+                ), false, observer
+            )
         }
 
         IntentFilter().apply {
@@ -118,90 +140,160 @@ class AndroidInputMethodAdapter(
         }
     }
 
-    override fun showImePicker(fromForeground: Boolean) {
-        if (fromForeground) {
-            inputMethodManager.showInputMethodPicker()
-        } else {
-            when {
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 -> {
-                    inputMethodManager.showInputMethodPicker()
-                }
-
-                (Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT) -> {
-                    val command =
-                        "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
-                    RootUtils.executeRootCommand(command)
-                }
-
-                else -> ctx.toast(R.string.error_this_is_unsupported)
+    override fun showImePicker(fromForeground: Boolean): Result<Unit> {
+        when {
+            fromForeground || Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 -> {
+                inputMethodManager.showInputMethodPicker()
+                return Success(Unit)
             }
+
+            (Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT) -> {
+                val command =
+                    "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
+                RootUtils.executeRootCommand(command)
+
+                return Success(Unit)
+            }
+
+            else -> return Error.CantShowImePickerInBackground
         }
     }
 
-    override fun isImeEnabledById(imeId: String): Boolean {
-        return enabledInputMethods.value.any { it.id == imeId }
-    }
-
-    override fun isImeEnabledByPackageName(packageName: String): Boolean {
-        return enabledInputMethods.value.any { it.packageName == packageName }
-    }
-
-    override fun enableImeById(imeId: String) {
-        if (permissionAdapter.isGranted(Permission.ROOT)) {
-            RootUtils.executeRootCommand("ime enable $imeId")
-        } else {
+    override fun enableIme(imeId: String): Result<Unit> {
+        return enableImeWithoutUserInput(imeId).then {
             try {
                 val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
                 intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_TASK
 
                 ctx.startActivity(intent)
+                Success(Unit)
             } catch (e: Exception) {
-                toast(R.string.error_cant_find_ime_settings)
+                Error.CantFindImeSettings
             }
         }
     }
 
-    override fun enableImeByPackageName(packageName: String) {
-        getImeId(packageName).onSuccess {
-            enableImeById(it)
+    private fun enableImeWithoutUserInput(imeId: String): Result<Unit> {
+        if (permissionAdapter.isGranted(Permission.ROOT)) {
+            RootUtils.executeRootCommand("ime enable $imeId")
+            return Success(Unit)
+        } else {
+            return Error.PermissionDenied(Permission.ROOT)
         }
     }
 
-    override fun isImeChosenById(imeId: String): Boolean {
-        return chosenIme.value.id == imeId
+    override suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo> {
+        getInfoById(imeId).onFailure {
+            return it
+        }
+
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && serviceAdapter.isEnabled.value -> {
+                runBlocking { serviceAdapter.send(ChangeIme(imeId)) }.onFailure {
+                    return it
+                }
+            }
+
+            permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS) -> {
+                SettingsUtils.putSecureSetting(
+                    ctx,
+                    Settings.Secure.DEFAULT_INPUT_METHOD,
+                    imeId
+                )
+            }
+
+            else -> showImePicker(fromForeground).onFailure { return it }
+        }
+
+        //wait for the ime to change and then return the info of the ime
+        return Success(chosenIme.first { it.id == imeId })
     }
 
-    override fun isImeChosenByPackageName(packageName: String): Boolean {
-        return chosenIme.value.packageName == packageName
+    override fun getInfoById(imeId: String): Result<ImeInfo> {
+        val info =
+            inputMethods.value.find { it.id == imeId } ?: return Error.InputMethodNotFound(imeId)
+
+        return Success(info)
     }
 
-    override fun chooseImeById(imeId: String) {
-        TODO("Not yet implemented")
+    override fun getInfoByPackageName(packageName: String): Result<ImeInfo> {
+        return getImeId(packageName).then { getInfoById(it) }
     }
 
-    override fun chooseImeByPackageName(packageName: String) {
-        TODO("Not yet implemented")
+    /**
+     * Example:
+     * io.github.sds100.keymapper.system.inputmethod.latin/.LatinIME;-921088104
+     * :com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME;1891618174
+     */
+    private fun getImeHistory(): List<String> {
+        val ids = getSubtypeHistoryString(ctx)
+            .split(':')
+            .map { it.split(';')[0] }
+
+        return ids
     }
 
-    override fun getLabel(imeId: String): Result<String> {
-        val label = enabledInputMethods.value.find { it.id == imeId }
-            ?.label ?: return Error.InputMethodNotFound(imeId)
+    override fun inputKeyEvent(
+        imePackageName: String,
+        keyCode: Int,
+        metaState: Int,
+        keyEventAction: InputEventType,
+        deviceId: Int,
+        scanCode: Int
+    ) {
+        val intentAction = when (keyEventAction) {
+            InputEventType.DOWN -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN
+            InputEventType.DOWN_UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP
+            InputEventType.UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP
+        }
 
-        return Success(label)
+        Intent(intentAction).apply {
+            setPackage(imePackageName)
+
+            val action = when (keyEventAction) {
+                InputEventType.DOWN, InputEventType.DOWN_UP -> KeyEvent.ACTION_DOWN
+                InputEventType.UP -> KeyEvent.ACTION_UP
+            }
+
+            val eventTime = SystemClock.uptimeMillis()
+
+            val keyEvent =
+                KeyEvent(eventTime, eventTime, action, keyCode, 0, metaState, deviceId, scanCode)
+
+            putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT, keyEvent)
+
+            ctx.sendBroadcast(this)
+        }
     }
 
-    override fun getImeHistory(): List<String> {
-        TODO("Not yet implemented")
+    override fun inputText(imePackageName: String, text: String) {
+        Intent(KEY_MAPPER_INPUT_METHOD_ACTION_TEXT).apply {
+            setPackage(imePackageName)
+
+            putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT, text)
+            ctx.sendBroadcast(this)
+        }
     }
 
-    fun onEnabledInputMethodsUpdate() {
-        Timber.e("onupdate")
-        enabledInputMethods.value = getEnabledInputMethods()
+    fun onInputMethodsUpdate() {
+        inputMethods.value = getInputMethods()
+        inputMethodHistory.value = getImeHistory().mapNotNull { getInfoById(it).valueOrNull() }
     }
 
-    private fun getEnabledInputMethods(): List<ImeInfo> {
-        return inputMethodManager.enabledInputMethodList.map {
-            ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString())
+    private fun getInputMethods(): List<ImeInfo> {
+
+        val chosenImeId = getChosenImeId()
+
+        val enabledInputMethods = inputMethodManager.enabledInputMethodList
+
+        return inputMethodManager.inputMethodList.map { inputMethodInfo ->
+            ImeInfo(
+                inputMethodInfo.id,
+                inputMethodInfo.packageName,
+                inputMethodInfo.loadLabel(ctx.packageManager).toString(),
+                isChosen = inputMethodInfo.id == chosenImeId,
+                isEnabled = enabledInputMethods.any { it.id == inputMethodInfo.id }
+            )
         }
     }
 
@@ -212,37 +304,14 @@ class AndroidInputMethodAdapter(
         )
     }
 
-    /**
-     * Example:
-     * io.github.sds100.keymapper.system.inputmethod.latin/.LatinIME;-921088104
-     * :com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME;1891618174
-     */
-    private fun getInputMethodHistoryIds(ctx: Context): List<String> {
-        return getSubtypeHistoryString(ctx)
-            .split(':')
-            .map { it.split(';')[0] }
-    }
-
     private fun getChosenIme(): ImeInfo {
         val chosenImeId = getChosenImeId()
 
-        return inputMethodManager.inputMethodList
-            .single { it.id == chosenImeId }
-            .let { ImeInfo(it.id, it.packageName, it.loadLabel(ctx.packageManager).toString()) }
+        return getInfoById(chosenImeId).valueOrNull()!!
     }
 
     private fun getChosenImeId(): String {
         return Settings.Secure.getString(ctx.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
-    }
-
-    private fun getImePackageName(imeId: String): Result<String> {
-        val packageName = inputMethodManager.inputMethodList.find { it.id == imeId }?.packageName
-
-        return if (packageName == null) {
-            Error.InputMethodNotFound(imeId)
-        } else {
-            Success(packageName)
-        }
     }
 
     private fun getImeId(packageName: String): Result<String> {

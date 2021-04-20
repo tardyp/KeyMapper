@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.util
 
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 
 /**
  * Created by sds100 on 26/02/2020.
@@ -20,18 +20,13 @@ sealed class Error : Result<Nothing>() {
     object FileAccessDenied : Error()
     data class GenericError(val exception: Exception) : Error()
     object EmptyJson : Error()
-    object OptionsNotRequired : Error()
     data class SystemFeatureNotSupported(val feature: String) : Error()
-    object ConstraintNotFound : Error()
     data class ExtraNotFound(val extraId: String) : Error()
-    object NoActionData : Error()
     data class SdkVersionTooLow(val minSdk: Int) : Error()
     data class SdkVersionTooHigh(val maxSdk: Int) : Error()
     data class FeatureUnavailable(val feature: String) : Error()
-    data class SystemActionNotFound(val id: String) : Error()
     object KeyMapperImeNotFound : Error()
     data class InputMethodNotFound(val id: String) : Error()
-    data class OptionLabelNotFound(val id: String) : Error()
     object NoEnabledInputMethods : Error()
     object NoVoiceAssistant : Error()
     object FrontFlashNotFound : Error()
@@ -53,8 +48,7 @@ sealed class Error : Result<Nothing>() {
     data class CorruptJsonFile(val reason: String) : Error()
     object CorruptActionError : Error()
     object Duplicate : Error()
-    data class ImeNotFoundForPackage(val packageName: String) : Error()
-    object LauncherShortcutsNotSupported: Error()
+    object LauncherShortcutsNotSupported : Error()
 
     data class AppNotFound(val packageName: String) : Error()
     data class AppDisabled(val packageName: String) : Error()
@@ -63,6 +57,9 @@ sealed class Error : Result<Nothing>() {
 
     object AccessibilityServiceDisabled : Error()
     object AccessibilityServiceCrashed : Error()
+
+    object CantShowImePickerInBackground : Error()
+    object CantFindImeSettings : Error()
 
     data class PermissionDenied(val permission: Permission) : Error() {
         companion object {

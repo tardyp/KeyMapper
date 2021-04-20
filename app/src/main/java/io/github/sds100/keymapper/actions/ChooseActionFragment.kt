@@ -28,7 +28,6 @@ import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.system.keyevents.*
 import io.github.sds100.keymapper.system.phone.ChoosePhoneNumberFragment
 import io.github.sds100.keymapper.system.url.ChooseUrlFragment
-import io.github.sds100.keymapper.ui.fragment.*
 import io.github.sds100.keymapper.ui.utils.getJsonSerializable
 import io.github.sds100.keymapper.ui.utils.putJsonSerializable
 import io.github.sds100.keymapper.util.*

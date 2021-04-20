@@ -92,7 +92,7 @@
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="io.github.sds100.keymapper.ui.fragment.SettingsFragment"
+        android:name="io.github.sds100.keymapper.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_about" />
     <action
