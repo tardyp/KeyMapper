@@ -131,4 +131,5 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)
     is Error.ImeNotFoundForPackage -> TODO()
     Error.LauncherShortcutsNotSupported -> resourceProvider.getString(R.string.error_launcher_shortcuts_not_supported)
+    FixableError.AccessibilityServiceCrashed -> resourceProvider.getString(R.string.error_accessibility_service_crashed)
 }

@@ -29,11 +29,6 @@ class OnboardingUseCaseImpl(
         false
     )
 
-    override var shownScreenOffTriggersExplanation by PrefDelegate(
-        Keys.shownScreenOffTriggersExplanation,
-        false
-    )
-
     override var shownParallelTriggerOrderExplanation by PrefDelegate(
         Keys.shownParallelTriggerOrderExplanation,
         false
@@ -84,7 +79,6 @@ interface OnboardingUseCase {
     fun shownGuiKeyboardAd()
 
     var approvedFingerprintFeaturePrompt: Boolean
-    var shownScreenOffTriggersExplanation: Boolean
     var shownParallelTriggerOrderExplanation: Boolean
     var shownSequenceTriggerExplanation: Boolean
 

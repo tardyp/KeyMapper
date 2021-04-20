@@ -12,8 +12,9 @@ interface ServiceAdapter {
     val isEnabled: StateFlow<Boolean>
 
     fun enableService()
+    fun restartService()
     fun disableService()
 
-    fun send(event: Event): Result<Unit>
+    suspend fun send(event: Event): Result<Unit>
     val eventReceiver: SharedFlow<Event>
 }

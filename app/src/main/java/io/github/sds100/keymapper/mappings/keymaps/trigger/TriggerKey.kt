@@ -18,7 +18,17 @@ data class TriggerKey(
     val clickType: ClickType,
 
     val consumeKeyEvent: Boolean = true,
-)
+){
+
+    override fun toString(): String {
+        val deviceString= when(device){
+            TriggerKeyDevice.Any -> "any"
+            is TriggerKeyDevice.External -> "external"
+            TriggerKeyDevice.Internal -> "internal"
+        }
+        return "TriggerKey(uid=${uid.substring(0..5)}, keyCode=$keyCode, device=$deviceString, clickType=$clickType, consume=$consumeKeyEvent) "
+    }
+}
 
 object KeymapTriggerKeyEntityMapper {
     fun fromEntity(

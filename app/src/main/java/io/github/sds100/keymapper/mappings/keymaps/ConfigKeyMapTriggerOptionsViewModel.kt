@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.*
  */
 class ConfigKeyMapTriggerOptionsViewModel(
     private val coroutineScope: CoroutineScope,
-    private val onboarding: OnboardingUseCase,
     private val config: ConfigKeyMapUseCase,
     private val createKeyMapShortcut: CreateKeyMapShortcutUseCase,
     resourceProvider: ResourceProvider
@@ -69,14 +68,6 @@ class ConfigKeyMapTriggerOptionsViewModel(
             ID_SCREEN_OFF_TRIGGER -> config.setTriggerWhenScreenOff(value)
         }
     }
-
-    //TODO replace with dialogviewmodel
-//    fun onDialogResponse(key: String, response: UserResponse) {
-//        when {
-//            key == KEY_SCREEN_OFF_TRIGGERS && response == UserResponse.POSITIVE ->
-//                onboarding.shownScreenOffTriggersExplanation = true
-//        }
-//    }
 
     fun createLauncherShortcut() {
         coroutineScope.launch {

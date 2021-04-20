@@ -94,6 +94,9 @@
 
     <string name="trigger_error_dnd_access_denied">If you are remapping a volume button you need to grant Key Mapper permission to modify the Do Not Disturb mode if you want the buttons to work as expected in Do Not Disturb mode!</string>
     <string name="trigger_error_dnd_access_denied_short">This trigger will not work as expected in Do Not Disturb mode!</string>
+    <string name="trigger_error_screen_off_root_permission_denied">The option to trigger when the screen is off needs root permission to work!</string>
+    <string name="trigger_error_screen_off_root_permission_denied_short">The option to trigger when the screen is off will not work!</string>
+
     <string name="home_error_is_battery_optimised">Your mappings will stop working randomly! Tap \'Fix\' to fix this.</string>
     <string name="home_error_accessibility_service_is_disabled">The accessibility service needs to be turned on for your mappings to work!</string>
     <string name="home_success_accessibility_service_is_enabled">The accessibility service is enabled! Your mappings should work.</string>
@@ -375,7 +378,8 @@
     <string name="dialog_title_send_feedback">Send feedback</string>
     <string name="dialog_message_view_faq_and_use_discord_over_email">Please check out the FAQ to see if your question has already been answered. If not, then the developer would prefer it if you ask for help and suggest features in the Discord server. If you don\'t have Discord, you can email the developer directly.</string>
 
-    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service so that you can record a trigger.</string>
+    <string name="dialog_message_enable_accessibility_service_to_record_trigger">Turn on the accessibility service.</string>
+    <string name="dialog_message_restart_accessibility_service_to_record_trigger">Restart the accessibility service by turning it off and on.</string>
 
     <string name="pos_yes">Yes</string>
     <string name="pos_done">Done</string>
@@ -389,6 +393,7 @@
     <string name="pos_turn_off">Turn off</string>
     <string name="pos_ok">Ok</string>
     <string name="pos_turn_on">Turn on</string>
+    <string name="pos_restart">Restart</string>
 
     <string name="neg_turn_off">Turn off</string>
     <string name="neg_stay_out">Stay out</string>
@@ -558,7 +563,7 @@
     <string name="flag_vibrate">Vibrate</string>
     <string name="flag_show_toast">Show an on-screen message</string>
     <string name="flag_long_press_double_vibration">Vibrate when keys are initially pressed and again when long pressed.</string>
-    <string name="flag_detect_triggers_screen_off">Detect trigger when screen is off. ROOT only.</string>
+    <string name="flag_detect_triggers_screen_off">Detect trigger when the screen is off.</string>
     <string name="flag_repeat_actions">Repeat</string>
     <string name="flag_repeat_until_pressed_again">Repeat until pressed again</string>
     <string name="flag_hold_down">Hold down</string>
@@ -599,7 +604,6 @@
     <string name="showcase_contributing_title">Contributing</string>
     <string name="showcase_contributing_description">"This app is open source! You can start contributing by heading over to the sds100/KeyMapper repo on GitHub and by joining the Discord server. Even if you can\'t code, you can contribute by helping others and testing the latest features."</string>
     <string name="showcase_action_list">Tap the 3 dots to change the repeat behaviour and more. You can test an action and fix action errors by tapping it.</string>
-    <string name="showcase_screen_off_triggers">This option will only work if your device is rooted and you have told Key Mapper that it has root permission in the Key Mapper settings. If you don\'t know what root is then this option will not work. It will also only work for some keys (e.g volume buttons) so see the Help page for a list of supported keys.</string>
 
     <string name="showcase_fingerprint_gesture_support_title_supported_unknown">Remapping fingerprint reader gestures</string>
     <string name="showcase_fingerprint_gesture_support_title_supported">You can remap fingerprint reader gestures! :)</string>
@@ -713,6 +717,7 @@
     <string name="error_accessibility_service_disabled_record_trigger">The accessibility service needs to be enabled!</string>
     <string name="error_accessibility_service_enabled">Accessibility service is enabled!</string>
     <string name="error_accessibility_service_disabled">Accessibility service needs to be enabled!</string>
+    <string name="error_accessibility_service_crashed">The accessibility service needs to be restarted!</string>
     <string name="error_launcher_shortcuts_not_supported">Your launcher doesn\'t support shortcuts.</string>
 
     <string name="warning_need_write_secure_settings_permission">Some features need WRITE_SECURE_SETTINGS permission.</string>

@@ -17,6 +17,7 @@ import io.github.sds100.keymapper.system.files.FileAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapEntityGroup
 import io.github.sds100.keymapper.util.DispatcherProvider
 import io.github.sds100.keymapper.util.FlowUtils.toListWithTimeout
+import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success

@@ -65,6 +65,7 @@ sealed class FixableError : Error() {
     object NoCompatibleImeChosen : FixableError()
 
     object AccessibilityServiceDisabled : FixableError()
+    object AccessibilityServiceCrashed : FixableError()
 
     data class PermissionDenied(val permission: Permission) : FixableError() {
         companion object {

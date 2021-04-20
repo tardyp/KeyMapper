@@ -7,6 +7,7 @@ import io.github.sds100.keymapper.util.OnShowKeyboardEvent
 import io.github.sds100.keymapper.util.ShowKeyboardEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.runBlocking
 
 /**
  * Created by sds100 on 16/04/2021.
@@ -24,13 +25,12 @@ class ShowHideInputMethodUseCaseImpl(
     }
 
     override fun show() {
-        serviceAdapter.send(ShowKeyboardEvent)
+        runBlocking { serviceAdapter.send(ShowKeyboardEvent) }
     }
 
     override fun hide() {
-        serviceAdapter.send(HideKeyboardEvent)
+        runBlocking { serviceAdapter.send(HideKeyboardEvent) }
     }
-
 }
 
 interface ShowHideInputMethodUseCase {

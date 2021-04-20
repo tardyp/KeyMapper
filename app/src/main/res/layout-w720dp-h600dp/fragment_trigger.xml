@@ -81,11 +81,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/cardview_padding_left"
             android:layout_marginEnd="@dimen/cardview_padding_right"
-            android:checkedButton="@{viewModel.state.checkedClickTypeRadioButton}"
+            android:checkedButton="@{viewModel.checkedClickTypeRadioButton}"
             android:gravity="bottom"
             android:onCheckedChanged="@{(radioGroup, checkedId) -> viewModel.onClickTypeRadioButtonCheckedChange(checkedId)}"
             android:orientation="horizontal"
-            android:visibility="@{viewModel.state.clickTypeRadioButtonsVisible ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.clickTypeRadioButtonsVisible ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toTopOf="@id/buttonRecordKeys"
             app:layout_constraintEnd_toStartOf="@id/radioGroupTriggerMode"
             app:layout_constraintStart_toStartOf="parent">
@@ -110,14 +110,14 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:text="@string/radio_button_double_press"
-                android:visibility="@{viewModel.state.doublePressButtonVisible ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{viewModel.doublePressButtonVisible ? View.VISIBLE : View.GONE}" />
         </RadioGroup>
 
         <TextView
             android:id="@+id/textViewRadioGroupHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="@{viewModel.state.triggerModeButtonsEnabled}"
+            android:enabled="@{viewModel.triggerModeButtonsEnabled}"
             android:paddingTop="8dp"
             android:text="@string/press_dot_dot_dot"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
@@ -131,9 +131,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/cardview_padding_left"
             android:layout_marginEnd="@dimen/cardview_padding_right"
-            android:checkedButton="@{viewModel.state.checkedTriggerModeRadioButton}"
+            android:checkedButton="@{viewModel.checkedTriggerModeRadioButton}"
             android:gravity="bottom"
-            android:onCheckedChanged="@{(radioGroup, checkedId) -> viewModel.onTriggerModeRadioButtonCheckedChange(checkedId)}"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/buttonRecordKeys"
             app:layout_constraintEnd_toEndOf="parent"
@@ -143,16 +142,18 @@
                 android:id="@+id/radioButtonParallel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onCheckedChanged="@{(view, isChecked) -> viewModel.onParallelRadioButtonCheckedChange(isChecked)}"
                 android:layout_weight="0.5"
-                android:enabled="@{viewModel.state.triggerModeButtonsEnabled}"
+                android:enabled="@{viewModel.triggerModeButtonsEnabled}"
                 android:text="@string/radio_button_parallel" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radioButtonSequence"
+                android:onCheckedChanged="@{(view, isChecked) -> viewModel.onSequenceRadioButtonCheckedChange(isChecked)}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:enabled="@{viewModel.state.triggerModeButtonsEnabled}"
+                android:enabled="@{viewModel.triggerModeButtonsEnabled}"
                 android:text="@string/radio_button_sequence" />
 
 
@@ -173,7 +174,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
             android:onClick="@{() -> viewModel.onRecordTriggerButtonClick()}"
-            android:text="@{viewModel.state.recordTriggerButtonText}"
+            android:text="@{viewModel.recordTriggerButtonText}"
             app:backgroundTint="@color/red"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

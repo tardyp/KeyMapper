@@ -61,7 +61,6 @@ class ConfigTriggerKeyViewModel(
     }
 
     override fun setSliderValue(id: String, value: Defaultable<Int>) {
-        TODO("Not yet implemented")
     }
 
     override fun setCheckboxValue(id: String, value: Boolean) {

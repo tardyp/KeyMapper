@@ -34,6 +34,10 @@ class DisplayKeyMapUseCaseImpl(
             }
         }
 
+        if (trigger.screenOffTrigger && !permissionAdapter.isGranted(Permission.ROOT) && trigger.isDetectingWhenScreenOffAllowed()){
+            errors.add(KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED)
+        }
+
         return errors
     }
 }

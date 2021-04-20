@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
+import com.google.android.material.radiobutton.MaterialRadioButton
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.actions.ActionData
 import io.github.sds100.keymapper.actions.KeyEventAction
@@ -16,6 +17,7 @@ import io.github.sds100.keymapper.util.Defaultable
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.ifIsData
+import timber.log.Timber
 
 /**
  * Created by sds100 on 16/02/2021.
@@ -268,7 +270,7 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     override fun setEnabled(enabled: Boolean) {
-        editKeymap { it.copy(isEnabled = enabled) }
+        editKeyMap { it.copy(isEnabled = enabled) }
     }
 
     override fun setActionRepeatEnabled(uid: String, repeat: Boolean) =
@@ -319,18 +321,18 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     override fun setActionList(actionList: List<KeyMapAction>) {
-        editKeymap { it.copy(actionList = actionList) }
+        editKeyMap { it.copy(actionList = actionList) }
     }
 
     override fun setConstraintState(constraintState: ConstraintState) {
-        editKeymap { it.copy(constraintState = constraintState) }
+        editKeyMap { it.copy(constraintState = constraintState) }
     }
 
     private fun setActionOption(
         uid: String,
         block: (action: KeyMapAction) -> KeyMapAction
     ) {
-        editKeymap { keyMap ->
+        editKeyMap { keyMap ->
             val newActionList = keyMap.actionList.map { action ->
                 if (action.uid == uid) {
                     block.invoke(action)
@@ -346,10 +348,10 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     private fun editTrigger(block: (trigger: KeyMapTrigger) -> KeyMapTrigger) {
-        mapping.value.ifIsData { keyMap ->
+       editKeyMap { keyMap ->
             val newTrigger = block(keyMap.trigger)
 
-            setMapping(keyMap.copy(trigger = newTrigger))
+            keyMap.copy(trigger = newTrigger)
         }
     }
 
@@ -367,7 +369,7 @@ class ConfigKeyMapUseCaseImpl(
         }
     }
 
-    private fun editKeymap(block: (keymap: KeyMap) -> KeyMap) {
+    private fun editKeyMap(block: (keymap: KeyMap) -> KeyMap) {
         mapping.value.ifIsData { setMapping(block.invoke(it)) }
     }
 }

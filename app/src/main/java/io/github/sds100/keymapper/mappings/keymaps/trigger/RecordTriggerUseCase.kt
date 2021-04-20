@@ -5,12 +5,13 @@ import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 /**
  * Created by sds100 on 04/03/2021.
  */
 class RecordTriggerController(
-    coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
     private val serviceAdapter: ServiceAdapter
 ) : RecordTriggerUseCase {
     override val state = MutableStateFlow<RecordTriggerState>(RecordTriggerState.Stopped)
@@ -36,15 +37,20 @@ class RecordTriggerController(
             when (event) {
                 is OnStoppedRecordingTrigger -> state.value = RecordTriggerState.Stopped
 
-                is OnIncrementRecordTriggerTimer ->state.value =
+                is OnIncrementRecordTriggerTimer -> state.value =
                     RecordTriggerState.CountingDown(event.timeLeft)
             }
         }.launchIn(coroutineScope)
     }
 
-    override fun startRecording() = serviceAdapter.send(StartRecordingTrigger)
+    override suspend fun startRecording(): Result<Unit> {
+        return serviceAdapter.send(StartRecordingTrigger)
+    }
+
     override fun stopRecording() {
-        serviceAdapter.send(StopRecordingTrigger)
+        coroutineScope.launch {
+            serviceAdapter.send(StopRecordingTrigger)
+        }
     }
 }
 
@@ -55,6 +61,6 @@ interface RecordTriggerUseCase {
     /**
      * @return Success if started and an Error if failed to start.
      */
-    fun startRecording(): Result<Unit>
+    suspend fun startRecording(): Result<Unit>
     fun stopRecording()
 }

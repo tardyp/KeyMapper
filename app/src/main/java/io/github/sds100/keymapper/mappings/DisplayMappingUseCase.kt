@@ -49,6 +49,7 @@ class DisplaySimpleMappingUseCaseImpl(
     override fun fixError(error: FixableError) {
         when (error) {
             FixableError.AccessibilityServiceDisabled -> serviceAdapter.enableService()
+            FixableError.AccessibilityServiceCrashed -> serviceAdapter.restartService()
             is FixableError.AppDisabled -> packageManager.enableApp(error.packageName)
             is FixableError.AppNotFound -> packageManager.installApp(error.packageName)
             FixableError.NoCompatibleImeChosen -> keyMapperImeHelper.chooseCompatibleInputMethod(

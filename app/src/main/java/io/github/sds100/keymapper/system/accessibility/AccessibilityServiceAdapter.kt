@@ -1,25 +1,34 @@
 package io.github.sds100.keymapper.system.accessibility
 
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import io.github.sds100.keymapper.Constants
-import io.github.sds100.keymapper.ServiceLocator
-import io.github.sds100.keymapper.system.permissions.PermissionAdapter
-import io.github.sds100.keymapper.system.JobSchedulerHelper
-import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.MainActivity
+import io.github.sds100.keymapper.ServiceLocator
+import io.github.sds100.keymapper.system.JobSchedulerHelper
 import io.github.sds100.keymapper.system.SettingsUtils
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.util.Event
+import io.github.sds100.keymapper.util.Ping
+import io.github.sds100.keymapper.util.Pong
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.Success
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Created by sds100 on 17/03/2021.
@@ -56,10 +65,24 @@ class AccessibilityServiceAdapter(
         }
     }
 
-    override fun send(event: Event): Result<Unit> {
+    override suspend fun send(event: Event): Result<Unit> {
 
-        if (!AccessibilityUtils.isServiceEnabled(ctx)) {
+        if (!isEnabled.value) {
             return FixableError.AccessibilityServiceDisabled
+        }
+
+        val key = "ping_service"
+
+        coroutineScope.launch {
+            serviceOutputEvents.emit(Ping(key))
+        }
+
+        val pong: Pong? = withTimeoutOrNull(500L) {
+            eventReceiver.first { it == Pong(key) } as Pong?
+        }
+
+        if (pong == null) {
+            return FixableError.AccessibilityServiceCrashed
         }
 
         coroutineScope.launch {
@@ -71,25 +94,8 @@ class AccessibilityServiceAdapter(
 
     override fun enableService() {
         if (permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
-            val enabledServices = SettingsUtils.getSecureSetting<String>(
-                ctx,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
 
-            val className = MyAccessibilityService::class.java.name
-
-            val keyMapperEntry = "${Constants.PACKAGE_NAME}/$className"
-
-            val newEnabledServices = when {
-                enabledServices == null -> keyMapperEntry
-                enabledServices.contains(keyMapperEntry) -> enabledServices
-                else -> "$keyMapperEntry:$enabledServices"
-            }
-
-            SettingsUtils.putSecureSetting(
-                ctx,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
-            )
+            enableWithWriteSecureSettings()
 
             /*
             Turning on the accessibility service doesn't necessarily mean that it is running so
@@ -97,27 +103,31 @@ class AccessibilityServiceAdapter(
             is running.
              */
             coroutineScope.launch {
-                send(PingService("ping_accessibility_service"))
-                var isCrashed = true
+                val key = "ping_accessibility_service"
 
-                val job = eventReceiver.onEach {
-                    if (it is PingServiceResponse) {
-                        isCrashed = false
-                    }
-                }.launchIn(coroutineScope)
+                serviceOutputEvents.emit(Ping(key))
 
-                delay(1000L)
-                job.cancel()
+                val pong: Pong? = withTimeoutOrNull(1000L) {
+                    eventReceiver.first { it == Pong(key) } as Pong?
+                }
 
-                if (isCrashed) {
+                if (pong == null) {
                     disableService()
                     delay(200)
-
-                    SettingsUtils.putSecureSetting(
-                        ctx,
-                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
-                    )
+                    enableWithWriteSecureSettings()
                 }
+            }
+        } else {
+            openAccessibilitySettings()
+        }
+    }
+
+    override fun restartService() {
+        if (permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+            coroutineScope.launch {
+                disableService()
+                delay(200)
+                enableWithWriteSecureSettings()
             }
         } else {
             openAccessibilitySettings()
@@ -158,6 +168,30 @@ class AccessibilityServiceAdapter(
 
     fun updateWhetherServiceIsEnabled() {
         isEnabled.value = getIsEnabled()
+    }
+
+    private fun enableWithWriteSecureSettings() {
+        if (permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+            val enabledServices = SettingsUtils.getSecureSetting<String>(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            )
+
+            val className = MyAccessibilityService::class.java.name
+
+            val keyMapperEntry = "${Constants.PACKAGE_NAME}/$className"
+
+            val newEnabledServices = when {
+                enabledServices == null -> keyMapperEntry
+                enabledServices.contains(keyMapperEntry) -> enabledServices
+                else -> "$keyMapperEntry:$enabledServices"
+            }
+
+            SettingsUtils.putSecureSetting(
+                ctx,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, newEnabledServices
+            )
+        }
     }
 
     private fun openAccessibilitySettings() {

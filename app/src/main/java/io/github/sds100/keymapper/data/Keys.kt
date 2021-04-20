@@ -36,8 +36,6 @@ import androidx.datastore.preferences.core.preferencesSetKey
     val showDeviceDescriptors = preferencesKey<Boolean>("pref_show_device_descriptors")
     val approvedFingerprintFeaturePrompt =
         preferencesKey<Boolean>("pref_approved_fingerprint_feature_prompt")
-    val shownScreenOffTriggersExplanation =
-        preferencesKey<Boolean>("pref_screen_off_triggers_explanation")
     val shownParallelTriggerOrderExplanation =
         preferencesKey<Boolean>("key_shown_parallel_trigger_order_warning")
     val shownSequenceTriggerExplanation =
