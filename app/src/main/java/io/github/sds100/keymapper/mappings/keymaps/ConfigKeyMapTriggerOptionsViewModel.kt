@@ -93,7 +93,7 @@ class ConfigKeyMapTriggerOptionsViewModel(
 
             result.onFailure { error ->
                 val snackBar = PopupUi.SnackBar(
-                    title = error.getFullMessage(this@ConfigKeyMapTriggerOptionsViewModel)
+                    message = error.getFullMessage(this@ConfigKeyMapTriggerOptionsViewModel)
                 )
 
                 showPopup("create_shortcut_result", snackBar)

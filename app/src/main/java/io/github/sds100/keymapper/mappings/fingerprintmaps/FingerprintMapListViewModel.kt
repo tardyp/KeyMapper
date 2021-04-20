@@ -115,7 +115,7 @@ class FingerprintMapListViewModel(
             }
 
             val snackBar = PopupUi.SnackBar(
-                title = error.getFullMessage(this@FingerprintMapListViewModel),
+                message = error.getFullMessage(this@FingerprintMapListViewModel),
                 actionText = actionText
             )
 

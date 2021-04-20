@@ -4,12 +4,10 @@ package io.github.sds100.keymapper.util.ui
  * Created by sds100 on 23/03/2021.
  */
 
-//TODO have a subclass to show a toast as well. replace showToast in configconstraintviewmodel with this
-
 sealed class PopupUi<RESPONSE : PopupResponse> {
 
     data class SnackBar(
-        val title: String, val long: Boolean = false, val actionText: String? = null
+        val message: String, val long: Boolean = false, val actionText: String? = null
     ) : PopupUi<SnackBarActionResponse>()
 
     object SnackBarActionResponse : PopupResponse

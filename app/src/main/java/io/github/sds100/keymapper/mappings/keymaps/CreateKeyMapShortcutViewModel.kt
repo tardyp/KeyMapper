@@ -141,7 +141,7 @@ class CreateKeyMapShortcutViewModel(
             }
 
             val snackBar = PopupUi.SnackBar(
-                title = error.getFullMessage(this@CreateKeyMapShortcutViewModel),
+                message = error.getFullMessage(this@CreateKeyMapShortcutViewModel),
                 actionText = actionText
             )
 

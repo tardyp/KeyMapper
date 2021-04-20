@@ -169,7 +169,7 @@ open class KeyMapListViewModel constructor(
             }
 
             val snackBar = PopupUi.SnackBar(
-                title = error.getFullMessage(this@KeyMapListViewModel),
+                message = error.getFullMessage(this@KeyMapListViewModel),
                 actionText = actionText
             )
 

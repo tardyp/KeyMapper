@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.constraint
 import io.github.sds100.keymapper.databinding.FragmentConstraintListBinding
 import io.github.sds100.keymapper.util.ui.ListUiState
 import io.github.sds100.keymapper.util.ui.RecyclerViewFragment
+import io.github.sds100.keymapper.util.ui.showPopups
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -42,6 +43,7 @@ abstract class ConfigConstraintsFragment
 
     override fun subscribeUi(binding: FragmentConstraintListBinding) {
         binding.viewModel = configConstraintsViewModel
+        configConstraintsViewModel.showPopups(this, binding)
 
         binding.setOnAddConstraintClick {
             val direction = NavAppDirections.actionGlobalChooseConstraint(
@@ -50,13 +52,6 @@ abstract class ConfigConstraintsFragment
             )
 
             findNavController().navigate(direction)
-        }
-
-        //must be on created so that the toast can be shown after a constraint is chosen
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.CREATED) {
-            configConstraintsViewModel.showToast.collectLatest {
-                toast(it)
-            }
         }
     }
 

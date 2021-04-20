@@ -97,7 +97,7 @@ fun PopupViewModel.showPopups(
                 is PopupUi.SnackBar ->
                     SnackBarUtils.show(
                         binding.root.findViewById(R.id.coordinatorLayout),
-                        event.ui.title,
+                        event.ui.message,
                         event.ui.actionText,
                         event.ui.long
                     )

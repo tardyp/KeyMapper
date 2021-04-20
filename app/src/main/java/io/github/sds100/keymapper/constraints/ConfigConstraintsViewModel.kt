@@ -24,12 +24,9 @@ class ConfigConstraintsViewModel(
     private val config: ConfigMappingUseCase<*, *>,
     val allowedConstraints: Array<ChooseConstraintType>,
     resourceProvider: ResourceProvider
-) : ResourceProvider by resourceProvider {
+) : ResourceProvider by resourceProvider, PopupViewModel by PopupViewModelImpl() {
 
     private val uiHelper = ConstraintUiHelper(display, resourceProvider)
-
-    private val _showToast = MutableSharedFlow<String>()
-    val showToast = _showToast.asSharedFlow()
 
     private val _state = MutableStateFlow(buildState(State.Loading))
     val state = _state.asStateFlow()
@@ -61,7 +58,11 @@ class ConfigConstraintsViewModel(
 
         if (isDuplicate) {
             coroutineScope.launch {
-                _showToast.emit(getString(R.string.error_duplicate_constraint))
+                val snackBar = PopupUi.SnackBar(
+                    message = getString(R.string.error_duplicate_constraint)
+                )
+
+                showPopup("duplicate_constraint", snackBar)
             }
         }
     }

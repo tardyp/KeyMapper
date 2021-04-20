@@ -4,13 +4,15 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import io.github.sds100.keymapper.R
@@ -18,7 +20,6 @@ import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.util.str
 import io.github.sds100.keymapper.util.styledColor
 import io.github.sds100.keymapper.util.styledColorSL
-import timber.log.Timber
 
 /**
  * Created by sds100 on 25/01/2020.
@@ -58,16 +59,6 @@ fun TextInputLayout.errorWhenEmpty(enabled: Boolean) {
 @BindingAdapter("app:onLongClick")
 fun setLongClickListener(view: View, onLongClickListener: View.OnLongClickListener?) {
     view.setOnLongClickListener(onLongClickListener)
-}
-
-@BindingAdapter("app:errorText")
-fun TextInputLayout.errorText(text: String?) {
-    error = text
-}
-
-@BindingAdapter("app:onChangeListener")
-fun SeekBar.setOnChangeListener(onChangeListener: SeekBar.OnSeekBarChangeListener) {
-    setOnSeekBarChangeListener(onChangeListener)
 }
 
 @BindingAdapter("app:seekBarEnabled")

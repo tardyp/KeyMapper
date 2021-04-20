@@ -10,7 +10,6 @@ import io.github.sds100.keymapper.ui.*
 import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.ui.PopupViewModel
 import io.github.sds100.keymapper.util.ui.PopupViewModelImpl
-import io.github.sds100.keymapper.util.ui.SnackBarUi
 import io.github.sds100.keymapper.util.ui.showPopup
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -53,9 +52,6 @@ class PickDisplayCoordinateViewModel(
     private val _returnResult = MutableSharedFlow<PickCoordinateResult>()
     val returnResult = _returnResult.asSharedFlow()
 
-    private val _showSnackBar = MutableSharedFlow<SnackBarUi>()
-    val showSnackBar = _showSnackBar.asSharedFlow()
-
     private var createResultJob: Job? = null
 
     fun selectedScreenshot(newBitmap: Bitmap, displaySize: Point) {
@@ -68,9 +64,11 @@ class PickDisplayCoordinateViewModel(
                 && displaySize.x != newBitmap.height)
         ) {
             viewModelScope.launch {
-                _showSnackBar.emit(
-                    SnackBarUi(getString(R.string.toast_incorrect_screenshot_resolution))
+                val snackBar = PopupUi.SnackBar(
+                    message = getString(R.string.toast_incorrect_screenshot_resolution)
                 )
+
+                showPopup("incorrect_resolution", snackBar)
             }
 
             return

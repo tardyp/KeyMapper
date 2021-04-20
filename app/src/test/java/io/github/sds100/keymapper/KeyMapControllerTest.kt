@@ -38,7 +38,6 @@ import splitties.bitflags.withFlag
  * Created by sds100 on 17/05/2020.
  */
 
-//TODO do other tests
 @ExperimentalCoroutinesApi
 @RunWith(JUnitParamsRunner::class)
 class KeyMapControllerTest {

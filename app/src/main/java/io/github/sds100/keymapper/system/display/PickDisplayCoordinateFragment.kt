@@ -20,8 +20,8 @@ import androidx.navigation.fragment.findNavController
 import io.github.sds100.keymapper.actions.PickDisplayCoordinateViewModel
 import io.github.sds100.keymapper.databinding.FragmentPickCoordinateBinding
 import io.github.sds100.keymapper.system.files.FileUtils
-import io.github.sds100.keymapper.util.ui.showPopups
 import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.ui.showPopups
 import kotlinx.coroutines.flow.collectLatest
 import splitties.systemservices.windowManager
 
@@ -120,13 +120,6 @@ class PickDisplayCoordinateFragment : Fragment() {
                 )
 
                 findNavController().navigateUp()
-            }
-        }
-
-        //TODO delete use popupviewmodel
-        viewLifecycleOwner.addRepeatingJob(Lifecycle.State.RESUMED) {
-            viewModel.showSnackBar.collectLatest {
-                binding.showSnackBar(it)
             }
         }
 

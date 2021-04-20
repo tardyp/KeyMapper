@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 /**
  * Created by sds100 on 24/11/20.
@@ -278,7 +277,7 @@ class ConfigKeyMapTriggerViewModel(
                     if (recordResult is FixableError.AccessibilityServiceDisabled) {
 
                         val snackBar = PopupUi.SnackBar(
-                            title = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
+                            message = getString(R.string.dialog_message_enable_accessibility_service_to_record_trigger),
                             actionText = getString(R.string.pos_turn_on)
                         )
 
@@ -292,7 +291,7 @@ class ConfigKeyMapTriggerViewModel(
                     if (recordResult is FixableError.AccessibilityServiceCrashed) {
 
                         val snackBar = PopupUi.SnackBar(
-                            title = getString(R.string.dialog_message_restart_accessibility_service_to_record_trigger),
+                            message = getString(R.string.dialog_message_restart_accessibility_service_to_record_trigger),
                             actionText = getString(R.string.pos_restart)
                         )
 
