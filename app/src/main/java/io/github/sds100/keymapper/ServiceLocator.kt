@@ -24,6 +24,7 @@ import io.github.sds100.keymapper.system.files.FileRepository
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
+import io.github.sds100.keymapper.system.audio.AudioAdapter
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.notifications.NotificationController
@@ -212,6 +213,10 @@ object ServiceLocator {
 
     fun displayAdapter(context: Context): DisplayAdapter {
         return (context.applicationContext as KeyMapperApp).displayAdapter
+    }
+
+    fun audioAdapter(context: Context): AudioAdapter {
+        return (context.applicationContext as KeyMapperApp).audioAdapter
     }
 
     private fun createDatabase(context: Context): AppDatabase {

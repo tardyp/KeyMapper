@@ -7,9 +7,7 @@ import io.github.sds100.keymapper.util.*
  * Created by sds100 on 16/03/2021.
  */
 
-class KeyMapperImeHelper(
-    private val imeAdapter: InputMethodAdapter
-) {
+class KeyMapperImeHelper(private val imeAdapter: InputMethodAdapter) {
     companion object {
         const val KEY_MAPPER_GUI_IME_PACKAGE =
             "io.github.sds100.keymapper.inputmethod.latin"
@@ -64,6 +62,29 @@ class KeyMapperImeHelper(
             .any { it.packageName in KEY_MAPPER_IME_PACKAGE_LIST }
     }
 
+    fun inputKeyEvent(
+        keyCode: Int,
+        metaState: Int,
+        keyEventAction: InputEventType,
+        deviceId: Int,
+        scanCode: Int
+    ): Result<*> {
+        val imePackageName = imeAdapter.chosenIme.firstBlocking().packageName
+
+        if (imePackageName !in KEY_MAPPER_IME_PACKAGE_LIST) {
+            return Error.NoCompatibleImeChosen
+        }
+
+        imeAdapter.inputKeyEvent(
+            imePackageName,
+            keyCode,
+            metaState,
+            keyEventAction,
+            deviceId,
+            scanCode
+        )
+        return Success(Unit)
+    }
 
     private fun getLastUsedCompatibleImeId(): Result<String> {
         for (ime in imeAdapter.inputMethodHistory.firstBlocking()) {

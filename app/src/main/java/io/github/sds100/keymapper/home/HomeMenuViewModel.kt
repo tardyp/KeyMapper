@@ -80,6 +80,8 @@ class HomeMenuViewModel(
                 areMappingsPaused -> pauseMappings.resume()
                 !areMappingsPaused -> pauseMappings.pause()
             }
+
+            _dismiss.emit(Unit)
         }
     }
 

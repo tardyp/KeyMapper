@@ -72,6 +72,11 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     Error.AccessibilityServiceCrashed -> resourceProvider.getString(R.string.error_accessibility_service_crashed)
     Error.CantFindImeSettings -> resourceProvider.getString(R.string.error_cant_find_ime_settings)
     Error.CantShowImePickerInBackground -> resourceProvider.getString(R.string.error_cant_show_ime_picker_in_background)
+    Error.FailedToFindAccessibilityNode -> resourceProvider.getString(R.string.error_failed_to_find_accessibility_node)
+    is Error.FailedToPerformAccessibilityGlobalAction -> resourceProvider.getString(
+        R.string.error_failed_to_perform_accessibility_global_action,
+        action
+    )
 }
 
 val Error.isFixable: Boolean

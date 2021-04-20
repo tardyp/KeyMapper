@@ -229,9 +229,7 @@ object Inject {
         )
     }
 
-    fun accessibilityServiceController(
-        service: MyAccessibilityService
-    ): AccessibilityServiceController {
+    fun accessibilityServiceController(service: MyAccessibilityService): AccessibilityServiceController {
         return AccessibilityServiceController(
             coroutineScope = service.lifecycleScope,
             accessibilityService = service,
@@ -239,7 +237,7 @@ object Inject {
             outputEvents = ServiceLocator.serviceAdapter(service).eventReceiver,
             detectConstraintsUseCase = UseCases.detectConstraints(service),
             performActionsUseCase = UseCases.performActions(service),
-            detectKeyMapsUseCase = UseCases.detectKeyMaps(service, service),
+            detectKeyMapsUseCase = UseCases.detectKeyMaps(service),
             detectFingerprintMapsUseCase = UseCases.detectFingerprintMaps(service),
             pauseMappingsUseCase = UseCases.pauseMappings(service)
         )

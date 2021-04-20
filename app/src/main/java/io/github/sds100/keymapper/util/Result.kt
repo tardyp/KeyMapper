@@ -85,6 +85,9 @@ sealed class Error : Result<Nothing>() {
             }
         }
     }
+
+    object FailedToFindAccessibilityNode : Error()
+    data class FailedToPerformAccessibilityGlobalAction(val action: Int) : Error()
 }
 
 inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {

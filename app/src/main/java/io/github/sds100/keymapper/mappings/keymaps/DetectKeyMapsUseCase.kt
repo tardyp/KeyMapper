@@ -1,31 +1,38 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
 import android.os.SystemClock
-import io.github.sds100.keymapper.system.display.DisplayAdapter
-import io.github.sds100.keymapper.mappings.DetectMappingUseCase
+import android.view.KeyEvent
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.PreferenceDefaults
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.mappings.DetectMappingUseCase
+import io.github.sds100.keymapper.system.audio.AudioAdapter
+import io.github.sds100.keymapper.system.display.DisplayAdapter
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
+import io.github.sds100.keymapper.system.navigation.NavigationAdapter
 import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
-import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.util.InputEventType
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.State
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * Created by sds100 on 17/04/2021.
  */
 
 class DetectKeyMapsUseCaseImpl(
-    accessibilityService: IAccessibilityService,
     detectMappingUseCase: DetectMappingUseCase,
     private val keyMapRepository: KeyMapRepository,
     private val preferenceRepository: PreferenceRepository,
     private val checkRootPermission: CheckRootPermissionUseCase,
-    private val displayAdapter: DisplayAdapter
+    private val displayAdapter: DisplayAdapter,
+    private val audioAdapter: AudioAdapter,
+    private val navigationAdapter: NavigationAdapter,
+    inputMethodAdapter: InputMethodAdapter
 ) : DetectKeyMapsUseCase, DetectMappingUseCase by detectMappingUseCase {
+
     override val allKeyMapList: Flow<List<KeyMap>> =
         keyMapRepository.keyMapList
             .dropWhile { it !is State.Data }
@@ -69,15 +76,34 @@ class DetectKeyMapsUseCaseImpl(
     override val currentTime: Long
         get() = SystemClock.elapsedRealtime()
 
-    //TODO
+    private val keyMapperImeHelper by lazy { KeyMapperImeHelper(inputMethodAdapter) }
+
     override fun imitateButtonPress(
         keyCode: Int,
         metaState: Int,
         deviceId: Int,
         keyEventAction: InputEventType,
         scanCode: Int
-    ) {
-        Timber.e("imitate button press $keyCode")
+    ): Result<*> {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> audioAdapter.raiseVolume(showVolumeUi = true)
+
+            KeyEvent.KEYCODE_VOLUME_DOWN -> audioAdapter.lowerVolume(showVolumeUi = true)
+
+            KeyEvent.KEYCODE_BACK -> navigationAdapter.goBack()
+            KeyEvent.KEYCODE_HOME -> navigationAdapter.goHome()
+            KeyEvent.KEYCODE_APP_SWITCH -> navigationAdapter.openRecents()
+
+            KeyEvent.KEYCODE_MENU -> navigationAdapter.openMenu()
+
+            else -> keyMapperImeHelper.inputKeyEvent(
+                keyCode,
+                metaState,
+                keyEventAction,
+                deviceId,
+                scanCode
+            )
+        }
     }
 
     override val isScreenOn: Flow<Boolean> = displayAdapter.isScreenOn
@@ -99,9 +125,9 @@ interface DetectKeyMapsUseCase : DetectMappingUseCase {
         keyCode: Int,
         metaState: Int = 0,
         deviceId: Int = 0,
-        keyEventAction: InputEventType =InputEventType.DOWN_UP,
+        keyEventAction: InputEventType = InputEventType.DOWN_UP,
         scanCode: Int = 0
-    )
+    ): Result<*>
 
     val isScreenOn: Flow<Boolean>
 }

@@ -14,6 +14,7 @@ import io.github.sds100.keymapper.system.AndroidSystemFeatureAdapter
 import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.system.apps.AndroidAppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.AndroidPackageManagerAdapter
+import io.github.sds100.keymapper.system.audio.AndroidAudioAdapter
 import io.github.sds100.keymapper.system.camera.AndroidCameraAdapter
 import io.github.sds100.keymapper.system.devices.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
@@ -96,6 +97,7 @@ class KeyMapperApp : MultiDexApplication() {
     val popupMessageAdapter by lazy { AndroidToastAdapter(this) }
     val vibratorAdapter by lazy { AndroidVibratorAdapter(this) }
     val displayAdapter by lazy { AndroidDisplayAdapter(this) }
+    val audioAdapter by lazy { AndroidAudioAdapter(this) }
 
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
 

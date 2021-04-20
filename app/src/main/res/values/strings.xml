@@ -733,6 +733,8 @@
     <string name="error_ime_not_found">Can\'t find the %s input method</string>
     <string name="error_no_enabled_imes">This device has no enabled input methods!</string>
     <string name="error_cant_show_ime_picker_in_background">The input method picker can\'t be shown!</string>
+    <string name="error_failed_to_find_accessibility_node">Failed to find accessibility node!</string>
+    <string name="error_failed_to_perform_accessibility_global_action">Failed perform global action %s!</string>
 
     <string name="error_the_app_wont_work">Your key maps won\'t work! Some things need fixing!</string>
     <string name="error_cant_move_to_end_of_text_in_this_field">You can\'t move to the end of the text in this field!</string>

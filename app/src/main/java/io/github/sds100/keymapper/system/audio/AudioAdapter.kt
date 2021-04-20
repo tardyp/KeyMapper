@@ -1,0 +1,16 @@
+package io.github.sds100.keymapper.system.audio
+
+import io.github.sds100.keymapper.util.Result
+
+/**
+ * Created by sds100 on 20/04/2021.
+ */
+interface AudioAdapter {
+    fun raiseVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
+    fun lowerVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
+    fun muteVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
+    fun unmuteVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
+    fun toggleMuteVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
+    fun showVolumeUi(): Result<*>
+    fun setRingerMode(mode: RingerMode): Result<*>
+}

@@ -1,7 +1,9 @@
 package io.github.sds100.keymapper.actions
 
-import io.github.sds100.keymapper.util.InputEventType
 import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.InputEventType
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import timber.log.Timber
 
 /**
@@ -16,9 +18,10 @@ class PerformActionsUseCaseImpl(
         actionData: ActionData,
         inputEventType: InputEventType,
         keyMetaState: Int
-    ) {
-       // TODO("Not yet implemented")
+    ): Result<*> {
+        // TODO("Not yet implemented")
         Timber.e("perform $actionData $inputEventType $keyMetaState")
+        return Success(Unit)
     }
 
     override fun getError(action: ActionData): Error? {
@@ -27,10 +30,11 @@ class PerformActionsUseCaseImpl(
 }
 
 interface PerformActionsUseCase {
-    fun performAction(actionData: ActionData,
-                      inputEventType: InputEventType = InputEventType.DOWN_UP,
-                      keyMetaState: Int = 0
-    )
+    fun performAction(
+        actionData: ActionData,
+        inputEventType: InputEventType = InputEventType.DOWN_UP,
+        keyMetaState: Int = 0
+    ): Result<*>
 
     fun getError(action: ActionData): Error?
 }

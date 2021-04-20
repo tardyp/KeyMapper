@@ -1,33 +1,36 @@
 package io.github.sds100.keymapper
 
 import android.content.Context
-import io.github.sds100.keymapper.constraints.DetectConstraintsUseCaseImpl
-import io.github.sds100.keymapper.constraints.GetConstraintErrorUseCaseImpl
 import io.github.sds100.keymapper.actions.GetActionErrorUseCaseImpl
 import io.github.sds100.keymapper.actions.IsSystemActionSupportedUseCaseImpl
-import io.github.sds100.keymapper.system.devices.GetInputDevicesUseCaseImpl
-import io.github.sds100.keymapper.mappings.DetectMappingUseCaseImpl
-import io.github.sds100.keymapper.mappings.fingerprintmaps.AreFingerprintGesturesSupportedUseCaseImpl
-import io.github.sds100.keymapper.onboarding.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.actions.PerformActionsUseCaseImpl
-import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCase
-import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCaseImpl
-import io.github.sds100.keymapper.system.inputmethod.ToggleCompatibleImeUseCaseImpl
+import io.github.sds100.keymapper.constraints.DetectConstraintsUseCaseImpl
+import io.github.sds100.keymapper.constraints.GetConstraintErrorUseCaseImpl
+import io.github.sds100.keymapper.mappings.DetectMappingUseCaseImpl
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCase
 import io.github.sds100.keymapper.mappings.DisplaySimpleMappingUseCaseImpl
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCaseImpl
+import io.github.sds100.keymapper.mappings.fingerprintmaps.AreFingerprintGesturesSupportedUseCaseImpl
 import io.github.sds100.keymapper.mappings.fingerprintmaps.DetectFingerprintMapsUseCaseImpl
+import io.github.sds100.keymapper.mappings.keymaps.CreateKeyMapShortcutUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
-import io.github.sds100.keymapper.system.apps.DisplayAppsUseCase
-import io.github.sds100.keymapper.system.apps.DisplayAppsUseCaseImpl
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCaseImpl
+import io.github.sds100.keymapper.onboarding.OnboardingUseCaseImpl
 import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCase
 import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCaseImpl
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
-import io.github.sds100.keymapper.mappings.keymaps.CreateKeyMapShortcutUseCaseImpl
+import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
+import io.github.sds100.keymapper.system.apps.DisplayAppsUseCase
+import io.github.sds100.keymapper.system.apps.DisplayAppsUseCaseImpl
+import io.github.sds100.keymapper.system.devices.GetInputDevicesUseCaseImpl
+import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCase
+import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCaseImpl
+import io.github.sds100.keymapper.system.inputmethod.ToggleCompatibleImeUseCaseImpl
+import io.github.sds100.keymapper.system.navigation.AndroidNavigationAdapter
+import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCaseImpl
+import io.github.sds100.keymapper.system.root.SuProcessDelegate
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -132,13 +135,15 @@ object UseCases {
         ServiceLocator.resourceProvider(ctx)
     )
 
-    fun detectKeyMaps(ctx: Context, service: IAccessibilityService) = DetectKeyMapsUseCaseImpl(
-        service,
-        detectMappings(ctx),
-        ServiceLocator.roomKeymapRepository(ctx),
-        ServiceLocator.preferenceRepository(ctx),
-        checkRootPermission(ctx),
-        ServiceLocator.displayAdapter(ctx)
+    fun detectKeyMaps(service: MyAccessibilityService) = DetectKeyMapsUseCaseImpl(
+        detectMappings(service),
+        ServiceLocator.roomKeymapRepository(service),
+        ServiceLocator.preferenceRepository(service),
+        checkRootPermission(service),
+        ServiceLocator.displayAdapter(service),
+        ServiceLocator.audioAdapter(service),
+        AndroidNavigationAdapter(service, service.suProcessDelegate, checkRootPermission(service)),
+        ServiceLocator.inputMethodAdapter(service)
     )
 
     fun detectFingerprintMaps(ctx: Context) = DetectFingerprintMapsUseCaseImpl(

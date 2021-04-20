@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
 import io.github.sds100.keymapper.system.devices.isExternalCompat
+import io.github.sds100.keymapper.system.root.SuProcessDelegate
 import io.github.sds100.keymapper.util.Inject
 import io.github.sds100.keymapper.util.InputEventType
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -68,6 +69,8 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
 
     override val onKeyboardHiddenChange = MutableSharedFlow<Boolean>()
+
+    val suProcessDelegate by lazy { SuProcessDelegate() }
 
     private lateinit var controller: AccessibilityServiceController
 
