@@ -2,13 +2,13 @@ package io.github.sds100.keymapper.mappings
 
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.actions.Action
-import io.github.sds100.keymapper.constraints.ConstraintMode
-import io.github.sds100.keymapper.util.ui.ResourceProvider
-import io.github.sds100.keymapper.util.ui.ChipUi
-import io.github.sds100.keymapper.util.ui.IconInfo
 import io.github.sds100.keymapper.actions.ActionUiHelper
+import io.github.sds100.keymapper.constraints.ConstraintMode
 import io.github.sds100.keymapper.constraints.ConstraintUiHelper
 import io.github.sds100.keymapper.util.result.*
+import io.github.sds100.keymapper.util.ui.ChipUi
+import io.github.sds100.keymapper.util.ui.IconInfo
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 
 /**
  * Created by sds100 on 18/03/2021.
@@ -35,7 +35,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
 
                 append(actionTitle)
 
-                actionUiHelper.getOptionLabels(mapping, action).forEach{ label ->
+                actionUiHelper.getOptionLabels(mapping, action).forEach { label ->
                     append(" $midDot ")
 
                     append(label)
@@ -63,18 +63,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
                 val chip = ChipUi.Normal(id = action.uid, text = chipText, icon = icon)
                 yield(chip)
             } else {
-                val chip = if (error is FixableError) {
-                    ChipUi.FixableError(
-                        action.uid,
-                        chipText,
-                        error
-                    )
-                } else {
-                    ChipUi.Error(
-                        action.uid,
-                        chipText
-                    )
-                }
+                val chip = ChipUi.Error(action.uid, chipText, error)
 
                 yield(chip)
             }
@@ -109,18 +98,11 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
                     icon = icon
                 )
             } else {
-                if (error is FixableError) {
-                    ChipUi.FixableError(
-                        constraint.uid,
-                        text,
-                        error
-                    )
-                } else {
-                    ChipUi.Error(
-                        constraint.uid,
-                        text
-                    )
-                }
+                ChipUi.Error(
+                    constraint.uid,
+                    text,
+                    error
+                )
             }
 
             yield(chip)
@@ -138,7 +120,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
             append(getString(R.string.disabled))
         }
 
-        if (actionChipList.any { it is ChipUi.FixableError }) {
+        if (actionChipList.any { it is ChipUi.Error }) {
             if (this.isNotEmpty()) {
                 append(" $midDot ")
             }
@@ -146,7 +128,7 @@ abstract class BaseMappingListItemCreator<M : Mapping<A>, A : Action>(
             append(getString(R.string.tap_actions_to_fix))
         }
 
-        if (constraintChipList.any { it is ChipUi.FixableError }) {
+        if (constraintChipList.any { it is ChipUi.Error }) {
             if (this.isNotEmpty()) {
                 append(" $midDot ")
             }

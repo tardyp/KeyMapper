@@ -78,7 +78,7 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.CorruptJsonFile -> reason
     Error.NoIncompatibleKeyboardsInstalled -> throw Exception()
     Error.NoMediaSessions -> throw Exception()
-    Error.NoVoiceAssistant -> throw Exception()
+    Error.NoVoiceAssistant -> resourceProvider.getString(R.string.errorvoice_assistant_not_found)
     is Error.UnknownFileLocation ->throw Exception()
     FixableError.AccessibilityServiceDisabled -> resourceProvider.getString(R.string.error_accessibility_service_disabled)
     Error.Duplicate -> resourceProvider.getString(R.string.error_duplicate_constraint)

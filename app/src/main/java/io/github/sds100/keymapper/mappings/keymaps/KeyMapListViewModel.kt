@@ -9,6 +9,7 @@ import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.ui.MultiSelectProvider
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.getFullMessage
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -141,34 +142,42 @@ open class KeyMapListViewModel constructor(
         }
     }
 
-    fun onActionChipClick(chipModel: ChipUi) {
-        if (chipModel is ChipUi.FixableError) {
+    fun onTriggerErrorChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.Error) {
             showSnackBarAndFixError(chipModel.error)
         }
     }
 
-    fun onTriggerErrorChipClick(chipModel: ChipUi) {
-        if (chipModel is ChipUi.FixableError) {
+    fun onActionChipClick(chipModel: ChipUi) {
+        if (chipModel is ChipUi.Error) {
             showSnackBarAndFixError(chipModel.error)
         }
     }
 
     fun onConstraintsChipClick(chipModel: ChipUi) {
-        if (chipModel is ChipUi.FixableError) {
+        if (chipModel is ChipUi.Error) {
             showSnackBarAndFixError(chipModel.error)
         }
     }
 
-    private fun showSnackBarAndFixError(error: FixableError) {
+    private fun showSnackBarAndFixError(error: Error) {
         coroutineScope.launch {
+            val actionText = if (error is FixableError){
+                getString(R.string.snackbar_fix)
+            }else{
+                null
+            }
+
             val snackBar = PopupUi.SnackBar(
                 title = error.getFullMessage(this@KeyMapListViewModel),
-                actionText = getString(R.string.snackbar_fix)
+                actionText = actionText
             )
 
             showPopup("fix_error", snackBar) ?: return@launch
 
-            useCase.fixError(error)
+            if (error is FixableError) {
+                useCase.fixError(error)
+            }
         }
     }
 }

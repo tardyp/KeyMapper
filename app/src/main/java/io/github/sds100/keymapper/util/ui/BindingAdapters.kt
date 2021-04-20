@@ -18,6 +18,7 @@ import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.util.str
 import io.github.sds100.keymapper.util.styledColor
 import io.github.sds100.keymapper.util.styledColorSL
+import timber.log.Timber
 
 /**
  * Created by sds100 on 25/01/2020.
@@ -110,21 +111,12 @@ fun ChipGroup.setChipUiModels(
     models.forEach { model ->
         when (model) {
 
-            is ChipUi.FixableError -> {
-                MaterialButton(context, null, R.attr.fixableErrorChipButtonStyle).apply {
+            is ChipUi.Error -> {
+                MaterialButton(context, null, R.attr.errorChipButtonStyle).apply {
                     id = View.generateViewId()
 
                     text = model.text
                     setOnClickListener { callback.onChipClick(model) }
-                    addView(this)
-                }
-            }
-
-            is ChipUi.Error -> {
-                TextView(context, null, R.attr.errorChipButtonStyle).apply {
-                    id = View.generateViewId()
-
-                    text = model.text
                     addView(this)
                 }
             }

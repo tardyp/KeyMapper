@@ -1,19 +1,20 @@
 package io.github.sds100.keymapper.system.apps
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
 import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.result.Result
 import io.github.sds100.keymapper.util.result.success
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Created by sds100 on 16/03/2021.
@@ -27,19 +28,37 @@ class AndroidPackageManagerAdapter(
 
     override val installedPackages = MutableStateFlow<State<List<PackageInfo>>>(State.Loading)
 
-    //TODO have broadcast receiver that updates the installed packages when a new package is installed, removed or change
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            context ?: return
+            intent ?: return
+
+            when (intent.action) {
+                Intent.ACTION_PACKAGE_CHANGED,
+                Intent.ACTION_PACKAGE_ADDED,
+                Intent.ACTION_PACKAGE_REMOVED,
+                Intent.ACTION_PACKAGE_REPLACED -> {
+                    coroutineScope.launch(Dispatchers.Default) {
+                        updatePackageList()
+                    }
+                }
+            }
+        }
+    }
 
     init {
-        coroutineScope.launch {
-            installedPackages.value = State.Loading
+        coroutineScope.launch(Dispatchers.Default) {
+            updatePackageList()
+        }
 
-            packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
-                val canBeLaunched =
-                    (packageManager.getLaunchIntentForPackage(it.packageName) != null
-                        || packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null)
+        IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_CHANGED)
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addDataScheme("package")
 
-                PackageInfo(it.packageName, canBeLaunched)
-            }.let { installedPackages.value = State.Data(it) }
+            ctx.registerReceiver(broadcastReceiver, this)
         }
     }
 
@@ -84,7 +103,10 @@ class AndroidPackageManagerAdapter(
     }
 
     override fun isVoiceAssistantInstalled(): Boolean {
-        TODO("Not yet implemented")
+        val activityExists =
+            Intent(Intent.ACTION_VOICE_COMMAND).resolveActivityInfo(ctx.packageManager, 0) != null
+
+        return activityExists
     }
 
     override fun getAppName(packageName: String): Result<String> {
@@ -108,5 +130,19 @@ class AndroidPackageManagerAdapter(
         } catch (e: PackageManager.NameNotFoundException) {
             return FixableError.AppNotFound(packageName)
         }
+    }
+    
+    private fun updatePackageList(){
+        installedPackages.value = State.Loading
+
+       val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
+            val canBeLaunched =
+                (packageManager.getLaunchIntentForPackage(it.packageName) != null
+                    || packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null)
+
+            PackageInfo(it.packageName, canBeLaunched)
+        }
+
+        installedPackages.value = State.Data(packages)
     }
 }

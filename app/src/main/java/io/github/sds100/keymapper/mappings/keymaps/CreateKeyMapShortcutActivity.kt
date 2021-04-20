@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.collectLatest
 /**
  * Created by sds100 on 08/09/20.
  */
-//TODO test whether moving this to a different package affects old shortcut intents
-class CreateKeymapShortcutActivity : AppCompatActivity() {
+
+class CreateKeyMapShortcutActivity : AppCompatActivity() {
     private lateinit var requestPermissionDelegate: RequestPermissionDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class CreateKeymapShortcutActivity : AppCompatActivity() {
         requestPermissionDelegate = RequestPermissionDelegate(this, showDialogs = true)
 
         addRepeatingJob(Lifecycle.State.RESUMED) {
-            ServiceLocator.permissionAdapter(this@CreateKeymapShortcutActivity).request
+            ServiceLocator.permissionAdapter(this@CreateKeyMapShortcutActivity).request
                 .collectLatest { permission ->
                     requestPermissionDelegate.requestPermission(
                         permission,

@@ -8,6 +8,7 @@ import io.github.sds100.keymapper.util.ui.PopupUi
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.result.FixableError
 import io.github.sds100.keymapper.util.getFullMessage
+import io.github.sds100.keymapper.util.result.Error
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -93,29 +94,36 @@ class FingerprintMapListViewModel(
         useCase.resetFingerprintMaps()
     }
 
-
     fun onActionChipClick(chipModel: ChipUi) {
-        if (chipModel is ChipUi.FixableError) {
+        if (chipModel is ChipUi.Error) {
             showSnackBarAndFixError(chipModel.error)
         }
     }
 
     fun onConstraintsChipClick(chipModel: ChipUi) {
-        if (chipModel is ChipUi.FixableError) {
+        if (chipModel is ChipUi.Error) {
             showSnackBarAndFixError(chipModel.error)
         }
     }
 
-    private fun showSnackBarAndFixError(error: FixableError) {
+    private fun showSnackBarAndFixError(error: Error) {
         coroutineScope.launch {
+            val actionText = if (error is FixableError){
+                getString(R.string.snackbar_fix)
+            }else{
+                null
+            }
+
             val snackBar = PopupUi.SnackBar(
                 title = error.getFullMessage(this@FingerprintMapListViewModel),
-                actionText = getString(R.string.snackbar_fix)
+                actionText = actionText
             )
 
             showPopup("fix_error", snackBar) ?: return@launch
 
-            useCase.fixError(error)
+            if (error is FixableError) {
+                useCase.fixError(error)
+            }
         }
     }
 }

@@ -130,7 +130,6 @@
                 android:id="@+id/chipGroupConstraints"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:theme="@style/ActionChipGroup"
                 android:visibility="@{model.constraintChipList.isEmpty ? View.GONE : View.VISIBLE}"
                 app:chipUiModels="@{model.constraintChipList}"
                 app:layout_constraintEnd_toEndOf="parent"

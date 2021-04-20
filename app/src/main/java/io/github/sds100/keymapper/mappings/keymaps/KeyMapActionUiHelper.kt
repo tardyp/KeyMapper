@@ -40,5 +40,6 @@ class KeyMapActionUiHelper(
             yield(getString(R.string.flag_hold_down_until_pressed_again))
         }
 
+
     }.toList()
 }

@@ -22,7 +22,6 @@ import io.github.sds100.keymapper.util.ui.TextBlockActionTypeFragment
 
 class ChooseActionPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
-    //TODO move this to a view model similar to HomeTabs
     val tabFragmentCreators: List<TabFragmentModel> = mutableListOf(
         TabFragmentModel(R.string.action_type_title_application, ChooseAppFragment.SEARCH_STATE_KEY) {
             ChooseAppFragment().apply {

@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.system.accessibility.AccessibilityUtils
+import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
 import splitties.toast.toast
 
@@ -17,7 +17,7 @@ class LaunchKeyMapShortcutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (AccessibilityUtils.isServiceEnabled(this)) {
+        if (ServiceLocator.serviceAdapter(this).isEnabled.value) {
             if (intent.action == MyAccessibilityService.ACTION_TRIGGER_KEYMAP_BY_UID) {
                 Intent(MyAccessibilityService.ACTION_TRIGGER_KEYMAP_BY_UID).apply {
                     setPackage(Constants.PACKAGE_NAME)

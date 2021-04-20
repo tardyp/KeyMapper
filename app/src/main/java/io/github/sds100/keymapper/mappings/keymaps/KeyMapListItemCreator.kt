@@ -98,13 +98,13 @@ class KeyMapListItemCreator(
         val triggerErrorChips = triggerErrors.map {
             when (it) {
                 KeyMapTriggerError.DND_ACCESS_DENIED ->
-                    ChipUi.FixableError(
+                    ChipUi.Error(
                         id = KeyMapTriggerError.DND_ACCESS_DENIED.toString(),
                         text = getString(R.string.trigger_error_dnd_access_denied_short),
                         error = FixableError.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
                     )
 
-                KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED -> ChipUi.FixableError(
+                KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED -> ChipUi.Error(
                     id = KeyMapTriggerError.SCREEN_OFF_ROOT_DENIED.toString(),
                     text = getString(R.string.trigger_error_screen_off_root_permission_denied_short),
                     error = FixableError.PermissionDenied(Permission.ROOT)
