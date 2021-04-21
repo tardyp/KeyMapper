@@ -20,9 +20,12 @@ import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
 import io.github.sds100.keymapper.system.root.RootUtils
 import io.github.sds100.keymapper.util.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -93,7 +96,7 @@ class AndroidInputMethodAdapter(
     init {
         //use job scheduler because there is there is a much shorter delay when the app is in the background
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            JobSchedulerHelper.observeEnabledInputMethods(ctx)
+            JobSchedulerHelper.observeInputMethods(ctx)
         } else {
             val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
                 override fun onChange(selfChange: Boolean, uri: Uri?) {
@@ -166,11 +169,18 @@ class AndroidInputMethodAdapter(
     }
 
     override suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo> {
+        getInfoById(imeId).onSuccess {
+            if (!it.isEnabled) {
+                return Error.ImeDisabled
+            }
+        }.onFailure {
+            return it
+        }
 
         var failed = true
 
         if (failed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && serviceAdapter.isEnabled.value) {
-            runBlocking { serviceAdapter.send(ChangeIme(imeId)) }.onSuccess {
+            serviceAdapter.send(ChangeIme(imeId)).onSuccess {
                 failed = false
             }
         }
@@ -191,7 +201,15 @@ class AndroidInputMethodAdapter(
         }
 
         //wait for the ime to change and then return the info of the ime
-        return Success(chosenIme.first { it.id == imeId })
+        val didImeChange = withTimeoutOrNull(2000) {
+                chosenIme.first { it.id == imeId }
+        }
+
+        if (didImeChange != null) {
+            return Success(didImeChange)
+        } else {
+            return Error.FailedToChangeIme
+        }
     }
 
     override fun getInfoById(imeId: String): Result<ImeInfo> {
@@ -221,6 +239,7 @@ class AndroidInputMethodAdapter(
     fun onInputMethodsUpdate() {
         inputMethods.value = getInputMethods()
         inputMethodHistory.value = getImeHistory().mapNotNull { getInfoById(it).valueOrNull() }
+        chosenIme.value = getChosenIme()
     }
 
     private fun getInputMethods(): List<ImeInfo> {

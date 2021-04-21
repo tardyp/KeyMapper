@@ -1,5 +1,9 @@
 package io.github.sds100.keymapper.system
 
+import io.github.sds100.keymapper.system.shell.ShellAdapter
+import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.Success
 import java.io.IOException
 import java.io.InputStream
 
@@ -7,7 +11,7 @@ import java.io.InputStream
 /**
  * Created by sds100 on 05/11/2018.
  */
-object Shell {
+object Shell : ShellAdapter {
     /**
      * @return whether the command was executed successfully
      */
@@ -39,5 +43,15 @@ object Shell {
     @Throws(IOException::class)
     fun getShellCommandStdErr(vararg command: String): InputStream {
         return Runtime.getRuntime().exec(command).errorStream
+    }
+
+    override fun execute(command: String): Result<*> {
+        try {
+            Runtime.getRuntime().exec(command)
+
+            return Success(Unit)
+        } catch (e: IOException) {
+            return Error.Exception(e)
+        }
     }
 }

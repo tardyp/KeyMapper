@@ -1,11 +1,13 @@
-package io.github.sds100.keymapper.system.audio
+package io.github.sds100.keymapper.system.volume
 
 import io.github.sds100.keymapper.util.Result
 
 /**
  * Created by sds100 on 20/04/2021.
  */
-interface AudioAdapter {
+interface VolumeAdapter {
+    val ringerMode: RingerMode
+
     fun raiseVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
     fun lowerVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
     fun muteVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
@@ -13,4 +15,8 @@ interface AudioAdapter {
     fun toggleMuteVolume(stream: VolumeStream? = null, showVolumeUi: Boolean): Result<*>
     fun showVolumeUi(): Result<*>
     fun setRingerMode(mode: RingerMode): Result<*>
+
+    fun enableDndMode(dndMode: DndMode):Result<*>
+    fun disableDndMode():Result<*>
+    fun toggleDndMode(dndMode: DndMode):Result<*>
 }

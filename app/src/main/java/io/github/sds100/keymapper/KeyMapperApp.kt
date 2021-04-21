@@ -14,7 +14,7 @@ import io.github.sds100.keymapper.system.AndroidSystemFeatureAdapter
 import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.system.apps.AndroidAppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.AndroidPackageManagerAdapter
-import io.github.sds100.keymapper.system.audio.AndroidAudioAdapter
+import io.github.sds100.keymapper.system.volume.AndroidVolumeAdapter
 import io.github.sds100.keymapper.system.camera.AndroidCameraAdapter
 import io.github.sds100.keymapper.system.devices.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
@@ -30,6 +30,7 @@ import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCas
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
+import io.github.sds100.keymapper.system.phone.AndroidPhoneAdapter
 import io.github.sds100.keymapper.system.popup.AndroidToastAdapter
 import io.github.sds100.keymapper.system.root.SuAdapterImpl
 import io.github.sds100.keymapper.system.vibrator.AndroidVibratorAdapter
@@ -86,24 +87,21 @@ class KeyMapperApp : MultiDexApplication() {
             ServiceLocator.preferenceRepository(this)
         )
     }
-
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }
     val serviceAdapter by lazy { AccessibilityServiceAdapter(this, appCoroutineScope) }
     val appShortcutAdapter by lazy { AndroidAppShortcutAdapter(this) }
-
-    val recordTriggerController by lazy {
-        RecordTriggerController(appCoroutineScope, serviceAdapter)
-    }
-
     val fileAdapter by lazy { AndroidFileAdapter(this) }
     val popupMessageAdapter by lazy { AndroidToastAdapter(this) }
     val vibratorAdapter by lazy { AndroidVibratorAdapter(this) }
     val displayAdapter by lazy { AndroidDisplayAdapter(this) }
-    val audioAdapter by lazy { AndroidAudioAdapter(this) }
-
+    val audioAdapter by lazy { AndroidVolumeAdapter(this) }
     val suAdapter by lazy { SuAdapterImpl(ServiceLocator.preferenceRepository(this)) }
-
+    val phoneAdapter by lazy { AndroidPhoneAdapter(this) }
     val intentAdapter by lazy{IntentAdapterImpl(this)}
+
+    val recordTriggerController by lazy {
+        RecordTriggerController(appCoroutineScope, serviceAdapter)
+    }
 
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
 

@@ -13,7 +13,7 @@ class ObserveInputMethodsJob : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         (applicationContext as KeyMapperApp).inputMethodAdapter.onInputMethodsUpdate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            JobSchedulerHelper.observeEnabledInputMethods(applicationContext)
+            JobSchedulerHelper.observeInputMethods(applicationContext)
         }
         return false
     }

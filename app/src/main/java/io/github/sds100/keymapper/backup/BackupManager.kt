@@ -272,7 +272,7 @@ class BackupManagerImpl(
                 throw e
             }
 
-            return Error.GenericError(e)
+            return Error.Exception(e)
         }
     }
 
@@ -328,7 +328,7 @@ class BackupManagerImpl(
         } catch (e: Exception) {
             if (throwExceptions) throw e
 
-            return@async Error.GenericError(e)
+            return@async Error.Exception(e)
         }
     }
 

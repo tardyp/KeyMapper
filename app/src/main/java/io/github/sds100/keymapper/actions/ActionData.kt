@@ -1,8 +1,8 @@
 package io.github.sds100.keymapper.actions
 
-import io.github.sds100.keymapper.system.audio.DndMode
-import io.github.sds100.keymapper.system.audio.RingerMode
-import io.github.sds100.keymapper.system.audio.VolumeStream
+import io.github.sds100.keymapper.system.volume.DndMode
+import io.github.sds100.keymapper.system.volume.RingerMode
+import io.github.sds100.keymapper.system.volume.VolumeStream
 import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.intents.IntentTarget
@@ -137,23 +137,13 @@ data class SwitchKeyboardSystemAction(
 }
 
 @Serializable
-sealed class ChangeDndModeSystemAction : SystemAction() {
-    abstract val dndMode: DndMode
+data class ToggleDndMode(val dndMode: DndMode):SystemAction(){
+    override val id: SystemActionId = SystemActionId.TOGGLE_DND_MODE
+}
 
-    @Serializable
-    data class Toggle(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
-        override val id = SystemActionId.TOGGLE_DND_MODE
-    }
-
-    @Serializable
-    data class Enable(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
-        override val id = SystemActionId.ENABLE_DND_MODE
-    }
-
-    @Serializable
-    data class Disable(override val dndMode: DndMode) : ChangeDndModeSystemAction() {
-        override val id = SystemActionId.DISABLE_DND_MODE
-    }
+@Serializable
+data class EnableDndMode(val dndMode: DndMode):SystemAction(){
+    override val id: SystemActionId = SystemActionId.ENABLE_DND_MODE
 }
 
 @Serializable

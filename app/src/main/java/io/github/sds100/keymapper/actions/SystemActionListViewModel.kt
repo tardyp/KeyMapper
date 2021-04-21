@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.github.sds100.keymapper.R
 import io.github.sds100.keymapper.domain.utils.*
-import io.github.sds100.keymapper.system.audio.*
+import io.github.sds100.keymapper.system.volume.*
 import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.system.camera.CameraLensUtils
 import io.github.sds100.keymapper.system.display.Orientation
@@ -89,9 +89,7 @@ class SystemActionListViewModel(
                             .sortedBy { it.second }
                     }
 
-                    val packageName =
-                        showPopup("choose_package", PopupUi.SingleChoice(items))?.item
-                            ?: return@launch
+                    val packageName = showPopup("choose_package", PopupUi.SingleChoice(items))?.item ?: return@launch
 
                     val action = when (id) {
                         SystemActionId.PAUSE_MEDIA_PACKAGE ->
@@ -157,11 +155,9 @@ class SystemActionListViewModel(
                             ?: return@launch
 
                     val action = when (id) {
-                        SystemActionId.TOGGLE_DND_MODE ->
-                            ChangeDndModeSystemAction.Toggle(dndMode)
+                        SystemActionId.TOGGLE_DND_MODE ->ToggleDndMode(dndMode)
 
-                        SystemActionId.ENABLE_DND_MODE ->
-                            ChangeDndModeSystemAction.Enable(dndMode)
+                        SystemActionId.ENABLE_DND_MODE ->EnableDndMode(dndMode)
 
                         else -> throw Exception("don't know how to create system action for $id")
                     }

@@ -68,8 +68,13 @@ class AccessibilityServiceAdapter(
 
         val key = "ping_service"
 
-        val pong: Pong? = withTimeoutOrNull(500L) {
+        //wait to start collecting
+        coroutineScope.launch {
+            delay(100)
             serviceOutputEvents.emit(Ping(key))
+        }
+
+        val pong: Pong? = withTimeoutOrNull(2000L) {
             eventReceiver.first { it == Pong(key) } as Pong?
         }
 
@@ -95,11 +100,17 @@ class AccessibilityServiceAdapter(
             is running.
              */
             coroutineScope.launch {
+                delay(200)
+
                 val key = "ping_accessibility_service"
 
-
-                val pong: Pong? = withTimeoutOrNull(500L) {
+                //wait to start collecting
+                coroutineScope.launch {
+                    delay(100)
                     serviceOutputEvents.emit(Ping(key))
+                }
+
+                val pong: Pong? = withTimeoutOrNull(2000L) {
                     eventReceiver.first { it == Pong(key) } as Pong?
                 }
 

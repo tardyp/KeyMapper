@@ -44,10 +44,15 @@ object JobSchedulerHelper {
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun observeEnabledInputMethods(ctx: Context) {
+    fun observeInputMethods(ctx: Context) {
 
         val enabledContentUri = JobInfo.TriggerContentUri(
             Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS),
+            JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS
+        )
+
+        val defaultImeContentUri = JobInfo.TriggerContentUri(
+            Settings.Secure.getUriFor(Settings.Secure.DEFAULT_INPUT_METHOD),
             JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS
         )
 
@@ -61,6 +66,7 @@ object JobSchedulerHelper {
             ComponentName(ctx, ObserveInputMethodsJob::class.java)
         )
             .addTriggerContentUri(enabledContentUri)
+            .addTriggerContentUri(defaultImeContentUri)
             .addTriggerContentUri(historyContentUri)
             .setTriggerContentUpdateDelay(500)
 

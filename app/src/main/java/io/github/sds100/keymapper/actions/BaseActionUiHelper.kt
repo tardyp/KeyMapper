@@ -7,9 +7,9 @@ import io.github.sds100.keymapper.mappings.DisplayActionUseCase
 import io.github.sds100.keymapper.mappings.Mapping
 import io.github.sds100.keymapper.system.camera.CameraLensUtils
 import io.github.sds100.keymapper.system.display.OrientationUtils
-import io.github.sds100.keymapper.system.audio.DndModeUtils
-import io.github.sds100.keymapper.system.audio.RingerModeUtils
-import io.github.sds100.keymapper.system.audio.VolumeStreamUtils
+import io.github.sds100.keymapper.system.volume.DndModeUtils
+import io.github.sds100.keymapper.system.volume.RingerModeUtils
+import io.github.sds100.keymapper.system.volume.VolumeStreamUtils
 import io.github.sds100.keymapper.util.ui.IconInfo
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
@@ -79,23 +79,20 @@ abstract class BaseActionUiHelper<MAPPING: Mapping<A>,A: Action>(
 
         is SimpleSystemAction -> getString(SystemActionUtils.getTitle(action.id))
 
-        is ChangeDndModeSystemAction -> {
+        is EnableDndMode ->{
             val dndModeString = getString(DndModeUtils.getLabel(action.dndMode))
+            getString(
+                R.string.action_enable_dnd_mode_formatted,
+                dndModeString
+            )
+        }
 
-            when (action) {
-                is ChangeDndModeSystemAction.Toggle -> getString(
-                    R.string.action_toggle_dnd_mode_formatted,
-                    dndModeString
-                )
-                is ChangeDndModeSystemAction.Disable -> getString(
-                    R.string.action_enable_dnd_mode_formatted,
-                    dndModeString
-                )
-                is ChangeDndModeSystemAction.Enable -> getString(
-                    R.string.action_enable_dnd_mode_formatted,
-                    dndModeString
-                )
-            }
+        is ToggleDndMode ->{
+            val dndModeString = getString(DndModeUtils.getLabel(action.dndMode))
+            getString(
+                R.string.action_toggle_dnd_mode_formatted,
+                dndModeString
+            )
         }
 
         is ChangeRingerModeSystemAction -> {

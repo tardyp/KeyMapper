@@ -58,8 +58,8 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
 
     override val rootNode: AccessibilityNodeModel
         get() = AccessibilityNodeModel(
-            packageName = rootInActiveWindow.packageName?.toString(),
-            contentDescription = rootInActiveWindow.contentDescription?.toString()
+            packageName = rootInActiveWindow?.packageName?.toString(),
+            contentDescription = rootInActiveWindow?.contentDescription?.toString()
         )
 
     override val isGestureDetectionAvailable: Boolean
@@ -70,7 +70,6 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
 
     override val onKeyboardHiddenChange = MutableSharedFlow<Boolean>()
-
 
     private lateinit var controller: AccessibilityServiceController
 

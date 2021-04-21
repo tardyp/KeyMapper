@@ -706,6 +706,7 @@
     <string name="error_need_write_secure_settings_permission">Key Mapper needs WRITE_SECURE_SETTINGS permission.</string>
     <string name="error_no_app_found_to_open_url">No app can be found to open that URL</string>
     <string name="error_failed_execute_getevent">Failed to execute "getevent" command. Are you sure you\'re rooted?</string>
+    <string name="error_no_app_to_phone_call">There is no app that can start this phone call</string>
 
     <string name="error_camera_in_use">Camera is in use!</string>
     <string name="error_camera_disconnected">Camera disconnected!</string>
@@ -727,7 +728,7 @@
     <string name="fixed_need_write_secure_settings_permission">WRITE_SECURE_SETTINGS permission granted.</string>
 
     <string name="error_ime_service_disabled_status_layout">Your selected input method needs to be enabled for “Key event”, “Key”, “Text” and some other actions to work.</string>
-    <string name="error_ime_service_disabled">None of the Key Mapper keyboards are enabled!</string>
+    <string name="error_key_mapper_ime_service_disabled">None of the Key Mapper keyboards are enabled!</string>
     <string name="error_ime_service_enabled">A Key Mapper keyboard is enabled!</string>
     <string name="error_critical_ime_service_disabled">A Key Mapper keyboard must be enabled and selected for some of your actions to work!</string>
     <string name="error_ime_not_found">Can\'t find the %s input method</string>
@@ -774,17 +775,16 @@
     <string name="error_no_media_sessions">There are no apps playing media!</string>
     <string name="error_unknown_file_location">Unknown file location!</string>
     <string name="error_failed_to_dispatch_gesture">Failed to input gesture!</string>
+    <string name="error_failed_to_modify_system_setting">Failed to modify system setting %s!</string>
+    <string name="error_ime_disabled">You need to enable the keyboard!</string>
+    <string name="error_failed_to_change_ime">Failed to change ime!</string>
 
     <!-- Error messages -->
 
     <!-- System action labels -->
-    <string name="action_toggle_wifi">Toggle WiFi (non-root)</string>
-    <string name="action_enable_wifi">Enable WiFi (non-root)</string>
-    <string name="action_disable_wifi">Disable WiFi (non-root)</string>
-
-    <string name="action_toggle_wifi_root">Toggle WiFi (root)</string>
-    <string name="action_enable_wifi_root">Enable WiFi (root)</string>
-    <string name="action_disable_wifi_root">Disable WiFi (root)</string>
+    <string name="action_toggle_wifi">Toggle WiFi</string>
+    <string name="action_enable_wifi">Enable WiFi</string>
+    <string name="action_disable_wifi">Disable WiFi</string>
 
     <string name="action_toggle_bluetooth">Toggle Bluetooth</string>
     <string name="action_enable_bluetooth">Enable Bluetooth</string>
@@ -885,13 +885,11 @@
     <string name="action_nfc_toggle">Toggle NFC</string>
 
     <string name="action_screenshot">Screenshot</string>
-    <string name="action_screenshot_root">Screenshot (root)</string>
     <string name="action_open_assistant">Launch voice assistant</string>
     <string name="action_open_device_assistant">Launch device assistant</string>
     <string name="action_open_camera">Open camera</string>
 
-    <string name="action_lock_device">Lock device (non-root)</string>
-    <string name="action_lock_device_root">Lock device (root)</string>
+    <string name="action_lock_device">Lock device</string>
 
     <string name="action_secure_lock_device">Secure lock device</string>
     <string name="action_secure_lock_device_message">You will only be able to log back in with your PIN. The fingerprint scanner and face unlock will be disabled. This is the only reliable way I have found to lock non-rooted devices before Android Pie 9.0.</string>

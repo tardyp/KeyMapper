@@ -1,8 +1,10 @@
-package io.github.sds100.keymapper.system.audio
+package io.github.sds100.keymapper.system.volume
 
+import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.util.Error
@@ -13,10 +15,19 @@ import io.github.sds100.keymapper.util.then
 /**
  * Created by sds100 on 20/04/2021.
  */
-class AndroidAudioAdapter(context: Context) : AudioAdapter {
+class AndroidVolumeAdapter(context: Context) : VolumeAdapter {
     private val ctx = context.applicationContext
 
     private val audioManager: AudioManager by lazy { ctx.getSystemService()!! }
+    private val notificationManager: NotificationManager by lazy { ctx.getSystemService()!! }
+
+    override val ringerMode: RingerMode
+        get() = when (audioManager.ringerMode) {
+            AudioManager.RINGER_MODE_NORMAL -> RingerMode.NORMAL
+            AudioManager.RINGER_MODE_VIBRATE -> RingerMode.VIBRATE
+            AudioManager.RINGER_MODE_SILENT -> RingerMode.SILENT
+            else -> throw Exception("Don't know how to convert this ringer moder ${audioManager.ringerMode}")
+        }
 
     override fun raiseVolume(stream: VolumeStream?, showVolumeUi: Boolean): Result<*> {
         return stream.convert().then { streamType ->
@@ -77,6 +88,48 @@ class AndroidAudioAdapter(context: Context) : AudioAdapter {
             return Success(Unit)
         } catch (e: SecurityException) {
             return Error.PermissionDenied(Permission.ACCESS_NOTIFICATION_POLICY)
+        }
+    }
+
+    override fun enableDndMode(dndMode: DndMode): Result<*> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationManager.setInterruptionFilter(dndMode.convert())
+            return Success(Unit)
+        }
+
+        return Error.SdkVersionTooLow(Build.VERSION_CODES.M)
+    }
+
+    override fun disableDndMode(): Result<*> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+            return Success(Unit)
+        }
+
+        return Error.SdkVersionTooLow(Build.VERSION_CODES.M)
+    }
+
+    override fun toggleDndMode(dndMode: DndMode): Result<*> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (notificationManager.currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL) {
+                disableDndMode()
+            } else {
+                enableDndMode(dndMode)
+            }
+
+            return Success(Unit)
+        }
+
+        return Error.SdkVersionTooLow(Build.VERSION_CODES.M)
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun DndMode.convert(): Int {
+        return when (this) {
+            DndMode.ALARMS -> NotificationManager.INTERRUPTION_FILTER_ALARMS
+            DndMode.PRIORITY -> NotificationManager.INTERRUPTION_FILTER_PRIORITY
+            DndMode.NONE -> NotificationManager.INTERRUPTION_FILTER_NONE
         }
     }
 

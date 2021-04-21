@@ -3,9 +3,9 @@ package io.github.sds100.keymapper.actions
 import io.github.sds100.keymapper.data.entities.ActionEntity
 import io.github.sds100.keymapper.data.entities.Extra
 import io.github.sds100.keymapper.data.entities.getData
-import io.github.sds100.keymapper.system.audio.DndMode
-import io.github.sds100.keymapper.system.audio.RingerMode
-import io.github.sds100.keymapper.system.audio.VolumeStream
+import io.github.sds100.keymapper.system.volume.DndMode
+import io.github.sds100.keymapper.system.volume.RingerMode
+import io.github.sds100.keymapper.system.volume.VolumeStream
 import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.intents.IntentTarget
@@ -156,34 +156,34 @@ object ActionDataEntityMapper {
                                 FlashlightSystemAction.Toggle(lens)
 
                             SystemActionId.ENABLE_FLASHLIGHT ->
-                                FlashlightSystemAction.Toggle(lens)
+                                FlashlightSystemAction.Enable(lens)
 
                             SystemActionId.DISABLE_FLASHLIGHT ->
-                                FlashlightSystemAction.Toggle(lens)
+                                FlashlightSystemAction.Disable(lens)
 
                             else -> throw Exception("don't know how to create system action for $id")
                         }
                     }
 
                     SystemActionId.TOGGLE_DND_MODE,
-                    SystemActionId.ENABLE_DND_MODE,
-                    SystemActionId.DISABLE_DND_MODE -> {
+                    SystemActionId.ENABLE_DND_MODE -> {
                         val dndMode = entity.extras.getData(ActionEntity.EXTRA_DND_MODE).then {
                             DND_MODE_MAP.getKey(it)!!.success()
                         }.valueOrNull() ?: return null
 
                         when (id) {
                             SystemActionId.TOGGLE_DND_MODE ->
-                                ChangeDndModeSystemAction.Toggle(dndMode)
+                                ToggleDndMode(dndMode)
 
                             SystemActionId.ENABLE_DND_MODE ->
-                                ChangeDndModeSystemAction.Enable(dndMode)
-
-                            SystemActionId.DISABLE_DND_MODE ->
-                                ChangeDndModeSystemAction.Disable(dndMode)
+                                EnableDndMode(dndMode)
 
                             else -> throw Exception("don't know how to create system action for $id")
                         }
+                    }
+
+                    SystemActionId.DISABLE_DND_MODE ->{
+                        return SimpleSystemAction(SystemActionId.DISABLE_DND_MODE)
                     }
 
                     SystemActionId.PAUSE_MEDIA_PACKAGE,
@@ -339,7 +339,11 @@ object ActionDataEntityMapper {
 
         is PhoneCallAction -> emptyList()
 
-        is ChangeDndModeSystemAction -> listOf(
+        is EnableDndMode -> listOf(
+            Extra(ActionEntity.EXTRA_DND_MODE, DND_MODE_MAP[data.dndMode]!!)
+        )
+
+        is ToggleDndMode -> listOf(
             Extra(ActionEntity.EXTRA_DND_MODE, DND_MODE_MAP[data.dndMode]!!)
         )
 
@@ -435,10 +439,6 @@ object ActionDataEntityMapper {
         SystemActionId.ENABLE_WIFI to "enable_wifi",
         SystemActionId.DISABLE_WIFI to "disable_wifi",
 
-        SystemActionId.TOGGLE_WIFI_ROOT to "toggle_wifi_root",
-        SystemActionId.ENABLE_WIFI_ROOT to "enable_wifi_root",
-        SystemActionId.DISABLE_WIFI_ROOT to "disable_wifi_root",
-
         SystemActionId.TOGGLE_BLUETOOTH to "toggle_bluetooth",
         SystemActionId.ENABLE_BLUETOOTH to "enable_bluetooth",
         SystemActionId.DISABLE_BLUETOOTH to "disable_bluetooth",
@@ -479,7 +479,7 @@ object ActionDataEntityMapper {
         SystemActionId.EXPAND_NOTIFICATION_DRAWER to "expand_notification_drawer",
         SystemActionId.TOGGLE_NOTIFICATION_DRAWER to "toggle_notification_drawer",
         SystemActionId.EXPAND_QUICK_SETTINGS to "expand_quick_settings",
-        SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER to "toggle_quick_settings_drawer",
+        SystemActionId.TOGGLE_QUICK_SETTINGS to "toggle_quick_settings_drawer",
         SystemActionId.COLLAPSE_STATUS_BAR to "collapse_status_bar",
 
         SystemActionId.PAUSE_MEDIA to "pause_media",
@@ -530,12 +530,10 @@ object ActionDataEntityMapper {
         SystemActionId.DISABLE_AIRPLANE_MODE to "disable_airplane_mode",
 
         SystemActionId.SCREENSHOT to "screenshot",
-        SystemActionId.SCREENSHOT_ROOT to "screenshot_root",
         SystemActionId.OPEN_VOICE_ASSISTANT to "open_assistant",
         SystemActionId.OPEN_DEVICE_ASSISTANT to "open_device_assistant",
         SystemActionId.OPEN_CAMERA to "open_camera",
-        SystemActionId.LOCK_DEVICE to "lock_device_no_root",
-        SystemActionId.LOCK_DEVICE_ROOT to "lock_device",
+        SystemActionId.LOCK_DEVICE to "lock_device",
         SystemActionId.POWER_ON_OFF_DEVICE to "power_on_off_device",
         SystemActionId.SECURE_LOCK_DEVICE to "secure_lock_device",
         SystemActionId.CONSUME_KEY_EVENT to "consume_key_event",

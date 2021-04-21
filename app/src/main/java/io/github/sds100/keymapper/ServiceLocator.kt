@@ -24,13 +24,13 @@ import io.github.sds100.keymapper.system.files.FileRepository
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
-import io.github.sds100.keymapper.system.audio.AudioAdapter
+import io.github.sds100.keymapper.system.volume.VolumeAdapter
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.display.DisplayAdapter
 import io.github.sds100.keymapper.system.intents.IntentAdapter
-import io.github.sds100.keymapper.system.intents.IntentAdapterImpl
+import io.github.sds100.keymapper.system.phone.PhoneAdapter
 import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
 import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.system.vibrator.VibratorAdapter
@@ -218,7 +218,7 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).displayAdapter
     }
 
-    fun audioAdapter(context: Context): AudioAdapter {
+    fun audioAdapter(context: Context): VolumeAdapter {
         return (context.applicationContext as KeyMapperApp).audioAdapter
     }
 
@@ -228,6 +228,10 @@ object ServiceLocator {
 
     fun intentAdapter(context: Context): IntentAdapter {
         return (context.applicationContext as KeyMapperApp).intentAdapter
+    }
+
+    fun phoneAdapter(context: Context): PhoneAdapter {
+        return (context.applicationContext as KeyMapperApp).phoneAdapter
     }
 
     private fun createDatabase(context: Context): AppDatabase {

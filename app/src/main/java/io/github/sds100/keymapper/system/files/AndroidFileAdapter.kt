@@ -2,9 +2,11 @@ package io.github.sds100.keymapper.system.files
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.Result
 import io.github.sds100.keymapper.util.Success
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -24,7 +26,7 @@ class AndroidFileAdapter(context: Context) : FileAdapter {
         } catch (e: Exception) {
             when (e) {
                 is SecurityException -> Error.FileAccessDenied
-                else -> Error.GenericError(e)
+                else -> Error.Exception(e)
             }
         }
     }
@@ -39,8 +41,12 @@ class AndroidFileAdapter(context: Context) : FileAdapter {
         } catch (e: Exception) {
             when (e) {
                 is SecurityException -> Error.FileAccessDenied
-                else -> Error.GenericError(e)
+                else -> Error.Exception(e)
             }
         }
+    }
+
+    override fun getPicturesFolder(): File {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
     }
 }

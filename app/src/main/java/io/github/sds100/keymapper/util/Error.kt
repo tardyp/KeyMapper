@@ -19,7 +19,7 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
         packageName
     )
     is Error.AppDisabled -> resourceProvider.getString(R.string.error_app_is_disabled)
-    is Error.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_ime_service_disabled)
+    is Error.NoCompatibleImeEnabled -> resourceProvider.getString(R.string.error_key_mapper_ime_service_disabled)
     is Error.NoCompatibleImeChosen -> resourceProvider.getString(R.string.error_ime_must_be_chosen)
     is Error.SystemFeatureNotSupported -> resourceProvider.getString(
         R.string.error_feature_not_available,
@@ -43,12 +43,11 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     is Error.NoEnabledInputMethods -> resourceProvider.getString(R.string.error_no_enabled_imes)
     is Error.FrontFlashNotFound -> resourceProvider.getString(R.string.error_front_flash_not_found)
     is Error.BackFlashNotFound -> resourceProvider.getString(R.string.error_back_flash_not_found)
-    is Error.ImeNotFound -> resourceProvider.getString(R.string.error_ime_not_found, id)
     is Error.DownloadFailed -> resourceProvider.getString(R.string.error_download_failed)
     is Error.FileNotCached -> resourceProvider.getString(R.string.error_file_not_cached)
     is Error.SSLHandshakeError -> resourceProvider.getString(R.string.error_ssl_handshake_exception)
     is Error.DeviceNotFound -> resourceProvider.getString(R.string.error_device_not_found)
-    is Error.GenericError -> exception.toString()
+    is Error.Exception -> exception.toString()
     is Error.EmptyJson -> resourceProvider.getString(R.string.error_empty_json)
     is Error.FileAccessDenied -> resourceProvider.getString(R.string.error_file_access_denied)
     is Error.FailedToSplitString -> resourceProvider.getString(
@@ -81,6 +80,19 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     Error.FailedToDispatchGesture -> resourceProvider.getString(R.string.error_failed_to_dispatch_gesture)
     Error.AppShortcutCantBeOpened -> resourceProvider.getString(R.string.error_opening_app_shortcut)
     Error.InsufficientPermissionsToOpenAppShortcut -> resourceProvider.getString(R.string.error_keymapper_doesnt_have_permission_app_shortcut)
+    Error.NoAppToPhoneCall -> resourceProvider.getString(R.string.error_no_app_to_phone_call)
+
+    Error.CameraInUse -> resourceProvider.getString(R.string.error_camera_in_use)
+    Error.CameraError -> resourceProvider.getString(R.string.error_camera_error)
+    Error.CameraDisabled -> resourceProvider.getString(R.string.error_camera_disabled)
+    Error.CameraDisconnected -> resourceProvider.getString(R.string.error_camera_disconnected)
+    Error.MaxCamerasInUse -> resourceProvider.getString(R.string.error_max_cameras_in_use)
+    is Error.FailedToModifySystemSetting -> resourceProvider.getString(
+        R.string.error_failed_to_modify_system_setting,
+        setting
+    )
+    Error.ImeDisabled -> resourceProvider.getString(R.string.error_ime_disabled)
+    Error.FailedToChangeIme -> resourceProvider.getString(R.string.error_failed_to_change_ime)
 }
 
 val Error.isFixable: Boolean

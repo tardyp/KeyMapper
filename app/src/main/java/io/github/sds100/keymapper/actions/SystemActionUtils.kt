@@ -38,9 +38,6 @@ object SystemActionUtils {
             SystemActionId.TOGGLE_WIFI -> SystemActionCategory.WIFI
             SystemActionId.ENABLE_WIFI -> SystemActionCategory.WIFI
             SystemActionId.DISABLE_WIFI -> SystemActionCategory.WIFI
-            SystemActionId.TOGGLE_WIFI_ROOT -> SystemActionCategory.WIFI
-            SystemActionId.ENABLE_WIFI_ROOT -> SystemActionCategory.WIFI
-            SystemActionId.DISABLE_WIFI_ROOT -> SystemActionCategory.WIFI
 
             SystemActionId.TOGGLE_BLUETOOTH -> SystemActionCategory.BLUETOOTH
             SystemActionId.ENABLE_BLUETOOTH -> SystemActionCategory.BLUETOOTH
@@ -82,7 +79,7 @@ object SystemActionUtils {
             SystemActionId.EXPAND_NOTIFICATION_DRAWER -> SystemActionCategory.STATUS_BAR
             SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> SystemActionCategory.STATUS_BAR
             SystemActionId.EXPAND_QUICK_SETTINGS -> SystemActionCategory.STATUS_BAR
-            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER -> SystemActionCategory.STATUS_BAR
+            SystemActionId.TOGGLE_QUICK_SETTINGS -> SystemActionCategory.STATUS_BAR
             SystemActionId.COLLAPSE_STATUS_BAR -> SystemActionCategory.STATUS_BAR
 
             SystemActionId.PAUSE_MEDIA -> SystemActionCategory.MEDIA
@@ -132,12 +129,10 @@ object SystemActionUtils {
             SystemActionId.DISABLE_AIRPLANE_MODE -> SystemActionCategory.AIRPLANE_MODE
 
             SystemActionId.SCREENSHOT -> SystemActionCategory.OTHER
-            SystemActionId.SCREENSHOT_ROOT -> SystemActionCategory.OTHER
             SystemActionId.OPEN_VOICE_ASSISTANT -> SystemActionCategory.OTHER
             SystemActionId.OPEN_DEVICE_ASSISTANT -> SystemActionCategory.OTHER
             SystemActionId.OPEN_CAMERA -> SystemActionCategory.OTHER
             SystemActionId.LOCK_DEVICE -> SystemActionCategory.OTHER
-            SystemActionId.LOCK_DEVICE_ROOT -> SystemActionCategory.OTHER
             SystemActionId.POWER_ON_OFF_DEVICE -> SystemActionCategory.OTHER
             SystemActionId.SECURE_LOCK_DEVICE -> SystemActionCategory.OTHER
             SystemActionId.CONSUME_KEY_EVENT -> SystemActionCategory.OTHER
@@ -151,9 +146,6 @@ object SystemActionUtils {
             SystemActionId.TOGGLE_WIFI -> R.string.action_toggle_wifi
             SystemActionId.ENABLE_WIFI -> R.string.action_enable_wifi
             SystemActionId.DISABLE_WIFI -> R.string.action_disable_wifi
-            SystemActionId.TOGGLE_WIFI_ROOT -> R.string.action_toggle_wifi_root
-            SystemActionId.ENABLE_WIFI_ROOT -> R.string.action_enable_wifi_root
-            SystemActionId.DISABLE_WIFI_ROOT -> R.string.action_disable_wifi_root
             SystemActionId.TOGGLE_BLUETOOTH -> R.string.action_toggle_bluetooth
             SystemActionId.ENABLE_BLUETOOTH -> R.string.action_enable_bluetooth
             SystemActionId.DISABLE_BLUETOOTH -> R.string.action_disable_bluetooth
@@ -189,7 +181,7 @@ object SystemActionUtils {
             SystemActionId.EXPAND_NOTIFICATION_DRAWER -> R.string.action_expand_notification_drawer
             SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> R.string.action_toggle_notification_drawer
             SystemActionId.EXPAND_QUICK_SETTINGS -> R.string.action_expand_quick_settings
-            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER -> R.string.action_toggle_quick_settings
+            SystemActionId.TOGGLE_QUICK_SETTINGS -> R.string.action_toggle_quick_settings
             SystemActionId.COLLAPSE_STATUS_BAR -> R.string.action_collapse_status_bar
             SystemActionId.PAUSE_MEDIA -> R.string.action_pause_media
             SystemActionId.PAUSE_MEDIA_PACKAGE -> R.string.action_pause_media_package
@@ -232,12 +224,10 @@ object SystemActionUtils {
             SystemActionId.ENABLE_AIRPLANE_MODE -> R.string.action_enable_airplane_mode
             SystemActionId.DISABLE_AIRPLANE_MODE -> R.string.action_disable_airplane_mode
             SystemActionId.SCREENSHOT -> R.string.action_screenshot
-            SystemActionId.SCREENSHOT_ROOT -> R.string.action_screenshot_root
             SystemActionId.OPEN_VOICE_ASSISTANT -> R.string.action_open_assistant
             SystemActionId.OPEN_DEVICE_ASSISTANT -> R.string.action_open_device_assistant
             SystemActionId.OPEN_CAMERA -> R.string.action_open_camera
             SystemActionId.LOCK_DEVICE -> R.string.action_lock_device
-            SystemActionId.LOCK_DEVICE_ROOT -> R.string.action_lock_device_root
             SystemActionId.POWER_ON_OFF_DEVICE -> R.string.action_power_on_off_device
             SystemActionId.SECURE_LOCK_DEVICE -> R.string.action_secure_lock_device
             SystemActionId.CONSUME_KEY_EVENT -> R.string.action_consume_keyevent
@@ -251,9 +241,6 @@ object SystemActionUtils {
             SystemActionId.TOGGLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.ENABLE_WIFI -> R.drawable.ic_outline_wifi_24
             SystemActionId.DISABLE_WIFI -> R.drawable.ic_outline_wifi_off_24
-            SystemActionId.TOGGLE_WIFI_ROOT -> R.drawable.ic_outline_wifi_24
-            SystemActionId.ENABLE_WIFI_ROOT -> R.drawable.ic_outline_wifi_24
-            SystemActionId.DISABLE_WIFI_ROOT -> R.drawable.ic_outline_wifi_off_24
             SystemActionId.TOGGLE_BLUETOOTH -> R.drawable.ic_outline_bluetooth_24
             SystemActionId.ENABLE_BLUETOOTH -> R.drawable.ic_outline_bluetooth_24
             SystemActionId.DISABLE_BLUETOOTH -> R.drawable.ic_outline_bluetooth_disabled_24
@@ -289,7 +276,7 @@ object SystemActionUtils {
             SystemActionId.EXPAND_NOTIFICATION_DRAWER -> null
             SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> null
             SystemActionId.EXPAND_QUICK_SETTINGS -> null
-            SystemActionId.TOGGLE_QUICK_SETTINGS_DRAWER -> null
+            SystemActionId.TOGGLE_QUICK_SETTINGS -> null
             SystemActionId.COLLAPSE_STATUS_BAR -> null
             SystemActionId.PAUSE_MEDIA -> R.drawable.ic_outline_pause_24
             SystemActionId.PAUSE_MEDIA_PACKAGE -> R.drawable.ic_outline_pause_24
@@ -332,12 +319,10 @@ object SystemActionUtils {
             SystemActionId.ENABLE_AIRPLANE_MODE -> R.drawable.ic_outline_airplanemode_active_24
             SystemActionId.DISABLE_AIRPLANE_MODE -> R.drawable.ic_outline_airplanemode_inactive_24
             SystemActionId.SCREENSHOT -> R.drawable.ic_outline_fullscreen_24
-            SystemActionId.SCREENSHOT_ROOT -> R.drawable.ic_outline_fullscreen_24
             SystemActionId.OPEN_VOICE_ASSISTANT -> R.drawable.ic_outline_assistant_24
             SystemActionId.OPEN_DEVICE_ASSISTANT -> R.drawable.ic_outline_assistant_24
             SystemActionId.OPEN_CAMERA -> R.drawable.ic_outline_camera_alt_24
             SystemActionId.LOCK_DEVICE -> R.drawable.ic_outline_lock_24
-            SystemActionId.LOCK_DEVICE_ROOT -> R.drawable.ic_outline_lock_24
             SystemActionId.POWER_ON_OFF_DEVICE -> R.drawable.ic_outline_power_settings_new_24
             SystemActionId.SECURE_LOCK_DEVICE -> R.drawable.ic_outline_lock_24
             SystemActionId.CONSUME_KEY_EVENT -> null
@@ -349,24 +334,6 @@ object SystemActionUtils {
         return when (id) {
             SystemActionId.TOGGLE_SPLIT_SCREEN -> Build.VERSION_CODES.N
             SystemActionId.GO_LAST_APP -> Build.VERSION_CODES.N
-
-            SystemActionId.PLAY_PAUSE_MEDIA,
-            SystemActionId.PAUSE_MEDIA,
-            SystemActionId.PLAY_MEDIA,
-            SystemActionId.NEXT_TRACK,
-            SystemActionId.PREVIOUS_TRACK,
-            SystemActionId.FAST_FORWARD,
-            SystemActionId.REWIND,
-            -> Build.VERSION_CODES.KITKAT
-
-            SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE,
-            SystemActionId.PAUSE_MEDIA_PACKAGE,
-            SystemActionId.PLAY_MEDIA_PACKAGE,
-            SystemActionId.NEXT_TRACK_PACKAGE,
-            SystemActionId.PREVIOUS_TRACK_PACKAGE,
-            SystemActionId.FAST_FORWARD_PACKAGE,
-            SystemActionId.REWIND_PACKAGE,
-            -> Build.VERSION_CODES.LOLLIPOP
 
             SystemActionId.VOLUME_MUTE,
             SystemActionId.VOLUME_UNMUTE,
@@ -511,6 +478,7 @@ object SystemActionUtils {
             SystemActionId.SCREENSHOT -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 return listOf(Permission.ROOT)
             }
+
             SystemActionId.LOCK_DEVICE -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 return listOf(Permission.ROOT)
             }

@@ -18,7 +18,7 @@ data class Success<T>(val value: T) : Result<T>()
 
 sealed class Error : Result<Nothing>() {
     object FileAccessDenied : Error()
-    data class GenericError(val exception: Exception) : Error()
+    data class Exception(val exception: java.lang.Exception) : Error()
     object EmptyJson : Error()
     data class SystemFeatureNotSupported(val feature: String) : Error()
     data class ExtraNotFound(val extraId: String) : Error()
@@ -31,7 +31,7 @@ sealed class Error : Result<Nothing>() {
     object NoVoiceAssistant : Error()
     object FrontFlashNotFound : Error()
     object BackFlashNotFound : Error()
-    data class ImeNotFound(val id: String) : Error()
+   object ImeDisabled : Error()
     object DownloadFailed : Error()
     object FileNotCached : Error()
     object SSLHandshakeError : Error()
@@ -63,6 +63,8 @@ sealed class Error : Result<Nothing>() {
     object CantShowImePickerInBackground : Error()
     object CantFindImeSettings : Error()
 
+    object NoAppToPhoneCall: Error()
+
     data class PermissionDenied(val permission: Permission) : Error() {
         companion object {
 
@@ -91,6 +93,15 @@ sealed class Error : Result<Nothing>() {
     object FailedToFindAccessibilityNode : Error()
     data class FailedToPerformAccessibilityGlobalAction(val action: Int) : Error()
     object FailedToDispatchGesture : Error()
+
+    object CameraInUse: Error()
+    object CameraDisconnected: Error()
+    object CameraDisabled: Error()
+    object MaxCamerasInUse: Error()
+    object CameraError: Error()
+
+    data class FailedToModifySystemSetting(val setting: String):Error()
+    object FailedToChangeIme:Error()
 }
 
 inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {

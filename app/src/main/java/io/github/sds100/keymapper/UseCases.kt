@@ -17,6 +17,7 @@ import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCaseImpl
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCase
 import io.github.sds100.keymapper.mappings.keymaps.DisplayKeyMapUseCaseImpl
 import io.github.sds100.keymapper.onboarding.OnboardingUseCaseImpl
+import io.github.sds100.keymapper.system.Shell
 import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCase
 import io.github.sds100.keymapper.system.accessibility.ControlAccessibilityServiceUseCaseImpl
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
@@ -116,9 +117,12 @@ object UseCases {
 
     fun performActions(ctx: Context, service: IAccessibilityService) =
         PerformActionsUseCaseImpl(
+            (ctx.applicationContext as KeyMapperApp).appCoroutineScope,
             service,
             ServiceLocator.inputMethodAdapter(ctx),
+            ServiceLocator.fileAdapter(ctx),
             ServiceLocator.suAdapter(ctx),
+            Shell,
             ServiceLocator.intentAdapter(ctx),
             getActionError(ctx),
             keyMapperImeMessenger(ctx),
@@ -126,6 +130,10 @@ object UseCases {
             ServiceLocator.appShortcutAdapter(ctx),
             ServiceLocator.popupMessageAdapter(ctx),
             ServiceLocator.externalDevicesAdapter(ctx),
+            ServiceLocator.phoneAdapter(ctx),
+            ServiceLocator.audioAdapter(ctx),
+            ServiceLocator.cameraAdapter(ctx),
+            ServiceLocator.displayAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
 

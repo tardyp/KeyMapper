@@ -1,4 +1,4 @@
-package io.github.sds100.keymapper.system.audio
+package io.github.sds100.keymapper.system.volume
 
 import io.github.sds100.keymapper.R
 

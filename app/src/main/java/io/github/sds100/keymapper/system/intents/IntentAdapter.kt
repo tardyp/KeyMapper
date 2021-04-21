@@ -30,7 +30,7 @@ class IntentAdapterImpl(context: Context) : IntentAdapter {
             }
             return Success(Unit)
         } catch (e: Exception) {
-            return Error.GenericError(e)
+            return Error.Exception(e)
         }
     }
 }

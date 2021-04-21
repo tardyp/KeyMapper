@@ -8,14 +8,13 @@ import io.github.sds100.keymapper.data.PreferenceDefaults
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.mappings.DetectMappingUseCase
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
-import io.github.sds100.keymapper.system.audio.AudioAdapter
+import io.github.sds100.keymapper.system.volume.VolumeAdapter
 import io.github.sds100.keymapper.system.display.DisplayAdapter
 import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeMessenger
 import io.github.sds100.keymapper.system.keyevents.InputKeyModel
 import io.github.sds100.keymapper.system.navigation.OpenMenuHelper
 import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.InputEventType
-import io.github.sds100.keymapper.util.Result
 import io.github.sds100.keymapper.util.State
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -30,7 +29,7 @@ class DetectKeyMapsUseCaseImpl(
     private val preferenceRepository: PreferenceRepository,
     private val suAdapter: SuAdapter,
     private val displayAdapter: DisplayAdapter,
-    private val audioAdapter: AudioAdapter,
+    private val volumeAdapter: VolumeAdapter,
     private val keyMapperImeMessenger: KeyMapperImeMessenger,
     private val accessibilityService: IAccessibilityService
 ) : DetectKeyMapsUseCase, DetectMappingUseCase by detectMappingUseCase {
@@ -86,11 +85,11 @@ class DetectKeyMapsUseCaseImpl(
         deviceId: Int,
         keyEventAction: InputEventType,
         scanCode: Int
-    ): Result<*> {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP -> audioAdapter.raiseVolume(showVolumeUi = true)
+    ) {
+        when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> volumeAdapter.raiseVolume(showVolumeUi = true)
 
-            KeyEvent.KEYCODE_VOLUME_DOWN -> audioAdapter.lowerVolume(showVolumeUi = true)
+            KeyEvent.KEYCODE_VOLUME_DOWN -> volumeAdapter.lowerVolume(showVolumeUi = true)
 
             KeyEvent.KEYCODE_BACK -> accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
             KeyEvent.KEYCODE_HOME -> accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
@@ -131,7 +130,7 @@ interface DetectKeyMapsUseCase : DetectMappingUseCase {
         deviceId: Int = 0,
         keyEventAction: InputEventType = InputEventType.DOWN_UP,
         scanCode: Int = 0
-    ): Result<*>
+    )
 
     val isScreenOn: Flow<Boolean>
 }
