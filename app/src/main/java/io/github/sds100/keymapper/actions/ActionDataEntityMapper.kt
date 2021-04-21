@@ -1,14 +1,13 @@
 package io.github.sds100.keymapper.actions
 
-import io.github.sds100.keymapper.system.camera.CameraLens
 import io.github.sds100.keymapper.data.entities.ActionEntity
 import io.github.sds100.keymapper.data.entities.Extra
 import io.github.sds100.keymapper.data.entities.getData
-import io.github.sds100.keymapper.system.devices.InputDeviceInfo
-import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.audio.DndMode
 import io.github.sds100.keymapper.system.audio.RingerMode
 import io.github.sds100.keymapper.system.audio.VolumeStream
+import io.github.sds100.keymapper.system.camera.CameraLens
+import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.util.getKey
 import io.github.sds100.keymapper.util.success
@@ -50,15 +49,15 @@ object ActionDataEntityMapper {
                 val deviceDescriptor =
                     entity.extras.getData(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR)
                         .valueOrNull()
-                        ?: ""
 
                 val useShell =
                     entity.extras.getData(ActionEntity.EXTRA_KEY_EVENT_USE_SHELL).then {
                         (it == "true").success()
                     }.valueOrNull() ?: false
 
-                val device: InputDeviceInfo? = if (deviceDescriptor == null) {
-                    null //TODO issue #612 get device name name
+                //TODO issue #612 get device name name
+                val device = if (deviceDescriptor != null) {
+                    KeyEventAction.Device(deviceDescriptor, "stub name")
                 } else {
                     null
                 }
@@ -329,6 +328,7 @@ object ActionDataEntityMapper {
                     Extra(ActionEntity.EXTRA_KEY_EVENT_DEVICE_DESCRIPTOR, data.device.descriptor)
                 )
             }
+            //TODO save device name
         }.toList()
 
         is OpenAppAction -> emptyList()

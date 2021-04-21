@@ -125,6 +125,7 @@ object UseCases {
             ServiceLocator.packageManagerAdapter(ctx),
             ServiceLocator.appShortcutAdapter(ctx),
             ServiceLocator.popupMessageAdapter(ctx),
+            ServiceLocator.externalDevicesAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
 

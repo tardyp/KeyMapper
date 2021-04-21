@@ -9,9 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.provider.Settings
-import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.ServiceLocator
@@ -145,7 +143,7 @@ class AndroidInputMethodAdapter(
     }
 
     override fun enableIme(imeId: String): Result<Unit> {
-        return enableImeWithoutUserInput(imeId).then {
+        return enableImeWithoutUserInput(imeId).otherwise {
             try {
                 val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
                 intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -168,26 +166,28 @@ class AndroidInputMethodAdapter(
     }
 
     override suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo> {
-        getInfoById(imeId).onFailure {
-            return it
+
+        var failed = true
+
+        if (failed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && serviceAdapter.isEnabled.value) {
+            runBlocking { serviceAdapter.send(ChangeIme(imeId)) }.onSuccess {
+                failed = false
+            }
         }
 
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && serviceAdapter.isEnabled.value -> {
-                runBlocking { serviceAdapter.send(ChangeIme(imeId)) }.onFailure {
-                    return it
-                }
-            }
+        if (failed && permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS)) {
+            SettingsUtils.putSecureSetting(
+                ctx,
+                Settings.Secure.DEFAULT_INPUT_METHOD,
+                imeId
+            )
 
-            permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS) -> {
-                SettingsUtils.putSecureSetting(
-                    ctx,
-                    Settings.Secure.DEFAULT_INPUT_METHOD,
-                    imeId
-                )
-            }
+            failed = false
+        }
 
-            else -> showImePicker(fromForeground).onFailure { return it }
+        //show the ime picker as a last resort
+        if (failed) {
+            showImePicker(fromForeground).onFailure { return it }
         }
 
         //wait for the ime to change and then return the info of the ime

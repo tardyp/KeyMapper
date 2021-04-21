@@ -1,11 +1,10 @@
 package io.github.sds100.keymapper.actions
 
-import io.github.sds100.keymapper.system.camera.CameraLens
-import io.github.sds100.keymapper.system.devices.InputDeviceInfo
-import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.audio.DndMode
 import io.github.sds100.keymapper.system.audio.RingerMode
 import io.github.sds100.keymapper.system.audio.VolumeStream
+import io.github.sds100.keymapper.system.camera.CameraLens
+import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.intents.IntentTarget
 import kotlinx.serialization.Serializable
 
@@ -32,8 +31,15 @@ data class KeyEventAction(
     val keyCode: Int,
     val metaState: Int = 0,
     val useShell: Boolean = false,
-    val device: InputDeviceInfo? = null
-) : ActionData()
+    val device: Device? = null
+) : ActionData() {
+
+    @Serializable
+    data class Device(
+        val descriptor: String,
+        val name: String
+    )
+}
 
 @Serializable
 sealed class SystemAction : ActionData() {

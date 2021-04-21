@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.SystemClock
 import android.view.KeyEvent
 import io.github.sds100.keymapper.system.keyevents.InputKeyModel
-import io.github.sds100.keymapper.util.*
+import io.github.sds100.keymapper.util.InputEventType
+import io.github.sds100.keymapper.util.Result
+import io.github.sds100.keymapper.util.firstBlocking
 
 /**
  * Created by sds100 on 21/04/2021.
@@ -37,10 +39,7 @@ class KeyMapperImeMessengerImpl(
 
     private val keyMapperImeHelper = KeyMapperImeHelper(inputMethodAdapter)
 
-    override fun inputKeyEvent(model: InputKeyModel): Result<*> {
-        if (!keyMapperImeHelper.isCompatibleImeChosen()) {
-            return Error.NoCompatibleImeChosen
-        }
+    override fun inputKeyEvent(model: InputKeyModel) {
 
         val imePackageName = inputMethodAdapter.chosenIme.firstBlocking().packageName
 
@@ -75,15 +74,9 @@ class KeyMapperImeMessengerImpl(
 
             ctx.sendBroadcast(this)
         }
-
-        return Success(Unit)
     }
 
-    override fun inputText(text: String): Result<*> {
-        if (!keyMapperImeHelper.isCompatibleImeChosen()) {
-            return Error.NoCompatibleImeChosen
-        }
-
+    override fun inputText(text: String) {
         val imePackageName = inputMethodAdapter.chosenIme.firstBlocking().packageName
 
         Intent(KEY_MAPPER_INPUT_METHOD_ACTION_TEXT).apply {
@@ -92,12 +85,10 @@ class KeyMapperImeMessengerImpl(
             putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT, text)
             ctx.sendBroadcast(this)
         }
-
-        return Success(Unit)
     }
 }
 
 interface KeyMapperImeMessenger {
-    fun inputKeyEvent(model: InputKeyModel): Result<*>
-    fun inputText(text: String): Result<*>
+    fun inputKeyEvent(model: InputKeyModel)
+    fun inputText(text: String)
 }

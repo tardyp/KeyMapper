@@ -24,7 +24,6 @@ import io.github.sds100.keymapper.system.apps.ChooseAppShortcutResult
 import io.github.sds100.keymapper.system.display.PickDisplayCoordinateFragment
 import io.github.sds100.keymapper.system.intents.ConfigIntentFragment
 import io.github.sds100.keymapper.system.intents.ConfigIntentResult
-import io.github.sds100.keymapper.system.intents.IntentTarget
 import io.github.sds100.keymapper.system.keyevents.*
 import io.github.sds100.keymapper.system.phone.ChoosePhoneNumberFragment
 import io.github.sds100.keymapper.system.url.ChooseUrlFragment
@@ -90,7 +89,18 @@ class ChooseActionFragment : Fragment() {
 
             result!!
 
-            KeyEventAction(result.keyCode, result.metaState, result.useShell, result.device)
+            val device = if (result.device!=null){
+                KeyEventAction.Device(result.device.descriptor, result.device.name)
+            }else{
+                null
+            }
+
+            KeyEventAction(
+                result.keyCode,
+                result.metaState,
+                result.useShell,
+                device
+            )
         }
 
         createActionOnResult(TextBlockActionTypeFragment.REQUEST_KEY) {
@@ -125,7 +135,7 @@ class ChooseActionFragment : Fragment() {
 
         createActionOnResult(ConfigIntentFragment.REQUEST_KEY) { bundle ->
             val json = bundle.getString(ConfigIntentFragment.EXTRA_RESULT)!!
-           val result: ConfigIntentResult = Json.decodeFromString(json)
+            val result: ConfigIntentResult = Json.decodeFromString(json)
 
             IntentAction(result.description, result.target, result.uri)
         }
@@ -223,8 +233,8 @@ class ChooseActionFragment : Fragment() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                    searchViewMenuItem.isVisible =
-                        pagerAdapter.tabFragmentCreators[position].searchStateKey != null
+                searchViewMenuItem.isVisible =
+                    pagerAdapter.tabFragmentCreators[position].searchStateKey != null
             }
         })
 

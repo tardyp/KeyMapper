@@ -64,6 +64,10 @@ class AndroidExternalDevicesAdapter(
         }
     }
 
+    override fun deviceHasKey(id: Int, keyCode: Int): Boolean {
+        return InputDevice.getDevice(id).hasKeys(keyCode)[0]
+    }
+
     override fun getInputDeviceName(descriptor: String): Result<String> {
         InputDevice.getDeviceIds().forEach {
             val device = InputDevice.getDevice(it)
@@ -84,7 +88,7 @@ class AndroidExternalDevicesAdapter(
 
             if (!device.isExternalCompat) return@forEach
 
-            devices.add(InputDeviceInfo(device.descriptor, device.name))
+            devices.add(InputDeviceInfo(device.descriptor, device.name, device.id))
         }
 
         inputDevices.value = State.Data(devices)

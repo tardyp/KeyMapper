@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.system.inputmethod
 
 import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Created by sds100 on 14/02/2021.
@@ -19,7 +20,7 @@ interface InputMethodAdapter {
     /**
      * The last used input method is first.
      */
-    val inputMethodHistory: Flow<List<ImeInfo>>
-    val inputMethods: Flow<List<ImeInfo>>
-    val chosenIme: Flow<ImeInfo>
+    val inputMethodHistory: StateFlow<List<ImeInfo>>
+    val inputMethods: StateFlow<List<ImeInfo>>
+    val chosenIme: StateFlow<ImeInfo>
 }

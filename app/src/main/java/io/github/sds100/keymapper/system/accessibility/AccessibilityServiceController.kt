@@ -2,17 +2,17 @@ package io.github.sds100.keymapper.system.accessibility
 
 import android.os.Build
 import android.view.KeyEvent
-import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
-import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
 import io.github.sds100.keymapper.actions.PerformActionsUseCase
+import io.github.sds100.keymapper.constraints.DetectConstraintsUseCase
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
 import io.github.sds100.keymapper.mappings.fingerprintmaps.DetectFingerprintMapsUseCase
-import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCase
-import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintGestureMapController
-import io.github.sds100.keymapper.system.keyevents.GetEventDelegate
+import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
+import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCase
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapController
 import io.github.sds100.keymapper.mappings.keymaps.TriggerKeyMapFromOtherAppsController
+import io.github.sds100.keymapper.system.keyevents.GetEventDelegate
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -148,7 +148,6 @@ class AccessibilityServiceController(
         deviceId: Int,
         scanCode: Int = 0
     ): Boolean {
-
         if (recordingTrigger) {
             if (action == KeyEvent.ACTION_DOWN) {
                 coroutineScope.launch {

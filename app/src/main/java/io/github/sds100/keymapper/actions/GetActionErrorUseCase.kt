@@ -60,10 +60,9 @@ class GetActionErrorUseCaseImpl(
 
             is KeyEventAction ->
                 if (
-                    action.useShell
-                    && !permissionAdapter.isGranted(Permission.ROOT)
+                    action.useShell && !permissionAdapter.isGranted(Permission.ROOT)
                 ) {
-                    Error.PermissionDenied(Permission.ROOT)
+                   return Error.PermissionDenied(Permission.ROOT)
                 }
 
             is TapCoordinateAction ->

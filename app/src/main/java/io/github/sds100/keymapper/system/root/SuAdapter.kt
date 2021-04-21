@@ -33,8 +33,6 @@ class SuAdapterImpl(preferenceRepository: PreferenceRepository) : SuAdapter {
 
             return Success(Unit)
         } catch (e: Exception) {
-            Timber.e(e)
-
             return Error.GenericError(e)
         }
     }

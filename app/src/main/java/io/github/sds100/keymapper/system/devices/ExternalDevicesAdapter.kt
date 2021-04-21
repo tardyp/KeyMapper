@@ -11,5 +11,6 @@ interface ExternalDevicesAdapter {
     val inputDevices: StateFlow<State<List<InputDeviceInfo>>>
     val pairedBluetoothDevices: StateFlow<State<List<BluetoothDeviceInfo>>>
 
+    fun deviceHasKey(id: Int, keyCode: Int):Boolean
     fun getInputDeviceName(descriptor: String): Result<String>
 }
