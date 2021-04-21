@@ -1,0 +1,11 @@
+package io.github.sds100.keymapper.system.accessibility
+
+import android.accessibilityservice.GestureDescription
+
+/**
+ * Created by sds100 on 21/04/2021.
+ */
+data class AccessibilityNodeModel(
+    val packageName: String?,
+    val contentDescription: String?
+)

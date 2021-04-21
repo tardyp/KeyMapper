@@ -3,9 +3,9 @@ package io.github.sds100.keymapper.settings
 import androidx.datastore.preferences.core.Preferences
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
+import io.github.sds100.keymapper.system.root.SuAdapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.map
 class ConfigSettingsUseCaseImpl(
     private val preferenceRepository: PreferenceRepository,
     private val permissionAdapter: PermissionAdapter,
-    checkRootPermissionUseCase: CheckRootPermissionUseCase
+    suAdapter: SuAdapter
 ) : ConfigSettingsUseCase {
 
-    override val isRootGranted: Flow<Boolean> = checkRootPermissionUseCase.isGranted
+    override val isRootGranted: Flow<Boolean> = suAdapter.isGranted
 
     override val isWriteSecureSettingsGranted: Flow<Boolean> = channelFlow {
         send(permissionAdapter.isGranted(Permission.WRITE_SECURE_SETTINGS))

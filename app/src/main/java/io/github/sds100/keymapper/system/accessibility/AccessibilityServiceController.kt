@@ -216,7 +216,7 @@ class AccessibilityServiceController(
                 }
             }
 
-            is TestActionEvent -> performActionsUseCase.performAction(event.action)
+            is TestActionEvent -> performActionsUseCase.perform(event.action)
 
             is Ping -> coroutineScope.launch { outputEvents.emit(Pong(event.key)) }
             is HideKeyboardEvent -> accessibilityService.hideKeyboard()

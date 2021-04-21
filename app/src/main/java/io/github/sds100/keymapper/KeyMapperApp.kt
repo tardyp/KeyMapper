@@ -24,12 +24,14 @@ import io.github.sds100.keymapper.system.inputmethod.AndroidInputMethodAdapter
 import io.github.sds100.keymapper.system.inputmethod.AutoSwitchImeController
 import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.system.inputmethod.ShowHideInputMethodUseCaseImpl
+import io.github.sds100.keymapper.system.intents.IntentAdapterImpl
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCaseImpl
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.popup.AndroidToastAdapter
+import io.github.sds100.keymapper.system.root.SuAdapterImpl
 import io.github.sds100.keymapper.system.vibrator.AndroidVibratorAdapter
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.ResourceProviderImpl
@@ -99,6 +101,10 @@ class KeyMapperApp : MultiDexApplication() {
     val displayAdapter by lazy { AndroidDisplayAdapter(this) }
     val audioAdapter by lazy { AndroidAudioAdapter(this) }
 
+    val suAdapter by lazy { SuAdapterImpl(ServiceLocator.preferenceRepository(this)) }
+
+    val intentAdapter by lazy{IntentAdapterImpl(this)}
+
     private val processLifecycleOwner by lazy { ProcessLifecycleOwner.get() }
 
     override fun onCreate() {
@@ -126,7 +132,7 @@ class KeyMapperApp : MultiDexApplication() {
             ManageNotificationsUseCaseImpl(
                 ServiceLocator.preferenceRepository(this),
                 notificationAdapter,
-                UseCases.checkRootPermission(this)
+                suAdapter
             ),
             UseCases.pauseMappings(this),
             UseCases.showImePicker(this),

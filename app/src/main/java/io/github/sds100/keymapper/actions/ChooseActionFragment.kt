@@ -216,12 +216,15 @@ class ChooseActionFragment : Fragment() {
         val searchViewMenuItem = appBar.menu.findItem(R.id.action_search)
         val searchView = searchViewMenuItem.actionView as SearchView
 
+        searchViewMenuItem.isVisible =
+            pagerAdapter.tabFragmentCreators[viewPager.currentItem].searchStateKey != null
+
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                searchViewMenuItem.isVisible =
-                    pagerAdapter.tabFragmentCreators[position].searchStateKey != null
+                    searchViewMenuItem.isVisible =
+                        pagerAdapter.tabFragmentCreators[position].searchStateKey != null
             }
         })
 

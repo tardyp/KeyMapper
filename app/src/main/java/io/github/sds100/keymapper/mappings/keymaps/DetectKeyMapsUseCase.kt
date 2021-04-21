@@ -1,17 +1,19 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
+import android.accessibilityservice.AccessibilityService
 import android.os.SystemClock
 import android.view.KeyEvent
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.PreferenceDefaults
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.mappings.DetectMappingUseCase
+import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.system.audio.AudioAdapter
 import io.github.sds100.keymapper.system.display.DisplayAdapter
-import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
-import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
-import io.github.sds100.keymapper.system.navigation.NavigationAdapter
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeMessenger
+import io.github.sds100.keymapper.system.keyevents.InputKeyModel
+import io.github.sds100.keymapper.system.navigation.OpenMenuHelper
+import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.InputEventType
 import io.github.sds100.keymapper.util.Result
 import io.github.sds100.keymapper.util.State
@@ -26,11 +28,11 @@ class DetectKeyMapsUseCaseImpl(
     detectMappingUseCase: DetectMappingUseCase,
     private val keyMapRepository: KeyMapRepository,
     private val preferenceRepository: PreferenceRepository,
-    private val checkRootPermission: CheckRootPermissionUseCase,
+    private val suAdapter: SuAdapter,
     private val displayAdapter: DisplayAdapter,
     private val audioAdapter: AudioAdapter,
-    private val navigationAdapter: NavigationAdapter,
-    inputMethodAdapter: InputMethodAdapter
+    private val keyMapperImeMessenger: KeyMapperImeMessenger,
+    private val accessibilityService: IAccessibilityService
 ) : DetectKeyMapsUseCase, DetectMappingUseCase by detectMappingUseCase {
 
     override val allKeyMapList: Flow<List<KeyMap>> =
@@ -48,7 +50,7 @@ class DetectKeyMapsUseCaseImpl(
     override val detectScreenOffTriggers: Flow<Boolean> =
         combine(
             allKeyMapList,
-            checkRootPermission.isGranted
+            suAdapter.isGranted
         ) { keyMapList, isRootPermissionGranted ->
             keyMapList.any { it.trigger.screenOffTrigger } && isRootPermissionGranted
         }.flowOn(Dispatchers.Default)
@@ -76,7 +78,7 @@ class DetectKeyMapsUseCaseImpl(
     override val currentTime: Long
         get() = SystemClock.elapsedRealtime()
 
-    private val keyMapperImeHelper by lazy { KeyMapperImeHelper(inputMethodAdapter) }
+    private val openMenuHelper = OpenMenuHelper(suAdapter, accessibilityService)
 
     override fun imitateButtonPress(
         keyCode: Int,
@@ -90,18 +92,20 @@ class DetectKeyMapsUseCaseImpl(
 
             KeyEvent.KEYCODE_VOLUME_DOWN -> audioAdapter.lowerVolume(showVolumeUi = true)
 
-            KeyEvent.KEYCODE_BACK -> navigationAdapter.goBack()
-            KeyEvent.KEYCODE_HOME -> navigationAdapter.goHome()
-            KeyEvent.KEYCODE_APP_SWITCH -> navigationAdapter.openRecents()
+            KeyEvent.KEYCODE_BACK -> accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
+            KeyEvent.KEYCODE_HOME -> accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
+            KeyEvent.KEYCODE_APP_SWITCH -> accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
 
-            KeyEvent.KEYCODE_MENU -> navigationAdapter.openMenu()
+            KeyEvent.KEYCODE_MENU -> openMenuHelper.openMenu()
 
-            else -> keyMapperImeHelper.inputKeyEvent(
-                keyCode,
-                metaState,
-                keyEventAction,
-                deviceId,
-                scanCode
+            else -> keyMapperImeMessenger.inputKeyEvent(
+                InputKeyModel(
+                    keyCode,
+                    keyEventAction,
+                    metaState,
+                    deviceId,
+                    scanCode
+                )
             )
         }
     }

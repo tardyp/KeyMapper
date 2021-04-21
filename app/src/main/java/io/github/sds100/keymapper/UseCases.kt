@@ -24,13 +24,10 @@ import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
 import io.github.sds100.keymapper.system.apps.DisplayAppsUseCase
 import io.github.sds100.keymapper.system.apps.DisplayAppsUseCaseImpl
 import io.github.sds100.keymapper.system.devices.GetInputDevicesUseCaseImpl
+import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeMessengerImpl
 import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCase
 import io.github.sds100.keymapper.system.inputmethod.ShowInputMethodPickerUseCaseImpl
 import io.github.sds100.keymapper.system.inputmethod.ToggleCompatibleImeUseCaseImpl
-import io.github.sds100.keymapper.system.navigation.AndroidNavigationAdapter
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCaseImpl
-import io.github.sds100.keymapper.system.root.SuProcessDelegate
 
 /**
  * Created by sds100 on 03/03/2021.
@@ -98,12 +95,6 @@ object UseCases {
     fun pauseMappings(ctx: Context) =
         PauseMappingsUseCaseImpl(ServiceLocator.preferenceRepository(ctx))
 
-    fun checkRootPermission(ctx: Context): CheckRootPermissionUseCase {
-        return CheckRootPermissionUseCaseImpl(
-            ServiceLocator.preferenceRepository(ctx)
-        )
-    }
-
     fun showImePicker(ctx: Context): ShowInputMethodPickerUseCase {
         return ShowInputMethodPickerUseCaseImpl(
             ServiceLocator.inputMethodAdapter(ctx)
@@ -123,9 +114,18 @@ object UseCases {
 
     fun detectConstraints(service: IAccessibilityService) = DetectConstraintsUseCaseImpl(service)
 
-    fun performActions(ctx: Context) =
+    fun performActions(ctx: Context, service: IAccessibilityService) =
         PerformActionsUseCaseImpl(
-            getActionError(ctx)
+            service,
+            ServiceLocator.inputMethodAdapter(ctx),
+            ServiceLocator.suAdapter(ctx),
+            ServiceLocator.intentAdapter(ctx),
+            getActionError(ctx),
+            keyMapperImeMessenger(ctx),
+            ServiceLocator.packageManagerAdapter(ctx),
+            ServiceLocator.appShortcutAdapter(ctx),
+            ServiceLocator.popupMessageAdapter(ctx),
+            ServiceLocator.resourceProvider(ctx)
         )
 
     fun detectMappings(ctx: Context) = DetectMappingUseCaseImpl(
@@ -139,16 +139,21 @@ object UseCases {
         detectMappings(service),
         ServiceLocator.roomKeymapRepository(service),
         ServiceLocator.preferenceRepository(service),
-        checkRootPermission(service),
+        ServiceLocator.suAdapter(service),
         ServiceLocator.displayAdapter(service),
         ServiceLocator.audioAdapter(service),
-        AndroidNavigationAdapter(service, service.suProcessDelegate, checkRootPermission(service)),
-        ServiceLocator.inputMethodAdapter(service)
+        keyMapperImeMessenger(service),
+        service
     )
 
     fun detectFingerprintMaps(ctx: Context) = DetectFingerprintMapsUseCaseImpl(
         ServiceLocator.fingerprintMapRepository(ctx),
         fingerprintGesturesSupported(ctx),
         detectMappings(ctx)
+    )
+
+    private fun keyMapperImeMessenger(ctx: Context) = KeyMapperImeMessengerImpl(
+        ctx,
+        ServiceLocator.inputMethodAdapter(ctx)
     )
 }

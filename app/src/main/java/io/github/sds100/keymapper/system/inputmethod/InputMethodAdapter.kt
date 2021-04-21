@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.system.inputmethod
 
-import io.github.sds100.keymapper.util.InputEventType
 import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -23,14 +22,4 @@ interface InputMethodAdapter {
     val inputMethodHistory: Flow<List<ImeInfo>>
     val inputMethods: Flow<List<ImeInfo>>
     val chosenIme: Flow<ImeInfo>
-
-    fun inputText(imePackageName: String, text: String)
-    fun inputKeyEvent(
-        imePackageName: String,
-        keyCode: Int,
-        metaState: Int = 0,
-        keyEventAction: InputEventType = InputEventType.DOWN_UP,
-        deviceId: Int,
-        scanCode: Int = 0
-    )
 }

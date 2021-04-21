@@ -695,7 +695,7 @@
     <string name="error_cant_find_ime_settings">Can\'t find the keyboard settings page!</string>
     <string name="error_need_to_enable_device_admin">Key Mapper needs to be a device administrator!</string>
     <string name="error_in_do_not_disturb_mode">In Do Not Disturb mode!</string>
-    <string name="error_keymapper_doesnt_have_permission_app_shortcut">Key Mapper doesn\'t have permission to use that shortcut.</string>
+    <string name="error_keymapper_doesnt_have_permission_app_shortcut">Key Mapper doesn\'t have permission to use that shortcut</string>
     <string name="error_action_notification_policy_permission">The app needs permission to change the Do Not Disturb state!</string>
     <string name="error_action_requires_read_phone_state_permission">This action needs permission to read the phone state!</string>
     <string name="error_cant_find_write_settings_page">Can\'t find the WRITE_SETTINGS permission page!</string>
@@ -773,6 +773,7 @@
     <string name="error_no_incompatible_input_methods_installed">You only have Key Mapper keyboards installed!</string>
     <string name="error_no_media_sessions">There are no apps playing media!</string>
     <string name="error_unknown_file_location">Unknown file location!</string>
+    <string name="error_failed_to_dispatch_gesture">Failed to input gesture!</string>
 
     <!-- Error messages -->
 

@@ -124,7 +124,7 @@ abstract class SimpleMappingController(
         inputEventType: InputEventType = InputEventType.DOWN_UP
     ) {
         repeat(action.multiplier ?: 1) {
-            performActionsUseCase.performAction(action.data, inputEventType)
+            performActionsUseCase.perform(action.data, inputEventType)
         }
     }
 

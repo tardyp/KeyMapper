@@ -3,7 +3,7 @@ package io.github.sds100.keymapper.system.notifications
 import android.os.Build
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.system.permissions.CheckRootPermissionUseCase
+import io.github.sds100.keymapper.system.root.SuAdapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.map
 class ManageNotificationsUseCaseImpl(
     private val preferences: PreferenceRepository,
     private val notificationAdapter: NotificationAdapter,
-    private val checkRootPermission: CheckRootPermissionUseCase
+    private val suAdapter: SuAdapter,
 ) : ManageNotificationsUseCase {
 
     override val showImePickerNotification: Flow<Boolean> =
         combine(
-            checkRootPermission.isGranted,
+            suAdapter.isGranted,
             preferences.get(Keys.showImePickerNotification)
         ) { hasRootPermission, show ->
             when {

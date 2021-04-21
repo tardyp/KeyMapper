@@ -62,30 +62,6 @@ class KeyMapperImeHelper(private val imeAdapter: InputMethodAdapter) {
             .any { it.packageName in KEY_MAPPER_IME_PACKAGE_LIST }
     }
 
-    fun inputKeyEvent(
-        keyCode: Int,
-        metaState: Int,
-        keyEventAction: InputEventType,
-        deviceId: Int,
-        scanCode: Int
-    ): Result<*> {
-        val imePackageName = imeAdapter.chosenIme.firstBlocking().packageName
-
-        if (imePackageName !in KEY_MAPPER_IME_PACKAGE_LIST) {
-            return Error.NoCompatibleImeChosen
-        }
-
-        imeAdapter.inputKeyEvent(
-            imePackageName,
-            keyCode,
-            metaState,
-            keyEventAction,
-            deviceId,
-            scanCode
-        )
-        return Success(Unit)
-    }
-
     private fun getLastUsedCompatibleImeId(): Result<String> {
         for (ime in imeAdapter.inputMethodHistory.firstBlocking()) {
             if (ime.packageName in KEY_MAPPER_IME_PACKAGE_LIST) {

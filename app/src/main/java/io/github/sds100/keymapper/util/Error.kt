@@ -77,6 +77,10 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
         R.string.error_failed_to_perform_accessibility_global_action,
         action
     )
+
+    Error.FailedToDispatchGesture -> resourceProvider.getString(R.string.error_failed_to_dispatch_gesture)
+    Error.AppShortcutCantBeOpened -> resourceProvider.getString(R.string.error_opening_app_shortcut)
+    Error.InsufficientPermissionsToOpenAppShortcut -> resourceProvider.getString(R.string.error_keymapper_doesnt_have_permission_app_shortcut)
 }
 
 val Error.isFixable: Boolean

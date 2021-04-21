@@ -38,21 +38,6 @@ class AndroidInputMethodAdapter(
 
     companion object {
         const val SETTINGS_SECURE_SUBTYPE_HISTORY_KEY = "input_methods_subtype_history"
-
-        //DON'T CHANGE THESE!!!
-        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP =
-            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_DOWN_UP"
-        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN =
-            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_DOWN"
-        private const val KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP =
-            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_UP"
-        private const val KEY_MAPPER_INPUT_METHOD_ACTION_TEXT =
-            "io.github.sds100.keymapper.system.inputmethod.ACTION_INPUT_TEXT"
-
-        private const val KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT =
-            "io.github.sds100.keymapper.system.inputmethod.EXTRA_KEY_EVENT"
-        private const val KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT =
-            "io.github.sds100.keymapper.system.inputmethod.EXTRA_TEXT"
     }
 
     override val chosenIme by lazy { MutableStateFlow(getChosenIme()) }
@@ -231,48 +216,6 @@ class AndroidInputMethodAdapter(
             .map { it.split(';')[0] }
 
         return ids
-    }
-
-    override fun inputKeyEvent(
-        imePackageName: String,
-        keyCode: Int,
-        metaState: Int,
-        keyEventAction: InputEventType,
-        deviceId: Int,
-        scanCode: Int
-    ) {
-        val intentAction = when (keyEventAction) {
-            InputEventType.DOWN -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN
-            InputEventType.DOWN_UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_DOWN_UP
-            InputEventType.UP -> KEY_MAPPER_INPUT_METHOD_ACTION_INPUT_UP
-        }
-
-        Intent(intentAction).apply {
-            setPackage(imePackageName)
-
-            val action = when (keyEventAction) {
-                InputEventType.DOWN, InputEventType.DOWN_UP -> KeyEvent.ACTION_DOWN
-                InputEventType.UP -> KeyEvent.ACTION_UP
-            }
-
-            val eventTime = SystemClock.uptimeMillis()
-
-            val keyEvent =
-                KeyEvent(eventTime, eventTime, action, keyCode, 0, metaState, deviceId, scanCode)
-
-            putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_KEY_EVENT, keyEvent)
-
-            ctx.sendBroadcast(this)
-        }
-    }
-
-    override fun inputText(imePackageName: String, text: String) {
-        Intent(KEY_MAPPER_INPUT_METHOD_ACTION_TEXT).apply {
-            setPackage(imePackageName)
-
-            putExtra(KEY_MAPPER_INPUT_METHOD_EXTRA_TEXT, text)
-            ctx.sendBroadcast(this)
-        }
     }
 
     fun onInputMethodsUpdate() {

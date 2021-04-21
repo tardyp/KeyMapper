@@ -52,6 +52,8 @@ sealed class Error : Result<Nothing>() {
 
     data class AppNotFound(val packageName: String) : Error()
     data class AppDisabled(val packageName: String) : Error()
+    object AppShortcutCantBeOpened : Error()
+    object InsufficientPermissionsToOpenAppShortcut: Error()
     object NoCompatibleImeEnabled : Error()
     object NoCompatibleImeChosen : Error()
 
@@ -88,6 +90,7 @@ sealed class Error : Result<Nothing>() {
 
     object FailedToFindAccessibilityNode : Error()
     data class FailedToPerformAccessibilityGlobalAction(val action: Int) : Error()
+    object FailedToDispatchGesture : Error()
 }
 
 inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {

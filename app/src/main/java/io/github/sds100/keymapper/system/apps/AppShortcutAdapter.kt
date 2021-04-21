@@ -28,4 +28,5 @@ interface AppShortcutAdapter {
 
     fun getShortcutName(info: AppShortcutInfo): Result<String>
     fun getShortcutIcon(info: AppShortcutInfo): Result<Drawable>
+    fun launchShortcut(uri: String): Result<*>
 }

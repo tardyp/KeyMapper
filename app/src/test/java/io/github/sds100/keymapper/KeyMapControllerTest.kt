@@ -205,7 +205,7 @@ class KeyMapControllerTest {
                 scanCode = 33
             )
 
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.DOWN,
                 metaState
@@ -219,7 +219,7 @@ class KeyMapControllerTest {
                 scanCode = 33
             )
 
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.UP,
                 0
@@ -268,7 +268,7 @@ class KeyMapControllerTest {
             )
 
 
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.DOWN,
                 metaState
@@ -290,7 +290,7 @@ class KeyMapControllerTest {
                 scanCode = 33
             )
 
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.UP,
                 0
@@ -327,7 +327,7 @@ class KeyMapControllerTest {
             inputKeyEvent(KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.ACTION_UP)
             inputKeyEvent(KeyEvent.KEYCODE_A, KeyEvent.ACTION_UP)
             //THEN
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
 
             //test 2. test triggering 1 key trigger
             //WHEN
@@ -338,7 +338,7 @@ class KeyMapControllerTest {
 
             //THEN
 
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION_2.data)
         }
 
     @Test
@@ -365,7 +365,7 @@ class KeyMapControllerTest {
             mockTriggerKeyInput(triggerKey(KeyEvent.KEYCODE_A, FAKE_KEYBOARD_TRIGGER_KEY_DEVICE))
 
             //THEN
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION_2.data)
         }
 
     @Test
@@ -384,7 +384,7 @@ class KeyMapControllerTest {
             mockTriggerKeyInput(triggerKey(KeyEvent.KEYCODE_A, FAKE_KEYBOARD_TRIGGER_KEY_DEVICE))
 
             //THEN
-            verify(performActionsUseCase, never()).performAction(any(), any(), any())
+            verify(performActionsUseCase, never()).perform(any(), any(), any())
         }
 
 
@@ -413,7 +413,7 @@ class KeyMapControllerTest {
             mockTriggerKeyInput(trigger.keys[0])
 
             //THEN
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.DOWN
             )
@@ -421,7 +421,7 @@ class KeyMapControllerTest {
             //WHEN
             mockTriggerKeyInput(trigger.keys[0])
 
-            verify(performActionsUseCase, times(1)).performAction(
+            verify(performActionsUseCase, times(1)).perform(
                 action.data,
                 InputEventType.UP
             )
@@ -528,7 +528,7 @@ class KeyMapControllerTest {
             )
             mockTriggerKeyInput(triggerKey(KeyEvent.KEYCODE_VOLUME_UP))
 
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION_2.data)
         }
 
     @Test
@@ -606,7 +606,7 @@ class KeyMapControllerTest {
 
             //then
             //the first action performed shouldn't be the short press action
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION_2.data)
 
             /*
             rerun the test to see if the short press trigger action is performed correctly.
@@ -617,7 +617,7 @@ class KeyMapControllerTest {
             advanceUntilIdle()
 
             //then
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
         }
 
     @Test
@@ -644,7 +644,7 @@ class KeyMapControllerTest {
 
             //THEN
             //the first action performed shouldn't be the short press action
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION_2.data)
 
             //WHEN
             //rerun the test to see if the short press trigger action is performed correctly.
@@ -652,7 +652,7 @@ class KeyMapControllerTest {
 
             //THEN
             //the first action performed shouldn't be the short press action
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
         }
 
     @Test
@@ -672,7 +672,7 @@ class KeyMapControllerTest {
                 TriggerMode.Undefined -> mockTriggerKeyInput(trigger.keys[0], delay = 2000L)
             }
 
-            verify(performActionsUseCase, atLeast(10)).performAction(action.data)
+            verify(performActionsUseCase, atLeast(10)).perform(action.data)
         }
 
     fun params_repeatAction() = listOf(
@@ -867,8 +867,8 @@ class KeyMapControllerTest {
             mockTriggerKeyInput(triggerKey(KeyEvent.KEYCODE_VOLUME_DOWN))
 
             //then
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
-            verify(performActionsUseCase, never()).performAction(TEST_ACTION_2.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
+            verify(performActionsUseCase, never()).perform(TEST_ACTION_2.data)
             verify(detectKeyMapsUseCase, never()).imitateButtonPress(
                 any(),
                 any(),
@@ -898,7 +898,7 @@ class KeyMapControllerTest {
             advanceUntilIdle()
 
             //then
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
 
             //wait for the double press to try and imitate the key.
             verify(detectKeyMapsUseCase, never()).imitateButtonPress(
@@ -936,7 +936,7 @@ class KeyMapControllerTest {
                 any(),
                 any()
             )
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
         }
 
     @Test
@@ -983,7 +983,7 @@ class KeyMapControllerTest {
 
             //THEN
             actionList.forEach { action ->
-                verify(performActionsUseCase, times(1)).performAction(action.data)
+                verify(performActionsUseCase, times(1)).perform(action.data)
             }
         }
 
@@ -1862,7 +1862,7 @@ class KeyMapControllerTest {
             }
 
             //THEN
-            verify(performActionsUseCase, times(1)).performAction(TEST_ACTION.data)
+            verify(performActionsUseCase, times(1)).perform(TEST_ACTION.data)
         }
 
 

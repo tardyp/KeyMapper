@@ -19,9 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
 import io.github.sds100.keymapper.system.devices.isExternalCompat
-import io.github.sds100.keymapper.system.root.SuProcessDelegate
-import io.github.sds100.keymapper.util.Inject
-import io.github.sds100.keymapper.util.InputEventType
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import splitties.bitflags.minusFlag
 import splitties.bitflags.withFlag
@@ -58,8 +56,11 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
     private var fingerprintGestureCallback:
         FingerprintGestureController.FingerprintGestureCallback? = null
 
-    override val foregroundAppPackageName: String?
-        get() = rootInActiveWindow?.packageName?.toString()
+    override val rootNode: AccessibilityNodeModel
+        get() = AccessibilityNodeModel(
+            packageName = rootInActiveWindow.packageName?.toString(),
+            contentDescription = rootInActiveWindow.contentDescription?.toString()
+        )
 
     override val isGestureDetectionAvailable: Boolean
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -70,7 +71,6 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
 
     override val onKeyboardHiddenChange = MutableSharedFlow<Boolean>()
 
-    val suProcessDelegate by lazy { SuProcessDelegate() }
 
     private lateinit var controller: AccessibilityServiceController
 
@@ -120,7 +120,7 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            softKeyboardController?.addOnShowModeChangedListener { _, showMode ->
+            softKeyboardController.addOnShowModeChangedListener { _, showMode ->
                 lifecycleScope.launchWhenStarted {
                     when (showMode) {
                         SHOW_MODE_AUTO -> onKeyboardHiddenChange.emit(false)
@@ -186,10 +186,6 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
     }
 
-    override fun performActionOnFocussedNode(action: Int) {
-        rootInActiveWindow?.performActionOnFocusedNode(action)
-    }
-
     override fun hideKeyboard() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             softKeyboardController.showMode = SHOW_MODE_HIDDEN
@@ -208,7 +204,40 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
         }
     }
 
-    override fun tapScreen(x: Int, y: Int, inputEventType: InputEventType) {
+    override fun performActionOnNode(
+        action: Int,
+        predicate: (node: AccessibilityNodeModel) -> Boolean
+    ): Result<*> {
+        val node = rootInActiveWindow.findNodeRecursively {
+            predicate(
+                AccessibilityNodeModel(
+                    it.packageName.toString(),
+                    it.contentDescription.toString()
+                )
+            )
+        }
+
+        if (node == null) {
+            return Error.FailedToFindAccessibilityNode
+        }
+
+        node.performAction(action)
+        node.recycle()
+
+        return Success(Unit)
+    }
+
+    override fun doGlobalAction(action: Int): Result<*> {
+        val success = performGlobalAction(action)
+
+        if (success) {
+            return Success(Unit)
+        } else {
+            return Error.FailedToPerformAccessibilityGlobalAction(action)
+        }
+    }
+
+    override fun tapScreen(x: Int, y: Int, inputEventType: InputEventType): Result<*> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             val duration = 1L //ms
@@ -219,8 +248,7 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
 
             val strokeDescription =
                 when {
-                    inputEventType == InputEventType.DOWN
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+                    inputEventType == InputEventType.DOWN && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
                         GestureDescription.StrokeDescription(
                             path,
                             0,
@@ -228,8 +256,7 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
                             true
                         )
 
-                    inputEventType == InputEventType.UP
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+                    inputEventType == InputEventType.UP && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
                         GestureDescription.StrokeDescription(
                             path,
                             59999,
@@ -245,8 +272,16 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
                     addStroke(it)
                 }.build()
 
-                dispatchGesture(gestureDescription, null, null)
+                val success = dispatchGesture(gestureDescription, null, null)
+
+                if (success) {
+                    return Success(Unit)
+                } else {
+                    Error.FailedToDispatchGesture
+                }
             }
         }
+
+        return Error.SdkVersionTooLow(Build.VERSION_CODES.N)
     }
 }

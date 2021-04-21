@@ -29,7 +29,10 @@ import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapte
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.display.DisplayAdapter
+import io.github.sds100.keymapper.system.intents.IntentAdapter
+import io.github.sds100.keymapper.system.intents.IntentAdapterImpl
 import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
+import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.system.vibrator.VibratorAdapter
 
 /**
@@ -217,6 +220,14 @@ object ServiceLocator {
 
     fun audioAdapter(context: Context): AudioAdapter {
         return (context.applicationContext as KeyMapperApp).audioAdapter
+    }
+
+    fun suAdapter(context: Context): SuAdapter {
+        return (context.applicationContext as KeyMapperApp).suAdapter
+    }
+
+    fun intentAdapter(context: Context): IntentAdapter {
+        return (context.applicationContext as KeyMapperApp).intentAdapter
     }
 
     private fun createDatabase(context: Context): AppDatabase {

@@ -16,6 +16,7 @@ interface PackageManagerAdapter {
     fun isAppEnabled(packageName: String): Boolean
     fun isAppInstalled(packageName: String): Boolean
 
+    fun openApp(packageName: String): Result<*>
     fun enableApp(packageName: String)
     fun installApp(packageName: String)
 

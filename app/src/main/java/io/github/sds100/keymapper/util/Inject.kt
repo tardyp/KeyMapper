@@ -1,5 +1,6 @@
 package io.github.sds100.keymapper.util
 
+import android.app.Service
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
 import io.github.sds100.keymapper.KeyMapperApp
@@ -207,7 +208,7 @@ object Inject {
             ConfigSettingsUseCaseImpl(
                 ServiceLocator.preferenceRepository(context),
                 ServiceLocator.permissionAdapter(context),
-                UseCases.checkRootPermission(context)
+                ServiceLocator.suAdapter(context)
             )
         )
     }
@@ -236,7 +237,7 @@ object Inject {
             inputEvents = ServiceLocator.serviceAdapter(service).serviceOutputEvents,
             outputEvents = ServiceLocator.serviceAdapter(service).eventReceiver,
             detectConstraintsUseCase = UseCases.detectConstraints(service),
-            performActionsUseCase = UseCases.performActions(service),
+            performActionsUseCase = UseCases.performActions(service, service),
             detectKeyMapsUseCase = UseCases.detectKeyMaps(service),
             detectFingerprintMapsUseCase = UseCases.detectFingerprintMaps(service),
             pauseMappingsUseCase = UseCases.pauseMappings(service)

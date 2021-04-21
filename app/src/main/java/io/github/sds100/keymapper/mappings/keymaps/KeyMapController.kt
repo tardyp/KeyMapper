@@ -1651,7 +1651,7 @@ class KeyMapController(
         val additionalMetaState = metaStateFromKeyEvent.withFlag(metaStateFromActions)
 
         repeat(multiplier) {
-            performActions.performAction(action.data, inputEventType, additionalMetaState)
+            performActions.perform(action.data, inputEventType, additionalMetaState)
         }
     }
 

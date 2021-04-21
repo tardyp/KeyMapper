@@ -5,10 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
-import io.github.sds100.keymapper.util.State
-import io.github.sds100.keymapper.util.Result
-import io.github.sds100.keymapper.util.success
-import io.github.sds100.keymapper.util.Error
+import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,6 +97,35 @@ class AndroidPackageManagerAdapter(
         }
     }
 
+    override fun openApp(packageName: String): Result<*> {
+        val leanbackIntent = packageManager.getLeanbackLaunchIntentForPackage(packageName)
+
+        val normalIntent = packageManager.getLaunchIntentForPackage(packageName)
+
+        val intent = leanbackIntent ?: normalIntent
+
+        //intent = null if the app doesn't exist
+        if (intent != null) {
+            ctx.startActivity(intent)
+            return Success(Unit)
+
+        } else {
+            try {
+                val appInfo = ctx.packageManager.getApplicationInfo(packageName, 0)
+
+                //if the app is disabled, show an error message because it won't open
+                if (!appInfo.enabled) {
+                    return Error.AppDisabled(packageName)
+                }
+
+                return Success(Unit)
+
+            } catch (e: Exception) {
+                return Error.AppNotFound(packageName)
+            }
+        }
+    }
+
     override fun isVoiceAssistantInstalled(): Boolean {
         val activityExists =
             Intent(Intent.ACTION_VOICE_COMMAND).resolveActivityInfo(ctx.packageManager, 0) != null
@@ -129,11 +155,11 @@ class AndroidPackageManagerAdapter(
             return Error.AppNotFound(packageName)
         }
     }
-    
-    private fun updatePackageList(){
+
+    private fun updatePackageList() {
         installedPackages.value = State.Loading
 
-       val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
+        val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map {
             val canBeLaunched =
                 (packageManager.getLaunchIntentForPackage(it.packageName) != null
                     || packageManager.getLeanbackLaunchIntentForPackage(it.packageName) != null)

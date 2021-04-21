@@ -42,8 +42,13 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
     override val areLauncherShortcutsSupported: Boolean
         get() = ShortcutManagerCompat.isRequestPinShortcutSupported(ctx)
 
-    override fun createLauncherShortcut(icon: Drawable, label: String, intentAction: String, intentExtras: Bundle): ShortcutInfoCompat {
-       val builder =  ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
+    override fun createLauncherShortcut(
+        icon: Drawable,
+        label: String,
+        intentAction: String,
+        intentExtras: Bundle
+    ): ShortcutInfoCompat {
+        val builder = ShortcutInfoCompat.Builder(ctx, UUID.randomUUID().toString()).apply {
             setIcon(IconCompat.createWithBitmap(icon.toBitmap()))
             setShortLabel(label)
 
@@ -62,9 +67,9 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
     override fun pinShortcut(shortcut: ShortcutInfoCompat): Result<*> {
         val supported = ShortcutManagerCompat.requestPinShortcut(ctx, shortcut, null)
 
-        if (!supported){
+        if (!supported) {
             return Error.LauncherShortcutsNotSupported
-        }else{
+        } else {
             return Success(Unit)
         }
     }
@@ -93,6 +98,20 @@ class AndroidAppShortcutAdapter(context: Context) : AppShortcutAdapter {
                 .success()
         } catch (e: PackageManager.NameNotFoundException) {
             return Error.AppNotFound(info.packageName)
+        }
+    }
+
+    override fun launchShortcut(uri: String): Result<*> {
+        val intent = Intent.parseUri(uri, 0)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        try {
+            ctx.startActivity(intent)
+            return Success(Unit)
+        } catch (e: SecurityException) {
+            return Error.InsufficientPermissionsToOpenAppShortcut
+        } catch (e: Exception) {
+            return Error.AppShortcutCantBeOpened
         }
     }
 }
