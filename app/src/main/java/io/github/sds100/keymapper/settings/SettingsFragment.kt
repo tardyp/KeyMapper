@@ -145,6 +145,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         DropDownPreference(requireContext()).apply {
             key = Keys.darkTheme.name
             setDefaultValue(PreferenceDefaults.DARK_THEME)
+            isSingleLineTitle = false
 
             setTitle(R.string.title_pref_dark_theme)
             entries = strArray(R.array.pref_dark_theme_entries)
@@ -160,6 +161,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue("")
 
             setTitle(R.string.title_pref_automatic_backup_location)
+            isSingleLineTitle = false
 
             viewModel.automaticBackupLocation.collectWhenResumed(viewLifecycleOwner, {
                 summary = if (it.isBlank()) {
@@ -202,6 +204,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(false)
 
             setTitle(R.string.title_pref_hide_home_screen_alerts)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_hide_home_screen_alerts)
 
             addPreference(this)
@@ -213,6 +216,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(false)
 
             setTitle(R.string.title_pref_force_vibrate)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_force_vibrate)
 
             addPreference(this)
@@ -237,6 +241,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 key = Keys.showToggleKeymapsNotification.name
 
                 setTitle(R.string.title_pref_show_toggle_keymaps_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_toggle_keymaps_notification)
 
                 setOnPreferenceClickListener {
@@ -257,6 +262,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setDefaultValue(true)
 
                 setTitle(R.string.title_pref_show_toggle_keymaps_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_toggle_keymaps_notification)
 
                 addPreference(this)
@@ -312,6 +318,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 key = Keys.showImePickerNotification.name
 
                 setTitle(R.string.title_pref_show_ime_picker_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_ime_picker_notification)
 
                 setOnPreferenceClickListener {
@@ -331,6 +338,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setDefaultValue(false)
 
                 setTitle(R.string.title_pref_auto_show_ime_picker)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_auto_show_ime_picker)
 
                 addPreference(this)
@@ -384,6 +392,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 key = Keys.showToggleKeyboardNotification.name
 
                 setTitle(R.string.title_pref_show_toggle_keyboard_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_toggle_keyboard_notification)
 
                 setOnPreferenceClickListener {
@@ -404,6 +413,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setDefaultValue(true)
 
                 setTitle(R.string.title_pref_show_toggle_keyboard_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_toggle_keyboard_notification)
 
                 addPreference(this)
@@ -423,6 +433,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 key = Keys.showImePickerNotification.name
 
                 setTitle(R.string.title_pref_show_ime_picker_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_ime_picker_notification)
 
                 setOnPreferenceClickListener {
@@ -442,6 +453,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setDefaultValue(false)
 
                 setTitle(R.string.title_pref_show_ime_picker_notification)
+                isSingleLineTitle = false
                 setSummary(R.string.summary_pref_show_ime_picker_notification)
 
                 addPreference(this)
@@ -454,6 +466,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(false)
 
             setTitle(R.string.title_pref_auto_show_ime_picker)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_auto_show_ime_picker)
 
             addPreference(this)
@@ -472,6 +485,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.LONG_PRESS_DELAY)
 
             setTitle(R.string.title_pref_long_press_delay)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_long_press_delay)
             min = OptionMinimums.TRIGGER_LONG_PRESS_DELAY
             max = 5000
@@ -486,6 +500,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.DOUBLE_PRESS_DELAY)
 
             setTitle(R.string.title_pref_double_press_delay)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_double_press_delay)
             min = OptionMinimums.TRIGGER_DOUBLE_PRESS_DELAY
             max = 5000
@@ -500,6 +515,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.VIBRATION_DURATION)
 
             setTitle(R.string.title_pref_vibration_duration)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_vibration_duration)
             min = OptionMinimums.VIBRATION_DURATION
             max = 1000
@@ -514,6 +530,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.REPEAT_DELAY)
 
             setTitle(R.string.title_pref_repeat_delay)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_repeat_delay)
             min = OptionMinimums.ACTION_REPEAT_DELAY
             max = SliderMaximums.ACTION_REPEAT_DELAY
@@ -528,6 +545,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.REPEAT_RATE)
 
             setTitle(R.string.title_pref_repeat_rate)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_repeat_rate)
             min = OptionMinimums.ACTION_REPEAT_RATE
             max = SliderMaximums.ACTION_REPEAT_RATE
@@ -542,6 +560,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             setDefaultValue(PreferenceDefaults.SEQUENCE_TRIGGER_TIMEOUT)
 
             setTitle(R.string.title_pref_sequence_trigger_timeout)
+            isSingleLineTitle = false
             setSummary(R.string.summary_pref_sequence_trigger_timeout)
             min = OptionMinimums.TRIGGER_SEQUENCE_TRIGGER_TIMEOUT
             max = 5000
@@ -556,6 +575,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             this.key = key
 
             setTitle(R.string.title_pref_bluetooth_devices)
+            isSingleLineTitle = false
 
             setOnPreferenceClickListener {
                 populateBluetoothDevicesPreferences()
