@@ -1,45 +1,41 @@
 package io.github.sds100.keymapper
 
 import android.content.Context
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
-import io.github.sds100.keymapper.data.db.AppDatabase
-import io.github.sds100.keymapper.data.repositories.DataStorePreferenceRepository
-import io.github.sds100.keymapper.data.repositories.DataStoreFingerprintMapRepository
-import io.github.sds100.keymapper.data.repositories.RoomDeviceInfoCache
-import io.github.sds100.keymapper.data.repositories.RoomKeyMapRepository
-import io.github.sds100.keymapper.system.devices.DeviceInfoCache
 import io.github.sds100.keymapper.backup.BackupManager
 import io.github.sds100.keymapper.backup.BackupManagerImpl
-import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
-import io.github.sds100.keymapper.data.repositories.PreferenceRepository
-import io.github.sds100.keymapper.system.files.FileAdapter
-import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
-import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
-import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
-import io.github.sds100.keymapper.system.camera.CameraAdapter
-import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
-import io.github.sds100.keymapper.system.devices.DevicesAdapter
-import io.github.sds100.keymapper.system.files.FileRepository
-import io.github.sds100.keymapper.util.ui.ResourceProvider
-import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
+import io.github.sds100.keymapper.data.db.AppDatabase
+import io.github.sds100.keymapper.data.repositories.*
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
+import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
 import io.github.sds100.keymapper.system.airplanemode.AirplaneModeAdapter
-import io.github.sds100.keymapper.system.volume.VolumeAdapter
-import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
-import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
-import io.github.sds100.keymapper.system.notifications.NotificationController
+import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
+import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
+import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
+import io.github.sds100.keymapper.system.camera.CameraAdapter
+import io.github.sds100.keymapper.system.devices.DeviceInfoCache
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.display.DisplayAdapter
+import io.github.sds100.keymapper.system.files.FileAdapter
+import io.github.sds100.keymapper.system.files.FileRepository
+import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.system.intents.IntentAdapter
 import io.github.sds100.keymapper.system.lock.LockScreenAdapter
 import io.github.sds100.keymapper.system.media.MediaAdapter
 import io.github.sds100.keymapper.system.network.NetworkAdapter
 import io.github.sds100.keymapper.system.nfc.NfcAdapter
+import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
+import io.github.sds100.keymapper.system.notifications.NotificationController
+import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
+import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.phone.PhoneAdapter
 import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
 import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.system.url.OpenUrlAdapter
 import io.github.sds100.keymapper.system.vibrator.VibratorAdapter
+import io.github.sds100.keymapper.system.volume.VolumeAdapter
+import io.github.sds100.keymapper.util.ui.ResourceProvider
 
 /**
  * Created by sds100 on 17/05/2020.
@@ -92,12 +88,12 @@ object ServiceLocator {
         }
     }
 
+    private val Context.fingerprintMapDataStore by preferencesDataStore("fingerprint_gestures")
     private fun createFingerprintMapRepository(context: Context): FingerprintMapRepository {
-        val dataStore = context.createDataStore("fingerprint_gestures")
         val scope = (context.applicationContext as KeyMapperApp).appCoroutineScope
 
         return fingerprintMapRepository
-            ?: DataStoreFingerprintMapRepository(dataStore, scope).also {
+            ?: DataStoreFingerprintMapRepository(context.fingerprintMapDataStore, scope).also {
                 this.fingerprintMapRepository = it
             }
     }

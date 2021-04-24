@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.remove
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.preferences.preferencesDataStore
 import io.github.sds100.keymapper.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,10 +28,12 @@ class DataStorePreferenceRepository(
         DEFAULT_SHARED_PREFS_NAME
     )
 
-    private val dataStore = ctx.createDataStore(
+    private val Context.dataStore by preferencesDataStore(
         name = "preferences",
-        migrations = listOf(sharedPreferencesMigration)
+        produceMigrations = { listOf(sharedPreferencesMigration)}
     )
+
+    val dataStore = ctx.dataStore
 
     override fun <T> get(key: Preferences.Key<T>): Flow<T?> {
         return dataStore.data.map { it[key] }.distinctUntilChanged()

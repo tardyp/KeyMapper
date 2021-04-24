@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.mappings.fingerprintmaps
 
 import android.os.Build
-import androidx.datastore.preferences.core.preferencesKey
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import kotlinx.coroutines.flow.Flow
