@@ -7,20 +7,11 @@ import kotlinx.coroutines.flow.Flow
  * Created by sds100 on 14/02/2021.
  */
 interface BluetoothAdapter {
-    /**
-     * Value is the address of the device
-     */
-    val onDeviceConnect: Flow<String>
+    val onDeviceConnect: Flow<BluetoothDeviceInfo>
 
-    /**
-     * Value is the address of the device
-     */
-    val onDeviceDisconnect: Flow<String>
+    val onDeviceDisconnect: Flow<BluetoothDeviceInfo>
 
-    /**
-     * Value is the address of the device
-     */
-    val onDevicePairedChange: Flow<String>
+    val onDevicePairedChange: Flow<BluetoothDeviceInfo>
 
     val isBluetoothEnabled: Flow<Boolean>
 

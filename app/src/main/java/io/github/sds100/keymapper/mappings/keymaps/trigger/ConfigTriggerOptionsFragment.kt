@@ -1,22 +1,23 @@
 package io.github.sds100.keymapper.mappings.keymaps.trigger
 
 import android.content.ClipData
+import android.content.ClipboardManager
+import androidx.core.content.getSystemService
 import androidx.navigation.navGraphViewModels
 import com.airbnb.epoxy.EpoxyRecyclerView
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapTriggerOptionsViewModel
+import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapViewModel
+import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.triggerFromOtherApps
 import io.github.sds100.keymapper.ui.*
-import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapViewModel
-import io.github.sds100.keymapper.mappings.keymaps.ConfigKeyMapTriggerOptionsViewModel
 import io.github.sds100.keymapper.ui.utils.configuredCheckBox
 import io.github.sds100.keymapper.ui.utils.configuredSlider
 import io.github.sds100.keymapper.util.FragmentInfo
 import io.github.sds100.keymapper.util.Inject
-import io.github.sds100.keymapper.system.url.UrlUtils
 import io.github.sds100.keymapper.util.str
 import io.github.sds100.keymapper.util.ui.*
 import kotlinx.coroutines.flow.Flow
-import splitties.systemservices.clipboardManager
 import splitties.toast.toast
 
 /**
@@ -46,7 +47,7 @@ class ConfigTriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
         recyclerView.withModels {
             listItems.forEach { listItem ->
                 if (listItem is CheckBoxListItem) {
-                    configuredCheckBox( listItem) { isChecked ->
+                    configuredCheckBox(listItem) { isChecked ->
                         viewModel.setCheckboxValue(listItem.id, isChecked)
                     }
                 }
@@ -72,6 +73,9 @@ class ConfigTriggerOptionsFragment : SimpleRecyclerViewFragment<ListItem>() {
                                 str(R.string.clipboard_label_keymap_uid),
                                 listItem.keyMapUid
                             )
+
+                            val clipboardManager: ClipboardManager =
+                                requireContext().getSystemService()!!
 
                             clipboardManager.setPrimaryClip(clipData)
 

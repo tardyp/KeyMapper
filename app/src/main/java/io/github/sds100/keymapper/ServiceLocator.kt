@@ -19,7 +19,7 @@ import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
 import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
 import io.github.sds100.keymapper.system.camera.CameraAdapter
 import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
-import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.files.FileRepository
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
@@ -168,7 +168,7 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).inputMethodAdapter
     }
 
-    fun externalDevicesAdapter(context: Context): ExternalDevicesAdapter {
+    fun externalDevicesAdapter(context: Context): DevicesAdapter {
         return (context.applicationContext as KeyMapperApp).externalDevicesAdapter
     }
 

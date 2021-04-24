@@ -11,6 +11,7 @@ import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
 import io.github.sds100.keymapper.mappings.keymaps.DetectKeyMapsUseCase
 import io.github.sds100.keymapper.mappings.keymaps.KeyMapController
 import io.github.sds100.keymapper.mappings.keymaps.TriggerKeyMapFromOtherAppsController
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.keyevents.GetEventDelegate
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.*
@@ -29,7 +30,8 @@ class AccessibilityServiceController(
     val performActionsUseCase: PerformActionsUseCase,
     val detectKeyMapsUseCase: DetectKeyMapsUseCase,
     val detectFingerprintMapsUseCase: DetectFingerprintMapsUseCase,
-    val pauseMappingsUseCase: PauseMappingsUseCase
+    val pauseMappingsUseCase: PauseMappingsUseCase,
+    val devicesAdapter: DevicesAdapter
 ) {
 
     companion object {
@@ -73,7 +75,7 @@ class AccessibilityServiceController(
             .stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
     private val getEventDelegate =
-        GetEventDelegate { keyCode, action, deviceDescriptor, isExternal, deviceId ->
+        GetEventDelegate(devicesAdapter) { keyCode, action, deviceDescriptor, isExternal, deviceId ->
 
             if (!isPaused.value) {
                 withContext(Dispatchers.Main.immediate) {

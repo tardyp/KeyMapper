@@ -7,7 +7,6 @@ import android.os.Handler
 import android.view.InputDevice
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.system.bluetooth.BluetoothDeviceInfo
-import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.Result
 import io.github.sds100.keymapper.util.Success
@@ -19,18 +18,19 @@ import splitties.mainthread.mainLooper
 /**
  * Created by sds100 on 13/03/2021.
  */
-class AndroidExternalDevicesAdapter(
+class AndroidDevicesAdapter(
     context: Context,
     private val bluetoothAdapter: io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter,
     private val coroutineScope: CoroutineScope
-) : ExternalDevicesAdapter {
+) : DevicesAdapter {
     private val ctx = context.applicationContext
     private val inputManager = ctx.getSystemService<InputManager>()
 
-    override val inputDevices = MutableStateFlow<State<List<InputDeviceInfo>>>(State.Loading)
+    override val inputDevices = MutableStateFlow<List<InputDeviceInfo>>(emptyList())
 
-    override val pairedBluetoothDevices =
-        MutableStateFlow<State<List<BluetoothDeviceInfo>>>(State.Loading)
+    override val pairedBluetoothDevices = MutableStateFlow<List<BluetoothDeviceInfo>>(emptyList())
+
+    override val connectedBluetoothDevices = MutableStateFlow<Set<BluetoothDeviceInfo>>(emptySet())
 
     init {
         coroutineScope.launch {
@@ -63,6 +63,18 @@ class AndroidExternalDevicesAdapter(
 
             }, Handler(mainLooper))
         }
+
+        bluetoothAdapter.onDeviceConnect.onEach { device ->
+            val currentValue = connectedBluetoothDevices.value
+
+            connectedBluetoothDevices.value = currentValue.plus(device)
+        }.launchIn(coroutineScope)
+
+        bluetoothAdapter.onDeviceDisconnect.onEach { device ->
+            val currentValue = connectedBluetoothDevices.value
+
+            connectedBluetoothDevices.value = currentValue.minus(device)
+        }.launchIn(coroutineScope)
     }
 
     override fun deviceHasKey(id: Int, keyCode: Int): Boolean {
@@ -89,17 +101,24 @@ class AndroidExternalDevicesAdapter(
 
             if (!device.isExternalCompat) return@forEach
 
-            devices.add(InputDeviceInfo(device.descriptor, device.name, device.id))
+            devices.add(
+                InputDeviceInfo(
+                    device.descriptor,
+                    device.name,
+                    device.id,
+                    device.isExternalCompat
+                )
+            )
         }
 
-        inputDevices.value = State.Data(devices)
+        inputDevices.value = devices
     }
 
     private fun updatePairedBluetoothDevices() {
         val adapter = BluetoothAdapter.getDefaultAdapter()
 
         if (adapter == null) {
-            pairedBluetoothDevices.value = State.Data(emptyList())
+            pairedBluetoothDevices.value = emptyList()
             return
         }
 
@@ -107,6 +126,6 @@ class AndroidExternalDevicesAdapter(
             BluetoothDeviceInfo(it.address, it.name)
         }
 
-        pairedBluetoothDevices.value = State.Data(devices)
+        pairedBluetoothDevices.value = devices
     }
 }

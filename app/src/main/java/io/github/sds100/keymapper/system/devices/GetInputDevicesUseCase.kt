@@ -20,14 +20,12 @@ import kotlinx.coroutines.flow.map
 class GetInputDevicesUseCaseImpl(
     private val deviceInfoCache: DeviceInfoCache,
     private val preferenceRepository: PreferenceRepository,
-    private val externalDevicesAdapter: ExternalDevicesAdapter
+    private val devicesAdapter: DevicesAdapter
 ) : PreferenceRepository by preferenceRepository, GetInputDevicesUseCase, ShowDeviceInfoUseCase,
     GetDeviceNameUseCase {
 
     //TODO show device descriptor in name if showdevicedescriptors is turned on
-    override val devices: Flow<List<InputDeviceInfo>> = externalDevicesAdapter.inputDevices
-        .dropWhile { it !is State.Data }
-        .map { it.dataOrNull()!! }
+    override val devices: Flow<List<InputDeviceInfo>> = devicesAdapter.inputDevices
 
     //TODO remove
     override suspend fun getAll(): Set<InputDeviceInfo> {
@@ -36,7 +34,7 @@ class GetInputDevicesUseCaseImpl(
 
     override suspend fun getDeviceName(descriptor: String) =
         deviceInfoCache.getDeviceName(descriptor).otherwise {
-            externalDevicesAdapter.getInputDeviceName(descriptor)
+            devicesAdapter.getInputDeviceName(descriptor)
         }.then { name ->
             if (showDeviceDescriptors) {
                 Success("$name ${descriptor.substring(0..4)}")

@@ -9,7 +9,9 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.getSystemService
 import androidx.core.graphics.decodeBitmap
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -23,7 +25,6 @@ import io.github.sds100.keymapper.system.files.FileUtils
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.showPopups
 import kotlinx.coroutines.flow.collectLatest
-import splitties.systemservices.windowManager
 
 /**
  * Created by sds100 on 30/03/2020.
@@ -53,6 +54,7 @@ class PickDisplayCoordinateFragment : Fragment() {
             }
 
             val displaySize = Point().apply {
+                val windowManager: WindowManager = requireContext().getSystemService()!!
                 windowManager.defaultDisplay.getRealSize(this)
             }
 

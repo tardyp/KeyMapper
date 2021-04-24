@@ -17,7 +17,7 @@ import io.github.sds100.keymapper.system.apps.AndroidAppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.AndroidPackageManagerAdapter
 import io.github.sds100.keymapper.system.bluetooth.AndroidBluetoothAdapter
 import io.github.sds100.keymapper.system.camera.AndroidCameraAdapter
-import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
+import io.github.sds100.keymapper.system.devices.AndroidDevicesAdapter
 import io.github.sds100.keymapper.system.display.AndroidDisplayAdapter
 import io.github.sds100.keymapper.system.files.AndroidFileAdapter
 import io.github.sds100.keymapper.system.inputmethod.AndroidInputMethodAdapter
@@ -79,7 +79,7 @@ class KeyMapperApp : MultiDexApplication() {
         )
     }
     val externalDevicesAdapter by lazy {
-        AndroidExternalDevicesAdapter(
+        AndroidDevicesAdapter(
             this,
             bluetoothMonitor,
             appCoroutineScope

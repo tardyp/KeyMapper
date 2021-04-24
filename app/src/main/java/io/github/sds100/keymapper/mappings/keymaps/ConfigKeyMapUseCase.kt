@@ -1,10 +1,9 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
-import com.google.android.material.radiobutton.MaterialRadioButton
 import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.actions.ActionData
 import io.github.sds100.keymapper.actions.KeyEventAction
-import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.mappings.keymaps.trigger.KeyMapTrigger
 import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKey
 import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKeyDevice
@@ -17,13 +16,12 @@ import io.github.sds100.keymapper.util.Defaultable
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
 import io.github.sds100.keymapper.util.dataOrNull
 import io.github.sds100.keymapper.util.ifIsData
-import timber.log.Timber
 
 /**
  * Created by sds100 on 16/02/2021.
  */
 class ConfigKeyMapUseCaseImpl(
-    private val externalDevicesAdapter: ExternalDevicesAdapter
+    private val devicesAdapter: DevicesAdapter
 ) : BaseConfigMappingUseCase<KeyMapAction, KeyMap>(), ConfigKeyMapUseCase {
 
     override fun addTriggerKey(
@@ -252,8 +250,7 @@ class ConfigKeyMapUseCaseImpl(
 
     override fun getAvailableTriggerKeyDevices(): List<TriggerKeyDevice> {
         val externalDevices = sequence {
-            val inputDevices =
-                externalDevicesAdapter.inputDevices.value.dataOrNull() ?: return@sequence
+            val inputDevices = devicesAdapter.inputDevices.value
 
             inputDevices.forEach {
                 yield(

@@ -1,19 +1,18 @@
 package io.github.sds100.keymapper.system.keyevents
 
 import android.view.KeyEvent
-import io.github.sds100.keymapper.R
-import io.github.sds100.keymapper.system.root.RootUtils
 import io.github.sds100.keymapper.system.Shell
-import io.github.sds100.keymapper.system.devices.isExternalCompat
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
+import io.github.sds100.keymapper.system.root.RootUtils
+import io.github.sds100.keymapper.util.State
 import kotlinx.coroutines.*
-import splitties.systemservices.inputManager
-import splitties.toast.toast
-import java.io.IOException
+import kotlinx.coroutines.flow.first
 
 /**
  * Created by sds100 on 21/06/2020.
  */
 class GetEventDelegate(
+    private val devicesAdapter: DevicesAdapter,
     private val onKeyEvent: suspend (
         keyCode: Int,
         action: Int,
@@ -27,7 +26,7 @@ class GetEventDelegate(
         private const val REGEX_GET_DEVICE_LOCATION = "/.*(?=:)"
         private const val REGEX_KEY_EVENT_ACTION = "(?<= )(DOWN|UP)"
 
-        fun canDetectKeyWhenScreenOff(keyCode: Int): Boolean{
+        fun canDetectKeyWhenScreenOff(keyCode: Int): Boolean {
             return KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE.containsValue(keyCode)
         }
     }
@@ -41,83 +40,77 @@ class GetEventDelegate(
         try {
             job = scope.launch(Dispatchers.IO) {
 
-                try {
-                    val getEventDevices: String
+                val getEventDevices: String
 
-                    RootUtils.getRootCommandOutput("getevent -i").apply {
-                        getEventDevices = bufferedReader().readText()
-                        close()
-                    }
+                RootUtils.getRootCommandOutput("getevent -i").apply {
+                    getEventDevices = bufferedReader().readText()
+                    close()
+                }
 
-                    val deviceLocationToDescriptorMap = mutableMapOf<String, String>()
-                    val descriptorToIsExternalMap = mutableMapOf<String, Boolean>()
+                val deviceLocationToDescriptorMap = mutableMapOf<String, String>()
+                val descriptorToIsExternalMap = mutableMapOf<String, Boolean>()
 
-                    inputManager.inputDeviceIds.forEach { id ->
-                        val device = inputManager.getInputDevice(id)
-                        val deviceLocation =
-                            getDeviceLocation(getEventDevices, device.name) ?: return@forEach
-                        deviceLocationToDescriptorMap[deviceLocation] = device.descriptor
-                        descriptorToIsExternalMap[device.descriptor] = device.isExternalCompat
-                    }
+                val inputDevices = devicesAdapter.inputDevices.value
 
-                    val getEventLabels = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE.keys
+                inputDevices.forEach { device ->
+                    val deviceLocation =
+                        getDeviceLocation(getEventDevices, device.name) ?: return@forEach
+                    deviceLocationToDescriptorMap[deviceLocation] = device.descriptor
+                    descriptorToIsExternalMap[device.descriptor] = device.isExternal
+                }
 
-                    val deviceLocationRegex = Regex(REGEX_GET_DEVICE_LOCATION)
-                    val actionRegex = Regex(REGEX_KEY_EVENT_ACTION)
+                val getEventLabels = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE.keys
 
-                    //use -q option to not initially output the list of devices
-                    val inputStream = Shell.getShellCommandStdOut("su", "-c", "getevent -lq")
-                    var line: String?
+                val deviceLocationRegex = Regex(REGEX_GET_DEVICE_LOCATION)
+                val actionRegex = Regex(REGEX_KEY_EVENT_ACTION)
 
-                    while (inputStream.bufferedReader().readLine()
-                            .also { line = it } != null && isActive
-                    ) {
-                        line ?: continue
+                //use -q option to not initially output the list of devices
+                val inputStream = Shell.getShellCommandStdOut("su", "-c", "getevent -lq")
+                var line: String?
 
-                        getEventLabels.forEach { label ->
-                            if (line?.contains(label) == true) {
-                                val keycode = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE[label]!!
-                                val deviceLocation =
-                                    deviceLocationRegex.find(line!!)?.value ?: return@forEach
-                                val deviceDescriptor =
-                                    deviceLocationToDescriptorMap[deviceLocation]!!
-                                val isExternal = descriptorToIsExternalMap[deviceDescriptor]!!
-                                val actionString = actionRegex.find(line!!)?.value ?: return@forEach
+                while (inputStream.bufferedReader().readLine()
+                        .also { line = it } != null && isActive
+                ) {
+                    line ?: continue
 
-                                when (actionString) {
-                                    "UP" -> {
-                                        onKeyEvent.invoke(
-                                            keycode,
-                                            KeyEvent.ACTION_UP,
-                                            deviceDescriptor,
-                                            isExternal,
-                                            0
-                                        )
-                                    }
+                    getEventLabels.forEach { label ->
+                        if (line?.contains(label) == true) {
+                            val keycode = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE[label]!!
+                            val deviceLocation =
+                                deviceLocationRegex.find(line!!)?.value ?: return@forEach
+                            val deviceDescriptor =
+                                deviceLocationToDescriptorMap[deviceLocation]!!
+                            val isExternal = descriptorToIsExternalMap[deviceDescriptor]!!
+                            val actionString = actionRegex.find(line!!)?.value ?: return@forEach
 
-                                    "DOWN" -> {
-                                        onKeyEvent.invoke(
-                                            keycode,
-                                            KeyEvent.ACTION_DOWN,
-                                            deviceDescriptor,
-                                            isExternal,
-                                            0
-                                        )
-                                    }
+                            when (actionString) {
+                                "UP" -> {
+                                    onKeyEvent.invoke(
+                                        keycode,
+                                        KeyEvent.ACTION_UP,
+                                        deviceDescriptor,
+                                        isExternal,
+                                        0
+                                    )
                                 }
 
-                                return@forEach
+                                "DOWN" -> {
+                                    onKeyEvent.invoke(
+                                        keycode,
+                                        KeyEvent.ACTION_DOWN,
+                                        deviceDescriptor,
+                                        isExternal,
+                                        0
+                                    )
+                                }
                             }
+
+                            return@forEach
                         }
                     }
-
-                    inputStream.close()
-
-                } catch (e: IOException) {
-                    withContext(Dispatchers.Main) {
-                        toast(R.string.toast_io_exception_shrug)
-                    }
                 }
+
+                inputStream.close()
             }
 
         } catch (e: Exception) {

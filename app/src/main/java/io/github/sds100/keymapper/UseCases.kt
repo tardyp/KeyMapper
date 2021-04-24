@@ -113,7 +113,12 @@ object UseCases {
             ServiceLocator.inputMethodAdapter(ctx)
         )
 
-    fun detectConstraints(service: IAccessibilityService) = DetectConstraintsUseCaseImpl(service)
+    fun detectConstraints(service: MyAccessibilityService) = DetectConstraintsUseCaseImpl(
+        service,
+        ServiceLocator.mediaAdapter(service),
+        ServiceLocator.externalDevicesAdapter(service),
+        ServiceLocator.displayAdapter(service)
+    )
 
     fun performActions(ctx: Context, service: IAccessibilityService) =
         PerformActionsUseCaseImpl(

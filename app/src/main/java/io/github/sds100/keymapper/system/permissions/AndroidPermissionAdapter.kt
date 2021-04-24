@@ -1,6 +1,8 @@
 package io.github.sds100.keymapper.system.permissions
 
 import android.Manifest
+import android.app.NotificationManager
+import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -17,10 +19,11 @@ import io.github.sds100.keymapper.system.DeviceAdmin
 import io.github.sds100.keymapper.system.root.RootUtils
 import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
-import splitties.systemservices.devicePolicyManager
-import splitties.systemservices.notificationManager
 
 /**
  * Created by sds100 on 17/03/2021.
@@ -67,12 +70,10 @@ class AndroidPermissionAdapter(
                     Manifest.permission.CAMERA
                 ) == PERMISSION_GRANTED
 
-            Permission.DEVICE_ADMIN -> devicePolicyManager?.isAdminActive(
-                ComponentName(
-                    ctx,
-                    DeviceAdmin::class.java
-                )
-            ) == true
+            Permission.DEVICE_ADMIN -> {
+                val devicePolicyManager: DevicePolicyManager = ctx.getSystemService()!!
+                devicePolicyManager.isAdminActive(ComponentName(ctx, DeviceAdmin::class.java))
+            }
 
             Permission.READ_PHONE_STATE -> ContextCompat.checkSelfPermission(
                 ctx,
@@ -81,6 +82,7 @@ class AndroidPermissionAdapter(
 
             Permission.ACCESS_NOTIFICATION_POLICY ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val notificationManager: NotificationManager = ctx.getSystemService()!!
                     notificationManager.isNotificationPolicyAccessGranted
                 } else {
                     true

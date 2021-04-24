@@ -5,15 +5,13 @@ import android.content.Context
 import android.media.AudioManager
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.view.KeyEvent
 import androidx.core.content.getSystemService
 import io.github.sds100.keymapper.system.notifications.NotificationReceiver
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
-import io.github.sds100.keymapper.util.Error
-import io.github.sds100.keymapper.util.Result
-import io.github.sds100.keymapper.util.Success
-import io.github.sds100.keymapper.util.onSuccess
+import io.github.sds100.keymapper.util.*
 
 /**
  * Created by sds100 on 21/04/2021.
@@ -55,13 +53,21 @@ class AndroidMediaAdapter(
         return sendMediaKeyEvent(KeyEvent.KEYCODE_MEDIA_NEXT, packageName)
     }
 
+    override fun getPackagesPlayingMedia(): List<String> {
+        val activeMediaSessions = getActiveMediaSessions().valueOrNull() ?: return emptyList()
+
+        return activeMediaSessions
+            .filter { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+            .map { it.packageName }
+    }
+
     private fun sendMediaKeyEvent(keyCode: Int, packageName: String?): Result<*> {
-        if (packageName == null){
+        if (packageName == null) {
             audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
             audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
             return Success(Unit)
-        }else {
-           return  getActiveMediaSessions().onSuccess { mediaSessions ->
+        } else {
+            return getActiveMediaSessions().onSuccess { mediaSessions ->
                 for (session in mediaSessions) {
                     if (session.packageName == packageName) {
                         session.dispatchMediaButtonEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))

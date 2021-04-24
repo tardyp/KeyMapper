@@ -26,9 +26,9 @@ class AndroidBluetoothAdapter(
 
     private val adapter: BluetoothAdapter? by lazy { BluetoothAdapter.getDefaultAdapter() }
 
-    override val onDeviceConnect = MutableSharedFlow<String>()
-    override val onDeviceDisconnect = MutableSharedFlow<String>()
-    override val onDevicePairedChange = MutableSharedFlow<String>()
+    override val onDeviceConnect = MutableSharedFlow<BluetoothDeviceInfo>()
+    override val onDeviceDisconnect = MutableSharedFlow<BluetoothDeviceInfo>()
+    override val onDevicePairedChange = MutableSharedFlow<BluetoothDeviceInfo>()
     override val isBluetoothEnabled =
         MutableStateFlow(BluetoothAdapter.getDefaultAdapter()?.isEnabled ?: false)
 
@@ -59,7 +59,12 @@ class AndroidBluetoothAdapter(
                         ?: return
 
                 coroutineScope.launch {
-                    onDeviceConnect.emit(device.address)
+                    onDeviceConnect.emit(
+                        BluetoothDeviceInfo(
+                            address = device.address,
+                            name = device.name
+                        )
+                    )
                 }
             }
 
@@ -69,7 +74,10 @@ class AndroidBluetoothAdapter(
                         ?: return
 
                 coroutineScope.launch {
-                    onDeviceDisconnect.emit(device.address)
+                    onDeviceDisconnect.emit( BluetoothDeviceInfo(
+                        address = device.address,
+                        name = device.name
+                    ))
                 }
             }
 
@@ -79,7 +87,10 @@ class AndroidBluetoothAdapter(
                         ?: return
 
                 coroutineScope.launch {
-                    onDevicePairedChange.emit(device.address)
+                    onDevicePairedChange.emit( BluetoothDeviceInfo(
+                        address = device.address,
+                        name = device.name
+                    ))
                 }
             }
 

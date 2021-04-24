@@ -7,6 +7,7 @@ import io.github.sds100.keymapper.util.Result
  */
 interface MediaAdapter {
 
+    fun getPackagesPlayingMedia(): List<String>
     fun fastForward(packageName: String? = null): Result<*>
     fun rewind(packageName: String? = null): Result<*>
     fun play(packageName: String? = null): Result<*>

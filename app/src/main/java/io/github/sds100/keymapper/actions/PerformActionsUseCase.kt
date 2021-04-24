@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
 import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
 import io.github.sds100.keymapper.system.camera.CameraAdapter
-import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.display.DisplayAdapter
 import io.github.sds100.keymapper.system.display.Orientation
 import io.github.sds100.keymapper.system.files.FileAdapter
@@ -57,7 +57,7 @@ class PerformActionsUseCaseImpl(
     private val packageManagerAdapter: PackageManagerAdapter,
     private val appShortcutAdapter: AppShortcutAdapter,
     private val popupMessageAdapter: PopupMessageAdapter,
-    private val deviceAdapter: ExternalDevicesAdapter,
+    private val deviceAdapter: DevicesAdapter,
     private val phoneAdapter: PhoneAdapter,
     private val volumeAdapter: VolumeAdapter,
     private val cameraAdapter: CameraAdapter,
@@ -667,7 +667,7 @@ class PerformActionsUseCaseImpl(
             return -1
         }
 
-        val inputDevices = deviceAdapter.inputDevices.value.dataOrNull() ?: return -1
+        val inputDevices = deviceAdapter.inputDevices.value ?: return -1
 
         val devicesWithSameDescriptor =
             inputDevices.filter { it.descriptor == action.device.descriptor }

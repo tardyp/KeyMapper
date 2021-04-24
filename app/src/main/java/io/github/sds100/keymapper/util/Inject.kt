@@ -239,7 +239,8 @@ object Inject {
             performActionsUseCase = UseCases.performActions(service, service),
             detectKeyMapsUseCase = UseCases.detectKeyMaps(service),
             detectFingerprintMapsUseCase = UseCases.detectFingerprintMaps(service),
-            pauseMappingsUseCase = UseCases.pauseMappings(service)
+            pauseMappingsUseCase = UseCases.pauseMappings(service),
+            devicesAdapter = ServiceLocator.externalDevicesAdapter(service)
         )
     }
 
