@@ -34,7 +34,7 @@ sealed class Error : Result<Nothing>() {
     object NoSettingsApp : Error()
     object FrontFlashNotFound : Error()
     object BackFlashNotFound : Error()
-   object ImeDisabled : Error()
+   data class ImeDisabled(val imeId: String) : Error()
     object DownloadFailed : Error()
     object FileNotCached : Error()
     object SSLHandshakeError : Error()
@@ -180,6 +180,5 @@ suspend fun <T, U> Result<T>.handleAsync(
         is Error -> onFailure(this)
     }
 }
-
 
 fun <T> T.success() = Success(this)

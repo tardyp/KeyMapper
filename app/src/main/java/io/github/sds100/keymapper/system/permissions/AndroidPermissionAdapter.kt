@@ -16,7 +16,7 @@ import io.github.sds100.keymapper.Constants
 import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.system.DeviceAdmin
-import io.github.sds100.keymapper.system.root.RootUtils
+import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.firstBlocking
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,7 +31,8 @@ import kotlinx.coroutines.launch
 class AndroidPermissionAdapter(
     context: Context,
     private val coroutineScope: CoroutineScope,
-    private val preferenceRepository: PreferenceRepository
+    private val preferenceRepository: PreferenceRepository,
+    private val suAdapter: SuAdapter
 ) : PermissionAdapter {
     private val ctx = context.applicationContext
 
@@ -90,7 +91,7 @@ class AndroidPermissionAdapter(
 
             Permission.WRITE_SECURE_SETTINGS -> {
                 if (isGranted(Permission.ROOT)) {
-                    RootUtils.executeRootCommand("pm grant ${Constants.PACKAGE_NAME} ${Manifest.permission.WRITE_SECURE_SETTINGS}")
+                    suAdapter.execute("pm grant ${Constants.PACKAGE_NAME} ${Manifest.permission.WRITE_SECURE_SETTINGS}")
                 }
 
                 ContextCompat.checkSelfPermission(
@@ -109,9 +110,7 @@ class AndroidPermissionAdapter(
                     Manifest.permission.CALL_PHONE
                 ) == PERMISSION_GRANTED
 
-            Permission.ROOT ->
-                preferenceRepository.get(Keys.hasRootPermission).firstBlocking()
-                    ?: false
+            Permission.ROOT -> suAdapter.isGranted.firstBlocking()
 
             Permission.IGNORE_BATTERY_OPTIMISATION ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

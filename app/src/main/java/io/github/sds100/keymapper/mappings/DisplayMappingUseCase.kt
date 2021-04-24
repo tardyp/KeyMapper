@@ -58,6 +58,7 @@ class DisplaySimpleMappingUseCaseImpl(
                 fromForeground = true
             )
             Error.NoCompatibleImeEnabled -> keyMapperImeHelper.enableCompatibleInputMethods()
+          is   Error.ImeDisabled -> inputMethodAdapter.enableIme(error.imeId)
             is Error.PermissionDenied -> permissionAdapter.request(error.permission)
         }
     }

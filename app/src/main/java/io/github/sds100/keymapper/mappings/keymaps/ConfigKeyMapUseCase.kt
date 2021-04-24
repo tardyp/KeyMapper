@@ -1,20 +1,19 @@
 package io.github.sds100.keymapper.mappings.keymaps
 
-import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.actions.ActionData
 import io.github.sds100.keymapper.actions.KeyEventAction
-import io.github.sds100.keymapper.system.devices.DevicesAdapter
-import io.github.sds100.keymapper.mappings.keymaps.trigger.KeyMapTrigger
-import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKey
-import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKeyDevice
-import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerMode
+import io.github.sds100.keymapper.constraints.ConstraintState
 import io.github.sds100.keymapper.domain.utils.*
 import io.github.sds100.keymapper.mappings.BaseConfigMappingUseCase
 import io.github.sds100.keymapper.mappings.ClickType
 import io.github.sds100.keymapper.mappings.ConfigMappingUseCase
-import io.github.sds100.keymapper.util.Defaultable
+import io.github.sds100.keymapper.mappings.keymaps.trigger.KeyMapTrigger
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKey
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerKeyDevice
+import io.github.sds100.keymapper.mappings.keymaps.trigger.TriggerMode
+import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.keyevents.KeyEventUtils
-import io.github.sds100.keymapper.util.dataOrNull
+import io.github.sds100.keymapper.util.Defaultable
 import io.github.sds100.keymapper.util.ifIsData
 
 /**
@@ -122,9 +121,9 @@ class ConfigKeyMapUseCaseImpl(
                 newKeys.distinctBy { Pair(it.keyCode, it.device) }.toMutableList()
         }
 
-        val newMode = if (newKeys.size <= 1){
+        val newMode = if (newKeys.size <= 1) {
             TriggerMode.Undefined
-        }else{
+        } else {
             TriggerMode.Parallel(newKeys[0].clickType)
         }
 
@@ -253,9 +252,9 @@ class ConfigKeyMapUseCaseImpl(
             val inputDevices = devicesAdapter.inputDevices.value
 
             inputDevices.forEach {
-                yield(
-                    TriggerKeyDevice.External(it.descriptor, it.name)
-                )
+                if (it.isExternal) {
+                    yield(TriggerKeyDevice.External(it.descriptor, it.name))
+                }
             }
         }
 
@@ -345,7 +344,7 @@ class ConfigKeyMapUseCaseImpl(
     }
 
     private fun editTrigger(block: (trigger: KeyMapTrigger) -> KeyMapTrigger) {
-       editKeyMap { keyMap ->
+        editKeyMap { keyMap ->
             val newTrigger = block(keyMap.trigger)
 
             keyMap.copy(trigger = newTrigger)

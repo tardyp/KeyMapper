@@ -1,17 +1,18 @@
 package io.github.sds100.keymapper.system.keyevents
 
 import android.view.KeyEvent
-import io.github.sds100.keymapper.system.Shell
 import io.github.sds100.keymapper.system.devices.DevicesAdapter
-import io.github.sds100.keymapper.system.root.RootUtils
-import io.github.sds100.keymapper.util.State
+import io.github.sds100.keymapper.system.devices.InputDeviceInfo
+import io.github.sds100.keymapper.system.root.SuAdapter
+import io.github.sds100.keymapper.util.valueOrNull
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import timber.log.Timber
 
 /**
  * Created by sds100 on 21/06/2020.
  */
 class GetEventDelegate(
+    private val suAdapter: SuAdapter,
     private val devicesAdapter: DevicesAdapter,
     private val onKeyEvent: suspend (
         keyCode: Int,
@@ -40,23 +41,21 @@ class GetEventDelegate(
         try {
             job = scope.launch(Dispatchers.IO) {
 
-                val getEventDevices: String
+                val devicesInputStream =
+                    suAdapter.getCommandOutput("getevent -i").valueOrNull() ?: return@launch
 
-                RootUtils.getRootCommandOutput("getevent -i").apply {
-                    getEventDevices = bufferedReader().readText()
-                    close()
-                }
+                val getEventDevices: String = devicesInputStream.bufferedReader().readText()
+                devicesInputStream.close()
 
-                val deviceLocationToDescriptorMap = mutableMapOf<String, String>()
-                val descriptorToIsExternalMap = mutableMapOf<String, Boolean>()
+                val deviceLocationToDeviceMap = mutableMapOf<String, InputDeviceInfo>()
 
                 val inputDevices = devicesAdapter.inputDevices.value
 
                 inputDevices.forEach { device ->
                     val deviceLocation =
                         getDeviceLocation(getEventDevices, device.name) ?: return@forEach
-                    deviceLocationToDescriptorMap[deviceLocation] = device.descriptor
-                    descriptorToIsExternalMap[device.descriptor] = device.isExternal
+
+                    deviceLocationToDeviceMap[deviceLocation] = device
                 }
 
                 val getEventLabels = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE.keys
@@ -65,7 +64,9 @@ class GetEventDelegate(
                 val actionRegex = Regex(REGEX_KEY_EVENT_ACTION)
 
                 //use -q option to not initially output the list of devices
-                val inputStream = Shell.getShellCommandStdOut("su", "-c", "getevent -lq")
+                val inputStream =
+                    suAdapter.getCommandOutput("getevent -lq").valueOrNull() ?: return@launch
+
                 var line: String?
 
                 while (inputStream.bufferedReader().readLine()
@@ -75,31 +76,33 @@ class GetEventDelegate(
 
                     getEventLabels.forEach { label ->
                         if (line?.contains(label) == true) {
-                            val keycode = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE[label]!!
+                            val keyCode = KeyEventUtils.GET_EVENT_LABEL_TO_KEYCODE[label]
+                                ?: return@forEach
+
                             val deviceLocation =
                                 deviceLocationRegex.find(line!!)?.value ?: return@forEach
-                            val deviceDescriptor =
-                                deviceLocationToDescriptorMap[deviceLocation]!!
-                            val isExternal = descriptorToIsExternalMap[deviceDescriptor]!!
+
+                            val device = deviceLocationToDeviceMap[deviceLocation] ?: return@forEach
+
                             val actionString = actionRegex.find(line!!)?.value ?: return@forEach
 
                             when (actionString) {
                                 "UP" -> {
                                     onKeyEvent.invoke(
-                                        keycode,
+                                        keyCode,
                                         KeyEvent.ACTION_UP,
-                                        deviceDescriptor,
-                                        isExternal,
+                                        device.descriptor,
+                                        device.isExternal,
                                         0
                                     )
                                 }
 
                                 "DOWN" -> {
                                     onKeyEvent.invoke(
-                                        keycode,
+                                        keyCode,
                                         KeyEvent.ACTION_DOWN,
-                                        deviceDescriptor,
-                                        isExternal,
+                                        device.descriptor,
+                                        device.isExternal,
                                         0
                                     )
                                 }
@@ -114,6 +117,7 @@ class GetEventDelegate(
             }
 
         } catch (e: Exception) {
+            Timber.e(e)
             job?.cancel()
             return false
         }
@@ -123,6 +127,7 @@ class GetEventDelegate(
 
     fun stopListening() {
         job?.cancel()
+        job = null
     }
 
     private fun getDeviceLocation(getEventDeviceOutput: String, deviceName: String): String? {

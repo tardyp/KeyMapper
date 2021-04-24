@@ -75,7 +75,8 @@ class KeyMapperApp : MultiDexApplication() {
         AndroidInputMethodAdapter(
             this,
             serviceAdapter,
-            permissionAdapter
+            permissionAdapter,
+            suAdapter
         )
     }
     val externalDevicesAdapter by lazy {
@@ -90,7 +91,8 @@ class KeyMapperApp : MultiDexApplication() {
         AndroidPermissionAdapter(
             this,
             appCoroutineScope,
-            ServiceLocator.preferenceRepository(this)
+            ServiceLocator.preferenceRepository(this),
+            suAdapter
         )
     }
     val systemFeatureAdapter by lazy { AndroidSystemFeatureAdapter(this) }

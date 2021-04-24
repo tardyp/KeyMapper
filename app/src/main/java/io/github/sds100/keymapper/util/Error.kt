@@ -91,7 +91,7 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
         R.string.error_failed_to_modify_system_setting,
         setting
     )
-    Error.ImeDisabled -> resourceProvider.getString(R.string.error_ime_disabled)
+    is Error.ImeDisabled -> resourceProvider.getString(R.string.error_ime_disabled)
     Error.FailedToChangeIme -> resourceProvider.getString(R.string.error_failed_to_change_ime)
     Error.NoCameraApp -> resourceProvider.getString(R.string.error_no_camera_app)
     Error.NoDeviceAssistant -> resourceProvider.getString(R.string.error_no_device_assistant)
@@ -105,6 +105,7 @@ val Error.isFixable: Boolean
         is Error.AppDisabled,
         Error.NoCompatibleImeEnabled,
         Error.NoCompatibleImeChosen,
+      is  Error.ImeDisabled,
         Error.AccessibilityServiceDisabled,
         Error.AccessibilityServiceCrashed,
         is Error.PermissionDenied

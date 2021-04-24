@@ -60,7 +60,7 @@ class AccessibilityServiceAdapter(
         }
     }
 
-    override suspend fun send(event: Event): Result<Unit> {
+    override suspend fun send(event: Event): Result<*> {
 
         if (!isEnabled.value) {
             return Error.AccessibilityServiceDisabled

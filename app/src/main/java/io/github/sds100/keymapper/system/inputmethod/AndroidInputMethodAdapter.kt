@@ -12,13 +12,12 @@ import android.os.Looper
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
-import io.github.sds100.keymapper.ServiceLocator
 import io.github.sds100.keymapper.system.JobSchedulerHelper
 import io.github.sds100.keymapper.system.SettingsUtils
 import io.github.sds100.keymapper.system.accessibility.ServiceAdapter
 import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.permissions.PermissionAdapter
-import io.github.sds100.keymapper.system.root.RootUtils
+import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,7 +30,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 class AndroidInputMethodAdapter(
     context: Context,
     private val serviceAdapter: ServiceAdapter,
-    permissionAdapter: PermissionAdapter
+    private val permissionAdapter: PermissionAdapter,
+    private val suAdapter: SuAdapter
 ) : InputMethodAdapter {
 
     companion object {
@@ -88,8 +88,6 @@ class AndroidInputMethodAdapter(
     private val inputMethodManager: InputMethodManager
         get() = ctx.getSystemService()!!
 
-    private val permissionAdapter: PermissionAdapter by lazy { ServiceLocator.permissionAdapter(ctx) }
-
     init {
         //use job scheduler because there is there is a much shorter delay when the app is in the background
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -123,7 +121,7 @@ class AndroidInputMethodAdapter(
         }
     }
 
-    override fun showImePicker(fromForeground: Boolean): Result<Unit> {
+    override fun showImePicker(fromForeground: Boolean): Result<*> {
         when {
             fromForeground || Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 -> {
                 inputMethodManager.showInputMethodPicker()
@@ -133,16 +131,14 @@ class AndroidInputMethodAdapter(
             (Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P).contains(Build.VERSION.SDK_INT) -> {
                 val command =
                     "am broadcast -a com.android.server.InputMethodManagerService.SHOW_INPUT_METHOD_PICKER"
-                RootUtils.executeRootCommand(command)
-
-                return Success(Unit)
+                return suAdapter.execute(command)
             }
 
             else -> return Error.CantShowImePickerInBackground
         }
     }
 
-    override fun enableIme(imeId: String): Result<Unit> {
+    override fun enableIme(imeId: String): Result<*> {
         return enableImeWithoutUserInput(imeId).otherwise {
             try {
                 val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
@@ -156,19 +152,14 @@ class AndroidInputMethodAdapter(
         }
     }
 
-    private fun enableImeWithoutUserInput(imeId: String): Result<Unit> {
-        if (permissionAdapter.isGranted(Permission.ROOT)) {
-            RootUtils.executeRootCommand("ime enable $imeId")
-            return Success(Unit)
-        } else {
-            return Error.PermissionDenied(Permission.ROOT)
-        }
+    private fun enableImeWithoutUserInput(imeId: String): Result<*> {
+        return suAdapter.execute("ime enable $imeId")
     }
 
     override suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo> {
         getInfoById(imeId).onSuccess {
             if (!it.isEnabled) {
-                return Error.ImeDisabled
+                return Error.ImeDisabled(imeId)
             }
         }.onFailure {
             return it
@@ -199,7 +190,7 @@ class AndroidInputMethodAdapter(
 
         //wait for the ime to change and then return the info of the ime
         val didImeChange = withTimeoutOrNull(2000) {
-                chosenIme.first { it.id == imeId }
+            chosenIme.first { it.id == imeId }
         }
 
         if (didImeChange != null) {

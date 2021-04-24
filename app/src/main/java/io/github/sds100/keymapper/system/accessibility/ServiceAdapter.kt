@@ -15,6 +15,6 @@ interface ServiceAdapter {
     fun restartService()
     fun disableService()
 
-    suspend fun send(event: Event): Result<Unit>
+    suspend fun send(event: Event): Result<*>
     val eventReceiver: SharedFlow<Event>
 }

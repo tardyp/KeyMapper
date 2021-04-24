@@ -13,6 +13,7 @@ import io.github.sds100.keymapper.mappings.keymaps.KeyMapController
 import io.github.sds100.keymapper.mappings.keymaps.TriggerKeyMapFromOtherAppsController
 import io.github.sds100.keymapper.system.devices.DevicesAdapter
 import io.github.sds100.keymapper.system.keyevents.GetEventDelegate
+import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -31,7 +32,8 @@ class AccessibilityServiceController(
     val detectKeyMapsUseCase: DetectKeyMapsUseCase,
     val detectFingerprintMapsUseCase: DetectFingerprintMapsUseCase,
     val pauseMappingsUseCase: PauseMappingsUseCase,
-    val devicesAdapter: DevicesAdapter
+    val devicesAdapter: DevicesAdapter,
+    val suAdapter: SuAdapter
 ) {
 
     companion object {
@@ -75,7 +77,7 @@ class AccessibilityServiceController(
             .stateIn(coroutineScope, SharingStarted.Eagerly, false)
 
     private val getEventDelegate =
-        GetEventDelegate(devicesAdapter) { keyCode, action, deviceDescriptor, isExternal, deviceId ->
+        GetEventDelegate(suAdapter, devicesAdapter) { keyCode, action, deviceDescriptor, isExternal, deviceId ->
 
             if (!isPaused.value) {
                 withContext(Dispatchers.Main.immediate) {
@@ -117,8 +119,8 @@ class AccessibilityServiceController(
             triggerKeyMapFromOtherAppsController.reset()
         }.launchIn(coroutineScope)
 
-        detectKeyMapsUseCase.isScreenOn.distinctUntilChanged().onEach { isScreenOn ->
-            if (isScreenOn) {
+        detectKeyMapsUseCase.isScreenOn.onEach { isScreenOn ->
+            if (!isScreenOn) {
                 if (screenOffTriggersEnabled.value) {
                     getEventDelegate.startListening(coroutineScope)
                 }

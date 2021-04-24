@@ -11,12 +11,12 @@ import io.github.sds100.keymapper.util.Result
 class TestActionUseCaseImpl(
     private val serviceAdapter: ServiceAdapter
 ) : TestActionUseCase {
-    override suspend fun invoke(action: ActionData): Result<Unit> {
+    override suspend fun invoke(action: ActionData): Result<*> {
 
         return serviceAdapter.send(TestActionEvent(action))
     }
 }
 
 interface TestActionUseCase {
-    suspend operator fun invoke(action: ActionData): Result<Unit>
+    suspend operator fun invoke(action: ActionData): Result<*>
 }

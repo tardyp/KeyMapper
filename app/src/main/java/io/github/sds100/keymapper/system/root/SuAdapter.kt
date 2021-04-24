@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.io.InputStream
 
 /**
  * Created by sds100 on 21/04/2021.
@@ -40,7 +41,7 @@ class SuAdapterImpl(
 
             } else {
                 if (process == null) {
-                    process = RootUtils.getSuProcess()
+                    process = ProcessBuilder("su").start()
                 }
 
                 with(process!!.outputStream.bufferedWriter()) {
@@ -54,9 +55,19 @@ class SuAdapterImpl(
             return Error.Exception(e)
         }
     }
+
+    override fun getCommandOutput(command: String): Result<InputStream> {
+        if (!isGranted.firstBlocking()) {
+            return Error.PermissionDenied(Permission.ROOT)
+        }
+
+        val inputStream = Shell.getShellCommandStdOut("su", "-c", command)
+        return Success(inputStream)
+    }
 }
 
 interface SuAdapter {
     val isGranted: Flow<Boolean>
     fun execute(command: String, block: Boolean = false): Result<*>
+    fun getCommandOutput(command: String): Result<InputStream>
 }

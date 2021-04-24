@@ -240,7 +240,8 @@ object Inject {
             detectKeyMapsUseCase = UseCases.detectKeyMaps(service),
             detectFingerprintMapsUseCase = UseCases.detectFingerprintMaps(service),
             pauseMappingsUseCase = UseCases.pauseMappings(service),
-            devicesAdapter = ServiceLocator.externalDevicesAdapter(service)
+            devicesAdapter = ServiceLocator.externalDevicesAdapter(service),
+            suAdapter = ServiceLocator.suAdapter(service)
         )
     }
 

@@ -43,7 +43,7 @@ class RecordTriggerController(
         }.launchIn(coroutineScope)
     }
 
-    override suspend fun startRecording(): Result<Unit> {
+    override suspend fun startRecording(): Result<*> {
         return serviceAdapter.send(StartRecordingTrigger)
     }
 
@@ -61,6 +61,6 @@ interface RecordTriggerUseCase {
     /**
      * @return Success if started and an Error if failed to start.
      */
-    suspend fun startRecording(): Result<Unit>
+    suspend fun startRecording(): Result<*>
     fun stopRecording()
 }

@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 interface InputMethodAdapter {
     val isUserInputRequiredToChangeIme: Flow<Boolean>
 
-    fun showImePicker(fromForeground: Boolean): Result<Unit>
-    fun enableIme(imeId: String): Result<Unit>
+    fun showImePicker(fromForeground: Boolean): Result<*>
+    fun enableIme(imeId: String): Result<*>
     suspend fun chooseIme(imeId: String, fromForeground: Boolean): Result<ImeInfo>
 
     fun getInfoById(imeId: String): Result<ImeInfo>

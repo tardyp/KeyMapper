@@ -99,8 +99,6 @@ class AndroidDevicesAdapter(
         InputDevice.getDeviceIds().forEach {
             val device = InputDevice.getDevice(it)
 
-            if (!device.isExternalCompat) return@forEach
-
             devices.add(
                 InputDeviceInfo(
                     device.descriptor,
