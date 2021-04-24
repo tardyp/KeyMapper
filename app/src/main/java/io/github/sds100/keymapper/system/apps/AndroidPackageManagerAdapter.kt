@@ -4,6 +4,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.provider.MediaStore
 import android.provider.Settings
 import io.github.sds100.keymapper.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -71,6 +72,32 @@ class AndroidPackageManagerAdapter(
         }
     }
 
+    override fun launchVoiceAssistant(): Result<*> {
+        try {
+            Intent(Intent.ACTION_VOICE_COMMAND).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                ctx.startActivity(this)
+            }
+
+            return Success(Unit)
+        } catch (e: ActivityNotFoundException) {
+            return Error.NoVoiceAssistant
+        }
+    }
+
+    override fun launchDeviceAssistant(): Result<*> {
+        try {
+            Intent(Intent.ACTION_ASSIST).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                ctx.startActivity(this)
+            }
+
+            return Success(Unit)
+        } catch (e: ActivityNotFoundException) {
+            return Error.NoDeviceAssistant
+        }
+    }
+
     override fun enableApp(packageName: String) {
         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.parse("package:${packageName}")
@@ -131,6 +158,32 @@ class AndroidPackageManagerAdapter(
             Intent(Intent.ACTION_VOICE_COMMAND).resolveActivityInfo(ctx.packageManager, 0) != null
 
         return activityExists
+    }
+
+    override fun launchCameraApp(): Result<*> {
+        try {
+            Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                ctx.startActivity(this)
+            }
+
+            return Success(Unit)
+        } catch (e: ActivityNotFoundException) {
+            return Error.NoCameraApp
+        }
+    }
+
+    override fun launchSettingsApp(): Result<*> {
+        try {
+            Intent(Settings.ACTION_SETTINGS).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                ctx.startActivity(this)
+            }
+
+            return Success(Unit)
+        } catch (e: ActivityNotFoundException) {
+            return Error.NoSettingsApp
+        }
     }
 
     override fun getAppName(packageName: String): Result<String> {

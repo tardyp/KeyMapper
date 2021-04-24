@@ -29,13 +29,13 @@ fun AccessibilityNodeInfo?.findNodeRecursively(
     return null
 }
 
-fun AccessibilityNodeInfo?.focusedNode(func: (node: AccessibilityNodeInfo?) -> Unit) {
-    func.invoke(findNodeRecursively { it.isFocused })
-}
-
-fun AccessibilityNodeInfo?.performActionOnFocusedNode(action: Int) {
-    focusedNode {
-        it?.performAction(action)
-        it?.recycle()
-    }
+fun AccessibilityNodeInfo.toModel(): AccessibilityNodeModel {
+    return AccessibilityNodeModel(
+        packageName = packageName?.toString(),
+        contentDescription = contentDescription?.toString(),
+        isFocused = isFocused,
+        textSelectionStart = textSelectionStart,
+        textSelectionEnd = textSelectionEnd,
+        text = text?.toString()
+    )
 }

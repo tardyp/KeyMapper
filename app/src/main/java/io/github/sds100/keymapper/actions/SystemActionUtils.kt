@@ -117,7 +117,6 @@ object SystemActionUtils {
             SystemActionId.SHOW_KEYBOARD -> SystemActionCategory.KEYBOARD
             SystemActionId.HIDE_KEYBOARD -> SystemActionCategory.KEYBOARD
             SystemActionId.SHOW_KEYBOARD_PICKER -> SystemActionCategory.KEYBOARD
-            SystemActionId.SHOW_KEYBOARD_PICKER_ROOT -> SystemActionCategory.KEYBOARD
             SystemActionId.TEXT_CUT -> SystemActionCategory.KEYBOARD
             SystemActionId.TEXT_COPY -> SystemActionCategory.KEYBOARD
             SystemActionId.TEXT_PASTE -> SystemActionCategory.KEYBOARD
@@ -187,8 +186,8 @@ object SystemActionUtils {
             SystemActionId.PAUSE_MEDIA_PACKAGE -> R.string.action_pause_media_package
             SystemActionId.PLAY_MEDIA -> R.string.action_play_media
             SystemActionId.PLAY_MEDIA_PACKAGE -> R.string.action_play_media_package
-            SystemActionId.PLAY_PAUSE_MEDIA -> R.string.action_pause_media
-            SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_pause_media_package
+            SystemActionId.PLAY_PAUSE_MEDIA -> R.string.action_play_pause_media
+            SystemActionId.PLAY_PAUSE_MEDIA_PACKAGE -> R.string.action_play_pause_media_package
             SystemActionId.NEXT_TRACK -> R.string.action_next_track
             SystemActionId.NEXT_TRACK_PACKAGE -> R.string.action_next_track_package
             SystemActionId.PREVIOUS_TRACK -> R.string.action_previous_track
@@ -214,7 +213,6 @@ object SystemActionUtils {
             SystemActionId.SHOW_KEYBOARD -> R.string.action_show_keyboard
             SystemActionId.HIDE_KEYBOARD -> R.string.action_hide_keyboard
             SystemActionId.SHOW_KEYBOARD_PICKER -> R.string.action_show_keyboard_picker
-            SystemActionId.SHOW_KEYBOARD_PICKER_ROOT -> R.string.action_show_keyboard_picker_root
             SystemActionId.TEXT_CUT -> R.string.action_text_cut
             SystemActionId.TEXT_COPY -> R.string.action_text_copy
             SystemActionId.TEXT_PASTE -> R.string.action_text_paste
@@ -309,7 +307,6 @@ object SystemActionUtils {
             SystemActionId.SHOW_KEYBOARD -> R.drawable.ic_outline_keyboard_24
             SystemActionId.HIDE_KEYBOARD -> R.drawable.ic_outline_keyboard_hide_24
             SystemActionId.SHOW_KEYBOARD_PICKER -> R.drawable.ic_outline_keyboard_24
-            SystemActionId.SHOW_KEYBOARD_PICKER_ROOT -> R.drawable.ic_outline_keyboard_24
             SystemActionId.TEXT_CUT -> R.drawable.ic_content_cut
             SystemActionId.TEXT_COPY -> R.drawable.ic_content_copy
             SystemActionId.TEXT_PASTE -> R.drawable.ic_content_paste
@@ -378,10 +375,20 @@ object SystemActionUtils {
             SystemActionId.SECURE_LOCK_DEVICE
             -> listOf(PackageManager.FEATURE_DEVICE_ADMIN)
 
+            SystemActionId.TOGGLE_WIFI,
+            SystemActionId.ENABLE_WIFI,
+            SystemActionId.DISABLE_WIFI,
+            -> listOf(PackageManager.FEATURE_WIFI)
+
             SystemActionId.TOGGLE_NFC,
             SystemActionId.ENABLE_NFC,
             SystemActionId.DISABLE_NFC,
             -> listOf(PackageManager.FEATURE_NFC)
+
+            SystemActionId.TOGGLE_BLUETOOTH,
+            SystemActionId.ENABLE_BLUETOOTH,
+            SystemActionId.DISABLE_BLUETOOTH,
+                -> listOf(PackageManager.FEATURE_BLUETOOTH)
 
             SystemActionId.TOGGLE_FLASHLIGHT,
             SystemActionId.ENABLE_FLASHLIGHT,
@@ -458,15 +465,11 @@ object SystemActionUtils {
             -> return listOf(Permission.ROOT)
 
             SystemActionId.SHOW_KEYBOARD_PICKER ->
-                if (Build.VERSION.SDK_INT in arrayOf(
-                        Build.VERSION_CODES.O_MR1,
-                        Build.VERSION_CODES.P
-                    )
-                ) {
+                if (Build.VERSION.SDK_INT in Build.VERSION_CODES.O_MR1..Build.VERSION_CODES.P) {
                     return listOf(Permission.ROOT)
                 }
 
-            SystemActionId.SWITCH_KEYBOARD -> if (Build.VERSION.SDK_INT <   Build.VERSION_CODES.R) {
+            SystemActionId.SWITCH_KEYBOARD -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 return listOf(Permission.WRITE_SECURE_SETTINGS)
             }
 

@@ -109,20 +109,13 @@ class AndroidVolumeAdapter(context: Context) : VolumeAdapter {
         return Error.SdkVersionTooLow(Build.VERSION_CODES.M)
     }
 
-    override fun toggleDndMode(dndMode: DndMode): Result<*> {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (notificationManager.currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL) {
-                disableDndMode()
-            } else {
-                enableDndMode(dndMode)
-            }
-
-            return Success(Unit)
+    override fun isDndEnabled(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationManager.currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL
+        } else {
+            false
         }
-
-        return Error.SdkVersionTooLow(Build.VERSION_CODES.M)
     }
-
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun DndMode.convert(): Int {

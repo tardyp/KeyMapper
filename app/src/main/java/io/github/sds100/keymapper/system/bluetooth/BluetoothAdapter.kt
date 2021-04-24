@@ -1,11 +1,12 @@
-package io.github.sds100.keymapper.system.devices
+package io.github.sds100.keymapper.system.bluetooth
 
+import io.github.sds100.keymapper.util.Result
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Created by sds100 on 14/02/2021.
  */
-interface BluetoothMonitor {
+interface BluetoothAdapter {
     /**
      * Value is the address of the device
      */
@@ -22,4 +23,7 @@ interface BluetoothMonitor {
     val onDevicePairedChange: Flow<String>
 
     val isBluetoothEnabled: Flow<Boolean>
+
+    fun enable(): Result<*>
+    fun disable(): Result<*>
 }

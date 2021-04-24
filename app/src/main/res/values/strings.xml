@@ -778,6 +778,10 @@
     <string name="error_failed_to_modify_system_setting">Failed to modify system setting %s!</string>
     <string name="error_ime_disabled">You need to enable the keyboard!</string>
     <string name="error_failed_to_change_ime">Failed to change ime!</string>
+    <string name="error_no_camera_app">Your device has no camera app!</string>
+    <string name="error_no_device_assistant">Your device has no assistant!</string>
+    <string name="error_no_settings_app">Your device has no settings app!</string>
+    <string name="error_no_app_to_open_url">No app can open this url!</string>
 
     <!-- Error messages -->
 
@@ -905,8 +909,7 @@
     <string name="action_toggle_keyboard_message">This action will only work if you have tapped on an input field where the keyboard is supposed to be shown.</string>
     <string name="action_show_keyboard">Show keyboard</string>
     <string name="action_hide_keyboard">Hide keyboard</string>
-    <string name="action_show_keyboard_picker">Show keyboard picker (non-root)</string>
-    <string name="action_show_keyboard_picker_root">Show keyboard picker (root)</string>
+    <string name="action_show_keyboard_picker">Show keyboard picker</string>
 
     <string name="action_switch_keyboard">Switch keyboard</string>
     <string name="action_switch_keyboard_formatted">Switch to %s</string>

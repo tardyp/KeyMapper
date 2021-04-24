@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.util.Result
 import splitties.toast.toast
 
 /**

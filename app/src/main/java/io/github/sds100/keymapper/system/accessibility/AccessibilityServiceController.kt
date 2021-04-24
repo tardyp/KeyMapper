@@ -129,7 +129,7 @@ class AccessibilityServiceController(
             onEventFromUi(it)
         }.launchIn(coroutineScope)
 
-        accessibilityService.onKeyboardHiddenChange.onEach { isHidden ->
+        accessibilityService.isKeyboardHidden.onEach { isHidden ->
             if (isHidden) {
                 outputEvents.emit(OnHideKeyboardEvent)
             } else {

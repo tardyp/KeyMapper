@@ -4,7 +4,7 @@ import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.repositories.PreferenceRepository
 import io.github.sds100.keymapper.util.PrefDelegate
 import io.github.sds100.keymapper.mappings.PauseMappingsUseCase
-import io.github.sds100.keymapper.system.devices.BluetoothMonitor
+import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -17,7 +17,7 @@ class AutoSwitchImeController(
     private val preferenceRepository: PreferenceRepository,
     private val inputMethodAdapter: InputMethodAdapter,
     private val pauseMappingsUseCase: PauseMappingsUseCase,
-    private val bluetoothMonitor: BluetoothMonitor
+    private val bluetoothAdapter: BluetoothAdapter
 ) : PreferenceRepository by preferenceRepository{
     private val imeHelper = KeyMapperImeHelper(inputMethodAdapter)
 
@@ -46,7 +46,7 @@ class AutoSwitchImeController(
             }
         }.launchIn(coroutineScope)
 
-        bluetoothMonitor.onDeviceConnect.onEach { address ->
+        bluetoothAdapter.onDeviceConnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
                 imeHelper.chooseCompatibleInputMethod(fromForeground = false)
             }
@@ -56,7 +56,7 @@ class AutoSwitchImeController(
             }
         }.launchIn(coroutineScope)
 
-        bluetoothMonitor.onDeviceDisconnect.onEach { address ->
+        bluetoothAdapter.onDeviceDisconnect.onEach { address ->
             if (changeImeOnBtConnect && devicesThatToggleKeyboard.contains(address)) {
                 imeHelper.chooseLastUsedIncompatibleInputMethod(fromForeground = false)
             }

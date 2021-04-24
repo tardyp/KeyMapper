@@ -12,11 +12,11 @@ import io.github.sds100.keymapper.mappings.keymaps.trigger.RecordTriggerControll
 import io.github.sds100.keymapper.settings.ThemeUtils
 import io.github.sds100.keymapper.system.AndroidSystemFeatureAdapter
 import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapter
+import io.github.sds100.keymapper.system.airplanemode.AndroidAirplaneModeAdapter
 import io.github.sds100.keymapper.system.apps.AndroidAppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.AndroidPackageManagerAdapter
-import io.github.sds100.keymapper.system.volume.AndroidVolumeAdapter
+import io.github.sds100.keymapper.system.bluetooth.AndroidBluetoothAdapter
 import io.github.sds100.keymapper.system.camera.AndroidCameraAdapter
-import io.github.sds100.keymapper.system.devices.AndroidBluetoothMonitor
 import io.github.sds100.keymapper.system.devices.AndroidExternalDevicesAdapter
 import io.github.sds100.keymapper.system.display.AndroidDisplayAdapter
 import io.github.sds100.keymapper.system.files.AndroidFileAdapter
@@ -25,6 +25,10 @@ import io.github.sds100.keymapper.system.inputmethod.AutoSwitchImeController
 import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeHelper
 import io.github.sds100.keymapper.system.inputmethod.ShowHideInputMethodUseCaseImpl
 import io.github.sds100.keymapper.system.intents.IntentAdapterImpl
+import io.github.sds100.keymapper.system.lock.AndroidLockScreenAdapter
+import io.github.sds100.keymapper.system.media.AndroidMediaAdapter
+import io.github.sds100.keymapper.system.network.AndroidNetworkAdapter
+import io.github.sds100.keymapper.system.nfc.AndroidNfcAdapter
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.notifications.ManageNotificationsUseCaseImpl
 import io.github.sds100.keymapper.system.notifications.NotificationController
@@ -33,7 +37,9 @@ import io.github.sds100.keymapper.system.permissions.Permission
 import io.github.sds100.keymapper.system.phone.AndroidPhoneAdapter
 import io.github.sds100.keymapper.system.popup.AndroidToastAdapter
 import io.github.sds100.keymapper.system.root.SuAdapterImpl
+import io.github.sds100.keymapper.system.url.AndroidOpenUrlAdapter
 import io.github.sds100.keymapper.system.vibrator.AndroidVibratorAdapter
+import io.github.sds100.keymapper.system.volume.AndroidVolumeAdapter
 import io.github.sds100.keymapper.util.*
 import io.github.sds100.keymapper.util.ui.ResourceProviderImpl
 import kotlinx.coroutines.MainScope
@@ -56,7 +62,7 @@ class KeyMapperApp : MultiDexApplication() {
 
     val resourceProvider by lazy { ResourceProviderImpl(this) }
 
-    val bluetoothMonitor by lazy { AndroidBluetoothMonitor(this, appCoroutineScope) }
+    val bluetoothMonitor by lazy { AndroidBluetoothAdapter(this, appCoroutineScope) }
 
     val packageManagerAdapter by lazy {
         AndroidPackageManagerAdapter(
@@ -95,9 +101,20 @@ class KeyMapperApp : MultiDexApplication() {
     val vibratorAdapter by lazy { AndroidVibratorAdapter(this) }
     val displayAdapter by lazy { AndroidDisplayAdapter(this) }
     val audioAdapter by lazy { AndroidVolumeAdapter(this) }
-    val suAdapter by lazy { SuAdapterImpl(ServiceLocator.preferenceRepository(this)) }
+    val suAdapter by lazy {
+        SuAdapterImpl(
+            appCoroutineScope,
+            ServiceLocator.preferenceRepository(this)
+        )
+    }
     val phoneAdapter by lazy { AndroidPhoneAdapter(this) }
-    val intentAdapter by lazy{IntentAdapterImpl(this)}
+    val intentAdapter by lazy { IntentAdapterImpl(this) }
+    val mediaAdapter by lazy { AndroidMediaAdapter(this, permissionAdapter) }
+    val lockScreenAdapter by lazy { AndroidLockScreenAdapter(this) }
+    val airplaneModeAdapter by lazy { AndroidAirplaneModeAdapter(this, suAdapter) }
+    val networkAdapter by lazy { AndroidNetworkAdapter(this, suAdapter) }
+    val nfcAdapter by lazy { AndroidNfcAdapter(this, suAdapter) }
+    val openUrlAdapter by lazy { AndroidOpenUrlAdapter(this) }
 
     val recordTriggerController by lazy {
         RecordTriggerController(appCoroutineScope, serviceAdapter)

@@ -29,6 +29,9 @@ sealed class Error : Result<Nothing>() {
     data class InputMethodNotFound(val id: String) : Error()
     object NoEnabledInputMethods : Error()
     object NoVoiceAssistant : Error()
+    object NoDeviceAssistant : Error()
+    object NoCameraApp : Error()
+    object NoSettingsApp : Error()
     object FrontFlashNotFound : Error()
     object BackFlashNotFound : Error()
    object ImeDisabled : Error()
@@ -102,6 +105,7 @@ sealed class Error : Result<Nothing>() {
 
     data class FailedToModifySystemSetting(val setting: String):Error()
     object FailedToChangeIme:Error()
+    object NoAppToOpenUrl: Error()
 }
 
 inline fun <T> Result<T>.onSuccess(f: (T) -> Unit): Result<T> {

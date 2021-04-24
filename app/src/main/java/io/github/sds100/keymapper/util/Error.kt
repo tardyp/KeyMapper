@@ -93,6 +93,10 @@ fun Error.getFullMessage(resourceProvider: ResourceProvider) = when (this) {
     )
     Error.ImeDisabled -> resourceProvider.getString(R.string.error_ime_disabled)
     Error.FailedToChangeIme -> resourceProvider.getString(R.string.error_failed_to_change_ime)
+    Error.NoCameraApp -> resourceProvider.getString(R.string.error_no_camera_app)
+    Error.NoDeviceAssistant -> resourceProvider.getString(R.string.error_no_device_assistant)
+    Error.NoSettingsApp -> resourceProvider.getString(R.string.error_no_settings_app)
+    Error.NoAppToOpenUrl -> resourceProvider.getString(R.string.error_no_app_to_open_url)
 }
 
 val Error.isFixable: Boolean

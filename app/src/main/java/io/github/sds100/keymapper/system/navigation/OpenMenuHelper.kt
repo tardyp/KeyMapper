@@ -2,6 +2,7 @@ package io.github.sds100.keymapper.system.navigation
 
 import android.view.KeyEvent
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import io.github.sds100.keymapper.system.accessibility.AccessibilityNodeAction
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
 import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.util.Result
@@ -23,8 +24,8 @@ class OpenMenuHelper(
         return if (suAdapter.isGranted.firstBlocking()) {
             suAdapter.execute("input keyevent ${KeyEvent.KEYCODE_MENU}\n")
         } else {
-            accessibilityService.performActionOnNode(AccessibilityNodeInfoCompat.ACTION_CLICK) {
-                it.contentDescription == OVERFLOW_MENU_CONTENT_DESCRIPTION
+            accessibilityService.performActionOnNode({ it.contentDescription == OVERFLOW_MENU_CONTENT_DESCRIPTION }) {
+                AccessibilityNodeAction(AccessibilityNodeInfoCompat.ACTION_CLICK)
             }
         }
     }

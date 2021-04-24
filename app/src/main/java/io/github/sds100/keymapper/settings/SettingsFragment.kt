@@ -1,6 +1,7 @@
 package io.github.sds100.keymapper.settings
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -21,7 +22,6 @@ import io.github.sds100.keymapper.data.Keys
 import io.github.sds100.keymapper.data.PreferenceDefaults
 import io.github.sds100.keymapper.databinding.FragmentSettingsBinding
 import io.github.sds100.keymapper.mappings.OptionMinimums
-import io.github.sds100.keymapper.system.devices.BluetoothUtils
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.notifications.NotificationUtils
 import io.github.sds100.keymapper.util.*
@@ -121,7 +121,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private fun populateBluetoothDevicesPreferences() {
-        val pairedDevices = BluetoothUtils.getPairedDevices()
+        val pairedDevices = BluetoothAdapter.getDefaultAdapter()?.bondedDevices
 
         if (pairedDevices != null) {
             //the user will see the names of the devices

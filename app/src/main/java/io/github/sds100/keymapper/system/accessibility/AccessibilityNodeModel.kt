@@ -7,5 +7,9 @@ import android.accessibilityservice.GestureDescription
  */
 data class AccessibilityNodeModel(
     val packageName: String?,
-    val contentDescription: String?
+    val contentDescription: String?,
+    val isFocused: Boolean,
+    val text: String?,
+    val textSelectionStart: Int,
+    val textSelectionEnd: Int
 )

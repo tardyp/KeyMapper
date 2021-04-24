@@ -3,10 +3,14 @@ package io.github.sds100.keymapper.actions
 import android.accessibilityservice.AccessibilityService
 import android.os.Build
 import android.view.KeyEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import io.github.sds100.keymapper.R
+import io.github.sds100.keymapper.system.accessibility.AccessibilityNodeAction
 import io.github.sds100.keymapper.system.accessibility.IAccessibilityService
+import io.github.sds100.keymapper.system.airplanemode.AirplaneModeAdapter
 import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
 import io.github.sds100.keymapper.system.apps.PackageManagerAdapter
+import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
 import io.github.sds100.keymapper.system.camera.CameraAdapter
 import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
 import io.github.sds100.keymapper.system.display.DisplayAdapter
@@ -17,10 +21,16 @@ import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.system.inputmethod.KeyMapperImeMessenger
 import io.github.sds100.keymapper.system.intents.IntentAdapter
 import io.github.sds100.keymapper.system.keyevents.InputKeyModel
+import io.github.sds100.keymapper.system.lock.LockScreenAdapter
+import io.github.sds100.keymapper.system.media.MediaAdapter
+import io.github.sds100.keymapper.system.navigation.OpenMenuHelper
+import io.github.sds100.keymapper.system.network.NetworkAdapter
+import io.github.sds100.keymapper.system.nfc.NfcAdapter
 import io.github.sds100.keymapper.system.phone.PhoneAdapter
 import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
 import io.github.sds100.keymapper.system.root.SuAdapter
 import io.github.sds100.keymapper.system.shell.ShellAdapter
+import io.github.sds100.keymapper.system.url.OpenUrlAdapter
 import io.github.sds100.keymapper.system.volume.RingerMode
 import io.github.sds100.keymapper.system.volume.VolumeAdapter
 import io.github.sds100.keymapper.util.*
@@ -52,8 +62,17 @@ class PerformActionsUseCaseImpl(
     private val volumeAdapter: VolumeAdapter,
     private val cameraAdapter: CameraAdapter,
     private val displayAdapter: DisplayAdapter,
+    private val lockScreenAdapter: LockScreenAdapter,
+    private val mediaAdapter: MediaAdapter,
+    private val airplaneModeAdapter: AirplaneModeAdapter,
+    private val networkAdapter: NetworkAdapter,
+    private val bluetoothAdapter: BluetoothAdapter,
+    private val nfcAdapter: NfcAdapter,
+    private val openUrlAdapter: OpenUrlAdapter,
     private val resourceProvider: ResourceProvider
 ) : PerformActionsUseCase {
+
+    private val openMenuHelper by lazy { OpenMenuHelper(suAdapter, accessibilityService) }
 
     override fun perform(
         action: ActionData,
@@ -104,19 +123,37 @@ class PerformActionsUseCaseImpl(
                 result = volumeAdapter.enableDndMode(action.dndMode)
             }
             is ToggleDndMode -> {
-                result = volumeAdapter.toggleDndMode(action.dndMode)
+                result = if (volumeAdapter.isDndEnabled()) {
+                    volumeAdapter.disableDndMode()
+                } else {
+                    volumeAdapter.enableDndMode(action.dndMode)
+                }
             }
             is ChangeRingerModeSystemAction -> {
                 result = volumeAdapter.setRingerMode(action.ringerMode)
             }
 
-            is ControlMediaForAppSystemAction.FastForward -> TODO()
-            is ControlMediaForAppSystemAction.NextTrack -> TODO()
-            is ControlMediaForAppSystemAction.Pause -> TODO()
-            is ControlMediaForAppSystemAction.Play -> TODO()
-            is ControlMediaForAppSystemAction.PlayPause -> TODO()
-            is ControlMediaForAppSystemAction.PreviousTrack -> TODO()
-            is ControlMediaForAppSystemAction.Rewind -> TODO()
+            is ControlMediaForAppSystemAction.FastForward -> {
+                result = mediaAdapter.fastForward(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.NextTrack -> {
+                result = mediaAdapter.nextTrack(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.Pause -> {
+                result = mediaAdapter.pause(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.Play -> {
+                result = mediaAdapter.play(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.PlayPause -> {
+                result = mediaAdapter.playPause(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.PreviousTrack -> {
+                result = mediaAdapter.previousTrack(action.packageName)
+            }
+            is ControlMediaForAppSystemAction.Rewind -> {
+                result = mediaAdapter.rewind(action.packageName)
+            }
 
             is CycleRotationsSystemAction -> {
                 result = displayAdapter.disableAutoRotate().then {
@@ -207,18 +244,55 @@ class PerformActionsUseCaseImpl(
 
             is SimpleSystemAction -> {
                 when (action.id) {
-                    SystemActionId.TOGGLE_WIFI -> TODO()
-                    SystemActionId.ENABLE_WIFI -> TODO()
-                    SystemActionId.DISABLE_WIFI -> TODO()
-                    SystemActionId.TOGGLE_BLUETOOTH -> TODO()
-                    SystemActionId.ENABLE_BLUETOOTH -> TODO()
-                    SystemActionId.DISABLE_BLUETOOTH -> TODO()
-                    SystemActionId.TOGGLE_MOBILE_DATA -> TODO()
-                    SystemActionId.ENABLE_MOBILE_DATA -> TODO()
-                    SystemActionId.DISABLE_MOBILE_DATA -> TODO()
+                    SystemActionId.TOGGLE_WIFI -> {
+                        result = if (networkAdapter.isWifiEnabled()) {
+                            networkAdapter.disableWifi()
+                        } else {
+                            networkAdapter.enableWifi()
+                        }
+                    }
+                    SystemActionId.ENABLE_WIFI -> {
+                        result = networkAdapter.enableWifi()
+                    }
+                    SystemActionId.DISABLE_WIFI -> {
+                        result = networkAdapter.disableWifi()
+                    }
+
+                    SystemActionId.TOGGLE_BLUETOOTH -> {
+                        result = if (bluetoothAdapter.isBluetoothEnabled.firstBlocking()) {
+                            bluetoothAdapter.disable()
+                        } else {
+                            bluetoothAdapter.enable()
+                        }
+                    }
+                    SystemActionId.ENABLE_BLUETOOTH -> {
+                        result = bluetoothAdapter.enable()
+                    }
+
+                    SystemActionId.DISABLE_BLUETOOTH -> {
+                        result = bluetoothAdapter.disable()
+                    }
+
+                    SystemActionId.TOGGLE_MOBILE_DATA -> {
+                        result = if (networkAdapter.isMobileDataEnabled()) {
+                            networkAdapter.disableMobileData()
+                        } else {
+                            networkAdapter.enableMobileData()
+                        }
+                    }
+                    SystemActionId.ENABLE_MOBILE_DATA -> {
+                        result = networkAdapter.enableMobileData()
+                    }
+                    SystemActionId.DISABLE_MOBILE_DATA -> {
+                        result = networkAdapter.disableMobileData()
+                    }
 
                     SystemActionId.TOGGLE_AUTO_BRIGHTNESS -> {
-                        result = displayAdapter.toggleAutoBrightness()
+                        result = if (displayAdapter.isAutoBrightnessEnabled()) {
+                            displayAdapter.disableAutoBrightness()
+                        } else {
+                            displayAdapter.enableAutoBrightness()
+                        }
                     }
                     SystemActionId.DISABLE_AUTO_BRIGHTNESS -> {
                         result = displayAdapter.disableAutoBrightness()
@@ -234,7 +308,11 @@ class PerformActionsUseCaseImpl(
                     }
 
                     SystemActionId.TOGGLE_AUTO_ROTATE -> {
-                        result = displayAdapter.toggleAutoRotate()
+                        result = if (displayAdapter.isAutoRotateEnabled()) {
+                            displayAdapter.disableAutoRotate()
+                        } else {
+                            displayAdapter.enableAutoRotate()
+                        }
                     }
 
                     SystemActionId.ENABLE_AUTO_ROTATE -> {
@@ -295,7 +373,7 @@ class PerformActionsUseCaseImpl(
 
                     SystemActionId.TOGGLE_NOTIFICATION_DRAWER -> {
                         result =
-                            if (accessibilityService.rootNode.packageName == "com.android.systemui") {
+                            if (accessibilityService.rootNode?.packageName == "com.android.systemui") {
                                 shellAdapter.execute("cmd statusbar collapse")
                             } else {
                                 val globalAction = AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS
@@ -317,7 +395,7 @@ class PerformActionsUseCaseImpl(
 
                     SystemActionId.TOGGLE_QUICK_SETTINGS -> {
                         result =
-                            if (accessibilityService.rootNode.packageName == "com.android.systemui") {
+                            if (accessibilityService.rootNode?.packageName == "com.android.systemui") {
                                 shellAdapter.execute("cmd statusbar collapse")
                             } else {
                                 val globalAction = AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS
@@ -332,13 +410,27 @@ class PerformActionsUseCaseImpl(
                         result = shellAdapter.execute("cmd statusbar collapse")
                     }
 
-                    SystemActionId.PAUSE_MEDIA -> TODO()
-                    SystemActionId.PLAY_MEDIA -> TODO()
-                    SystemActionId.PLAY_PAUSE_MEDIA -> TODO()
-                    SystemActionId.NEXT_TRACK -> TODO()
-                    SystemActionId.PREVIOUS_TRACK -> TODO()
-                    SystemActionId.FAST_FORWARD -> TODO()
-                    SystemActionId.REWIND -> TODO()
+                    SystemActionId.PAUSE_MEDIA -> {
+                        result = mediaAdapter.pause()
+                    }
+                    SystemActionId.PLAY_MEDIA -> {
+                        result = mediaAdapter.play()
+                    }
+                    SystemActionId.PLAY_PAUSE_MEDIA -> {
+                        result = mediaAdapter.playPause()
+                    }
+                    SystemActionId.NEXT_TRACK -> {
+                        result = mediaAdapter.nextTrack()
+                    }
+                    SystemActionId.PREVIOUS_TRACK -> {
+                        result = mediaAdapter.previousTrack()
+                    }
+                    SystemActionId.FAST_FORWARD -> {
+                        result = mediaAdapter.fastForward()
+                    }
+                    SystemActionId.REWIND -> {
+                        result = mediaAdapter.rewind()
+                    }
 
                     SystemActionId.GO_BACK -> {
                         result =
@@ -373,26 +465,119 @@ class PerformActionsUseCaseImpl(
                         result = null
                     }
 
-                    SystemActionId.OPEN_MENU -> TODO()
-                    SystemActionId.ENABLE_NFC -> TODO()
-                    SystemActionId.DISABLE_NFC -> TODO()
-                    SystemActionId.TOGGLE_NFC -> TODO()
-                    SystemActionId.MOVE_CURSOR_TO_END -> TODO()
-                    SystemActionId.TOGGLE_KEYBOARD -> TODO()
-                    SystemActionId.SHOW_KEYBOARD -> TODO()
-                    SystemActionId.HIDE_KEYBOARD -> TODO()
-                    SystemActionId.SHOW_KEYBOARD_PICKER -> TODO()
-                    SystemActionId.SHOW_KEYBOARD_PICKER_ROOT -> TODO()
-                    SystemActionId.TEXT_CUT -> TODO()
-                    SystemActionId.TEXT_COPY -> TODO()
-                    SystemActionId.TEXT_PASTE -> TODO()
-                    SystemActionId.SELECT_WORD_AT_CURSOR -> TODO()
+                    SystemActionId.OPEN_MENU -> {
+                        result = openMenuHelper.openMenu()
+                    }
 
-                    SystemActionId.SWITCH_KEYBOARD -> TODO()
+                    SystemActionId.ENABLE_NFC -> {
+                        result = nfcAdapter.enable()
+                    }
+                    SystemActionId.DISABLE_NFC -> {
+                        result = nfcAdapter.disable()
+                    }
+                    SystemActionId.TOGGLE_NFC -> {
+                        result = if (nfcAdapter.isEnabled()) {
+                            nfcAdapter.disable()
+                        } else {
+                            nfcAdapter.enable()
+                        }
+                    }
 
-                    SystemActionId.TOGGLE_AIRPLANE_MODE -> TODO()
-                    SystemActionId.ENABLE_AIRPLANE_MODE -> TODO()
-                    SystemActionId.DISABLE_AIRPLANE_MODE -> TODO()
+                    SystemActionId.MOVE_CURSOR_TO_END -> {
+                        keyMapperImeMessenger.inputKeyEvent(
+                            InputKeyModel(
+                                keyCode = KeyEvent.KEYCODE_MOVE_END,
+                                metaState = KeyEvent.META_CTRL_ON,
+                            )
+                        )
+
+                        result = Success(Unit)
+                    }
+
+                    SystemActionId.TOGGLE_KEYBOARD -> {
+                        val isHidden = accessibilityService.isKeyboardHidden.firstBlocking()
+                        if (isHidden) {
+                            accessibilityService.showKeyboard()
+                        } else {
+                            accessibilityService.hideKeyboard()
+                        }
+
+                        result = Success(Unit)
+                    }
+
+
+                    SystemActionId.SHOW_KEYBOARD -> {
+                        accessibilityService.showKeyboard()
+                        result = Success(Unit)
+                    }
+
+                    SystemActionId.HIDE_KEYBOARD -> {
+                        accessibilityService.hideKeyboard()
+                        result = Success(Unit)
+                    }
+
+                    SystemActionId.SHOW_KEYBOARD_PICKER -> {
+                        result = inputMethodAdapter.showImePicker(fromForeground = false)
+                    }
+
+                    SystemActionId.TEXT_CUT -> {
+                        result = accessibilityService.performActionOnNode({ it.isFocused }) {
+                            AccessibilityNodeAction(AccessibilityNodeInfo.ACTION_CUT)
+                        }
+                    }
+
+                    SystemActionId.TEXT_COPY -> {
+                        result = accessibilityService.performActionOnNode({ it.isFocused }) {
+                            AccessibilityNodeAction(AccessibilityNodeInfo.ACTION_COPY)
+                        }
+                    }
+                    SystemActionId.TEXT_PASTE -> {
+                        result = accessibilityService.performActionOnNode({ it.isFocused }) {
+                            AccessibilityNodeAction(AccessibilityNodeInfo.ACTION_PASTE)
+                        }
+                    }
+
+                    SystemActionId.SELECT_WORD_AT_CURSOR -> {
+                        result = accessibilityService.performActionOnNode({ it.isFocused }) {
+                            //it is at the cursor position if they both return the same value
+                            if (it.textSelectionStart == it.textSelectionEnd) {
+                                val cursorPosition = it.textSelectionStart
+
+                                val wordBoundary =
+                                    it.text.toString().getWordBoundaries(cursorPosition)
+                                        ?: return@performActionOnNode null
+
+                                val extras = mapOf(
+                                    AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT to wordBoundary.first,
+
+                                    //The index of the cursor is the index of the last char in the word + 1
+                                    AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT to wordBoundary.second + 1
+                                )
+
+                                AccessibilityNodeAction(
+                                    AccessibilityNodeInfo.ACTION_SET_SELECTION,
+                                    extras
+                                )
+                            } else {
+                                null
+                            }
+
+                        }
+                    }
+
+                    SystemActionId.TOGGLE_AIRPLANE_MODE -> {
+                        result = if (airplaneModeAdapter.isEnabled()) {
+                            airplaneModeAdapter.disable()
+                        } else {
+                            airplaneModeAdapter.enable()
+                        }
+                    }
+                    SystemActionId.ENABLE_AIRPLANE_MODE -> {
+                        result = airplaneModeAdapter.enable()
+                    }
+                    SystemActionId.DISABLE_AIRPLANE_MODE -> {
+                        result = airplaneModeAdapter.disable()
+                    }
 
                     SystemActionId.SCREENSHOT -> {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
@@ -418,9 +603,15 @@ class PerformActionsUseCaseImpl(
                         }
                     }
 
-                    SystemActionId.OPEN_VOICE_ASSISTANT -> TODO()
-                    SystemActionId.OPEN_DEVICE_ASSISTANT -> TODO()
-                    SystemActionId.OPEN_CAMERA -> TODO()
+                    SystemActionId.OPEN_VOICE_ASSISTANT -> {
+                        result = packageManagerAdapter.launchVoiceAssistant()
+                    }
+                    SystemActionId.OPEN_DEVICE_ASSISTANT -> {
+                        result = packageManagerAdapter.launchDeviceAssistant()
+                    }
+                    SystemActionId.OPEN_CAMERA -> {
+                        result = packageManagerAdapter.launchCameraApp()
+                    }
 
                     SystemActionId.LOCK_DEVICE -> {
                         result = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
@@ -430,14 +621,22 @@ class PerformActionsUseCaseImpl(
                         }
                     }
 
-                    SystemActionId.POWER_ON_OFF_DEVICE -> TODO()
-                    SystemActionId.SECURE_LOCK_DEVICE -> TODO()
+                    SystemActionId.POWER_ON_OFF_DEVICE -> {
+                        result = suAdapter.execute("input keyevent ${KeyEvent.KEYCODE_POWER}")
+                    }
+
+                    SystemActionId.SECURE_LOCK_DEVICE -> {
+                        result = lockScreenAdapter.secureLockDevice()
+                    }
 
                     SystemActionId.CONSUME_KEY_EVENT -> {
                         result = Success(Unit)
                     }
 
-                    SystemActionId.OPEN_SETTINGS -> TODO()
+                    SystemActionId.OPEN_SETTINGS -> {
+                        result = packageManagerAdapter.launchSettingsApp()
+                    }
+
                     SystemActionId.SHOW_POWER_MENU -> {
                         result =
                             accessibilityService.doGlobalAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG)
@@ -447,7 +646,9 @@ class PerformActionsUseCaseImpl(
                 }
             }
 
-            is UrlAction -> TODO()
+            is UrlAction -> {
+                result = openUrlAdapter.openUrl(action.url)
+            }
 
             CorruptAction -> {
                 result = Error.CorruptActionError

@@ -65,6 +65,10 @@ class AndroidDisplayAdapter(context: Context) : DisplayAdapter {
         }
     }
 
+    override fun isAutoRotateEnabled(): Boolean {
+        return SettingsUtils.getSystemSetting<Int>(ctx, Settings.System.ACCELEROMETER_ROTATION) == 1
+    }
+
     override fun enableAutoRotate(): Result<*> {
         val success = SettingsUtils.putSystemSetting(ctx, Settings.System.ACCELEROMETER_ROTATION, 1)
 
@@ -85,20 +89,6 @@ class AndroidDisplayAdapter(context: Context) : DisplayAdapter {
         }
     }
 
-    override fun toggleAutoRotate(): Result<*> {
-
-        val autoRotateState = SettingsUtils.getSystemSetting<Int>(
-            ctx,
-            Settings.System.ACCELEROMETER_ROTATION
-        )
-
-        return if (autoRotateState == 0) {
-            enableAutoRotate()
-        } else {
-            disableAutoRotate()
-        }
-    }
-
     override fun setOrientation(orientation: Orientation): Result<*> {
         val sdkRotationValue = when (orientation) {
             Orientation.ORIENTATION_0 -> Surface.ROTATION_0
@@ -115,6 +105,13 @@ class AndroidDisplayAdapter(context: Context) : DisplayAdapter {
         } else {
             return Error.FailedToModifySystemSetting(Settings.System.USER_ROTATION)
         }
+    }
+
+    override fun isAutoBrightnessEnabled(): Boolean {
+        return SettingsUtils.getSystemSetting<Int>(
+            ctx,
+            Settings.System.SCREEN_BRIGHTNESS_MODE
+        ) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
     }
 
     override fun increaseBrightness(): Result<*> {
@@ -180,17 +177,6 @@ class AndroidDisplayAdapter(context: Context) : DisplayAdapter {
 
     override fun disableAutoBrightness(): Result<*> {
         return setBrightnessMode(Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-    }
-
-    override fun toggleAutoBrightness(): Result<*> {
-        val currentBrightnessMode =
-            SettingsUtils.getSystemSetting<Int>(ctx, Settings.System.SCREEN_BRIGHTNESS_MODE)
-
-        if (currentBrightnessMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-            return setBrightnessMode(Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-        } else {
-            return setBrightnessMode(Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
-        }
     }
 
     private fun setBrightnessMode(mode: Int): Result<*> {

@@ -12,7 +12,7 @@ import io.github.sds100.keymapper.NavAppDirections
 import io.github.sds100.keymapper.databinding.FragmentSimpleRecyclerviewBinding
 import io.github.sds100.keymapper.simple
 import io.github.sds100.keymapper.system.apps.ChooseAppFragment
-import io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceFragment
+import io.github.sds100.keymapper.system.bluetooth.ChooseBluetoothDeviceFragment
 import io.github.sds100.keymapper.util.ui.ListUiState
 import io.github.sds100.keymapper.util.ui.SimpleRecyclerViewFragment
 import io.github.sds100.keymapper.util.ui.showPopups

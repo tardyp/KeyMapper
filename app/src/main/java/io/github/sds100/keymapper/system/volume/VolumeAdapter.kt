@@ -16,7 +16,7 @@ interface VolumeAdapter {
     fun showVolumeUi(): Result<*>
     fun setRingerMode(mode: RingerMode): Result<*>
 
-    fun enableDndMode(dndMode: DndMode):Result<*>
-    fun disableDndMode():Result<*>
-    fun toggleDndMode(dndMode: DndMode):Result<*>
+    fun isDndEnabled(): Boolean
+    fun enableDndMode(dndMode: DndMode): Result<*>
+    fun disableDndMode(): Result<*>
 }

@@ -18,21 +18,27 @@ import io.github.sds100.keymapper.system.accessibility.AccessibilityServiceAdapt
 import io.github.sds100.keymapper.system.permissions.AndroidPermissionAdapter
 import io.github.sds100.keymapper.system.apps.AppShortcutAdapter
 import io.github.sds100.keymapper.system.camera.CameraAdapter
-import io.github.sds100.keymapper.system.devices.BluetoothMonitor
+import io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter
 import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
 import io.github.sds100.keymapper.system.files.FileRepository
 import io.github.sds100.keymapper.util.ui.ResourceProvider
 import io.github.sds100.keymapper.system.inputmethod.InputMethodAdapter
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapRepository
+import io.github.sds100.keymapper.system.airplanemode.AirplaneModeAdapter
 import io.github.sds100.keymapper.system.volume.VolumeAdapter
 import io.github.sds100.keymapper.system.notifications.AndroidNotificationAdapter
 import io.github.sds100.keymapper.system.permissions.SystemFeatureAdapter
 import io.github.sds100.keymapper.system.notifications.NotificationController
 import io.github.sds100.keymapper.system.display.DisplayAdapter
 import io.github.sds100.keymapper.system.intents.IntentAdapter
+import io.github.sds100.keymapper.system.lock.LockScreenAdapter
+import io.github.sds100.keymapper.system.media.MediaAdapter
+import io.github.sds100.keymapper.system.network.NetworkAdapter
+import io.github.sds100.keymapper.system.nfc.NfcAdapter
 import io.github.sds100.keymapper.system.phone.PhoneAdapter
 import io.github.sds100.keymapper.system.popup.PopupMessageAdapter
 import io.github.sds100.keymapper.system.root.SuAdapter
+import io.github.sds100.keymapper.system.url.OpenUrlAdapter
 import io.github.sds100.keymapper.system.vibrator.VibratorAdapter
 
 /**
@@ -166,7 +172,7 @@ object ServiceLocator {
         return (context.applicationContext as KeyMapperApp).externalDevicesAdapter
     }
 
-    fun bluetoothMonitor(context: Context): BluetoothMonitor {
+    fun bluetoothAdapter(context: Context): BluetoothAdapter {
         return (context.applicationContext as KeyMapperApp).bluetoothMonitor
     }
 
@@ -232,6 +238,30 @@ object ServiceLocator {
 
     fun phoneAdapter(context: Context): PhoneAdapter {
         return (context.applicationContext as KeyMapperApp).phoneAdapter
+    }
+
+    fun mediaAdapter(context: Context): MediaAdapter {
+        return (context.applicationContext as KeyMapperApp).mediaAdapter
+    }
+
+    fun lockScreenAdapter(context: Context): LockScreenAdapter {
+        return (context.applicationContext as KeyMapperApp).lockScreenAdapter
+    }
+
+    fun airplaneModeAdapter(context: Context): AirplaneModeAdapter {
+        return (context.applicationContext as KeyMapperApp).airplaneModeAdapter
+    }
+
+    fun networkAdapter(context: Context): NetworkAdapter {
+        return (context.applicationContext as KeyMapperApp).networkAdapter
+    }
+
+    fun nfcAdapter(context: Context): NfcAdapter {
+        return (context.applicationContext as KeyMapperApp).nfcAdapter
+    }
+
+    fun openUrlAdapter(context: Context): OpenUrlAdapter {
+        return (context.applicationContext as KeyMapperApp).openUrlAdapter
     }
 
     private fun createDatabase(context: Context): AppDatabase {

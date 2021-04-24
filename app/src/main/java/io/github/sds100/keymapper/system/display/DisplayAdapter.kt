@@ -10,14 +10,14 @@ interface DisplayAdapter {
     val isScreenOn: Flow<Boolean>
     val orientation: Orientation
 
+    fun isAutoRotateEnabled(): Boolean
     fun enableAutoRotate(): Result<*>
-    fun toggleAutoRotate(): Result<*>
     fun disableAutoRotate(): Result<*>
     fun setOrientation(orientation: Orientation): Result<*>
 
+    fun isAutoBrightnessEnabled(): Boolean
     fun increaseBrightness():Result<*>
     fun decreaseBrightness():Result<*>
     fun enableAutoBrightness():Result<*>
     fun disableAutoBrightness():Result<*>
-    fun toggleAutoBrightness():Result<*>
 }

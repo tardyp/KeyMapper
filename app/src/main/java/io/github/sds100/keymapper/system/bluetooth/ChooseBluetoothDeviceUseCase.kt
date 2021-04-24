@@ -1,5 +1,6 @@
-package io.github.sds100.keymapper.system.devices
+package io.github.sds100.keymapper.system.bluetooth
 
+import io.github.sds100.keymapper.system.devices.ExternalDevicesAdapter
 import io.github.sds100.keymapper.util.State
 import kotlinx.coroutines.flow.Flow
 
@@ -7,7 +8,8 @@ import kotlinx.coroutines.flow.Flow
  * Created by sds100 on 07/04/2021.
  */
 
-class ChooseBluetoothDeviceUseCaseImpl(adapter: ExternalDevicesAdapter): ChooseBluetoothDeviceUseCase{
+class ChooseBluetoothDeviceUseCaseImpl(adapter: ExternalDevicesAdapter):
+    ChooseBluetoothDeviceUseCase {
     override val devices: Flow<State<List<BluetoothDeviceInfo>>> = adapter.pairedBluetoothDevices
 }
 

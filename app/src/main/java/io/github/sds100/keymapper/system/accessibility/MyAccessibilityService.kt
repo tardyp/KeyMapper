@@ -12,6 +12,7 @@ import android.graphics.Path
 import android.os.Build
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -20,7 +21,8 @@ import io.github.sds100.keymapper.Constants.PACKAGE_NAME
 import io.github.sds100.keymapper.mappings.fingerprintmaps.FingerprintMapId
 import io.github.sds100.keymapper.system.devices.isExternalCompat
 import io.github.sds100.keymapper.util.*
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import splitties.bitflags.minusFlag
 import splitties.bitflags.withFlag
 
@@ -56,11 +58,11 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
     private var fingerprintGestureCallback:
         FingerprintGestureController.FingerprintGestureCallback? = null
 
-    override val rootNode: AccessibilityNodeModel
-        get() = AccessibilityNodeModel(
-            packageName = rootInActiveWindow?.packageName?.toString(),
-            contentDescription = rootInActiveWindow?.contentDescription?.toString()
-        )
+    override val rootNode: AccessibilityNodeModel?
+        get() {
+            val root = rootInActiveWindow ?: return null
+            return root.toModel()
+        }
 
     override val isGestureDetectionAvailable: Boolean
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -69,7 +71,16 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
             false
         }
 
-    override val onKeyboardHiddenChange = MutableSharedFlow<Boolean>()
+    private val _isKeyboardHidden by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            MutableStateFlow(softKeyboardController.showMode == AccessibilityService.SHOW_MODE_HIDDEN)
+        } else {
+            MutableStateFlow(false)
+        }
+    }
+
+    override val isKeyboardHidden: Flow<Boolean>
+        get() = _isKeyboardHidden
 
     private lateinit var controller: AccessibilityServiceController
 
@@ -122,8 +133,8 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
             softKeyboardController.addOnShowModeChangedListener { _, showMode ->
                 lifecycleScope.launchWhenStarted {
                     when (showMode) {
-                        SHOW_MODE_AUTO -> onKeyboardHiddenChange.emit(false)
-                        SHOW_MODE_HIDDEN -> onKeyboardHiddenChange.emit(true)
+                        SHOW_MODE_AUTO -> _isKeyboardHidden.value = false
+                        SHOW_MODE_HIDDEN -> _isKeyboardHidden.value = true
                     }
                 }
             }
@@ -204,23 +215,20 @@ class MyAccessibilityService : AccessibilityService(), LifecycleOwner, IAccessib
     }
 
     override fun performActionOnNode(
-        action: Int,
-        predicate: (node: AccessibilityNodeModel) -> Boolean
+        findNode: (node: AccessibilityNodeModel) -> Boolean,
+        performAction: (node: AccessibilityNodeModel) -> AccessibilityNodeAction?
     ): Result<*> {
         val node = rootInActiveWindow.findNodeRecursively {
-            predicate(
-                AccessibilityNodeModel(
-                    it.packageName.toString(),
-                    it.contentDescription.toString()
-                )
-            )
+            findNode(it.toModel())
         }
 
         if (node == null) {
             return Error.FailedToFindAccessibilityNode
         }
 
-        node.performAction(action)
+        val (action, extras) = performAction(node.toModel()) ?: return Success(Unit)
+
+        node.performAction(action, bundleOf(*extras.toList().toTypedArray()))
         node.recycle()
 
         return Success(Unit)

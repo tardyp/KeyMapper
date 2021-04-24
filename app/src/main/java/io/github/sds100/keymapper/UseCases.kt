@@ -134,6 +134,13 @@ object UseCases {
             ServiceLocator.audioAdapter(ctx),
             ServiceLocator.cameraAdapter(ctx),
             ServiceLocator.displayAdapter(ctx),
+            ServiceLocator.lockScreenAdapter(ctx),
+            ServiceLocator.mediaAdapter(ctx),
+            ServiceLocator.airplaneModeAdapter(ctx),
+            ServiceLocator.networkAdapter(ctx),
+            ServiceLocator.bluetoothAdapter(ctx),
+            ServiceLocator.nfcAdapter(ctx),
+            ServiceLocator.openUrlAdapter(ctx),
             ServiceLocator.resourceProvider(ctx)
         )
 

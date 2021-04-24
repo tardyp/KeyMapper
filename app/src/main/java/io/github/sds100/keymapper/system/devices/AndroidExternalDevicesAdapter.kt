@@ -6,6 +6,7 @@ import android.hardware.input.InputManager
 import android.os.Handler
 import android.view.InputDevice
 import androidx.core.content.getSystemService
+import io.github.sds100.keymapper.system.bluetooth.BluetoothDeviceInfo
 import io.github.sds100.keymapper.util.State
 import io.github.sds100.keymapper.util.Error
 import io.github.sds100.keymapper.util.Result
@@ -20,7 +21,7 @@ import splitties.mainthread.mainLooper
  */
 class AndroidExternalDevicesAdapter(
     context: Context,
-    private val bluetoothMonitor: BluetoothMonitor,
+    private val bluetoothAdapter: io.github.sds100.keymapper.system.bluetooth.BluetoothAdapter,
     private val coroutineScope: CoroutineScope
 ) : ExternalDevicesAdapter {
     private val ctx = context.applicationContext
@@ -39,8 +40,8 @@ class AndroidExternalDevicesAdapter(
 
         coroutineScope.launch {
             merge(
-                bluetoothMonitor.onDevicePairedChange,
-                bluetoothMonitor.isBluetoothEnabled
+                bluetoothAdapter.onDevicePairedChange,
+                bluetoothAdapter.isBluetoothEnabled
             ).collectLatest {
                 updatePairedBluetoothDevices()
             }

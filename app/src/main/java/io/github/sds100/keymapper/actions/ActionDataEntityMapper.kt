@@ -517,7 +517,6 @@ object ActionDataEntityMapper {
         SystemActionId.SHOW_KEYBOARD to "show_keyboard",
         SystemActionId.HIDE_KEYBOARD to "hide_keyboard",
         SystemActionId.SHOW_KEYBOARD_PICKER to "show_keyboard_picker",
-        SystemActionId.SHOW_KEYBOARD_PICKER_ROOT to "show_keyboard_picker_root",
         SystemActionId.TEXT_CUT to "text_cut",
         SystemActionId.TEXT_COPY to "text_copy",
         SystemActionId.TEXT_PASTE to "text_paste",

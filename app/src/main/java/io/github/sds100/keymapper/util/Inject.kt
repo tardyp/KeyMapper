@@ -1,6 +1,5 @@
 package io.github.sds100.keymapper.util
 
-import android.app.Service
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
 import io.github.sds100.keymapper.KeyMapperApp
@@ -23,8 +22,8 @@ import io.github.sds100.keymapper.system.accessibility.MyAccessibilityService
 import io.github.sds100.keymapper.system.apps.ChooseAppShortcutViewModel
 import io.github.sds100.keymapper.system.apps.ChooseAppViewModel
 import io.github.sds100.keymapper.system.apps.DisplayAppShortcutsUseCaseImpl
-import io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceUseCaseImpl
-import io.github.sds100.keymapper.system.devices.ChooseBluetoothDeviceViewModel
+import io.github.sds100.keymapper.system.bluetooth.ChooseBluetoothDeviceUseCaseImpl
+import io.github.sds100.keymapper.system.bluetooth.ChooseBluetoothDeviceViewModel
 import io.github.sds100.keymapper.system.files.OnlineFileViewModel
 import io.github.sds100.keymapper.system.intents.ConfigIntentViewModel
 import io.github.sds100.keymapper.system.keyevents.ChooseKeyCodeViewModel

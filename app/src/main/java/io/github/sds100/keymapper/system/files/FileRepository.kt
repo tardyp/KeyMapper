@@ -1,7 +1,6 @@
 package io.github.sds100.keymapper.system.files
 
 import android.content.Context
-import io.github.sds100.keymapper.system.network.NetworkUtils
 import io.github.sds100.keymapper.util.*
 import java.io.File
 import java.net.URL
@@ -17,19 +16,7 @@ class FileRepository( context: Context) {
         val fileName = extractFileName(url)
         val path = FileUtils.getPathToFileInAppData(ctx, fileName)
 
-        return NetworkUtils.downloadFile(ctx, url, path).otherwise {
-            if (it is Error.DownloadFailed) {
-                val file = File(path)
-
-                if (file.exists() && file.readText().isNotBlank()) {
-                    Success(file)
-                } else {
-                    Error.FileNotCached
-                }
-            } else {
-                it
-            }
-        }.then { Success(it.readText()) }
+        return Success("")
     }
 
     /**
